@@ -23,6 +23,11 @@ export default function ProjectPhotos() {
     queryKey: ["/api/projects", projectId, "photos"],
   });
 
+  const { data: annotations = [] } = useQuery<any[]>({
+    queryKey: ["/api/photos", selectedPhoto?.id, "annotations"],
+    enabled: !!selectedPhoto,
+  });
+
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       // For now, create blob URL - TODO: Add proper cloud storage
@@ -66,10 +71,11 @@ export default function ProjectPhotos() {
         });
       }
 
-      toast({ title: "Annotations saved successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/photos", selectedPhoto.id, "annotations"] });
+      toast({ title: `${annotations.length} annotation${annotations.length === 1 ? '' : 's'} saved successfully` });
       setSelectedPhoto(null);
     } catch (error: any) {
-      toast({ title: "Failed to save annotations", variant: "destructive" });
+      toast({ title: "Failed to save annotations", variant: "destructive", description: error.message });
     }
   };
 
@@ -147,7 +153,7 @@ export default function ProjectPhotos() {
             <PhotoAnnotationEditor
               photoUrl={selectedPhoto.url}
               photoId={selectedPhoto.id}
-              existingAnnotations={[]}
+              existingAnnotations={annotations}
               onSave={handleSaveAnnotations}
             />
           </DialogContent>

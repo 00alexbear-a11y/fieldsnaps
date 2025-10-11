@@ -826,7 +826,7 @@ export function PhotoAnnotationEditor({
       if (tempAnnotation.type === "pen") {
         // For pen, check if we have enough points (meaningful stroke)
         const points = tempAnnotation.position.points || [];
-        shouldCreate = points.length > 3; // At least 3 points to be meaningful
+        shouldCreate = points.length >= 2; // At least 2 points to create a line
       } else {
         // For other tools, check drag distance
         const dragDistance = Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2));
