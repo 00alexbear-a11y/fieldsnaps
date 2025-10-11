@@ -1,12 +1,36 @@
-import { pgTable, varchar, text, timestamp, jsonb, integer } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, jsonb, integer, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { sql } from "drizzle-orm";
+
+// Session storage table (required for Replit Auth)
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Users table (for authentication)
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 // Projects table - simplified for photo organization
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
+  userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -48,6 +72,8 @@ export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 
 // TypeScript types
+export type User = typeof users.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;

@@ -58,6 +58,22 @@ A Progressive Web App designed like Apple would - extremely simple, offline-reli
 
 ---
 
+## 🔐 Optional Authentication
+
+### Design Philosophy
+Authentication is **completely optional** to preserve offline-first functionality:
+- **No Auth Required** - App works fully offline without login
+- **Optional Cloud Sync** - Sign in to sync photos across devices  
+- **Replit Auth** - Simple OAuth with Google, GitHub, email
+- **User-Owned Data** - Photos stored locally, synced when authenticated
+
+### Implementation
+- Replit Auth with OpenID Connect
+- PostgreSQL session storage
+- useAuth() hook for frontend state
+- isAuthenticated middleware for protected routes
+- Avatar with profile image support
+
 ## 📸 Intelligent Photo System
 
 ### Quality Control
