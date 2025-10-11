@@ -7,12 +7,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
+import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import type { Photo, Project } from "../../../shared/schema";
 
 export default function ProjectPhotos() {
   const { id: projectId } = useParams();
   const [, setLocation] = useLocation();
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -38,6 +40,22 @@ export default function ProjectPhotos() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "photos"] });
       toast({ title: "Photo uploaded successfully" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (photoId: string) => {
+      await apiRequest("DELETE", `/api/photos/${photoId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "photos"] });
+      toast({ title: "Photo deleted successfully" });
+    },
+    onError: () => {
+      toast({ 
+        title: "Failed to delete photo", 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -129,11 +147,11 @@ export default function ProjectPhotos() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {photos.map((photo) => (
+            {photos.map((photo, index) => (
               <div
                 key={photo.id}
-                className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2"
-                onClick={() => setSelectedPhoto(photo)}
+                className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback"
+                onClick={() => setViewerPhotoIndex(index)}
                 data-testid={`photo-${photo.id}`}
               >
                 <img
@@ -147,6 +165,28 @@ export default function ProjectPhotos() {
         )}
       </main>
 
+      {/* Gesture-enabled Photo Viewer */}
+      {viewerPhotoIndex !== null && (
+        <PhotoGestureViewer
+          photos={photos}
+          initialIndex={viewerPhotoIndex}
+          onClose={() => setViewerPhotoIndex(null)}
+          onDelete={(photoId) => deleteMutation.mutate(photoId)}
+          onShare={(photo) => {
+            if (navigator.clipboard && window.isSecureContext) {
+              toast({ title: "Photo URL copied to clipboard" });
+            } else if (!navigator.share) {
+              toast({ 
+                title: "Sharing not available",
+                description: "Please use a secure connection (HTTPS) to share photos",
+                variant: "destructive"
+              });
+            }
+          }}
+        />
+      )}
+
+      {/* Annotation Editor Dialog (can be accessed via long-press in future) */}
       {selectedPhoto && (
         <Dialog open={true} onOpenChange={() => setSelectedPhoto(null)}>
           <DialogContent className="max-w-5xl max-h-[90vh] p-0">

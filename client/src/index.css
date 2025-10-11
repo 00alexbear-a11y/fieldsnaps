@@ -91,6 +91,13 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
+  /* Animation timing - Apple-inspired smooth 0.3s easing */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
 
   /* Fallback for older browsers */
@@ -324,5 +331,74 @@
   .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
+  }
+
+  /* Smooth animation utilities for Apple-like transitions */
+  .animate-smooth {
+    transition: all var(--transition-normal);
+  }
+
+  .animate-fast {
+    transition: all var(--transition-fast);
+  }
+
+  .animate-slow {
+    transition: all var(--transition-slow);
+  }
+
+  .animate-scale-in {
+    animation: scaleIn var(--transition-normal) var(--ease-out-expo);
+  }
+
+  .animate-slide-up {
+    animation: slideUp var(--transition-normal) var(--ease-out-expo);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn var(--transition-fast);
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Touch gesture feedback */
+  .touch-feedback {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .touch-feedback:active {
+    transform: scale(0.98);
+    transition: transform 100ms ease-out;
   }
 }
