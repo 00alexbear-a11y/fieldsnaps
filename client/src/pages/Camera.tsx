@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Camera as CameraIcon, X, Check, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { compressPhoto, type QualityPreset } from '@/lib/photoCompression';
+import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
+import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
 import {
@@ -118,20 +119,22 @@ export default function Camera() {
         );
       });
 
-      // Compress photo
-      const compressionResult = await compressPhoto(blob, selectedQuality);
+      // Compress photo using Web Worker (non-blocking)
+      const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
-      // Save to IndexedDB (returns saved photo with generated ID)
+      // Save to IndexedDB (blob only - URL created on-demand when loading)
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
-        url: compressionResult.url,
         quality: selectedQuality,
         caption: '',
         timestamp: Date.now(),
         syncStatus: 'pending',
         retryCount: 0,
       });
+
+      // Revoke temporary URL from worker (not stored in IndexedDB)
+      URL.revokeObjectURL(compressionResult.url);
 
       // Queue for sync
       await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
