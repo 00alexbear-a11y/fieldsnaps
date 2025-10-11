@@ -9,7 +9,7 @@ export interface LocalPhoto {
   id: string;
   projectId: string;
   blob: Blob;
-  url: string; // local blob URL
+  // url is NOT stored - create on-demand from blob using createPhotoUrl()
   caption?: string;
   quality: 'standard' | 'detailed' | 'quick';
   timestamp: number;
@@ -23,6 +23,14 @@ export interface LocalPhoto {
   retryCount: number;
   createdAt: number;
   updatedAt: number;
+}
+
+/**
+ * Create a temporary object URL from a LocalPhoto's blob.
+ * IMPORTANT: Caller must revoke the URL when done: URL.revokeObjectURL(url)
+ */
+export function createPhotoUrl(photo: LocalPhoto): string {
+  return URL.createObjectURL(photo.blob);
 }
 
 export interface LocalProject {

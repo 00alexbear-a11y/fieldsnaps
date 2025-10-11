@@ -98,11 +98,30 @@ New users see a welcoming 3-step guide on first visit:
 - **Smooth transitions** - 300ms fade-in when images load
 - **Memory efficient** - Disconnects observer after loading
 
+### Web Workers for Compression
+- **Non-blocking UI** - Compression runs in separate thread
+- **OffscreenCanvas** - High-performance canvas operations in worker
+- **Responsive capture** - UI stays fluid during compression
+- **Worker lifecycle** - Lazy initialization and proper cleanup
+- **Type-safe** - Full TypeScript support with Promise-based API
+
+### Architecture
+- **Worker**: `photoCompression.worker.ts` - Handles CPU-intensive compression
+- **Manager**: `photoCompressionWorker.ts` - Manages worker lifecycle and communication
+- **Camera Integration** - Seamlessly uses worker for all photo captures
+
+### Known Limitations & Future Improvements
+- **Object URLs**: Currently persist for session lifetime (cleaned on page unload)
+- **Future**: Create URLs on-demand from blobs for better memory management
+- **Tradeoff**: Acceptable for construction use (finite sessions, occasional captures)
+
 ### Benefits
-- Faster initial page load
+- Faster initial page load (lazy loading)
 - Reduced bandwidth usage on job sites
 - Better performance with large photo collections
 - Smooth scroll experience
+- No UI freezing during compression
+- Responsive camera capture even on slow devices
 
 ## 📸 Intelligent Photo System
 
