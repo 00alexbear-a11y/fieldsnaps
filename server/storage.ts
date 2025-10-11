@@ -1,7 +1,8 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments, users } from "../shared/schema";
+import { projects, photos, photoAnnotations, comments, users, credentials } from "../shared/schema";
 import type {
   User, UpsertUser,
+  Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment
 } from "../shared/schema";
@@ -11,6 +12,12 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  
+  // WebAuthn Credentials
+  getUserCredentials(userId: string): Promise<Credential[]>;
+  getCredentialByCredentialId(credentialId: string): Promise<Credential | undefined>;
+  createCredential(data: InsertCredential): Promise<Credential>;
+  updateCredentialCounter(id: string, counter: number): Promise<void>;
   
   // Projects
   getProjects(): Promise<Project[]>;
@@ -53,6 +60,25 @@ export class DbStorage implements IStorage {
       })
       .returning();
     return result[0];
+  }
+
+  // WebAuthn Credentials
+  async getUserCredentials(userId: string): Promise<Credential[]> {
+    return await db.select().from(credentials).where(eq(credentials.userId, userId));
+  }
+
+  async getCredentialByCredentialId(credentialId: string): Promise<Credential | undefined> {
+    const result = await db.select().from(credentials).where(eq(credentials.credentialId, credentialId));
+    return result[0];
+  }
+
+  async createCredential(data: InsertCredential): Promise<Credential> {
+    const result = await db.insert(credentials).values(data).returning();
+    return result[0];
+  }
+
+  async updateCredentialCounter(id: string, counter: number): Promise<void> {
+    await db.update(credentials).set({ counter }).where(eq(credentials.id, id));
   }
 
   // Projects

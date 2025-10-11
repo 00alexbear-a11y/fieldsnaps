@@ -25,6 +25,17 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// WebAuthn credentials table (for biometric authentication)
+export const credentials = pgTable("credentials", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  credentialId: text("credential_id").notNull().unique(), // Base64url encoded credential ID
+  publicKey: text("public_key").notNull(), // Base64url encoded public key
+  counter: integer("counter").notNull().default(0), // For clone detection
+  transports: text("transports").array().$type<string[]>(), // ['internal', 'usb', 'nfc', 'ble']
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Projects table - simplified for photo organization
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -70,10 +81,13 @@ export const insertProjectSchema = createInsertSchema(projects).omit({ id: true,
 export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
+export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
+export type Credential = typeof credentials.$inferSelect;
+export type InsertCredential = z.infer<typeof insertCredentialSchema>;
 export type Project = typeof projects.$inferSelect;
 export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
