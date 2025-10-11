@@ -1,12 +1,17 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments } from "../shared/schema";
+import { projects, photos, photoAnnotations, comments, users } from "../shared/schema";
 import type {
+  User, UpsertUser,
   Project, Photo, PhotoAnnotation, Comment,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment
 } from "../shared/schema";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
+  // User operations (required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
   // Projects
   getProjects(): Promise<Project[]>;
   getProject(id: string): Promise<Project | undefined>;
@@ -29,6 +34,27 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
+  // User operations (required for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const result = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result[0];
+  }
+
   // Projects
   async getProjects(): Promise<Project[]> {
     return await db.select().from(projects).orderBy(projects.createdAt);

@@ -1,12 +1,15 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import { syncManager } from '@/lib/syncManager';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Settings() {
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [isDark, setIsDark] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncStatus, setSyncStatus] = useState<{
@@ -96,6 +99,70 @@ export default function Settings() {
             data-testid="switch-dark-mode"
           />
         </label>
+      </Card>
+
+      {/* Account */}
+      <Card className="p-4 space-y-4">
+        <h2 className="text-lg font-semibold">Account</h2>
+        
+        {isLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </div>
+        ) : (isAuthenticated && user) ? (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <Avatar className="w-12 h-12" data-testid="avatar-user">
+                <AvatarImage 
+                  src={user?.profileImageUrl || undefined} 
+                  alt={user?.email || 'User'} 
+                  className="object-cover"
+                />
+                <AvatarFallback>
+                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate" data-testid="text-user-name">
+                  {user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user?.email || 'User'}
+                </p>
+                {user?.email && (
+                  <p className="text-sm text-muted-foreground truncate" data-testid="text-user-email">
+                    {user.email}
+                  </p>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="default"
+              className="w-full"
+              onClick={() => window.location.href = '/api/logout'}
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Sign in to sync your photos across devices
+            </p>
+            <Button
+              variant="default"
+              size="default"
+              className="w-full"
+              onClick={() => window.location.href = '/api/login'}
+              data-testid="button-login"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Sync Status */}
