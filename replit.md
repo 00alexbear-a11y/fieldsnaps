@@ -74,6 +74,21 @@ Authentication is **completely optional** to preserve offline-first functionalit
 - isAuthenticated middleware for protected routes
 - Avatar with profile image support
 
+## 👋 3-Step Onboarding Flow
+
+### User Experience
+New users see a welcoming 3-step guide on first visit:
+1. **Welcome** - Introduce the app and offline-first capability
+2. **Photo Quality** - Explain 3 compression levels (Quick/Standard/Detailed)
+3. **Offline Design** - Highlight local-first sync when online
+
+### Implementation
+- Onboarding component with smooth transitions
+- localStorage flag (onboarding_complete) to show once
+- Skippable at any step
+- Step indicators for progress
+- Apple-inspired design with icons and clear messaging
+
 ## 📸 Intelligent Photo System
 
 ### Quality Control
