@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
+import LazyImage from "@/components/LazyImage";
 import type { Photo, Project } from "../../../shared/schema";
 
 export default function ProjectPhotos() {
@@ -154,7 +155,7 @@ export default function ProjectPhotos() {
                 onClick={() => setViewerPhotoIndex(index)}
                 data-testid={`photo-${photo.id}`}
               >
-                <img
+                <LazyImage
                   src={photo.url}
                   alt={photo.caption || "Photo"}
                   className="w-full h-full object-cover"

@@ -89,6 +89,21 @@ New users see a welcoming 3-step guide on first visit:
 - Step indicators for progress
 - Apple-inspired design with icons and clear messaging
 
+## ⚡ Performance Optimizations
+
+### Lazy Loading
+- **Intersection Observer API** - Loads photos only when visible
+- **50px rootMargin** - Pre-loads images slightly before they enter viewport
+- **Skeleton loading** - Animated pulse placeholder during load
+- **Smooth transitions** - 300ms fade-in when images load
+- **Memory efficient** - Disconnects observer after loading
+
+### Benefits
+- Faster initial page load
+- Reduced bandwidth usage on job sites
+- Better performance with large photo collections
+- Smooth scroll experience
+
 ## 📸 Intelligent Photo System
 
 ### Quality Control
