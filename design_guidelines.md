@@ -1,147 +1,179 @@
-# Photo PWA Design Guidelines
+# Construction Photo Documentation PWA Design Guidelines
 
 ## Design Approach
-**Hybrid Approach**: Material Design foundation with inspiration from modern camera applications (Instagram Camera, iOS Camera, Google Camera). Focus on utility and performance while maintaining visual appeal for photo-centric experience.
+**Apple HIG Reference-Based**: Pure iOS design language prioritizing clarity, deference, and depth. Content-first philosophy with generous whitespace and minimal chrome. Optimized for construction workers using glove-friendly touch targets and instant visual feedback.
 
 **Core Principles**:
-- Mobile-first, touch-optimized interface
-- Minimal UI during capture for distraction-free photography
-- Dark-dominant theme to reduce glare and focus on photos
-- Instant feedback for all interactions
+- Content above interface
+- Clarity through hierarchy and motion
+- Depth through layering and translucency
+- Effortless interaction with minimal cognitive load
 
 ## Color Palette
 
-**Dark Mode Primary** (Default):
-- Background: 220 20% 12% (deep slate)
-- Surface: 220 18% 16% (elevated slate)
-- Primary: 210 100% 60% (vibrant blue)
-- Accent: 280 70% 65% (soft purple)
-- Text Primary: 0 0% 98%
-- Text Secondary: 220 10% 70%
+**Light Mode Primary**:
+- Background: 0 0% 100% (pure white)
+- Surface: 0 0% 97% (subtle gray for cards)
+- System Blue: 211 100% 50% (#007AFF)
+- Success Green: 145 63% 49% (#34C759)
+- Warning Amber: 28 100% 50% (#FF9500)
+- Warm Gray: 240 2% 56% (#8E8E93)
 
-**Light Mode**:
-- Background: 0 0% 98%
-- Surface: 0 0% 100%
-- Primary: 210 100% 50%
-- Text Primary: 220 20% 12%
+**Text Hierarchy**:
+- Primary: 0 0% 0% (true black)
+- Secondary: 240 2% 24% (#3C3C43)
+- Tertiary: 240 2% 56% (#8E8E93)
 
 **Functional Colors**:
-- Success (capture): 142 70% 55%
-- Danger (delete): 0 70% 60%
-- Warning: 45 90% 55%
+- Destructive: 0 100% 59% (iOS red)
+- Disabled: 240 2% 56% with 40% opacity
 
 ## Typography
 
 **Font Stack**:
-- Primary: 'Inter', system-ui, sans-serif (via Google Fonts)
-- Monospace: 'JetBrains Mono' for technical info (file sizes, timestamps)
+- Primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif
+- Monospace: 'SF Mono', 'Monaco', monospace (timestamps, measurements)
 
-**Scale**:
-- Hero/Display: text-4xl to text-6xl, font-bold (camera mode titles)
-- Headers: text-2xl to text-3xl, font-semibold
-- Body: text-base, font-normal
-- Small/Meta: text-sm, font-medium
-- Micro: text-xs (timestamps, file info)
+**Scale** (iOS-aligned):
+- Large Title: text-[34px] leading-[41px] font-bold (page headers)
+- Title 1: text-[28px] leading-[34px] font-bold
+- Title 2: text-[22px] leading-[28px] font-bold
+- Title 3: text-[20px] leading-[25px] font-semibold
+- Headline: text-[17px] leading-[22px] font-semibold
+- Body: text-[17px] leading-[22px] font-normal
+- Callout: text-[16px] leading-[21px] font-normal
+- Subheadline: text-[15px] leading-[20px] font-normal
+- Footnote: text-[13px] leading-[18px] font-normal
+- Caption: text-[12px] leading-[16px] font-normal
 
 ## Layout System
 
-**Spacing Primitives**: Tailwind units of 2, 4, 6, 8, 12, 16
-- Tight spacing: p-2, gap-2 (camera controls)
-- Standard: p-4, gap-4 (cards, buttons)
-- Generous: p-8, gap-8 (page sections)
-- Extra: p-12, p-16 (hero, feature areas)
+**8px Grid System**: All spacing uses multiples of 8px
+- Micro: 8px (element internal padding)
+- Tight: 16px (related elements)
+- Standard: 24px (section padding)
+- Generous: 32px (major sections)
+- Extra: 48px (hero spacing)
+
+**Safe Areas**:
+- Top inset: 44px (status bar + navigation)
+- Bottom inset: 83px (tab bar + safe area)
+- Horizontal padding: 16px (page margins)
 
 **Grid System**:
-- Camera view: Full viewport (h-screen)
-- Gallery: grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 with gap-2
-- Container max-width: max-w-7xl mx-auto
+- Photo Grid: 2 columns mobile, 3 tablet, 4 desktop with 8px gap
+- Container: max-w-screen-xl with 16px horizontal padding
 
 ## Component Library
 
 ### Camera Interface
-- **Viewfinder**: Full-screen video preview with minimal overlay
-- **Shutter Button**: 80px circular button, centered bottom, elevated with shadow-2xl, subtle scale animation on tap
-- **Control Bar**: Bottom sheet overlay (bg-black/80 backdrop-blur-md), height 24, contains flip camera, flash toggle
-- **Mode Indicator**: Top-left pill showing current mode (Photo/Video), subtle badge
+- **Viewfinder**: Full viewport with subtle corner guides (hairline borders in warm gray)
+- **Shutter Button**: 70px white circle with 4px system blue ring, centered 24px from bottom, smooth scale to 0.92 on press
+- **Control Strip**: Bottom toolbar (h-20) with frosted glass effect (bg-white/80 backdrop-blur-xl), contains flash, grid, timer toggles
+- **Mode Selector**: Segmented control at top (Photo/Video/Pano), 44px height, system blue active state
+- **Level Indicator**: Minimal yellow crosshair when device tilted
 
-### Gallery View
-- **Photo Grid**: Masonry-style grid, aspect-square cards with rounded-lg, overflow-hidden
-- **Photo Card**: Hover/tap state with opacity-90, subtle scale transform
-- **Empty State**: Centered icon (camera outline) with text-lg message, muted colors
-- **Photo Actions**: Floating action menu (share, delete, download) appearing on long-press/click
+### Projects View
+- **Project Cards**: White cards with 8px radius, 1px border (black/5%), gentle shadow (0 2px 8px rgba(0,0,0,0.1))
+- **Card Header**: Project name (Headline weight), date range (Subheadline, secondary color), 16px padding
+- **Photo Count Badge**: System blue pill with white text, positioned top-right
+- **Thumbnail Grid**: 3-photo preview in card, aspect-square, 4px radius
+- **Empty State**: Construction hat icon (SF Symbol style), "Start Your First Project" in secondary text
 
 ### Navigation
-- **App Bar**: Fixed top, h-16, backdrop-blur-md bg-slate-900/80, contains app title and settings icon
-- **Tab Bar**: Fixed bottom (when not in camera mode), h-16, two tabs: Camera & Gallery, icon + label
+- **Tab Bar**: Fixed bottom, 83px total height (49px bar + 34px safe area), frosted glass (bg-white/80 backdrop-blur-xl), hairline top border
+- **Tab Items**: Icon + label stack, system blue when active, warm gray inactive, 44px touch target
+- **Page Headers**: Large Title (34px) with 16px top padding, fades to inline on scroll
+
+### Photo Detail View
+- **Full Screen Display**: Edge-to-edge photo with pinch-zoom, double-tap 2x zoom
+- **Info Overlay**: Bottom sheet (rounded-t-3xl), displays project, timestamp, GPS, notes
+- **Action Bar**: Top bar with Share (system blue), Delete (destructive red), Edit icons, 44px touch targets
+- **Annotation Tools**: Markup toolbar slides up from bottom, contains pen, text, arrow, measure tools
+
+### Settings Panel
+- **Grouped List Style**: iOS Settings aesthetic with section headers (Footnote, uppercase, warm gray)
+- **Toggle Rows**: 44px height, label left, system switch right, divider lines (black/10%)
+- **Navigation Rows**: Chevron right indicator, 44px touch target
+- **Quality Picker**: Inline segmented control (High/Medium/Low) with system blue selection
 
 ### Forms & Inputs
-- **Settings Panel**: Slide-in panel from right, w-80, dark surface
-- **Toggle Switches**: Material-style switches for flash, grid overlay, quality settings
-- **Select Dropdowns**: Custom styled with rounded-lg, border-slate-700
-
-### Overlays
-- **Photo Preview Modal**: Full-screen overlay, backdrop-blur-xl, centered image with pinch-zoom support
-- **Delete Confirmation**: Bottom sheet modal, rounded-t-3xl, red accent for destructive action
-- **Share Sheet**: Native-style bottom sheet with sharing options grid
+- **Text Fields**: 44px height, 8px radius, 1px border (warm gray), focus state adds system blue border
+- **Date Picker**: iOS-native wheel picker, frosted bottom sheet presentation
+- **Photo Picker**: Grid selector with multi-select checkmarks (system blue circles)
+- **Notes Field**: Expandable text area, 8px radius, same border treatment
 
 ### Buttons
-- **Primary (Capture)**: 80px circle, bg-primary with ring-4 ring-primary/30, shadow-2xl
-- **Secondary (Controls)**: 48px circles, bg-white/10 backdrop-blur, border border-white/20
-- **Icon Buttons**: 40px touch target, p-2, rounded-full, hover:bg-white/10
-- **Text Buttons**: Minimal, text-primary, font-medium, underline-offset-4 hover:underline
+- **Primary**: System blue fill, white text, 44px height, 8px radius, font-semibold
+- **Secondary**: White fill, system blue text, 1px system blue border, same dimensions
+- **Destructive**: Destructive red with white text
+- **Borderless**: System blue text only, 44px touch target, no background
+- **Icon Buttons**: 44px circular touch target, warm gray icon, system blue on active
+
+### Overlays
+- **Action Sheets**: Bottom sheet with rounded-t-3xl, options list with 44px rows, cancel button separated
+- **Alerts**: Centered modal, 270px width, 8px radius, title (Headline), message (Body), button stack
+- **Loading**: System blue activity indicator, centered on frosted overlay
 
 ## Animations
 
-**Essential Only**:
-- Shutter button: Scale 0.95 on active (150ms ease-out)
-- Capture flash: White overlay fade (200ms) simulating camera flash
-- Photo grid: Stagger fade-in (100ms delay per item)
-- Modal transitions: Slide up/fade (250ms ease-in-out)
-- NO continuous animations, NO decorative effects
+**iOS-Standard Easing** (cubic-bezier(0.4, 0.0, 0.2, 1)):
+- Shutter capture: Scale 0.92 with spring bounce (0.3s)
+- Modal present: Slide up + fade (0.35s)
+- Tab switch: Crossfade content (0.25s)
+- Card tap: Gentle scale 0.98 (0.15s)
+- Page transitions: Slide horizontal 100% (0.35s)
+- Pull to refresh: Elastic resistance with spinner reveal
 
-## Images
+## Images & Icons
 
-**Hero Section**: NOT APPLICABLE - Camera app launches directly to camera view
+**Icons**: SF Symbols aesthetic via Heroicons
+- Camera, folder, gear, share, trash, pencil, grid, flash, timer
+- 24px base size, scale to 28px for tab bar
+- Stroke width: 2px (regular weight)
 
-**Gallery Images**:
-- User-captured photos displayed in grid
-- Thumbnail size: 300x300px (cropped to square)
-- Full resolution on preview modal
-- Lazy loading with blur-up placeholder effect
+**Photos**:
+- Captured images: Full resolution stored, 600px thumbnails generated
+- Grid display: aspect-square crops, 4px radius
+- Detail view: Original aspect ratio, edge-to-edge presentation
+- Blur placeholders: 20px blur with gradual focus load
 
 **Empty States**:
-- Camera icon SVG (Heroicons camera-outline) 
-- Gallery empty state: Image stack icon with "No photos yet" message
-
-**Icon Library**: Heroicons (outline style) via CDN for all UI icons
+- Construction imagery: Hard hat icon, blueprint icon, camera with plus
+- Illustrations use system blue with warm gray accents
 
 ## Responsive Behavior
 
-**Mobile (default)**:
-- Camera: Full viewport, portrait orientation lock encouraged
-- Gallery: 2-column grid, gap-2
-- Touch targets: Minimum 44px
+**Mobile (Default)**:
+- Single column layouts
+- Full-width cards with 16px margins
+- 2-column photo grids
+- Portrait camera lock
 
-**Tablet (md:)**:
-- Gallery: 3-column grid, gap-3
-- Settings panel: Wider (w-96)
+**Tablet (md: 768px)**:
+- 3-column photo grids
+- Side-by-side project list + detail (iPad split view)
+- Wider modals (420px)
 
-**Desktop (lg:)**:
-- Gallery: 4-column grid, gap-4
-- Optional: Side-by-side camera + gallery view
-- Mouse hover states enabled
+**Desktop (lg: 1024px)**:
+- 4-column photo grids  
+- Three-column layout: projects sidebar + detail + info panel
+- Hover states: Subtle card lift, cursor pointer
 
-## PWA-Specific Design
+## PWA Features
 
-- **Install Prompt**: Subtle banner at top, dismissible, reappears after 3 days
-- **Splash Screen**: Dark background with app icon centered, app name below
-- **App Icon**: Camera lens graphic, vibrant blue gradient (210 100% 60% to 280 70% 65%)
-- **Offline Indicator**: Toast notification at bottom when network unavailable
+- **Install Banner**: Top banner with system blue "Install" button, dismiss icon, reappears weekly
+- **Splash Screen**: Pure white with app icon (system blue construction camera) centered, app name below in black
+- **App Icon**: Minimal construction camera symbol in system blue, white background, iOS-style mask
+- **Offline Mode**: Amber banner notification, cached projects accessible, queue captures for upload
+- **Haptics**: Subtle vibration on capture, delete confirmation, project creation
 
 ## Accessibility
 
-- Focus indicators: ring-2 ring-primary ring-offset-2 ring-offset-slate-900
-- Reduced motion: Disable all animations for prefers-reduced-motion users
-- ARIA labels: All icon-only buttons have descriptive labels
-- Color contrast: WCAG AAA for all text on backgrounds
-- Keyboard navigation: Full camera control via spacebar (capture), arrow keys (mode switch)
+- **Focus Rings**: 2px system blue outline with 2px white offset
+- **Reduced Motion**: Replace all animations with instant state changes, crossfade only
+- **VoiceOver**: Descriptive labels for all images ("Site photo, Foundation pour, June 15")
+- **Dynamic Type**: All text scales with iOS text size preferences
+- **Color Contrast**: WCAG AAA compliance, minimum 7:1 for body text
+- **Glove Mode**: All targets 44px minimum, increased spacing in camera controls (56px shutter button)
+- **Keyboard Nav**: Full project navigation via Tab, Space to capture, Enter to confirm
