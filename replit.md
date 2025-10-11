@@ -100,20 +100,29 @@ New users see a welcoming 3-step guide on first visit:
 
 ### Web Workers for Compression
 - **Non-blocking UI** - Compression runs in separate thread
+- **Worker-Safe APIs** - Uses `createImageBitmap()` instead of DOM-dependent `new Image()`
 - **OffscreenCanvas** - High-performance canvas operations in worker
+- **ImageBitmap** - Worker-compatible image format for canvas operations
 - **Responsive capture** - UI stays fluid during compression
 - **Worker lifecycle** - Lazy initialization and proper cleanup
 - **Type-safe** - Full TypeScript support with Promise-based API
 
 ### Architecture
 - **Worker**: `photoCompression.worker.ts` - Handles CPU-intensive compression
+  - Uses `createImageBitmap(blob)` for worker-safe image loading
+  - All compression with OffscreenCanvas and ImageBitmap
+  - No DOM dependencies (100% worker-compatible)
 - **Manager**: `photoCompressionWorker.ts` - Manages worker lifecycle and communication
 - **Camera Integration** - Seamlessly uses worker for all photo captures
 
-### Known Limitations & Future Improvements
-- **Object URLs**: Currently persist for session lifetime (cleaned on page unload)
-- **Future**: Create URLs on-demand from blobs for better memory management
-- **Tradeoff**: Acceptable for construction use (finite sessions, occasional captures)
+### Complete URL Lifecycle (Zero Memory Leaks)
+1. **Worker Processing**: Loads blob with `createImageBitmap()`, compresses with OffscreenCanvas
+2. **Temporary URLs**: Manager creates object URLs only for preview/debugging
+3. **IndexedDB Storage**: Camera saves blobs (not URLs) to IndexedDB
+4. **URL Revocation**: Camera immediately revokes temporary URLs after save
+5. **Server Upload**: SyncManager uploads blobs, receives server URLs
+6. **Display**: Photos displayed using server URLs from database
+7. **Memory Safety**: No lingering object URLs, blobs managed by IndexedDB
 
 ### Benefits
 - Faster initial page load (lazy loading)
