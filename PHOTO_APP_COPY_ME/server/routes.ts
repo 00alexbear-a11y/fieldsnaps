@@ -1,9 +1,8 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema } from "../shared/schema";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export function registerRoutes(app: Express) {
   // Projects
   app.get("/api/projects", async (req, res) => {
     try {
@@ -128,7 +127,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ error: error.message });
     }
   });
-
-  const httpServer = createServer(app);
-  return httpServer;
 }
