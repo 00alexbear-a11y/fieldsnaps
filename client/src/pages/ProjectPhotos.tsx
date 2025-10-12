@@ -352,29 +352,6 @@ export default function ProjectPhotos() {
               >
                 <SettingsIcon className="w-5 h-5" />
               </Button>
-              <Button
-                onClick={() => setLocation(`/camera?projectId=${projectId}`)}
-                data-testid="button-open-camera"
-                size="icon"
-                className="flex-shrink-0"
-              >
-                <Camera className="w-5 h-5" />
-              </Button>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="photo-upload"
-              />
-              <label htmlFor="photo-upload">
-                <Button asChild disabled={uploadMutation.isPending} variant="outline" size="icon" className="flex-shrink-0">
-                  <span>
-                    <Camera className="w-5 h-5" />
-                  </span>
-                </Button>
-              </label>
               {photos.length > 0 && (
                 <Button
                   onClick={toggleSelectMode}
@@ -408,7 +385,10 @@ export default function ProjectPhotos() {
           <div className="text-center py-12">
             <Camera className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-semibold mb-2">No photos yet</h2>
-            <p className="text-muted-foreground mb-6">Add your first photo to get started</p>
+            <p className="text-muted-foreground mb-4">Tap the camera button below to get started</p>
+            <label htmlFor="photo-upload-fab" className="text-sm text-primary hover:underline cursor-pointer">
+              or choose from library
+            </label>
           </div>
         ) : (
           <div className="space-y-8">
@@ -745,6 +725,28 @@ export default function ProjectPhotos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Floating Action Buttons (FABs) - Camera & Upload */}
+      {!isSelectMode && (
+        <>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="photo-upload-fab"
+          />
+          {/* Main FAB - Camera */}
+          <Button
+            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+            data-testid="button-add-photo-fab"
+            size="lg"
+            className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-xl z-20 hover:scale-110 transition-transform"
+          >
+            <Camera className="w-6 h-6" />
+          </Button>
+        </>
+      )}
     </div>
   );
 }

@@ -17,13 +17,12 @@ import SyncBanner from "./components/SyncBanner";
 
 function AppContent() {
   const [location] = useLocation();
-  const isOnCamera = location.startsWith('/camera');
-  const isOnSharePage = location.startsWith('/share/');
+  const showSyncBanner = location === '/' || location === '/settings';
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Show sync banner on all pages except Camera and Share pages */}
-      {!isOnCamera && !isOnSharePage && <SyncBanner />}
+      {/* Show sync banner only on Projects list and Settings pages */}
+      {showSyncBanner && <SyncBanner />}
       
       <main className="flex-1 overflow-auto pb-16">
         <Switch>
