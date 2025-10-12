@@ -9,6 +9,7 @@ import Projects from "./pages/Projects";
 import ProjectPhotos from "./pages/ProjectPhotos";
 import PhotoEdit from "./pages/PhotoEdit";
 import Settings from "./pages/Settings";
+import ShareView from "./pages/ShareView";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -17,11 +18,12 @@ import SyncBanner from "./components/SyncBanner";
 function AppContent() {
   const [location] = useLocation();
   const isOnCamera = location.startsWith('/camera');
+  const isOnSharePage = location.startsWith('/share/');
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Show sync banner on all pages except Camera */}
-      {!isOnCamera && <SyncBanner />}
+      {/* Show sync banner on all pages except Camera and Share pages */}
+      {!isOnCamera && !isOnSharePage && <SyncBanner />}
       
       <main className="flex-1 overflow-auto pb-16">
         <Switch>
@@ -30,6 +32,7 @@ function AppContent() {
           <Route path="/projects/:id" component={ProjectPhotos} />
           <Route path="/photo/:id/edit" component={PhotoEdit} />
           <Route path="/settings" component={Settings} />
+          <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
       </main>
