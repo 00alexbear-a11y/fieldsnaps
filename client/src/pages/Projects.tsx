@@ -158,8 +158,8 @@ export default function Projects() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between p-4 border-b">
+      {/* Top Navigation Bar - Sticky with glassmorphism */}
+      <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-xl">
         <h1 className="text-2xl font-semibold">Projects</h1>
         <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -251,19 +251,23 @@ export default function Projects() {
             <div className="text-muted-foreground">Loading projects...</div>
           </div>
         ) : projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            <FolderOpen className="w-16 h-16 mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
-            <p className="text-muted-foreground mb-6 text-center">Create your first project to get started</p>
+          <div className="flex flex-col items-center justify-center py-12 px-4 m-3 mt-6">
+            <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center max-w-md">
+              <FolderOpen className="w-16 h-16 mb-4 text-muted-foreground mx-auto" />
+              <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
+              <p className="text-muted-foreground mb-6">Create your first project to get started</p>
+            </div>
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            <Search className="w-16 h-16 mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">No results found</h2>
-            <p className="text-muted-foreground mb-6 text-center">Try a different search term</p>
+          <div className="flex flex-col items-center justify-center py-12 px-4 m-3 mt-6">
+            <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center max-w-md">
+              <Search className="w-16 h-16 mb-4 text-muted-foreground mx-auto" />
+              <h2 className="text-xl font-semibold mb-2">No results found</h2>
+              <p className="text-muted-foreground mb-6">Try a different search term</p>
+            </div>
           </div>
         ) : (
-          <div className="divide-y">
+          <div className="space-y-0.5">
             {filteredProjects.map((project) => {
               const coverPhoto = getCoverPhoto(project);
               const photoCount = photosByProject[project.id]?.length || 0;
