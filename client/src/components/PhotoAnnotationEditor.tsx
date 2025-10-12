@@ -515,6 +515,35 @@ export function PhotoAnnotationEditor({
             if (distance < tolerance) {
               return anno;
             }
+            
+            // For arrows, also check if click is inside the arrowhead triangle
+            if (anno.type === "arrow") {
+              const dx = anno.position.x2 - anno.position.x;
+              const dy = anno.position.y2 - anno.position.y;
+              const length = Math.sqrt(dx * dx + dy * dy);
+              const unitX = dx / length;
+              const unitY = dy / length;
+              
+              const thickerLineWidth = anno.strokeWidth === "M" || anno.strokeWidth === "L" 
+                ? (anno.strokeWidth === "M" ? 3 : 5) * 3
+                : (anno.strokeWidth === "XS" ? 1 : 2) * 1.5;
+              const arrowheadSize = thickerLineWidth * 3;
+              
+              const arrowTipX = anno.position.x2;
+              const arrowTipY = anno.position.y2;
+              const baseX = arrowTipX - unitX * arrowheadSize;
+              const baseY = arrowTipY - unitY * arrowheadSize;
+              const perpX = -unitY;
+              const perpY = unitX;
+              const left1X = baseX + perpX * (arrowheadSize * 0.5);
+              const left1Y = baseY + perpY * (arrowheadSize * 0.5);
+              const right1X = baseX - perpX * (arrowheadSize * 0.5);
+              const right1Y = baseY - perpY * (arrowheadSize * 0.5);
+              
+              if (isPointInTriangle(x, y, arrowTipX, arrowTipY, left1X, left1Y, right1X, right1Y)) {
+                return anno;
+              }
+            }
           }
           break;
         case "circle":
@@ -579,6 +608,19 @@ export function PhotoAnnotationEditor({
     const dx = px - xx;
     const dy = py - yy;
     return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const isPointInTriangle = (
+    px: number, py: number,
+    x1: number, y1: number,
+    x2: number, y2: number,
+    x3: number, y3: number
+  ): boolean => {
+    const areaOrig = Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
+    const area1 = Math.abs((x1 - px) * (y2 - py) - (x2 - px) * (y1 - py));
+    const area2 = Math.abs((x2 - px) * (y3 - py) - (x3 - px) * (y2 - py));
+    const area3 = Math.abs((x3 - px) * (y1 - py) - (x1 - px) * (y3 - py));
+    return Math.abs(areaOrig - (area1 + area2 + area3)) < 1;
   };
 
   const updateCursor = (x: number, y: number) => {

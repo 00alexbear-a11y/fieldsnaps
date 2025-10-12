@@ -356,19 +356,19 @@ export function PhotoGestureViewer({
       {/* Photo Container */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => resetControlsTimer()}
+        className="flex-1 flex items-center justify-center overflow-hidden pointer-events-none"
       >
         <img
           ref={imageRef}
           src={currentPhoto.url}
           alt={currentPhoto.caption || "Photo"}
-          className="max-w-full max-h-full object-contain"
+          className="max-w-full max-h-full object-contain pointer-events-auto"
           draggable={false}
           data-testid="photo-viewer-image"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onClick={() => resetControlsTimer()}
         />
       </div>
 
