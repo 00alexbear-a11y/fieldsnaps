@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Image, Settings, ChevronRight, X } from 'lucide-react';
-import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 interface OnboardingProps {
   onComplete: () => void;

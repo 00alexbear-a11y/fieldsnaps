@@ -7,7 +7,7 @@ import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
-import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import {
   Select,
   SelectContent,
