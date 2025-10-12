@@ -226,7 +226,7 @@ export default function ProjectPhotos() {
     return selectedCount > 0 && selectedCount < datePhotos.length;
   };
 
-  const handleShareSelected = () => {
+  const handleShareSelected = async () => {
     if (selectedPhotoIds.size === 0) {
       toast({
         title: 'No photos selected',
@@ -236,11 +236,43 @@ export default function ProjectPhotos() {
       return;
     }
     
-    // TODO: Implement share functionality in next phase
-    toast({
-      title: 'Share feature coming soon',
-      description: `Ready to share ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'}`,
-    });
+    try {
+      // Create share via API
+      const response = await fetch('/api/shares', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          photoIds: Array.from(selectedPhotoIds),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create share link');
+      }
+
+      const share = await response.json();
+      const shareUrl = `${window.location.origin}/share/${share.token}`;
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareUrl);
+
+      toast({
+        title: 'Link copied!',
+        description: `Share link copied to clipboard. ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'} shared.`,
+      });
+
+      // Exit select mode
+      setIsSelectMode(false);
+      setSelectedPhotoIds(new Set());
+    } catch (error) {
+      console.error('Share error:', error);
+      toast({
+        title: 'Failed to create share link',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleSaveAnnotations = async (annotations: any[]) => {
