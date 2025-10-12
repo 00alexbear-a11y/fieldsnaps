@@ -85,6 +85,7 @@ export function PhotoAnnotationEditor({
   const [cursorStyle, setCursorStyle] = useState<string>("default");
   const [tempAnnotation, setTempAnnotation] = useState<Annotation | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [zoomCirclePos, setZoomCirclePos] = useState<{ x: number; y: number } | null>(null);
   const { toast } = useToast();
 
   const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } => {
@@ -870,6 +871,11 @@ export function PhotoAnnotationEditor({
         },
       };
       setTempAnnotation(newAnnotation);
+      
+      // Show zoom circle when creating arrows
+      if (tool === "arrow") {
+        setZoomCirclePos({ x, y });
+      }
     }
   };
 
@@ -907,6 +913,7 @@ export function PhotoAnnotationEditor({
       setIsCreating(false);
       setIsDrawing(false);
       setStartPos(null);
+      setZoomCirclePos(null);
     }
   };
 
@@ -1269,6 +1276,57 @@ export function PhotoAnnotationEditor({
                 color: selectedColor,
               }}
             />
+          </div>
+        )}
+        
+        {/* Magnified Zoom Circle - for arrow precision */}
+        {zoomCirclePos && (
+          <div
+            className="fixed top-4 right-4 pointer-events-none"
+            style={{ zIndex: 10001 }}
+          >
+            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-black/90">
+              <canvas
+                ref={(canvas) => {
+                  if (!canvas || !canvasRef.current || !imageRef.current) return;
+                  
+                  const ctx = canvas.getContext('2d');
+                  const mainCanvas = canvasRef.current;
+                  if (!ctx) return;
+                  
+                  canvas.width = 128;
+                  canvas.height = 128;
+                  
+                  const zoomFactor = 5;
+                  const sourceSize = 128 / zoomFactor;
+                  
+                  ctx.drawImage(
+                    mainCanvas,
+                    zoomCirclePos.x - sourceSize / 2,
+                    zoomCirclePos.y - sourceSize / 2,
+                    sourceSize,
+                    sourceSize,
+                    0,
+                    0,
+                    128,
+                    128
+                  );
+                  
+                  ctx.strokeStyle = '#ef4444';
+                  ctx.lineWidth = 2;
+                  ctx.beginPath();
+                  ctx.moveTo(64, 56);
+                  ctx.lineTo(64, 72);
+                  ctx.moveTo(56, 64);
+                  ctx.lineTo(72, 64);
+                  ctx.stroke();
+                }}
+                className="w-full h-full"
+              />
+              <div className="absolute bottom-1 left-0 right-0 text-center text-white text-xs font-bold bg-black/60 py-0.5">
+                5x
+              </div>
+            </div>
           </div>
         )}
       </div>
