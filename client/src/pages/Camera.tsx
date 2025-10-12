@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Camera as CameraIcon, X, Check, Settings2, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb } from '@/lib/indexeddb';
@@ -37,6 +38,7 @@ export default function Camera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Load projects
   const { data: projects = [] } = useQuery<Project[]>({
@@ -168,10 +170,68 @@ export default function Camera() {
     }
   };
 
-  // Capture and edit mode: Will be implemented in Task 6
+  // Capture and edit mode: Capture photo then open annotation editor
   const captureAndEdit = async () => {
-    // TODO: Implement in Task 6 - capture photo then navigate to editor
-    await quickCapture();
+    if (!videoRef.current || !selectedProject || isCapturing) return;
+
+    setIsCapturing(true);
+
+    try {
+      // Create canvas to capture frame
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Failed to get canvas context');
+
+      ctx.drawImage(video, 0, 0);
+
+      // Convert to blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
+          'image/jpeg',
+          0.95
+        );
+      });
+
+      // Compress photo using Web Worker
+      const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
+
+      // Save to IndexedDB
+      const savedPhoto = await idb.savePhoto({
+        projectId: selectedProject,
+        blob: compressionResult.blob,
+        quality: selectedQuality,
+        caption: '',
+        timestamp: Date.now(),
+        syncStatus: 'pending',
+        retryCount: 0,
+      });
+
+      // Revoke temporary URL from worker
+      URL.revokeObjectURL(compressionResult.url);
+
+      // Queue for sync
+      await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
+
+      // Stop camera before navigating
+      stopCamera();
+
+      // Navigate to photo edit page
+      setLocation(`/photo/${savedPhoto.id}/edit`);
+
+    } catch (error) {
+      console.error('Capture and edit error:', error);
+      toast({
+        title: 'Capture Failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+      setIsCapturing(false);
+    }
   };
 
   if (!hasPermission || !isActive) {
