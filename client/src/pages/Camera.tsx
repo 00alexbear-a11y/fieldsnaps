@@ -52,9 +52,8 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
-  // Auto-start camera when component mounts
+  // Cleanup camera when component unmounts
   useEffect(() => {
-    startCamera();
     return () => {
       stopCamera();
     };
@@ -75,6 +74,34 @@ export default function Camera() {
         streamRef.current = stream;
         setHasPermission(true);
         setIsActive(true);
+
+        // Wait for video metadata to load so dimensions are available
+        await new Promise<void>((resolve) => {
+          const video = videoRef.current;
+          if (!video) {
+            resolve();
+            return;
+          }
+
+          // If metadata already loaded, resolve immediately
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            resolve();
+            return;
+          }
+
+          // Otherwise wait for loadedmetadata event
+          const handleLoadedMetadata = () => {
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            resolve();
+          };
+          video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            resolve();
+          }, 5000);
+        });
       }
     } catch (error) {
       console.error('Camera error:', error);
@@ -83,6 +110,7 @@ export default function Camera() {
         description: 'Unable to access camera. Please check permissions.',
         variant: 'destructive',
       });
+      throw error; // Re-throw so caller knows it failed
     }
   };
 
@@ -97,13 +125,35 @@ export default function Camera() {
     setIsActive(false);
   };
 
+  // Start camera if not already started before capturing
+  const ensureCameraStarted = async () => {
+    if (!isActive) {
+      try {
+        await startCamera();
+      } catch (error) {
+        // Camera failed to start, error already shown in startCamera
+        throw new Error('Camera not available');
+      }
+    }
+  };
+
   // Quick capture mode: Capture photo and continue shooting
   const quickCapture = async () => {
-    if (!videoRef.current || !selectedProject || isCapturing) return;
+    if (!selectedProject || isCapturing) return;
 
     setIsCapturing(true);
 
     try {
+      // Start camera if needed
+      await ensureCameraStarted();
+      if (!videoRef.current) {
+        throw new Error('Video element not available');
+      }
+
+      // Verify video has valid dimensions
+      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
+        throw new Error('Camera not ready - please wait a moment and try again');
+      }
       // Create canvas to capture frame
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
@@ -174,11 +224,21 @@ export default function Camera() {
 
   // Capture and edit mode: Capture photo then open annotation editor
   const captureAndEdit = async () => {
-    if (!videoRef.current || !selectedProject || isCapturing) return;
+    if (!selectedProject || isCapturing) return;
 
     setIsCapturing(true);
 
     try {
+      // Start camera if needed
+      await ensureCameraStarted();
+      if (!videoRef.current) {
+        throw new Error('Video element not available');
+      }
+
+      // Verify video has valid dimensions
+      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
+        throw new Error('Camera not ready - please wait a moment and try again');
+      }
       // Create canvas to capture frame
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
@@ -259,6 +319,34 @@ export default function Camera() {
 
   return (
     <div className="relative h-full w-full bg-black overflow-hidden">
+      {/* Start Camera Prompt (shown when camera is not active) */}
+      {!isActive && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 z-30">
+          <div className="text-center space-y-4">
+            <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center">
+              <CameraIcon className="w-12 h-12 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-white">Ready to Capture</h2>
+              <p className="text-white/60 text-sm">
+                Tap the camera button to start taking photos
+              </p>
+            </div>
+          </div>
+          
+          {selectedProject && (
+            <div className="text-center space-y-2">
+              <p className="text-white/40 text-xs">Saving to</p>
+              <div className="px-4 py-2 bg-white/10 rounded-lg border border-white/20">
+                <p className="text-white font-medium">
+                  {projects.find(p => p.id === selectedProject)?.name}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Video Stream */}
       <video
         ref={videoRef}
