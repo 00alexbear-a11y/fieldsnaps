@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -30,6 +30,12 @@ interface Project {
   address?: string;
 }
 
+interface CameraDevice {
+  deviceId: string;
+  label: string;
+  zoomLevel: 0.5 | 1 | 2 | 3;
+}
+
 type CameraMode = 'photo' | 'video';
 type CameraFacing = 'environment' | 'user';
 
@@ -46,6 +52,8 @@ export default function Camera() {
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
+  const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
+  const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -73,12 +81,15 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
+  // Detect available cameras after permission is granted
+  // Don't run on mount because labels aren't available until permission granted
+
   // Auto-start camera when project is selected and camera is not yet active
   useEffect(() => {
     if (selectedProject && !showProjectSelection && !isActive && !permissionDenied) {
       startCamera();
     }
-  }, [selectedProject, showProjectSelection, cameraFacing]);
+  }, [selectedProject, showProjectSelection, currentDeviceId, cameraFacing]);
 
   // Cleanup camera when component unmounts
   useEffect(() => {
@@ -87,15 +98,110 @@ export default function Camera() {
     };
   }, []);
 
+  const detectAvailableCameras = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      // Filter cameras by facing mode (front vs back)
+      const relevantCameras: CameraDevice[] = [];
+      
+      for (const device of videoDevices) {
+        // Skip devices with no label or deviceId (permission not granted yet)
+        if (!device.label || !device.deviceId) continue;
+        
+        const label = device.label.toLowerCase();
+        
+        // Skip front camera if we're in environment mode, and vice versa
+        const isFrontCamera = label.includes('front') || label.includes('user');
+        const isBackCamera = label.includes('back') || label.includes('rear') || label.includes('environment');
+        
+        if (cameraFacing === 'user' && isBackCamera) continue;
+        if (cameraFacing === 'environment' && isFrontCamera) continue;
+        
+        // Try to determine zoom level based on label
+        let zoomLevel: 0.5 | 1 | 2 | 3 = 1;
+        
+        if (label.includes('ultra') || label.includes('wide') || label.includes('0.5')) {
+          zoomLevel = 0.5;
+        } else if (label.includes('telephoto') || label.includes('tele') || label.includes('2x') || label.includes('zoom')) {
+          zoomLevel = 2;
+        } else if (label.includes('3x') || label.includes('periscope')) {
+          zoomLevel = 3;
+        } else {
+          zoomLevel = 1; // Main/wide camera
+        }
+        
+        relevantCameras.push({
+          deviceId: device.deviceId,
+          label: device.label,
+          zoomLevel
+        });
+      }
+      
+      // Sort by zoom level
+      relevantCameras.sort((a, b) => a.zoomLevel - b.zoomLevel);
+      
+      // If we have multiple cameras with the same zoom level, keep only the first one
+      const uniqueCameras: CameraDevice[] = [];
+      const seenZoomLevels = new Set<number>();
+      
+      for (const camera of relevantCameras) {
+        if (!seenZoomLevels.has(camera.zoomLevel)) {
+          uniqueCameras.push(camera);
+          seenZoomLevels.add(camera.zoomLevel);
+        }
+      }
+      
+      setAvailableCameras(uniqueCameras);
+      
+      // Only set deviceId if we found valid cameras
+      if (uniqueCameras.length > 0) {
+        const defaultCamera = uniqueCameras.find(c => c.zoomLevel === 1) || uniqueCameras[0];
+        setCurrentDeviceId(defaultCamera.deviceId);
+        setZoomLevel(defaultCamera.zoomLevel);
+      }
+    } catch (error) {
+      console.error('Error detecting cameras:', error);
+      // Fallback to basic camera if detection fails
+      setAvailableCameras([]);
+      setCurrentDeviceId(null);
+    }
+  };
+
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
+      // Use deviceId only if it's a valid non-empty string, otherwise use facingMode
+      const constraints: MediaStreamConstraints = {
+        video: (currentDeviceId && currentDeviceId.trim()) ? {
+          deviceId: { exact: currentDeviceId },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        } : {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
         },
-      });
+      };
+      
+      let stream: MediaStream;
+      
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (deviceError) {
+        // If deviceId constraint fails, fall back to facingMode
+        console.warn('Camera deviceId failed, falling back to facingMode:', deviceError);
+        const fallbackConstraints: MediaStreamConstraints = {
+          video: {
+            facingMode: cameraFacing,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        };
+        stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+        // Clear deviceId since it didn't work
+        setCurrentDeviceId(null);
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -148,6 +254,9 @@ export default function Camera() {
         // NOW set isActive after metadata has loaded
         setIsActive(true);
         console.log('[Camera] isActive set to true, loading overlay should hide');
+        
+        // Detect available cameras after permission is granted (when labels are available)
+        await detectAvailableCameras();
       }
     } catch (error) {
       console.error('Camera error:', error);
@@ -179,6 +288,23 @@ export default function Camera() {
   const switchCamera = async () => {
     stopCamera();
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
+  };
+
+  const switchZoomLevel = async (level: 0.5 | 1 | 2 | 3) => {
+    // Find the camera with the requested zoom level
+    const targetCamera = availableCameras.find(c => c.zoomLevel === level);
+    
+    if (targetCamera && targetCamera.deviceId !== currentDeviceId) {
+      setZoomLevel(level);
+      setCurrentDeviceId(targetCamera.deviceId);
+      
+      // Restart camera with new device
+      stopCamera();
+      // Camera will auto-restart via useEffect dependency on currentDeviceId
+    } else {
+      // If camera already selected or not found, just update zoom level state
+      setZoomLevel(level);
+    }
   };
 
   const startRecording = async () => {
@@ -427,21 +553,21 @@ export default function Camera() {
         {/* Header */}
         <div className="flex flex-col items-center p-4 pb-2 border-b">
           <div className="flex items-center justify-between w-full mb-3">
-            <div className="w-10" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation('/')}
+              data-testid="button-back-to-home"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <img 
               src={logoPath} 
               alt="FieldSnaps" 
               className="h-9 w-auto object-contain"
               data-testid="img-fieldsnaps-logo"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation('/')}
-              data-testid="button-cancel-project-selection"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <div className="w-10" />
           </div>
           <h1 className="text-lg font-semibold text-muted-foreground" data-testid="text-select-project">
             Select Project
@@ -504,6 +630,16 @@ export default function Camera() {
 
   // Permission denied state
   if (permissionDenied) {
+    const handleRequestAgain = () => {
+      setPermissionDenied(false);
+      setHasPermission(false);
+      setIsActive(false);
+      // Trigger camera start
+      if (selectedProject && !showProjectSelection) {
+        startCamera();
+      }
+    };
+
     return (
       <div className="fixed inset-0 w-full bg-black overflow-hidden flex items-center justify-center" style={{ height: '100dvh', minHeight: '100vh' }}>
         <div className="text-center space-y-6 p-8">
@@ -516,14 +652,25 @@ export default function Camera() {
               Please enable camera permissions in your browser settings to take photos.
             </p>
           </div>
-          <Button 
-            onClick={() => setLocation('/')} 
-            variant="default"
-            data-testid="button-go-home-denied"
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Go Home
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button 
+              onClick={handleRequestAgain}
+              variant="default"
+              data-testid="button-request-again"
+            >
+              <CameraIcon className="w-4 h-4 mr-2" />
+              Request Again
+            </Button>
+            <Button 
+              onClick={() => setLocation('/')} 
+              variant="outline"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              data-testid="button-go-home-denied"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Go Home
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -554,10 +701,9 @@ export default function Camera() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
+        className="absolute inset-0 w-full h-full object-cover"
         style={{ 
           zIndex: 5,
-          transform: `scale(${zoomLevel})`,
         }}
         data-testid="video-camera-stream"
       />
@@ -600,8 +746,8 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Mode Selector - Right side, vertically centered */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
+      {/* Mode Selector - Right side, lower position */}
+      <div className="absolute right-4 bottom-48 flex flex-col gap-3 z-10">
         <Button
           variant="ghost"
           size="icon"
@@ -622,22 +768,40 @@ export default function Camera() {
         </Button>
       </div>
 
-      {/* Zoom Selector - Center, lower position */}
+      {/* Zoom Selector - Center, lower position - Only show available cameras */}
       <div className="absolute bottom-36 left-0 right-0 flex justify-center gap-2 z-10">
-        {[0.5, 1, 2, 3].map((level) => (
-          <Button
-            key={level}
-            variant="ghost"
-            size="sm"
-            onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
-            className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
-              zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
-            }`}
-            data-testid={`button-zoom-${level}x`}
-          >
-            {level}x
-          </Button>
-        ))}
+        {availableCameras.length > 0 ? (
+          availableCameras.map((camera) => (
+            <Button
+              key={camera.zoomLevel}
+              variant="ghost"
+              size="sm"
+              onClick={() => switchZoomLevel(camera.zoomLevel)}
+              className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
+                zoomLevel === camera.zoomLevel ? 'bg-white/25' : 'bg-white/10'
+              }`}
+              data-testid={`button-zoom-${camera.zoomLevel}x`}
+            >
+              {camera.zoomLevel}x
+            </Button>
+          ))
+        ) : (
+          // Fallback to basic zoom if camera detection failed
+          [1].map((level) => (
+            <Button
+              key={level}
+              variant="ghost"
+              size="sm"
+              onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
+              className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
+                zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
+              }`}
+              data-testid={`button-zoom-${level}x`}
+            >
+              {level}x
+            </Button>
+          ))
+        )}
       </div>
 
       {/* Bottom Capture Controls - Minimal, no background box */}
