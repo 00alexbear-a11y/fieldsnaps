@@ -4,6 +4,22 @@
 This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
+### Phase 4: Camera & Photo Display Fixes (October 12, 2025)
+- **Camera Permission Fix:** Camera no longer requests permission on every page load
+  - Shows "Ready to Capture" screen when camera is not active
+  - Camera only starts when user clicks a capture button
+  - Waits for video metadata to load before allowing capture
+  - Validates video dimensions before capture to prevent blob creation errors
+  - Uses rear/environment camera by default (facingMode: 'environment')
+- **Photo Display Fix:** Photos now display fully without cropping in annotation editor
+  - Changed canvas drawing to scale full image: `ctx.drawImage(img, 0, 0, canvas.width, canvas.height)`
+  - Maintains proper aspect ratio while ensuring complete visibility
+  - Annotation coordinates still work correctly with scaled image
+- **Zoom Removal:** Removed all zoom functionality from photo viewer per user request
+  - Removed pinch-to-zoom, double-tap zoom, and mouse wheel zoom
+  - Photos display at full size constrained to screen
+  - Simplified photo viewer for easier use
+
 ### Phase 3: Mobile Annotation & Swipe Gestures (October 12, 2025)
 - **Canvas Scaling Fix:** Fixed critical coordinate transformation bug in PhotoAnnotationEditor
   - Implemented `getCanvasCoordinates()` helper to properly scale display coordinates to canvas coordinates
