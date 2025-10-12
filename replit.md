@@ -4,6 +4,18 @@
 This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
+### Phase 3: Mobile Annotation & Swipe Gestures (October 12, 2025)
+- **Canvas Scaling Fix:** Fixed critical coordinate transformation bug in PhotoAnnotationEditor
+  - Implemented `getCanvasCoordinates()` helper to properly scale display coordinates to canvas coordinates
+  - Limited canvas width to 1200px to prevent memory issues while maintaining quality
+  - Text overlay positioning now uses separate display coordinates for accurate placement
+  - Touch events properly delegated to mouse handlers for consistent behavior
+- **Swipe-to-Delete:** Added intuitive swipe gesture for project deletion
+  - Left swipe on project cards reveals delete button (100px threshold)
+  - Delete button stays visible after 150px swipe
+  - Confirmation dialog with project details before deletion
+  - Smooth animations and touch-optimized thresholds
+
 ### Phase 2: Enhanced Project Management & Comments
 - **Projects Enhancement:** Added address field to projects
 
