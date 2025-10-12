@@ -37,27 +37,32 @@ export default function PhotoEdit() {
   useEffect(() => {
     if (!photoId) return;
 
-    // Load photo from IndexedDB
+    // Load photo from IndexedDB or server
     const loadPhoto = async () => {
       try {
+        // First try IndexedDB (for newly captured photos)
         const photo = await idb.getPhoto(photoId);
         if (photo && photo.blob) {
           const url = URL.createObjectURL(photo.blob);
           photoUrlRef.current = url;
           setPhotoUrl(url);
           setProjectId(photo.projectId);
-        } else {
-          toast({
-            title: 'Photo not found',
-            description: 'The photo could not be loaded',
-            variant: 'destructive',
-          });
-          setLocation('/camera');
+          return;
         }
+
+        // If not in IndexedDB, fetch from server
+        const response = await fetch(`/api/photos/${photoId}`);
+        if (!response.ok) {
+          throw new Error('Photo not found');
+        }
+        const serverPhoto = await response.json();
+        setPhotoUrl(serverPhoto.url);
+        setProjectId(serverPhoto.projectId);
       } catch (error) {
         console.error('Error loading photo:', error);
         toast({
-          title: 'Error loading photo',
+          title: 'Photo not found',
+          description: 'The photo could not be loaded',
           variant: 'destructive',
         });
         setLocation('/camera');

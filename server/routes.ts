@@ -141,6 +141,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/photos/:id", async (req, res) => {
+    try {
+      const photo = await storage.getPhoto(req.params.id);
+      if (!photo) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      res.json(photo);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/projects/:projectId/photos", upload.single('photo'), async (req: any, res) => {
     try {
       if (!req.file) {
@@ -183,6 +195,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('Photo upload error:', error);
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/photos/:id", async (req, res) => {
+    try {
+      const validated = insertPhotoSchema.partial().parse(req.body);
+      const updated = await storage.updatePhoto(req.params.id, validated);
+      if (!updated) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
   });
