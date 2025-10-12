@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +30,7 @@ export default function ProjectPhotos() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editedProject, setEditedProject] = useState({ name: "", description: "", address: "", coverPhotoId: "" });
   const { toast } = useToast();
 
@@ -113,6 +124,24 @@ export default function ProjectPhotos() {
     onError: (error: any) => {
       toast({ 
         title: "Failed to update project", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/projects/${projectId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "Project deleted successfully" });
+      setLocation("/");
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to delete project", 
         description: error.message,
         variant: "destructive" 
       });
@@ -354,24 +383,63 @@ export default function ProjectPhotos() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex justify-between items-center">
             <Button
-              variant="outline"
-              onClick={() => setShowSettings(false)}
-              data-testid="button-cancel-settings"
+              variant="destructive"
+              onClick={() => {
+                setShowDeleteConfirm(true);
+              }}
+              data-testid="button-delete-project"
+              className="mr-auto"
             >
-              Cancel
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Project
             </Button>
-            <Button
-              onClick={() => updateProjectMutation.mutate(editedProject)}
-              disabled={updateProjectMutation.isPending || !editedProject.name}
-              data-testid="button-save-settings"
-            >
-              {updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowSettings(false)}
+                data-testid="button-cancel-settings"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => updateProjectMutation.mutate(editedProject)}
+                disabled={updateProjectMutation.isPending || !editedProject.name}
+                data-testid="button-save-settings"
+              >
+                {updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete "{project?.name}" and all its photos. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                deleteProjectMutation.mutate();
+                setShowDeleteConfirm(false);
+                setShowSettings(false);
+              }}
+              data-testid="button-confirm-delete"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

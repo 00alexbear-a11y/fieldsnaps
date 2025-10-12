@@ -24,6 +24,7 @@ export interface IStorage {
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
+  deleteProject(id: string): Promise<boolean>;
   
   // Photos
   getProjectPhotos(projectId: string): Promise<Photo[]>;
@@ -104,6 +105,11 @@ export class DbStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return result[0];
+  }
+
+  async deleteProject(id: string): Promise<boolean> {
+    const result = await db.delete(projects).where(eq(projects.id, id)).returning();
+    return result.length > 0;
   }
 
   // Photos

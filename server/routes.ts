@@ -131,6 +131,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/projects/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteProject(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Photos
   app.get("/api/projects/:projectId/photos", async (req, res) => {
     try {
@@ -192,6 +204,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const photo = await storage.createPhoto(validated);
+      
+      // Auto-set as cover photo if project doesn't have one
+      const project = await storage.getProject(req.params.projectId);
+      if (project && !project.coverPhotoId) {
+        await storage.updateProject(req.params.projectId, { coverPhotoId: photo.id });
+      }
+      
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('Photo upload error:', error);
