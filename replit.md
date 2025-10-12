@@ -18,7 +18,9 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
 - **iOS Safari Video Display Fix:** Fixed blank video screen issue on iOS devices
   - Added explicit `video.play()` call after setting MediaStream srcObject
   - iOS Safari requires explicit play() - autoPlay attribute alone is insufficient
-  - Wrapped in try-catch for graceful error handling
+  - Fixed timing issue: now waits for video metadata to load before hiding loading overlay
+  - Previously hiding overlay when video dimensions were 0x0, causing blank white screen
+  - Loading overlay now stays visible until video has actual dimensions
   - Camera feed now displays correctly on iOS Safari browsers
 
 ### Phase 4: Camera & Photo Display Fixes (October 12, 2025)
