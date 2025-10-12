@@ -271,7 +271,7 @@ export function PhotoGestureViewer({
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
-      {/* Top Controls */}
+      {/* Top Controls - Close and Counter only */}
       <div
         className={`absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -292,64 +292,7 @@ export function PhotoGestureViewer({
             {currentIndex + 1} / {photos.length}
           </div>
 
-          <div className="flex gap-2">
-            {onAnnotate && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onAnnotate(currentPhoto)}
-                className="text-white hover:bg-white/20"
-                data-testid="button-annotate"
-              >
-                <Brush className="w-5 h-5" />
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowComments(!showComments)}
-              className="text-white hover:bg-white/20 relative"
-              data-testid="button-comments"
-            >
-              <MessageSquare className="w-5 h-5" />
-              {comments.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {comments.length}
-                </span>
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleEditCaption}
-              className="text-white hover:bg-white/20"
-              data-testid="button-edit-caption"
-            >
-              <Pencil className="w-5 h-5" />
-            </Button>
-            {onShare && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleShare}
-                className="text-white hover:bg-white/20"
-                data-testid="button-share"
-              >
-                <Share2 className="w-5 h-5" />
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowDeleteDialog(true)}
-                className="text-white hover:bg-white/20"
-                data-testid="button-delete"
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-            )}
-          </div>
+          <div className="w-10" />
         </div>
       </div>
 
@@ -403,18 +346,88 @@ export function PhotoGestureViewer({
         </>
       )}
 
-      {/* Bottom Caption */}
-      {currentPhoto.caption && (
-        <div
-          className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent transition-opacity duration-300 ${
-            showControls ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <p className="text-white text-center max-w-screen-xl mx-auto">
-            {currentPhoto.caption}
-          </p>
+      {/* Bottom Controls and Caption */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 transition-opacity duration-300 ${
+          showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {/* Caption */}
+        {currentPhoto.caption && (
+          <div className="px-4 pt-4 pb-2">
+            <p className="text-white text-center text-sm max-w-screen-xl mx-auto">
+              {currentPhoto.caption}
+            </p>
+          </div>
+        )}
+        
+        {/* Control Bar */}
+        <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3">
+          <div className="flex items-center justify-center gap-1 max-w-screen-xl mx-auto">
+            {onAnnotate && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onAnnotate(currentPhoto)}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+                data-testid="button-annotate"
+              >
+                <Brush className="w-5 h-5" />
+                <span className="text-[10px]">Edit</span>
+              </Button>
+            )}
+            {onShare && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleShare}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+                data-testid="button-share"
+              >
+                <Share2 className="w-5 h-5" />
+                <span className="text-[10px]">Share</span>
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowComments(!showComments)}
+              className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1 relative"
+              data-testid="button-comments"
+            >
+              <MessageSquare className="w-5 h-5" />
+              <span className="text-[10px]">Comment</span>
+              {comments.length > 0 && (
+                <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[9px]">
+                  {comments.length}
+                </span>
+              )}
+            </Button>
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+                data-testid="button-delete"
+              >
+                <Trash2 className="w-5 h-5" />
+                <span className="text-[10px]">Delete</span>
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleEditCaption}
+              className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+              data-testid="button-edit-caption"
+            >
+              <Pencil className="w-5 h-5" />
+              <span className="text-[10px]">Rename</span>
+            </Button>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
