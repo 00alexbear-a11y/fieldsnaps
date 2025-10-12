@@ -321,25 +321,26 @@ export default function ProjectPhotos() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b p-4 flex items-center justify-between bg-background sticky top-0 z-10">
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
+      <header className="border-b p-4 flex items-center justify-between bg-background sticky top-0 z-10 gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-shrink">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setLocation("/")}
             data-testid="button-back"
+            className="flex-shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-xl font-bold">{project?.name || "Project Photos"}</h1>
+          <div className="min-w-0 flex-shrink">
+            <h1 className="text-lg sm:text-xl font-bold truncate">{project?.name || "Project Photos"}</h1>
             {project?.description && (
-              <p className="text-sm text-muted-foreground">{project.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">{project.description}</p>
             )}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
           {!isSelectMode && (
             <>
               <Button
@@ -347,15 +348,17 @@ export default function ProjectPhotos() {
                 size="icon"
                 onClick={() => setShowSettings(true)}
                 data-testid="button-project-settings"
+                className="flex-shrink-0"
               >
                 <SettingsIcon className="w-5 h-5" />
               </Button>
               <Button
                 onClick={() => setLocation(`/camera?projectId=${projectId}`)}
                 data-testid="button-open-camera"
+                size="icon"
+                className="flex-shrink-0"
               >
-                <Camera className="w-5 h-5 mr-2" />
-                Camera
+                <Camera className="w-5 h-5" />
               </Button>
               <input
                 type="file"
@@ -366,10 +369,9 @@ export default function ProjectPhotos() {
                 id="photo-upload"
               />
               <label htmlFor="photo-upload">
-                <Button asChild disabled={uploadMutation.isPending} variant="outline">
+                <Button asChild disabled={uploadMutation.isPending} variant="outline" size="icon" className="flex-shrink-0">
                   <span>
-                    <Camera className="w-5 h-5 mr-2" />
-                    {uploadMutation.isPending ? "Uploading..." : "Upload"}
+                    <Camera className="w-5 h-5" />
                   </span>
                 </Button>
               </label>
@@ -377,6 +379,8 @@ export default function ProjectPhotos() {
                 <Button
                   onClick={toggleSelectMode}
                   data-testid="button-select-mode"
+                  size="sm"
+                  className="flex-shrink-0"
                 >
                   Select
                 </Button>
@@ -388,6 +392,8 @@ export default function ProjectPhotos() {
               onClick={toggleSelectMode}
               variant="outline"
               data-testid="button-cancel-select"
+              size="sm"
+              className="flex-shrink-0"
             >
               Cancel
             </Button>
