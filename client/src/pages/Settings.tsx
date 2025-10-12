@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { syncManager } from '@/lib/syncManager';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
-import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Settings() {
   const { user, isAuthenticated, isLoading } = useAuth();

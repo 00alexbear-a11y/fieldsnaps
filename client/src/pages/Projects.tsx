@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog,
