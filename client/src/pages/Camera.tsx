@@ -79,6 +79,14 @@ export default function Camera() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
+        
+        // Explicitly play the video (required for iOS Safari)
+        try {
+          await videoRef.current.play();
+        } catch (playError) {
+          console.warn('Video play error:', playError);
+        }
+        
         setHasPermission(true);
         setIsActive(true);
 
