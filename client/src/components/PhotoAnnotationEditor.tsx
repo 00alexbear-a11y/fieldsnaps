@@ -9,6 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -142,7 +149,7 @@ export function PhotoAnnotationEditor({
   const [resizeHandle, setResizeHandle] = useState<ResizeHandle | null>(null);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [textInput, setTextInput] = useState("");
-  const [textPosition, setTextPosition] = useState<{ canvasX: number; canvasY: number; screenX: number; screenY: number } | null>(null);
+  const [textDialogOpen, setTextDialogOpen] = useState(false);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
   const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
   const [initialAnnoState, setInitialAnnoState] = useState<Annotation | null>(null);
@@ -774,17 +781,10 @@ export function PhotoAnnotationEditor({
     setIsCreating(true);
     setStartPos({ x, y });
 
+    // Text tool now uses dialog, not inline positioning
     if (tool === "text") {
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-      const scaleX = canvasRect.width / canvasRef.current.width;
-      const scaleY = canvasRect.height / canvasRef.current.height;
-      
-      const screenX = x * scaleX;
-      const screenY = y * scaleY;
-      
-      setTextPosition({ canvasX: x, canvasY: y, screenX, screenY });
-      setTextInput("");
       setIsCreating(false);
+      return;
     } else if (tool === "pen") {
       const newAnnotation: Annotation = {
         id: `temp-${Date.now()}`,
@@ -1233,26 +1233,37 @@ export function PhotoAnnotationEditor({
     }
   };
 
-  const handleAddText = () => {
-    if (textInput.trim() && textPosition) {
-      const newAnnotation: Annotation = {
-        id: `anno-${Date.now()}`,
-        type: "text",
-        content: textInput,
-        color: selectedColor,
-        strokeWidth,
-        fontSize: Math.max(16, 20 + strokeWidth * 2),
-        position: {
-          x: textPosition.canvasX,
-          y: textPosition.canvasY,
-        },
-      };
-      const newAnnotations = [...annotations, newAnnotation];
-      setAnnotations(newAnnotations);
-      addToHistory(newAnnotations);
-      setTextInput("");
-      setTextPosition(null);
-    }
+  const handleAddTextFromDialog = () => {
+    if (!textInput.trim() || !canvasRef.current) return;
+
+    // Place text in the center of the canvas
+    const centerX = canvasRef.current.width / 2;
+    const centerY = canvasRef.current.height / 2;
+
+    const newAnnotation: Annotation = {
+      id: `anno-${Date.now()}`,
+      type: "text",
+      content: textInput,
+      color: selectedColor,
+      strokeWidth,
+      fontSize: Math.max(16, 20 + strokeWidth * 2),
+      position: {
+        x: centerX,
+        y: centerY,
+      },
+    };
+    
+    const newAnnotations = [...annotations, newAnnotation];
+    setAnnotations(newAnnotations);
+    addToHistory(newAnnotations);
+    
+    // Auto-select the new text so user can immediately reposition it
+    setSelectedAnnotation(newAnnotation.id);
+    setTool("select");
+    
+    // Close dialog and clear input
+    setTextDialogOpen(false);
+    setTextInput("");
   };
 
   const handleDeleteSelected = () => {
@@ -1321,49 +1332,6 @@ export function PhotoAnnotationEditor({
           data-testid="canvas-annotation"
         />
         
-        {/* Inline Text Input */}
-        {textPosition && (
-          <div
-            style={{
-              position: 'absolute',
-              left: `${textPosition.screenX}px`,
-              top: `${textPosition.screenY}px`,
-              transform: 'translate(0, -50%)',
-              zIndex: 10000,
-              pointerEvents: 'auto',
-            }}
-            data-testid="text-input-wrapper"
-          >
-            <Input
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Type text..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleAddText();
-                } else if (e.key === "Escape") {
-                  setTextPosition(null);
-                  setTextInput("");
-                }
-              }}
-              onBlur={() => {
-                if (textInput.trim()) {
-                  handleAddText();
-                } else {
-                  setTextPosition(null);
-                }
-              }}
-              autoFocus
-              data-testid="input-text-annotation"
-              className="min-w-[200px] bg-background/90 backdrop-blur-sm rounded-lg border-2 border-primary shadow-lg text-sm"
-              style={{
-                fontSize: `${Math.max(14, 16 + strokeWidth * 2)}px`,
-                color: selectedColor,
-              }}
-            />
-          </div>
-        )}
-        
         {/* Magnified Zoom Circle - for arrow precision */}
         {zoomCirclePos && (
           <ZoomCircle 
@@ -1374,7 +1342,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Left Toolbar - Colors and Sizes */}
-      <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+      <div className="fixed left-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
         {/* Color Picker - All Colors */}
         <div className="flex flex-col gap-2">
           {colors.map((color) => (
@@ -1415,12 +1383,12 @@ export function PhotoAnnotationEditor({
       <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
         {/* Tool Buttons */}
         <Button
-          variant={tool === "text" ? "default" : "ghost"}
+          variant="ghost"
           size="icon"
-          onClick={() => setTool(tool === "text" ? null : "text")}
+          onClick={() => setTextDialogOpen(true)}
           data-testid="button-tool-text"
           className="rounded-xl hover-elevate w-9 h-9"
-          aria-label="Text tool"
+          aria-label="Add text"
         >
           <Type className="w-5 h-5" />
         </Button>
@@ -1528,6 +1496,53 @@ export function PhotoAnnotationEditor({
           Save
         </Button>
       </div>
+
+      {/* Text Input Dialog */}
+      <Dialog open={textDialogOpen} onOpenChange={setTextDialogOpen}>
+        <DialogContent className="bg-background/95 backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle>Add Text</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Enter text..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && textInput.trim()) {
+                  handleAddTextFromDialog();
+                } else if (e.key === "Escape") {
+                  setTextDialogOpen(false);
+                  setTextInput("");
+                }
+              }}
+              autoFocus
+              data-testid="input-text-dialog"
+              className="text-base"
+              style={{ color: selectedColor }}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setTextDialogOpen(false);
+                setTextInput("");
+              }}
+              data-testid="button-cancel-text"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddTextFromDialog}
+              disabled={!textInput.trim()}
+              data-testid="button-submit-text"
+            >
+              Add Text
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
