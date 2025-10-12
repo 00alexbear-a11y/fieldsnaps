@@ -1003,10 +1003,10 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Canvas - fills remaining space */}
-      <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-2">
-        <div className="relative max-w-full max-h-full flex items-center justify-center">
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
+      {/* Canvas - fills available space above toolbar */}
+      <div className="flex-1 bg-muted/30 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-full flex items-center justify-center">
           <img
             ref={imageRef}
             src={photoUrl}
@@ -1031,7 +1031,7 @@ export function PhotoAnnotationEditor({
               maxHeight: "100%",
               objectFit: "contain"
             }}
-            className="rounded shadow-lg touch-none"
+            className="touch-none"
             data-testid="canvas-annotation"
           />
           
@@ -1080,8 +1080,8 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Toolbar - Moved to Bottom */}
-      <div className="border-t p-3 bg-background/95 backdrop-blur-sm">
+      {/* Toolbar - Fixed at Bottom */}
+      <div className="border-t p-3 bg-background/80 backdrop-blur-xl">
         {/* Row 1: Drawing Tools - Bigger Icons */}
         <div className="flex items-center gap-2 mb-3">
           <Button
