@@ -612,6 +612,9 @@ export function PhotoAnnotationEditor({
     if (!canvasRef.current) return;
 
     const { x, y } = getCanvasCoordinates(e);
+    const rect = canvasRef.current.getBoundingClientRect();
+    const displayX = e.clientX - rect.left;
+    const displayY = e.clientY - rect.top;
 
     // Check if clicking on a selected annotation's handle
     if (selectedAnnotation) {
@@ -648,9 +651,8 @@ export function PhotoAnnotationEditor({
     setStartPos({ x, y });
 
     if (tool === "text") {
-      // For text, just use canvas coordinates
-      // The input is positioned absolutely relative to canvas wrapper
-      const newTextPos = { canvasX: x, canvasY: y, screenX: x, screenY: y };
+      // Use canvas coordinates for drawing, display coordinates for input overlay
+      const newTextPos = { canvasX: x, canvasY: y, screenX: displayX, screenY: displayY };
       console.log("Text tool clicked - setting textPosition to:", newTextPos);
       setTextPosition(newTextPos);
       setIsCreating(false);
