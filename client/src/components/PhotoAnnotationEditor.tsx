@@ -612,9 +612,12 @@ export function PhotoAnnotationEditor({
     if (!canvasRef.current) return;
 
     const { x, y } = getCanvasCoordinates(e);
-    const rect = canvasRef.current.getBoundingClientRect();
-    const displayX = e.clientX - rect.left;
-    const displayY = e.clientY - rect.top;
+    // For text overlay positioning, use coordinates relative to the canvas parent wrapper
+    // which is position:relative, not the canvas itself
+    const canvasRect = canvasRef.current.getBoundingClientRect();
+    const parentRect = canvasRef.current.parentElement?.getBoundingClientRect();
+    const displayX = parentRect ? e.clientX - parentRect.left : e.clientX - canvasRect.left;
+    const displayY = parentRect ? e.clientY - parentRect.top : e.clientY - canvasRect.top;
 
     // Check if clicking on a selected annotation's handle
     if (selectedAnnotation) {
