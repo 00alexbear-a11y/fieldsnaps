@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
-import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface Annotation {
   id: string;
@@ -37,10 +34,8 @@ export default function PhotoEdit() {
   useEffect(() => {
     if (!photoId) return;
 
-    // Load photo from IndexedDB or server
     const loadPhoto = async () => {
       try {
-        // First try IndexedDB (for newly captured photos)
         const photo = await idb.getPhoto(photoId);
         if (photo && photo.blob) {
           const url = URL.createObjectURL(photo.blob);
@@ -50,7 +45,6 @@ export default function PhotoEdit() {
           return;
         }
 
-        // If not in IndexedDB, fetch from server
         const response = await fetch(`/api/photos/${photoId}`);
         if (!response.ok) {
           throw new Error('Photo not found');
@@ -85,7 +79,6 @@ export default function PhotoEdit() {
     setIsSaving(true);
 
     try {
-      // Queue annotations for sync when online
       if (annotations.length > 0) {
         await idb.addToSyncQueue({
           type: 'annotation',
@@ -105,13 +98,11 @@ export default function PhotoEdit() {
         duration: 1500,
       });
 
-      // Revoke URL only after successful save (before navigation)
       if (photoUrlRef.current) {
         URL.revokeObjectURL(photoUrlRef.current);
         photoUrlRef.current = null;
       }
 
-      // Return to camera to continue shooting
       setLocation('/camera');
     } catch (error) {
       console.error('Error saving annotations:', error);
@@ -120,14 +111,12 @@ export default function PhotoEdit() {
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });
-      // Keep URL valid so user can see image and retry
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
-    // Revoke URL before navigation (navigation is synchronous)
     if (photoUrlRef.current) {
       URL.revokeObjectURL(photoUrlRef.current);
       photoUrlRef.current = null;
@@ -146,42 +135,12 @@ export default function PhotoEdit() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      <header className="border-b p-4 flex items-center justify-between bg-background z-10">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancel}
-            disabled={isSaving}
-            data-testid="button-cancel-edit"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-semibold">Annotate Photo</h1>
-        </div>
-        <Button
-          onClick={() => {
-            // Trigger save via the editor's save mechanism
-            const saveButton = document.querySelector('[data-testid="button-save-annotations"]') as HTMLButtonElement;
-            if (saveButton) saveButton.click();
-          }}
-          disabled={isSaving}
-          data-testid="button-save-edit"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {isSaving ? 'Saving...' : 'Save & Continue'}
-        </Button>
-      </header>
-
-      <main className="flex-1 overflow-hidden">
-        <PhotoAnnotationEditor
-          photoUrl={photoUrl}
-          photoId={photoId!}
-          existingAnnotations={[]}
-          onSave={handleSave}
-        />
-      </main>
-    </div>
+    <PhotoAnnotationEditor
+      photoUrl={photoUrl}
+      photoId={photoId!}
+      existingAnnotations={[]}
+      onSave={handleSave}
+      onCancel={handleCancel}
+    />
   );
 }

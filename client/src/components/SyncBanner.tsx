@@ -94,10 +94,13 @@ export default function SyncBanner() {
   // Success banner (green)
   if (showSuccessBanner) {
     return (
-      <div className="sticky top-0 z-50 bg-green-600 text-white px-4 py-1 flex items-center justify-between shadow-sm animate-in slide-in-from-top">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4" />
-          <span className="text-sm font-medium">All photos synced</span>
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm animate-in slide-in-from-top overflow-hidden">
+        <div className="h-1 bg-green-600" />
+        <div className="px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-600" />
+            <span className="text-sm font-medium text-green-600">All photos synced</span>
+          </div>
         </div>
       </div>
     );
@@ -106,26 +109,37 @@ export default function SyncBanner() {
   // Offline banner (red)
   if (!isOnline) {
     return (
-      <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2">
-          <CloudOff className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            Offline - {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'} will sync when online
-          </span>
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+        <div className="h-1 bg-red-600" />
+        <div className="px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CloudOff className="w-4 h-4 text-red-600" />
+            <span className="text-sm font-medium text-red-600">
+              Offline - {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'} will sync when online
+            </span>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Syncing banner (blue)
+  // Syncing banner (blue) with animated progress bar
   if (isSyncing) {
     return (
-      <div className="sticky top-0 z-50 bg-blue-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-sm font-medium">
-            Syncing {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'}...
-          </span>
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+        <div className="h-1 bg-blue-200 dark:bg-blue-900 relative">
+          <div 
+            className="absolute top-0 left-0 h-full bg-blue-600 animate-[slide-progress_1.5s_ease-in-out_infinite]" 
+            style={{ width: '40%' }}
+          />
+        </div>
+        <div className="px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">
+              Syncing {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'}...
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -133,24 +147,27 @@ export default function SyncBanner() {
 
   // Pending banner (yellow/warning)
   return (
-    <div className="sticky top-0 z-50 bg-yellow-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
-      <div className="flex items-center gap-2">
-        <CloudUpload className="w-4 h-4" />
-        <span className="text-sm font-medium">
-          {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'} pending upload
-        </span>
+    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+      <div className="h-1 bg-yellow-600" />
+      <div className="px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CloudUpload className="w-4 h-4 text-yellow-600" />
+          <span className="text-sm font-medium text-yellow-600">
+            {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'} pending upload
+          </span>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleSync}
+          disabled={isSyncing}
+          className="h-7 text-yellow-600 hover:bg-yellow-600/10"
+          data-testid="button-sync-now"
+        >
+          <RefreshCw className="w-3 h-3 mr-1" />
+          Sync
+        </Button>
       </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleSync}
-        disabled={isSyncing}
-        className="h-7 text-white hover:bg-white/20 hover:text-white"
-        data-testid="button-sync-now"
-      >
-        <RefreshCw className="w-3 h-3 mr-1" />
-        Sync
-      </Button>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowUpRight, Minus, Circle, Trash2, Download, Palette, Undo, Pen } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, Hand, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -53,6 +52,7 @@ interface PhotoAnnotationEditorProps {
   photoId: string;
   existingAnnotations?: Annotation[];
   onSave: (annotations: Annotation[]) => void;
+  onCancel?: () => void;
 }
 
 type ResizeHandle = "start" | "end" | "radius" | "corner";
@@ -62,13 +62,14 @@ export function PhotoAnnotationEditor({
   photoId,
   existingAnnotations = [],
   onSave,
+  onCancel,
 }: PhotoAnnotationEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>(existingAnnotations);
   const [history, setHistory] = useState<Annotation[][]>([existingAnnotations]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | null>(null);
+  const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | "select" | null>(null);
   const [selectedColor, setSelectedColor] = useState(colors[0].value);
   const [strokeWidth, setStrokeWidth] = useState(strokeSizes[1].value);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -101,6 +102,21 @@ export function PhotoAnnotationEditor({
     return { x, y };
   };
 
+  const getTouchCanvasCoordinates = (e: React.TouchEvent<HTMLCanvasElement>): { x: number; y: number } => {
+    if (!canvasRef.current || !e.touches[0]) return { x: 0, y: 0 };
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.touches[0].clientX - rect.left) * scaleX;
+    const y = (e.touches[0].clientY - rect.top) * scaleY;
+    
+    return { x, y };
+  };
+
   useEffect(() => {
     if (!canvasRef.current || !imageRef.current) return;
 
@@ -125,15 +141,12 @@ export function PhotoAnnotationEditor({
       redrawCanvas();
     };
 
-    // Check if image is already loaded (from JSX src prop)
     if (img.complete && img.naturalWidth > 0) {
       handleImageLoad();
     } else if (img.complete && img.naturalWidth === 0) {
-      // Image failed to load, but still initialize canvas with default dimensions
       console.warn("Image failed to load, using default canvas dimensions:", photoUrl);
       canvas.width = 800;
       canvas.height = 600;
-      // Fill with gray background to indicate missing image
       ctx.fillStyle = "#374151";
       ctx.fillRect(0, 0, 800, 600);
       ctx.fillStyle = "#9ca3af";
@@ -141,11 +154,9 @@ export function PhotoAnnotationEditor({
       ctx.textAlign = "center";
       ctx.fillText("Image failed to load", 400, 300);
     } else {
-      // Otherwise wait for load event
       img.onload = handleImageLoad;
       img.onerror = (e) => {
         console.error("Failed to load photo for annotation:", photoUrl);
-        // Still initialize canvas with default dimensions
         canvas.width = 800;
         canvas.height = 600;
         ctx.fillStyle = "#374151";
@@ -188,15 +199,11 @@ export function PhotoAnnotationEditor({
     const ctx = canvas?.getContext("2d");
     if (!canvas || !img || !ctx) return;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw image if loaded, otherwise draw fallback background
     if (img.complete && img.naturalWidth > 0) {
-      // Draw image scaled to fit canvas dimensions
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     } else {
-      // Draw fallback background for failed image
       ctx.fillStyle = "#374151";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#9ca3af";
@@ -205,7 +212,6 @@ export function PhotoAnnotationEditor({
       ctx.fillText("Image failed to load - annotations still work", canvas.width / 2, canvas.height / 2);
     }
 
-    // Combine permanent annotations with temp annotation for rendering
     const allAnnotations = tempAnnotation 
       ? [...annotations, tempAnnotation]
       : annotations;
@@ -217,7 +223,6 @@ export function PhotoAnnotationEditor({
       ctx.fillStyle = annotation.color;
       ctx.lineWidth = annotation.strokeWidth;
       
-      // Make temp annotation slightly transparent to show it's a preview
       if (isTemp) {
         ctx.globalAlpha = 0.7;
       }
@@ -228,35 +233,29 @@ export function PhotoAnnotationEditor({
             const fontSize = annotation.fontSize || 20;
             ctx.font = `${fontSize}px Arial`;
             
-            // Measure text to draw background box
             const textMetrics = ctx.measureText(annotation.content);
             const textWidth = textMetrics.width;
             const textHeight = fontSize;
             const padding = 8;
             const borderRadius = 6;
             
-            // Draw rounded semi-transparent background box
             const boxX = annotation.position.x - padding;
             const boxY = annotation.position.y - textHeight - padding;
             const boxWidth = textWidth + padding * 2;
             const boxHeight = textHeight + padding * 2;
             
             ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; // Semi-transparent black background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.beginPath();
             ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
             ctx.fill();
             ctx.restore();
             
-            // Draw text over background
             ctx.fillStyle = annotation.color;
             ctx.fillText(annotation.content, annotation.position.x, annotation.position.y);
             
-            // Draw selection handles for text if selected
             if (isSelected) {
-              // Corner handle for resize (blue)
               drawHandle(ctx, annotation.position.x + textWidth, annotation.position.y, "#3b82f6");
-              // Center handle for move (blue)
               drawHandle(ctx, annotation.position.x + textWidth / 2, annotation.position.y - textHeight / 2, "#3b82f6");
             }
           }
@@ -317,9 +316,7 @@ export function PhotoAnnotationEditor({
             ctx.stroke();
             if (isSelected) {
               const radius = annotation.position.width;
-              // Draw resize handle on right edge (blue)
               drawHandle(ctx, annotation.position.x + radius, annotation.position.y, "#3b82f6");
-              // Draw move handle at center (blue)
               drawHandle(ctx, annotation.position.x, annotation.position.y, "#3b82f6");
             }
           }
@@ -338,7 +335,6 @@ export function PhotoAnnotationEditor({
             }
             ctx.stroke();
             
-            // Draw handles at start and end if selected
             if (isSelected && points.length > 0) {
               drawHandle(ctx, points[0].x, points[0].y, "#3b82f6");
               drawHandle(ctx, points[points.length - 1].x, points[points.length - 1].y, "#3b82f6");
@@ -347,7 +343,6 @@ export function PhotoAnnotationEditor({
           break;
       }
       
-      // Reset alpha after temp annotation
       if (isTemp) {
         ctx.globalAlpha = 1.0;
       }
@@ -355,7 +350,6 @@ export function PhotoAnnotationEditor({
   };
 
   const drawHandle = (ctx: CanvasRenderingContext2D, x: number, y: number, color: string) => {
-    // Draw outer white circle for visibility
     ctx.beginPath();
     ctx.arc(x, y, 8, 0, 2 * Math.PI);
     ctx.fillStyle = "white";
@@ -364,7 +358,6 @@ export function PhotoAnnotationEditor({
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Draw inner colored circle
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, 2 * Math.PI);
     ctx.fillStyle = color;
@@ -380,28 +373,33 @@ export function PhotoAnnotationEditor({
     lineWidth: number,
     color: string
   ) => {
-    // Make arrows thicker and more prominent
-    const thickerLineWidth = lineWidth * 1.5;
+    // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
+    const scaleFactor = lineWidth >= 8 ? 4.5 : 1.5;
+    const thickerLineWidth = lineWidth * scaleFactor;
+    
     const arrowLength = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
     
-    // Arrowhead scales proportionally - never exceeds 35% of arrow length
-    // Cap at 30px for very long arrows
-    const headLength = Math.min(arrowLength * 0.35, 30);
+    // Arrowhead size scales with the scaled line width
+    const headLength = Math.min(arrowLength * 0.35, thickerLineWidth * 3);
     const angle = Math.atan2(toY - fromY, toX - fromX);
 
-    // Draw thick arrow shaft
+    // Calculate the base of the arrowhead triangle
+    const baseX = toX - headLength * Math.cos(angle);
+    const baseY = toY - headLength * Math.sin(angle);
+
+    // Draw arrow shaft - STOP at the base of the triangle
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = thickerLineWidth;
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
+    ctx.lineTo(baseX, baseY); // Stop at triangle base, not at tip
     ctx.stroke();
 
-    // Draw filled arrowhead with sharper triangle (20 degrees instead of 30)
+    // Draw filled arrowhead triangle - starts at exact tip
     ctx.beginPath();
-    ctx.moveTo(toX, toY); // Arrow tip
+    ctx.moveTo(toX, toY); // Arrow tip - exact point
     
     // Left wing - sharper angle (PI/9 = 20 degrees)
     ctx.lineTo(
@@ -421,7 +419,7 @@ export function PhotoAnnotationEditor({
   };
 
   const getHandleAtPoint = (anno: Annotation, x: number, y: number): ResizeHandle | null => {
-    const handleSize = 16; // Increased for larger circular handles
+    const handleSize = 16;
     
     switch (anno.type) {
       case "text":
@@ -433,7 +431,6 @@ export function PhotoAnnotationEditor({
             ctx.font = `${fontSize}px Arial`;
             const textMetrics = ctx.measureText(anno.content);
             const textWidth = textMetrics.width;
-            // Check corner resize handle using circular distance
             const cornerX = anno.position.x + textWidth;
             const cornerY = anno.position.y;
             const distanceToCorner = Math.sqrt(
@@ -448,14 +445,12 @@ export function PhotoAnnotationEditor({
       case "arrow":
       case "line":
         if (anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
-          // Check start handle using circular distance
           const distanceToStart = Math.sqrt(
             Math.pow(x - anno.position.x, 2) + Math.pow(y - anno.position.y, 2)
           );
           if (distanceToStart <= handleSize / 2) {
             return "start";
           }
-          // Check end handle using circular distance
           const distanceToEnd = Math.sqrt(
             Math.pow(x - anno.position.x2, 2) + Math.pow(y - anno.position.y2, 2)
           );
@@ -469,7 +464,6 @@ export function PhotoAnnotationEditor({
           const radius = anno.position.width;
           const handleX = anno.position.x + radius;
           const handleY = anno.position.y;
-          // Check radius handle using circular distance
           const distanceToHandle = Math.sqrt(
             Math.pow(x - handleX, 2) + Math.pow(y - handleY, 2)
           );
@@ -534,6 +528,21 @@ export function PhotoAnnotationEditor({
             }
           }
           break;
+        case "pen":
+          if (anno.position.points && anno.position.points.length > 0) {
+            const tolerance = 10;
+            for (let i = 0; i < anno.position.points.length - 1; i++) {
+              const distance = distanceToLineSegment(
+                x, y,
+                anno.position.points[i].x, anno.position.points[i].y,
+                anno.position.points[i + 1].x, anno.position.points[i + 1].y
+              );
+              if (distance < tolerance) {
+                return anno;
+              }
+            }
+          }
+          break;
       }
     }
     return null;
@@ -573,51 +582,44 @@ export function PhotoAnnotationEditor({
   };
 
   const updateCursor = (x: number, y: number) => {
-    // When actively dragging/resizing, show grabbing/pinch cursors
     if (isDragging) {
       setCursorStyle("grabbing");
       return;
     }
     if (isResizing) {
-      setCursorStyle("grabbing"); // Pinching effect
+      setCursorStyle("grabbing");
       return;
     }
 
-    // Check if hovering over selected annotation's handle
     if (selectedAnnotation) {
       const anno = annotations.find(a => a.id === selectedAnnotation);
       if (anno) {
         const handle = getHandleAtPoint(anno, x, y);
         if (handle) {
-          setCursorStyle("grab"); // Will show pinching fingers
+          setCursorStyle("grab");
           return;
         }
       }
     }
 
-    // Check if hovering over any annotation body
     const clickedAnno = getClickedAnnotation(x, y);
     if (clickedAnno) {
-      setCursorStyle("grab"); // Open hand for move
+      setCursorStyle("grab");
       return;
     }
 
-    // Default cursor
-    setCursorStyle(tool ? "crosshair" : "default");
+    setCursorStyle(tool && tool !== "select" ? "crosshair" : "default");
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
 
     const { x, y } = getCanvasCoordinates(e);
-    // For text overlay positioning, use coordinates relative to the canvas parent wrapper
-    // which is position:relative, not the canvas itself
     const canvasRect = canvasRef.current.getBoundingClientRect();
     const parentRect = canvasRef.current.parentElement?.getBoundingClientRect();
     const displayX = parentRect ? e.clientX - parentRect.left : e.clientX - canvasRect.left;
     const displayY = parentRect ? e.clientY - parentRect.top : e.clientY - canvasRect.top;
 
-    // Check if clicking on a selected annotation's handle
     if (selectedAnnotation) {
       const anno = annotations.find(a => a.id === selectedAnnotation);
       if (anno) {
@@ -642,204 +644,196 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    // Deselect if clicking empty space
     setSelectedAnnotation(null);
 
-    if (!tool) return;
+    // Don't create new annotations if select tool is active
+    if (!tool || tool === "select") return;
 
-    // Start creating annotation with click-and-drag
     setIsCreating(true);
     setStartPos({ x, y });
 
     if (tool === "text") {
-      // Calculate proper screen position accounting for canvas scaling
       const canvasRect = canvasRef.current.getBoundingClientRect();
       const scaleX = canvasRect.width / canvasRef.current.width;
       const scaleY = canvasRect.height / canvasRef.current.height;
       
-      // Convert canvas coordinates to screen coordinates relative to canvas element
       const screenX = x * scaleX;
       const screenY = y * scaleY;
       
-      const newTextPos = { canvasX: x, canvasY: y, screenX, screenY };
-      console.log("Text tool clicked - setting textPosition to:", newTextPos);
-      setTextPosition(newTextPos);
+      setTextPosition({ canvasX: x, canvasY: y, screenX, screenY });
+      setTextInput("");
       setIsCreating(false);
-      setTextInput(""); // Clear any previous text
-      console.log("Text position state should now be set");
     } else if (tool === "pen") {
-      // For pen, start recording path points
-      const tempAnno: Annotation = {
+      const newAnnotation: Annotation = {
         id: `temp-${Date.now()}`,
         type: "pen",
         color: selectedColor,
-        strokeWidth: strokeWidth,
+        strokeWidth,
         position: {
-          x, y, // Store first point in x,y for compatibility
-          points: [{ x, y }]
+          x: 0,
+          y: 0,
+          points: [{ x, y }],
         },
       };
-      setTempAnnotation(tempAnno);
-    } else {
-      // For arrow, line, circle - create temp annotation starting at this point
-      const tempAnno: Annotation = {
-        id: `temp-${Date.now()}`,
-        type: tool,
-        color: selectedColor,
-        strokeWidth: strokeWidth,
-        fontSize: 20 + strokeWidth * 3,
-        position: 
-          tool === "circle"
-            ? { x, y, width: 1 }
-            : { x, y, x2: x, y2: y },
-      };
-      setTempAnnotation(tempAnno);
+      setTempAnnotation(newAnnotation);
+      setIsDrawing(true);
     }
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-
     const { x, y } = getCanvasCoordinates(e);
-
-    // Always update cursor based on hover position
+    
     updateCursor(x, y);
 
-    // Handle creation mode - update temp annotation preview
-    if (isCreating && startPos && tempAnnotation) {
-      if (tempAnnotation.type === "pen") {
-        // For pen, add points as we move
-        const currentPoints = tempAnnotation.position.points || [];
-        const lastPoint = currentPoints[currentPoints.length - 1];
+    if (isResizing && resizeHandle && dragStartPos && initialAnnoState && selectedAnnotation) {
+      const anno = annotations.find(a => a.id === selectedAnnotation);
+      if (!anno) return;
+
+      const dx = x - dragStartPos.x;
+      const dy = y - dragStartPos.y;
+
+      const updatedAnnotations = annotations.map(a => {
+        if (a.id !== selectedAnnotation) return a;
         
-        // Only add point if moved at least 2 pixels (smooth but responsive)
-        if (!lastPoint || Math.sqrt(Math.pow(x - lastPoint.x, 2) + Math.pow(y - lastPoint.y, 2)) > 2) {
-          const updatedTemp: Annotation = {
-            ...tempAnnotation,
-            position: {
-              ...tempAnnotation.position,
-              points: [...currentPoints, { x, y }]
-            },
-          };
-          setTempAnnotation(updatedTemp);
+        const updated = { ...a };
+        
+        switch (resizeHandle) {
+          case "start":
+            if (a.type === "arrow" || a.type === "line") {
+              updated.position = {
+                ...a.position,
+                x: initialAnnoState.position.x + dx,
+                y: initialAnnoState.position.y + dy,
+              };
+            }
+            break;
+          case "end":
+            if (a.type === "arrow" || a.type === "line") {
+              updated.position = {
+                ...a.position,
+                x2: initialAnnoState.position.x2! + dx,
+                y2: initialAnnoState.position.y2! + dy,
+              };
+            }
+            break;
+          case "radius":
+            if (a.type === "circle") {
+              const newRadius = Math.sqrt(
+                Math.pow(x - a.position.x, 2) + Math.pow(y - a.position.y, 2)
+              );
+              updated.position = {
+                ...a.position,
+                width: Math.max(10, newRadius),
+              };
+            }
+            break;
+          case "corner":
+            if (a.type === "text" && a.content) {
+              const canvas = canvasRef.current;
+              const ctx = canvas?.getContext("2d");
+              if (ctx) {
+                const currentFontSize = a.fontSize || 20;
+                const scaleFactor = Math.max(0.5, 1 + dx / 100);
+                const newFontSize = Math.max(12, Math.min(72, currentFontSize * scaleFactor));
+                updated.fontSize = newFontSize;
+              }
+            }
+            break;
         }
-      } else {
-        const updatedTemp: Annotation = {
-          ...tempAnnotation,
-          position:
-            tempAnnotation.type === "circle"
-              ? {
-                  x: startPos.x,
-                  y: startPos.y,
-                  width: Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2)),
-                }
-              : { x: startPos.x, y: startPos.y, x2: x, y2: y },
-        };
-        setTempAnnotation(updatedTemp);
-      }
+        
+        return updated;
+      });
+
+      setAnnotations(updatedAnnotations);
       return;
     }
 
-    // Only proceed with drag/resize if we have start position
-    if (!dragStartPos || !initialAnnoState) return;
+    if (isDragging && dragStartPos && initialAnnoState && selectedAnnotation) {
+      const dx = x - dragStartPos.x;
+      const dy = y - dragStartPos.y;
 
-    const deltaX = x - dragStartPos.x;
-    const deltaY = y - dragStartPos.y;
+      const updatedAnnotations = annotations.map(a => {
+        if (a.id !== selectedAnnotation) return a;
+        
+        const updated = { ...a };
+        
+        switch (a.type) {
+          case "text":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+            };
+            break;
+          case "arrow":
+          case "line":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+              x2: initialAnnoState.position.x2! + dx,
+              y2: initialAnnoState.position.y2! + dy,
+            };
+            break;
+          case "circle":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+            };
+            break;
+          case "pen":
+            if (initialAnnoState.position.points) {
+              updated.position = {
+                ...a.position,
+                points: initialAnnoState.position.points.map(p => ({
+                  x: p.x + dx,
+                  y: p.y + dy,
+                })),
+              };
+            }
+            break;
+        }
+        
+        return updated;
+      });
 
-    if (isResizing && selectedAnnotation && resizeHandle) {
-      const newAnnotations = annotations.map((anno) => {
-        if (anno.id === selectedAnnotation) {
-          switch (anno.type) {
-            case "text":
-              if (resizeHandle === "corner" && anno.content) {
-                // Scale text based on distance from origin
-                const canvas = canvasRef.current;
-                const ctx = canvas?.getContext("2d");
-                if (ctx) {
-                  const initialFontSize = initialAnnoState.fontSize || 20;
-                  // CRITICAL: Measure with the INITIAL font size, not current
-                  ctx.font = `${initialFontSize}px Arial`;
-                  const initialWidth = ctx.measureText(anno.content).width;
-                  const newWidth = Math.max(20, initialWidth + deltaX);
-                  const scale = newWidth / initialWidth;
-                  const newFontSize = Math.max(10, initialFontSize * scale);
-                  
-                  return {
-                    ...anno,
-                    fontSize: newFontSize,
-                  };
-                }
-              }
-              break;
-            case "arrow":
-            case "line":
-              if (resizeHandle === "start") {
-                return {
-                  ...anno,
-                  position: {
-                    ...anno.position,
-                    x: initialAnnoState.position.x + deltaX,
-                    y: initialAnnoState.position.y + deltaY,
-                  },
-                };
-              } else if (resizeHandle === "end") {
-                return {
-                  ...anno,
-                  position: {
-                    ...anno.position,
-                    x2: (initialAnnoState.position.x2 || 0) + deltaX,
-                    y2: (initialAnnoState.position.y2 || 0) + deltaY,
-                  },
-                };
-              }
-              break;
-            case "circle":
-              if (resizeHandle === "radius") {
-                const newRadius = Math.sqrt(
-                  Math.pow(x - anno.position.x, 2) + Math.pow(y - anno.position.y, 2)
-                );
-                return {
-                  ...anno,
-                  position: {
-                    ...anno.position,
-                    width: Math.max(10, newRadius),
-                  },
-                };
-              }
-              break;
-          }
-        }
-        return anno;
-      });
-      setAnnotations(newAnnotations);
-    } else if (isDragging && selectedAnnotation) {
-      const newAnnotations = annotations.map((anno) => {
-        if (anno.id === selectedAnnotation) {
-          return {
-            ...anno,
-            position: {
-              ...anno.position,
-              x: initialAnnoState.position.x + deltaX,
-              y: initialAnnoState.position.y + deltaY,
-              x2: initialAnnoState.position.x2 !== undefined ? initialAnnoState.position.x2 + deltaX : undefined,
-              y2: initialAnnoState.position.y2 !== undefined ? initialAnnoState.position.y2 + deltaY : undefined,
-            },
-          };
-        }
-        return anno;
-      });
-      setAnnotations(newAnnotations);
+      setAnnotations(updatedAnnotations);
+      return;
+    }
+
+    if (isCreating && tool === "pen" && tempAnnotation && isDrawing) {
+      const updated = { ...tempAnnotation };
+      if (updated.position.points) {
+        updated.position.points = [...updated.position.points, { x, y }];
+      }
+      setTempAnnotation(updated);
+      return;
+    }
+
+    if (isCreating && startPos && tool && tool !== "text" && tool !== "pen" && tool !== "select") {
+      const newAnnotation: Annotation = {
+        id: `temp-${Date.now()}`,
+        type: tool,
+        color: selectedColor,
+        strokeWidth,
+        position: {
+          x: startPos.x,
+          y: startPos.y,
+          x2: x,
+          y2: y,
+          width: tool === "circle" 
+            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2))
+            : undefined,
+        },
+      };
+      setTempAnnotation(newAnnotation);
     }
   };
 
-  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-
-    const { x, y } = getCanvasCoordinates(e);
-
-    if (isDragging || isResizing) {
-      addToHistory(annotations);
-      setIsDragging(false);
+  const handleCanvasMouseUp = () => {
+    if (isResizing && selectedAnnotation) {
+      addToHistory([...annotations]);
       setIsResizing(false);
       setResizeHandle(null);
       setDragStartPos(null);
@@ -847,48 +841,277 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    // Finalize creation - convert temp annotation to permanent
-    if (isCreating && tempAnnotation && startPos) {
-      let shouldCreate = false;
-      
-      if (tempAnnotation.type === "pen") {
-        // For pen, check if we have enough points (meaningful stroke)
-        const points = tempAnnotation.position.points || [];
-        shouldCreate = points.length >= 2; // At least 2 points to create a line
-      } else {
-        // For other tools, check drag distance
-        const dragDistance = Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2));
-        shouldCreate = dragDistance > 5; // Minimum 5px drag to create
-      }
-      
-      if (shouldCreate) {
-        const finalAnnotation: Annotation = {
-          ...tempAnnotation,
-          id: `anno-${Date.now()}`, // Replace temp ID with permanent ID
-        };
+    if (isDragging && selectedAnnotation) {
+      addToHistory([...annotations]);
+      setIsDragging(false);
+      setDragStartPos(null);
+      setInitialAnnoState(null);
+      return;
+    }
+
+    if (isCreating && tempAnnotation && tool && tool !== "text") {
+      if (tool === "pen") {
+        const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
+        const newAnnotations = [...annotations, finalAnnotation];
+        setAnnotations(newAnnotations);
+        addToHistory(newAnnotations);
+      } else if (startPos) {
+        const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
         const newAnnotations = [...annotations, finalAnnotation];
         setAnnotations(newAnnotations);
         addToHistory(newAnnotations);
       }
-      
-      // Clean up creation state
-      setIsCreating(false);
       setTempAnnotation(null);
-      setStartPos(null);
+      setIsCreating(false);
       setIsDrawing(false);
+      setStartPos(null);
+    }
+  };
+
+  const handleCanvasTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (!canvasRef.current || !e.touches[0]) return;
+
+    const { x, y } = getTouchCanvasCoordinates(e);
+
+    if (selectedAnnotation) {
+      const anno = annotations.find(a => a.id === selectedAnnotation);
+      if (anno) {
+        const handle = getHandleAtPoint(anno, x, y);
+        if (handle) {
+          setIsResizing(true);
+          setResizeHandle(handle);
+          setDragStartPos({ x, y });
+          setInitialAnnoState(JSON.parse(JSON.stringify(anno)));
+          return;
+        }
+      }
+    }
+
+    const clickedAnno = getClickedAnnotation(x, y);
+
+    if (clickedAnno) {
+      setSelectedAnnotation(clickedAnno.id);
+      setIsDragging(true);
+      setDragStartPos({ x, y });
+      setInitialAnnoState(JSON.parse(JSON.stringify(clickedAnno)));
+      return;
+    }
+
+    setSelectedAnnotation(null);
+
+    if (!tool || tool === "select") return;
+
+    setIsCreating(true);
+    setStartPos({ x, y });
+
+    if (tool === "pen") {
+      const newAnnotation: Annotation = {
+        id: `temp-${Date.now()}`,
+        type: "pen",
+        color: selectedColor,
+        strokeWidth,
+        position: {
+          x: 0,
+          y: 0,
+          points: [{ x, y }],
+        },
+      };
+      setTempAnnotation(newAnnotation);
+      setIsDrawing(true);
+    }
+  };
+
+  const handleCanvasTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (!e.touches[0]) return;
+
+    const { x, y } = getTouchCanvasCoordinates(e);
+
+    if (isResizing && resizeHandle && dragStartPos && initialAnnoState && selectedAnnotation) {
+      const anno = annotations.find(a => a.id === selectedAnnotation);
+      if (!anno) return;
+
+      const dx = x - dragStartPos.x;
+      const dy = y - dragStartPos.y;
+
+      const updatedAnnotations = annotations.map(a => {
+        if (a.id !== selectedAnnotation) return a;
+        
+        const updated = { ...a };
+        
+        switch (resizeHandle) {
+          case "start":
+            if (a.type === "arrow" || a.type === "line") {
+              updated.position = {
+                ...a.position,
+                x: initialAnnoState.position.x + dx,
+                y: initialAnnoState.position.y + dy,
+              };
+            }
+            break;
+          case "end":
+            if (a.type === "arrow" || a.type === "line") {
+              updated.position = {
+                ...a.position,
+                x2: initialAnnoState.position.x2! + dx,
+                y2: initialAnnoState.position.y2! + dy,
+              };
+            }
+            break;
+          case "radius":
+            if (a.type === "circle") {
+              const newRadius = Math.sqrt(
+                Math.pow(x - a.position.x, 2) + Math.pow(y - a.position.y, 2)
+              );
+              updated.position = {
+                ...a.position,
+                width: Math.max(10, newRadius),
+              };
+            }
+            break;
+        }
+        
+        return updated;
+      });
+
+      setAnnotations(updatedAnnotations);
+      return;
+    }
+
+    if (isDragging && dragStartPos && initialAnnoState && selectedAnnotation) {
+      const dx = x - dragStartPos.x;
+      const dy = y - dragStartPos.y;
+
+      const updatedAnnotations = annotations.map(a => {
+        if (a.id !== selectedAnnotation) return a;
+        
+        const updated = { ...a };
+        
+        switch (a.type) {
+          case "text":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+            };
+            break;
+          case "arrow":
+          case "line":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+              x2: initialAnnoState.position.x2! + dx,
+              y2: initialAnnoState.position.y2! + dy,
+            };
+            break;
+          case "circle":
+            updated.position = {
+              ...a.position,
+              x: initialAnnoState.position.x + dx,
+              y: initialAnnoState.position.y + dy,
+            };
+            break;
+          case "pen":
+            if (initialAnnoState.position.points) {
+              updated.position = {
+                ...a.position,
+                points: initialAnnoState.position.points.map(p => ({
+                  x: p.x + dx,
+                  y: p.y + dy,
+                })),
+              };
+            }
+            break;
+        }
+        
+        return updated;
+      });
+
+      setAnnotations(updatedAnnotations);
+      return;
+    }
+
+    if (isCreating && tool === "pen" && tempAnnotation && isDrawing) {
+      const updated = { ...tempAnnotation };
+      if (updated.position.points) {
+        updated.position.points = [...updated.position.points, { x, y }];
+      }
+      setTempAnnotation(updated);
+      return;
+    }
+
+    if (isCreating && startPos && tool && tool !== "text" && tool !== "pen" && tool !== "select") {
+      const newAnnotation: Annotation = {
+        id: `temp-${Date.now()}`,
+        type: tool,
+        color: selectedColor,
+        strokeWidth,
+        position: {
+          x: startPos.x,
+          y: startPos.y,
+          x2: x,
+          y2: y,
+          width: tool === "circle" 
+            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2))
+            : undefined,
+        },
+      };
+      setTempAnnotation(newAnnotation);
+    }
+  };
+
+  const handleCanvasTouchEnd = () => {
+    if (isResizing && selectedAnnotation) {
+      addToHistory([...annotations]);
+      setIsResizing(false);
+      setResizeHandle(null);
+      setDragStartPos(null);
+      setInitialAnnoState(null);
+      return;
+    }
+
+    if (isDragging && selectedAnnotation) {
+      addToHistory([...annotations]);
+      setIsDragging(false);
+      setDragStartPos(null);
+      setInitialAnnoState(null);
+      return;
+    }
+
+    if (isCreating && tempAnnotation && tool && tool !== "text") {
+      if (tool === "pen") {
+        const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
+        const newAnnotations = [...annotations, finalAnnotation];
+        setAnnotations(newAnnotations);
+        addToHistory(newAnnotations);
+      } else if (startPos) {
+        const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
+        const newAnnotations = [...annotations, finalAnnotation];
+        setAnnotations(newAnnotations);
+        addToHistory(newAnnotations);
+      }
+      setTempAnnotation(null);
+      setIsCreating(false);
+      setIsDrawing(false);
+      setStartPos(null);
     }
   };
 
   const handleAddText = () => {
-    if (textPosition && textInput) {
+    if (textInput.trim() && textPosition) {
       const newAnnotation: Annotation = {
         id: `anno-${Date.now()}`,
         type: "text",
         content: textInput,
         color: selectedColor,
-        strokeWidth: strokeWidth,
-        fontSize: 20 + strokeWidth * 3,
-        position: { x: textPosition.canvasX, y: textPosition.canvasY },
+        strokeWidth,
+        fontSize: Math.max(16, 20 + strokeWidth * 2),
+        position: {
+          x: textPosition.canvasX,
+          y: textPosition.canvasY,
+        },
       };
       const newAnnotations = [...annotations, newAnnotation];
       setAnnotations(newAnnotations);
@@ -898,77 +1121,9 @@ export function PhotoAnnotationEditor({
     }
   };
 
-  // Touch event handlers for mobile support
-  const handleCanvasTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-    
-    // Ignore multi-touch to keep state consistent
-    if (e.touches.length > 1) return;
-    
-    e.preventDefault(); // Prevent scrolling while drawing
-    const touch = e.touches[0];
-    if (!touch) return; // Defensive check
-    
-    // Create a synthetic mouse event with touch coordinates
-    const syntheticEvent = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    } as React.MouseEvent<HTMLCanvasElement>;
-    
-    handleCanvasMouseDown(syntheticEvent);
-  };
-
-  const handleCanvasTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-    
-    // Ignore multi-touch to keep state consistent
-    if (e.touches.length > 1) return;
-    
-    e.preventDefault(); // Prevent scrolling while drawing
-    const touch = e.touches[0];
-    if (!touch) return; // Defensive check
-    
-    // Create a synthetic mouse event with touch coordinates
-    const syntheticEvent = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    } as React.MouseEvent<HTMLCanvasElement>;
-    
-    handleCanvasMouseMove(syntheticEvent);
-  };
-
-  const handleCanvasTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-    
-    e.preventDefault();
-    const touch = e.changedTouches[0]; // Use changedTouches for touchend
-    
-    if (!touch) {
-      // Fallback cleanup if no touch info available
-      setIsDragging(false);
-      setIsResizing(false);
-      setIsCreating(false);
-      setDragStartPos(null);
-      setResizeHandle(null);
-      setInitialAnnoState(null);
-      setTempAnnotation(null);
-      setStartPos(null);
-      setIsDrawing(false);
-      return;
-    }
-    
-    // Create a synthetic mouse event with touch coordinates
-    const syntheticEvent = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    } as React.MouseEvent<HTMLCanvasElement>;
-    
-    handleCanvasMouseUp(syntheticEvent);
-  };
-
   const handleDeleteSelected = () => {
     if (selectedAnnotation) {
-      const newAnnotations = annotations.filter((a) => a.id !== selectedAnnotation);
+      const newAnnotations = annotations.filter(a => a.id !== selectedAnnotation);
       setAnnotations(newAnnotations);
       addToHistory(newAnnotations);
       setSelectedAnnotation(null);
@@ -992,254 +1147,243 @@ export function PhotoAnnotationEditor({
 
   const handleSave = () => {
     onSave(annotations);
-    toast({
-      title: "Annotations saved",
-      description: "Photo annotations have been saved successfully",
-    });
   };
 
-  const handleDownload = () => {
-    if (!canvasRef.current) return;
-    const link = document.createElement("a");
-    link.download = "annotated-photo.png";
-    link.href = canvasRef.current.toDataURL();
-    link.click();
-    toast({
-      title: "Downloaded",
-      description: "Annotated photo has been downloaded",
-    });
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    }
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden">
-      {/* Canvas - fills available space above toolbar */}
-      <div className="flex-1 bg-muted/30 flex items-center justify-center overflow-hidden">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <img
-            ref={imageRef}
-            src={photoUrl}
-            alt="Photo to annotate"
-            className="hidden"
-            crossOrigin="anonymous"
-          />
-          <canvas
-            ref={canvasRef}
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
-            onMouseLeave={handleCanvasMouseUp}
-            onTouchStart={handleCanvasTouchStart}
-            onTouchMove={handleCanvasTouchMove}
-            onTouchEnd={handleCanvasTouchEnd}
-            onTouchCancel={handleCanvasTouchEnd}
-            style={{ 
-              cursor: cursorStyle, 
-              transition: "cursor 0.1s ease",
-              maxWidth: "100%",
-              maxHeight: "100%",
-              objectFit: "contain"
+    <div className="fixed inset-0 flex items-center justify-center bg-muted/30">
+      {/* Canvas - Full screen */}
+      <div className="relative w-full h-full flex items-center justify-center">
+        <img
+          ref={imageRef}
+          src={photoUrl}
+          alt="Photo to annotate"
+          className="hidden"
+          crossOrigin="anonymous"
+        />
+        <canvas
+          ref={canvasRef}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleCanvasMouseUp}
+          onMouseLeave={handleCanvasMouseUp}
+          onTouchStart={handleCanvasTouchStart}
+          onTouchMove={handleCanvasTouchMove}
+          onTouchEnd={handleCanvasTouchEnd}
+          onTouchCancel={handleCanvasTouchEnd}
+          style={{ 
+            cursor: cursorStyle, 
+            transition: "cursor 0.1s ease",
+            maxWidth: "100%",
+            maxHeight: "100%",
+            objectFit: "contain"
+          }}
+          className="touch-none"
+          data-testid="canvas-annotation"
+        />
+        
+        {/* Inline Text Input */}
+        {textPosition && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${textPosition.screenX}px`,
+              top: `${textPosition.screenY}px`,
+              transform: 'translate(0, -50%)',
+              zIndex: 10000,
+              pointerEvents: 'auto',
             }}
-            className="touch-none"
-            data-testid="canvas-annotation"
-          />
-          
-          {/* Inline Text Input - appears directly on canvas */}
-          {textPosition && (
-            <div
-              style={{
-                position: 'absolute',
-                left: `${textPosition.screenX}px`,
-                top: `${textPosition.screenY}px`,
-                transform: 'translate(0, -50%)',
-                zIndex: 10000,
-                pointerEvents: 'auto',
+            data-testid="text-input-wrapper"
+          >
+            <Input
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Type text..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleAddText();
+                } else if (e.key === "Escape") {
+                  setTextPosition(null);
+                  setTextInput("");
+                }
               }}
-              data-testid="text-input-wrapper"
-            >
-              <Input
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Type text..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleAddText();
-                  } else if (e.key === "Escape") {
-                    setTextPosition(null);
-                    setTextInput("");
-                  }
-                }}
-                onBlur={() => {
-                  if (textInput.trim()) {
-                    handleAddText();
-                  } else {
-                    setTextPosition(null);
-                  }
-                }}
-                autoFocus
-                data-testid="input-text-annotation"
-                className="min-w-[200px] bg-background/90 backdrop-blur-sm rounded-lg border-2 border-primary shadow-lg text-sm"
-                style={{
-                  fontSize: `${Math.max(14, 16 + strokeWidth * 2)}px`,
-                  color: selectedColor,
-                }}
-              />
-            </div>
-          )}
-        </div>
+              onBlur={() => {
+                if (textInput.trim()) {
+                  handleAddText();
+                } else {
+                  setTextPosition(null);
+                }
+              }}
+              autoFocus
+              data-testid="input-text-annotation"
+              className="min-w-[200px] bg-background/90 backdrop-blur-sm rounded-lg border-2 border-primary shadow-lg text-sm"
+              style={{
+                fontSize: `${Math.max(14, 16 + strokeWidth * 2)}px`,
+                color: selectedColor,
+              }}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Toolbar - Fixed at Bottom */}
-      <div className="border-t p-3 bg-background/80 backdrop-blur-xl">
-        {/* Row 1: Drawing Tools - Bigger Icons */}
-        <div className="flex items-center gap-2 mb-3">
-          <Button
-            variant={tool === "text" ? "default" : "outline"}
-            size="default"
-            onClick={() => setTool("text")}
-            data-testid="button-tool-text"
-            className="flex-1"
-            aria-label="Text tool"
-          >
-            <Type className="w-5 h-5 sm:mr-2" />
-            <span className="hidden sm:inline">Text</span>
-          </Button>
-          <Button
-            variant={tool === "arrow" ? "default" : "outline"}
-            size="default"
-            onClick={() => setTool("arrow")}
-            data-testid="button-tool-arrow"
-            className="flex-1"
-            aria-label="Arrow tool"
-          >
-            <ArrowUpRight className="w-5 h-5 sm:mr-2" />
-            <span className="hidden sm:inline">Arrow</span>
-          </Button>
-          <Button
-            variant={tool === "line" ? "default" : "outline"}
-            size="default"
-            onClick={() => setTool("line")}
-            data-testid="button-tool-line"
-            className="flex-1"
-            aria-label="Line tool"
-          >
-            <Minus className="w-5 h-5 sm:mr-2" />
-            <span className="hidden sm:inline">Line</span>
-          </Button>
-          <Button
-            variant={tool === "circle" ? "default" : "outline"}
-            size="default"
-            onClick={() => setTool("circle")}
-            data-testid="button-tool-circle"
-            className="flex-1"
-            aria-label="Circle tool"
-          >
-            <Circle className="w-5 h-5 sm:mr-2" />
-            <span className="hidden sm:inline">Circle</span>
-          </Button>
-          <Button
-            variant={tool === "pen" ? "default" : "outline"}
-            size="default"
-            onClick={() => setTool("pen")}
-            data-testid="button-tool-pen"
-            className="flex-1"
-            aria-label="Pen tool"
-          >
-            <Pen className="w-5 h-5 sm:mr-2" />
-            <span className="hidden sm:inline">Pen</span>
-          </Button>
+      {/* Vertical Toolbar - Right Side */}
+      <div className="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-lg">
+        {/* Tool Buttons */}
+        <Button
+          variant={tool === "text" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "text" ? null : "text")}
+          data-testid="button-tool-text"
+          className="rounded-xl hover-elevate"
+          aria-label="Text tool"
+        >
+          <Type className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "arrow" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "arrow" ? null : "arrow")}
+          data-testid="button-tool-arrow"
+          className="rounded-xl hover-elevate"
+          aria-label="Arrow tool"
+        >
+          <ArrowUpRight className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "line" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "line" ? null : "line")}
+          data-testid="button-tool-line"
+          className="rounded-xl hover-elevate"
+          aria-label="Line tool"
+        >
+          <Minus className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "circle" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "circle" ? null : "circle")}
+          data-testid="button-tool-circle"
+          className="rounded-xl hover-elevate"
+          aria-label="Circle tool"
+        >
+          <Circle className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "pen" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "pen" ? null : "pen")}
+          data-testid="button-tool-pen"
+          className="rounded-xl hover-elevate"
+          aria-label="Pen tool"
+        >
+          <Pen className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "select" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "select" ? null : "select")}
+          data-testid="button-tool-select"
+          className="rounded-xl hover-elevate"
+          aria-label="Select/Move tool"
+        >
+          <Hand className="w-5 h-5" />
+        </Button>
+
+        <div className="w-full h-px bg-white/20 my-1" />
+
+        {/* Color Picker - Compact */}
+        <div className="flex flex-col gap-2">
+          {colors.slice(0, 4).map((color) => (
+            <button
+              key={color.value}
+              onClick={() => setSelectedColor(color.value)}
+              className={`w-8 h-8 rounded-lg border-2 hover-elevate transition-all ${
+                selectedColor === color.value ? 'border-white scale-110' : 'border-transparent'
+              }`}
+              style={{ backgroundColor: color.value }}
+              data-testid={`button-color-${color.name.toLowerCase()}`}
+              aria-label={`Color ${color.name}`}
+            />
+          ))}
         </div>
 
-        {/* Row 2: Size, Color, and Actions - Bigger Controls */}
-        <div className="flex items-center gap-2">
-          {/* Stroke Size - Bigger Buttons */}
-          <ToggleGroup
-            type="single"
-            value={strokeWidth.toString()}
-            onValueChange={(value) => value && setStrokeWidth(parseInt(value))}
-            className="gap-1"
-          >
-            {strokeSizes.map((size) => (
-              <ToggleGroupItem
-                key={size.value}
-                value={size.value.toString()}
-                aria-label={`Size ${size.name}`}
-                data-testid={`button-size-${size.name.toLowerCase()}`}
-                className="min-h-9 px-3"
-              >
-                {size.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+        <div className="w-full h-px bg-white/20 my-1" />
 
-          {/* Color Picker - Bigger */}
-          <Select value={selectedColor} onValueChange={setSelectedColor}>
-            <SelectTrigger className="min-h-9 w-[120px]" data-testid="select-color">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded border"
-                  style={{ backgroundColor: selectedColor }}
-                />
-                <span className="hidden sm:inline">
-                  {colors.find((c) => c.value === selectedColor)?.name}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {colors.map((color) => (
-                <SelectItem key={color.value} value={color.value}>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded border border-border"
-                      style={{ backgroundColor: color.value }}
-                    />
-                    {color.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Actions - Bigger Icons */}
-          <div className="flex gap-2 ml-auto">
+        {/* Stroke Size - Compact */}
+        <div className="flex flex-col gap-2">
+          {strokeSizes.map((size) => (
             <Button
-              variant="outline"
+              key={size.value}
+              variant={strokeWidth === size.value ? "default" : "ghost"}
               size="icon"
-              onClick={handleUndo}
-              disabled={historyIndex === 0}
-              data-testid="button-undo"
-              aria-label="Undo last annotation"
+              onClick={() => setStrokeWidth(size.value)}
+              data-testid={`button-size-${size.name.toLowerCase()}`}
+              className="rounded-lg hover-elevate text-xs font-bold"
+              aria-label={`Size ${size.name}`}
             >
-              <Undo className="w-5 h-5" />
+              {size.name}
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleClearAll}
-              data-testid="button-clear-all"
-              aria-label="Clear all annotations"
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleDownload}
-              data-testid="button-download"
-              className="hidden sm:flex"
-              aria-label="Download annotated photo"
-            >
-              <Download className="w-5 h-5" />
-            </Button>
-            <Button 
-              size="default" 
-              onClick={handleSave} 
-              data-testid="button-save-annotations"
-              className="px-4"
-            >
-              Save
-            </Button>
-          </div>
+          ))}
         </div>
+
+        <div className="w-full h-px bg-white/20 my-1" />
+
+        {/* Actions */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleUndo}
+          disabled={historyIndex === 0}
+          data-testid="button-undo"
+          className="rounded-xl hover-elevate"
+          aria-label="Undo"
+        >
+          <Undo className="w-5 h-5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDeleteSelected}
+          disabled={!selectedAnnotation}
+          data-testid="button-delete"
+          className="rounded-xl hover-elevate"
+          aria-label="Delete selected"
+        >
+          <Trash2 className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Bottom Left - Cancel Button */}
+      <div className="fixed bottom-6 left-6">
+        <Button
+          variant="ghost"
+          size="lg"
+          onClick={handleCancel}
+          data-testid="button-cancel"
+          className="bg-black/20 dark:bg-white/10 backdrop-blur-md hover-elevate rounded-2xl px-6"
+        >
+          <X className="w-5 h-5 mr-2" />
+          Cancel
+        </Button>
+      </div>
+
+      {/* Bottom Right - Save Button */}
+      <div className="fixed bottom-6 right-6">
+        <Button
+          size="lg"
+          onClick={handleSave}
+          data-testid="button-save-annotations"
+          className="bg-black/20 dark:bg-white/10 backdrop-blur-md hover-elevate rounded-2xl px-6"
+        >
+          <Check className="w-5 h-5 mr-2" />
+          Save
+        </Button>
       </div>
     </div>
   );
