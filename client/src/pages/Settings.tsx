@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { syncManager } from '@/lib/syncManager';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
+import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
 
 export default function Settings() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -71,11 +72,14 @@ export default function Settings() {
 
   return (
     <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
-      <div className="flex items-center space-x-3">
-        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-          <SettingsIcon className="w-6 h-6 text-primary" />
-        </div>
-        <h1 className="text-2xl font-semibold" data-testid="text-settings-title">
+      <div className="flex flex-col items-center space-y-4 pb-2">
+        <img 
+          src={logoPath} 
+          alt="FieldSnaps" 
+          className="h-12 w-auto object-contain"
+          data-testid="img-fieldsnaps-logo"
+        />
+        <h1 className="text-xl font-semibold text-muted-foreground" data-testid="text-settings-title">
           Settings
         </h1>
       </div>

@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -160,7 +161,12 @@ export default function Projects() {
     <div className="flex flex-col h-full">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
       <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-xl">
-        <h1 className="text-2xl font-semibold">Projects</h1>
+        <img 
+          src={logoPath} 
+          alt="FieldSnaps" 
+          className="h-9 w-auto object-contain"
+          data-testid="img-fieldsnaps-logo"
+        />
         <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>

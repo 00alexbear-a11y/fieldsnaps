@@ -7,6 +7,7 @@ import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
+import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
 import {
   Select,
   SelectContent,
@@ -414,18 +415,27 @@ export default function Camera() {
     return (
       <div className="flex flex-col h-full bg-background">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h1 className="text-xl font-semibold" data-testid="text-select-project">
+        <div className="flex flex-col items-center p-4 pb-2 border-b">
+          <div className="flex items-center justify-between w-full mb-3">
+            <div className="w-10" />
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-9 w-auto object-contain"
+              data-testid="img-fieldsnaps-logo"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation('/')}
+              data-testid="button-cancel-project-selection"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <h1 className="text-lg font-semibold text-muted-foreground" data-testid="text-select-project">
             Select Project
           </h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/')}
-            data-testid="button-cancel-project-selection"
-          >
-            <X className="w-5 h-5" />
-          </Button>
         </div>
 
         {/* Project List */}
