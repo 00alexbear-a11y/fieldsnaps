@@ -15,6 +15,11 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
   - Capture & Edit: One tap captures photo and opens annotation editor immediately
   - After editing, save returns to camera which auto-starts for next photo
   - Streamlined workflow optimized for rapid field documentation
+- **iOS Safari Video Display Fix:** Fixed blank video screen issue on iOS devices
+  - Added explicit `video.play()` call after setting MediaStream srcObject
+  - iOS Safari requires explicit play() - autoPlay attribute alone is insufficient
+  - Wrapped in try-catch for graceful error handling
+  - Camera feed now displays correctly on iOS Safari browsers
 
 ### Phase 4: Camera & Photo Display Fixes (October 12, 2025)
 - **Photo Display Fix:** Photos now display fully without cropping in annotation editor
