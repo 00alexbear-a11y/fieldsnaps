@@ -21,6 +21,8 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
   - Fixed timing issue: now waits for video metadata to load before hiding loading overlay
   - Previously hiding overlay when video dimensions were 0x0, causing blank white screen
   - Loading overlay now stays visible until video has actual dimensions
+  - Fixed viewport height issue: changed from `h-full` to `fixed inset-0` with `100dvh` height
+  - Dynamic viewport height (`100dvh`) accounts for iOS Safari's dynamic address bar
   - Camera feed now displays correctly on iOS Safari browsers
 
 ### Phase 4: Camera & Photo Display Fixes (October 12, 2025)
