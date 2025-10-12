@@ -20,6 +20,15 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
   - Provides full-screen viewfinder without UI distractions
   - Slides back up with smooth animation when leaving Camera
   - 300ms ease-in-out animation matches iOS design language
+  - Works for all camera-related routes (handles query params and sub-paths)
+- **Save Function Verification:** Confirmed both capture modes save correctly
+  - Quick Capture: Saves photo to selected project folder, stays on camera for next shot
+  - Capture & Edit: Saves photo to selected project folder, opens annotation editor
+  - Both use `projectId: selectedProject` to ensure proper folder association
+- **Arrow Tool Icon:** Improved arrow annotation tool visual design
+  - Changed from right-pointing arrow to diagonal up-right arrow icon
+  - Better represents multi-directional annotation capability
+  - More intuitive for users drawing arrows in any direction
 - **iOS Safari Video Display Fix:** Fixed blank video screen issue on iOS devices
   - Added explicit `video.play()` call after setting MediaStream srcObject
   - iOS Safari requires explicit play() - autoPlay attribute alone is insufficient
