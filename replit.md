@@ -3,6 +3,16 @@
 ## Overview
 This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
+## Recent Changes (October 2025)
+### Phase 2: Enhanced Project Management & Comments
+- **Projects Enhancement:** Added address field to projects, cover photo selection via project settings dialog
+- **Photographer Attribution:** Photos now track photographer ID and name, displayed as overlays on thumbnails
+- **Camera Workflow:** Redesigned with bottom-fixed controls (quick capture, edit capture, close)
+- **Quick Capture Mode:** Single-tap photo capture that saves and continues shooting
+- **Edit-on-Capture Mode:** Captures and navigates to annotation editor with resilient blob URL lifecycle
+- **Comments System:** Integrated sliding panel in PhotoGestureViewer with real-time comments on photos
+- **Search & Navigation:** Top nav bar with global search (projects, addresses, captions) and settings dropdown
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
