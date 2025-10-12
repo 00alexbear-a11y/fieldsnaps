@@ -1,388 +1,77 @@
-# Construction Photo PWA - Apple-Inspired Design
+# Construction Photo PWA
 
-## 🎯 Vision: Premium Construction Photo Documentation
+## Overview
+This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
-A Progressive Web App designed like Apple would - extremely simple, offline-reliable, and effortless to use. Built for construction professionals who need to quickly capture and document job sites, even with work gloves and poor connectivity.
+## User Preferences
+- **Communication style**: I prefer simple language and direct answers.
+- **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
+- **Workflow preferences**: I want iterative development with frequent updates and feedback loops. Prioritize core functionality first.
+- **Interaction preferences**: Ask for confirmation before implementing major architectural changes or deleting significant code.
+- **General working preferences**: 
+    - Ensure all user-facing features are intuitive and require minimal explanation.
+    - Focus on performance, especially for mobile and offline use cases.
+    - Adhere strictly to the Apple-inspired design principles outlined in the architecture.
+    - Do not introduce unnecessary complexity; simplicity is key.
+    - Provide clear explanations for any technical decisions.
 
----
+## System Architecture
 
-## 🏗️ Construction Industry Requirements
+### UI/UX Decisions
+The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence (San Francisco-inspired), and consistent 8px grid spacing.
+- **Color Palette**: Primary iOS Blue (`#007AFF`), Secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Amber (`#FF9500`), Background Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`).
+- **Interaction Design**: Fluid 0.3s easing animations, haptic feedback for key actions, natural gesture navigation, progressive disclosure of advanced features, and smart defaults.
+- **Component Design**: Rounded buttons (8px), subtle card shadows, clean forms with floating labels, and a tab bar navigation with SF Symbols-inspired icons.
 
-### Field Conditions
-- **Complete offline functionality** - Remote job sites, poor connectivity
-- **Touch-optimized for work gloves** - Minimum 44px touch targets
-- **Fast photo workflow** - Busy professionals need speed
-- **Reliable in challenging environments** - Weather, dust, battery life
-- **Battery efficient** - Long workdays without charging
+### Technical Implementations
+- **Offline-First**: Service Worker with intelligent caching, IndexedDB for local photo storage (Blob storage), and complete app functionality without internet.
+- **Background Sync**: Uses the Background Sync API for queued uploads with retry logic and batch operations.
+- **Performance Optimizations**:
+    - **Lazy Loading**: Implemented with Intersection Observer API for photos, including skeleton loading and smooth transitions.
+    - **Web Workers**: For non-blocking image compression using `createImageBitmap()` and OffscreenCanvas, ensuring a responsive UI during CPU-intensive tasks.
+    - **URL Lifecycle Management**: Strict revocation of temporary object URLs to prevent memory leaks.
+- **Intelligent Photo System**:
+    - Three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API compression and progressive JPEG optimization.
+    - Instant thumbnail generation (150x150px) and smart aspect ratio preservation.
+- **Authentication**: Optional Replit Auth with OpenID Connect, supporting biometric login (WebAuthn/FIDO2) for Touch ID, Face ID, and Windows Hello. PostgreSQL for session storage.
+- **Onboarding**: A 3-step interactive onboarding flow for new users, managed by a localStorage flag.
+- **PWA Installation**: Contextual install prompts after user engagement.
 
-### Core Workflow
-1. Instant photo capture with immediate local save
-2. Smart compression with user quality control
-3. Auto-timestamp and optional location tagging
-4. Simple text notes and project organization
-5. Batch operations for efficiency
+### Feature Specifications
+- **Main Navigation**: 3 tabs – Camera, Projects, Settings.
+- **Camera Interface**: Full-screen viewfinder, floating capture button, quality selector, recent photos carousel, quick project select.
+- **Project Organization**: Card-based layout, photo count, search functionality, simple folder metaphor.
+- **Photo Management**: Grid view, pinch-to-zoom, swipe actions, batch select, timeline view.
+- **Upload Status**: Subtle progress indicators, smart notifications, and clear visual hierarchy for upload states.
+- **Error Handling**: Graceful degradation, clear error messages, automatic retry logic, and offline mode indicators.
 
----
+### System Design Choices
+- **Build Philosophy**: Focus on doing fewer things exceptionally well, creating an invisible interface that allows users to focus on their work.
+- **PWA Infrastructure**: Service Worker registered with hourly updates, offline caching, and background sync. PWA manifest configured with iOS blue branding and appropriate icons.
+- **Storage Strategy**: IndexedDB with Blob storage for photos, intelligent quota management, and automatic thumbnail cleanup.
 
-## 🍎 Apple-Inspired Design Principles
-
-### Visual Design Philosophy
-- **Extreme Minimalism** - Remove everything unnecessary
-- **Content First** - Photos are the hero, interface disappears
-- **Generous White Space** - Clean, uncluttered layouts
-- **Subtle Depth** - Gentle shadows and layering, never heavy
-- **Typography Excellence** - San Francisco-inspired font stack
-- **Consistent Spacing** - 8px grid system throughout
-
-### Color Palette (Unique, iOS-inspired)
-- **Primary**: Clean Blue `#007AFF` - iOS system blue
-- **Secondary**: Warm Gray `#8E8E93` - subtle, never intrusive
-- **Success**: Fresh Green `#34C759` - positive actions
-- **Warning**: Amber `#FF9500` - gentle alerts
-- **Background**: Pure White `#FFFFFF` and Light Gray `#F2F2F7`
-- **Text**: True Black `#000000` and Gray `#3C3C43`
-
-### Interaction Design
-- **Fluid Animations** - 0.3s easing transitions, never jarring
-- **Haptic Feedback** - Subtle vibrations for key actions
-- **Gesture Navigation** - Swipe, pinch, long-press feel natural
-- **Progressive Disclosure** - Advanced features appear when needed
-- **Smart Defaults** - Everything works without configuration
-
-### Component Design
-- **Buttons** - Rounded corners (8px), generous padding, clear hierarchy
-- **Cards** - Subtle shadows `0 2px 8px rgba(0,0,0,0.1)`
-- **Forms** - Clean inputs with floating labels
-- **Navigation** - Tab bar with SF Symbols-inspired icons
-- **Status Indicators** - Subtle, non-intrusive visual feedback
-
----
-
-## 🔐 Optional Authentication
-
-### Design Philosophy
-Authentication is **completely optional** to preserve offline-first functionality:
-- **No Auth Required** - App works fully offline without login
-- **Optional Cloud Sync** - Sign in to sync photos across devices  
-- **Replit Auth** - Simple OAuth with Google, GitHub, email
-- **Biometric Login** - Touch ID, Face ID, Windows Hello support
-- **User-Owned Data** - Photos stored locally, synced when authenticated
-
-### Implementation
-- Replit Auth with OpenID Connect
-- PostgreSQL session storage
-- WebAuthn/FIDO2 biometric authentication
-- SimpleWebAuthn library for browser/server integration
-- useAuth() hook for frontend state
-- isAuthenticated middleware for protected routes
-- Avatar with profile image support
-
-### Biometric Authentication (WebAuthn)
-- **Platform Authenticators**: Touch ID (macOS/iOS), Face ID (iOS), Windows Hello
-- **Registration Flow**: Users can enable biometric login after signing in with Replit Auth
-- **Authentication Flow**: One-tap sign-in using biometrics
-- **Fallback**: Replit Auth always available as backup
-- **Security**: FIDO2-compliant, phishing-resistant public-key cryptography
-- **Database**: Credentials table stores public keys, counter for clone detection
-
-## 👋 3-Step Onboarding Flow
-
-### User Experience
-New users see a welcoming 3-step guide on first visit:
-1. **Welcome** - Introduce the app and offline-first capability
-2. **Photo Quality** - Explain 3 compression levels (Quick/Standard/Detailed)
-3. **Offline Design** - Highlight local-first sync when online
-
-### Implementation
-- Onboarding component with smooth transitions
-- localStorage flag (onboarding_complete) to show once
-- Skippable at any step
-- Step indicators for progress
-- Apple-inspired design with icons and clear messaging
-
-## ⚡ Performance Optimizations
-
-### Lazy Loading
-- **Intersection Observer API** - Loads photos only when visible
-- **50px rootMargin** - Pre-loads images slightly before they enter viewport
-- **Skeleton loading** - Animated pulse placeholder during load
-- **Smooth transitions** - 300ms fade-in when images load
-- **Memory efficient** - Disconnects observer after loading
-
-### Web Workers for Compression
-- **Non-blocking UI** - Compression runs in separate thread
-- **Worker-Safe APIs** - Uses `createImageBitmap()` instead of DOM-dependent `new Image()`
-- **OffscreenCanvas** - High-performance canvas operations in worker
-- **ImageBitmap** - Worker-compatible image format for canvas operations
-- **Responsive capture** - UI stays fluid during compression
-- **Worker lifecycle** - Lazy initialization and proper cleanup
-- **Type-safe** - Full TypeScript support with Promise-based API
-
-### Architecture
-- **Worker**: `photoCompression.worker.ts` - Handles CPU-intensive compression
-  - Uses `createImageBitmap(blob)` for worker-safe image loading
-  - All compression with OffscreenCanvas and ImageBitmap
-  - No DOM dependencies (100% worker-compatible)
-- **Manager**: `photoCompressionWorker.ts` - Manages worker lifecycle and communication
-- **Camera Integration** - Seamlessly uses worker for all photo captures
-
-### Complete URL Lifecycle (Zero Memory Leaks)
-1. **Worker Processing**: Loads blob with `createImageBitmap()`, compresses with OffscreenCanvas
-2. **Temporary URLs**: Manager creates object URLs only for preview/debugging
-3. **IndexedDB Storage**: Camera saves blobs (not URLs) to IndexedDB
-4. **URL Revocation**: Camera immediately revokes temporary URLs after save
-5. **Server Upload**: SyncManager uploads blobs, receives server URLs
-6. **Display**: Photos displayed using server URLs from database
-7. **Memory Safety**: No lingering object URLs, blobs managed by IndexedDB
-
-### Benefits
-- Faster initial page load (lazy loading)
-- Reduced bandwidth usage on job sites
-- Better performance with large photo collections
-- Smooth scroll experience
-- No UI freezing during compression
-- Responsive camera capture even on slow devices
-
-## 📸 Intelligent Photo System
-
-### Quality Control
-Three compression levels with smart defaults:
-1. **Standard (500KB)** - Default for most documentation
-2. **Detailed (1MB)** - High-quality for important captures
-3. **Quick (200KB)** - Fast sharing and progress updates
-
-### Photo Processing
-- Canvas API compression maintaining visual quality
-- Progressive JPEG optimization
-- Instant thumbnail generation (150x150px)
-- Smart aspect ratio preservation
-- Client-side processing (no server dependency)
-
-### Capture Experience
-- Large, centered capture button
-- Clean viewfinder with minimal UI overlay
-- One-tap capture with immediate feedback
-- Quality selector slide-up panel
-- Quick note entry with smart suggestions
-
----
-
-## 🔧 PWA Technical Foundation
-
-### Offline-First Architecture
-- Service Worker with intelligent caching
-- Complete app functionality without internet
-- Background sync when connection returns
-- Local-first data with cloud backup
-
-### Storage Strategy
-- **IndexedDB** with Blob storage for photos
-- Intelligent quota management
-- Automatic cleanup of old thumbnails
-- User-controlled storage optimization
-
-### Sync System
-- Background upload queue with retry logic
-- Batch uploads for efficiency
-- Progress indicators with estimated completion
-- Conflict resolution for offline edits
-
----
-
-## 📱 Simplified User Interface
-
-### Main Navigation (3 Tabs)
-1. **Camera** - Primary photo capture interface
-2. **Projects** - Clean project organization
-3. **Settings** - Minimal, essential controls only
-
-### Camera Interface
-- Full-screen viewfinder (minimal chrome)
-- Floating capture button (center bottom)
-- Quality selector (swipe up from bottom)
-- Recent photos carousel (swipe left from edge)
-- Project quick-select (top bar, auto-hide)
-
-### Project Organization
-- Card-based project layout
-- Photo count and last updated info
-- Search with instant results
-- Simple folder metaphor (no complex hierarchy)
-
-### Photo Management
-- Grid view with smart spacing
-- Pinch to zoom preview
-- Swipe for quick actions (share, delete, move)
-- Batch select with multi-touch
-- Timeline view option
-
-### Upload Status
-- Subtle progress indicators (never intrusive)
-- Smart notifications (grouped, not spammy)
-- Clear visual hierarchy for upload states
-- One-tap retry for failed uploads
-
----
-
-## 🔐 Authentication & Onboarding
-
-### Sign-Up Flow
-- Single screen: email, password, company name
-- Instant access (no email verification required initially)
-- "Remember this device" enabled by default
-- Biometric login support after initial setup
-
-### Onboarding Experience
-- 3-step interactive tutorial (2 minutes max)
-- Skip option for experienced users
-- Progressive feature discovery
-- Success state: First photo captured and saved
-
-### PWA Installation
-- Contextual install prompts (after engagement)
-- Clear offline benefits messaging
-- Smooth installation flow
-- Works great as web app if not installed
-
----
-
-## ⚠️ Error Handling & Reliability
-
-### Graceful Degradation
-- Clear error messages in plain language
-- Smart recovery suggestions
-- Offline mode indicators
-- Automatic retry logic with backoff
-
-### Performance Optimization
-- Lazy loading for large photo sets
-- Image compression in web workers
-- Virtual scrolling for galleries
-- Memory management for stability
-
-### Compatibility
-- Works across all modern mobile browsers
-- Progressive enhancement for PWA features
-- Fallback for unsupported functionality
-- Consistent experience regardless of platform
-
----
-
-## 🚀 Performance Targets
-
-- **App startup**: <1 second
-- **Photo capture to save**: <2 seconds
-- **Gallery load (50 photos)**: <3 seconds
-- **Photo compression**: <1 second each
-- **Smooth 60fps animations** throughout
-
----
-
-## 📋 Implementation Checklist
-
-- [ ] Works completely offline after installation
-- [ ] Photo capture and save functions reliably
-- [ ] Upload queue handles network interruptions
-- [ ] UI feels responsive and polished
-- [ ] Installation process is smooth
-- [ ] Authentication persists properly
-- [ ] Storage management works correctly
-
----
-
-## 🛠️ Current Tech Stack
+## External Dependencies
 
 ### Frontend
-- React, TypeScript, Vite
-- Tailwind CSS, shadcn/ui components
-- Wouter (routing)
-- TanStack Query (data fetching)
+- **React**: JavaScript library for building user interfaces.
+- **TypeScript**: Superset of JavaScript that adds static typing.
+- **Vite**: Next-generation frontend tooling.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **shadcn/ui**: Component library for React.
+- **Wouter**: A tiny routing library for React.
+- **TanStack Query**: Asynchronous state management library.
 
 ### Backend
-- Express.js
-- PostgreSQL (Replit built-in)
-- Drizzle ORM
+- **Express.js**: Web application framework for Node.js.
+- **PostgreSQL**: Relational database (Replit built-in).
+- **Drizzle ORM**: TypeScript ORM for relational databases.
 
-### PWA
-- Service Worker (enhanced offline support)
-- Web Manifest
-- IndexedDB (local photo storage)
-- Background Sync API
+### PWA Technologies
+- **Service Worker API**: For offline caching and background processes.
+- **Web Manifest**: For PWA installation and metadata.
+- **IndexedDB**: Client-side storage for structured data and Blobs.
+- **Background Sync API**: For deferring network operations until connectivity is restored.
 
----
-
-## 📂 Project Structure
-
-```
-client/
-  src/
-    components/       # React components
-    pages/           # Page components (Camera, Projects, Settings)
-    lib/             # Utilities, IndexedDB, compression
-    workers/         # Web workers for photo processing
-server/
-  db.ts            # Database connection
-  routes.ts        # API endpoints
-  storage.ts       # Data access layer
-shared/
-  schema.ts        # Database schema & types
-public/
-  manifest.json    # PWA manifest
-  sw.js           # Enhanced service worker
-```
-
----
-
-## 🔗 API Endpoints
-
-### Projects
-- `GET /api/projects` - List all projects
-- `POST /api/projects` - Create project
-- `GET /api/projects/:id` - Get project details
-- `DELETE /api/projects/:id` - Delete project
-
-### Photos
-- `GET /api/projects/:projectId/photos` - List project photos
-- `POST /api/projects/:projectId/photos` - Upload photo
-- `DELETE /api/photos/:id` - Delete photo
-- `GET /api/photos/:photoId` - Get photo details
-
-### Sync
-- `POST /api/sync/photos` - Batch upload photos
-- `GET /api/sync/status` - Get sync queue status
-- `POST /api/sync/retry` - Retry failed uploads
-
-### Annotations (Legacy - Optional)
-- `GET /api/photos/:photoId/annotations` - Get annotations
-- `POST /api/photos/:photoId/annotations` - Create annotation
-- `DELETE /api/annotations/:id` - Delete annotation
-
----
-
-## 🎨 Build Philosophy
-
-> "Create a tool so simple and elegant that construction professionals immediately understand how to use it, with the reliability they need for important project documentation. Focus on doing fewer things exceptionally well rather than many things adequately. The interface should feel invisible - users should focus on their work, not learning the app."
-
----
-
-## 📝 Development Notes
-
-### Current Implementation (v1)
-- ✅ PostgreSQL backend with projects, photos, annotations
-- ✅ Annotation tools (text, arrow, line, circle, pen)
-- ✅ Basic PWA setup
-- ✅ Mobile-responsive layout
-
-### Transformation to v2 (Apple-Inspired Construction PWA)
-- 🔄 Offline-first with IndexedDB
-- 🔄 Apple-inspired UI (iOS blue, clean white)
-- 🔄 3-tab navigation (Camera/Projects/Settings)
-- 🔄 Photo compression with quality presets
-- 🔄 Background sync queue
-- 🔄 Touch-optimized for gloves (44px+ targets)
-- 🔄 Enhanced Service Worker
-- ✅ **Biometric Authentication (WebAuthn)** - Production-ready with Touch ID, Face ID, Windows Hello support
-
----
-
-Last updated: October 12, 2025
+### Authentication
+- **Replit Auth**: For user authentication, likely using OpenID Connect.
+- **SimpleWebAuthn**: Library for WebAuthn/FIDO2 biometric authentication.
