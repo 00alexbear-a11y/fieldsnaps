@@ -36,6 +36,7 @@ export default function ProjectPhotos() {
   const [editedProject, setEditedProject] = useState({ name: "", description: "", address: "", coverPhotoId: "" });
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
+  const [shareLink, setShareLink] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -254,13 +255,25 @@ export default function ProjectPhotos() {
       const share = await response.json();
       const shareUrl = `${window.location.origin}/share/${share.token}`;
 
-      // Copy to clipboard
-      await navigator.clipboard.writeText(shareUrl);
+      // Try to copy to clipboard (may fail in some browsers)
+      let copiedToClipboard = false;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        copiedToClipboard = true;
+        toast({
+          title: 'Share link created!',
+          description: `Link copied to clipboard. ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'} shared.`,
+        });
+      } catch (clipboardError) {
+        console.log('Clipboard write failed, will show dialog instead');
+        toast({
+          title: 'Share link created',
+          description: 'Use the Copy button to copy the link',
+        });
+      }
 
-      toast({
-        title: 'Link copied!',
-        description: `Share link copied to clipboard. ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'} shared.`,
-      });
+      // Show the link in a dialog
+      setShareLink(shareUrl);
 
       // Exit select mode
       setIsSelectMode(false);
@@ -668,6 +681,64 @@ export default function ProjectPhotos() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share Link Dialog */}
+      <Dialog open={!!shareLink} onOpenChange={() => setShareLink(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share Link Created</DialogTitle>
+            <DialogDescription>
+              Copy this link to share your photos with others. The link will expire in 30 days.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Input
+                id="share-link"
+                value={shareLink || ''}
+                readOnly
+                className="font-mono text-sm"
+                data-testid="input-share-link"
+              />
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              className="px-3"
+              onClick={async () => {
+                if (shareLink) {
+                  try {
+                    await navigator.clipboard.writeText(shareLink);
+                    toast({
+                      title: 'Copied!',
+                      description: 'Share link copied to clipboard',
+                    });
+                  } catch (error) {
+                    toast({
+                      title: 'Copy failed',
+                      description: 'Please copy the link manually',
+                      variant: 'destructive',
+                    });
+                  }
+                }
+              }}
+              data-testid="button-copy-link"
+            >
+              Copy
+            </Button>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShareLink(null)}
+              data-testid="button-close-share-dialog"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
