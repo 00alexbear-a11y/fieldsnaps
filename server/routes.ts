@@ -1,11 +1,35 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
 import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(), // Store in memory for processing
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept images only
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve uploaded photos
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadsPath));
+
   // Setup authentication
   await setupAuth(app);
   
@@ -66,15 +90,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", async (req, res) => {
+  app.post("/api/projects/:projectId/photos", upload.single('photo'), async (req, res) => {
     try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No photo file provided" });
+      }
+
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'photos');
+      await fs.mkdir(uploadsDir, { recursive: true });
+
+      // Generate unique filename
+      const filename = `${Date.now()}-${crypto.randomUUID()}${path.extname(req.file.originalname || '.jpg')}`;
+      const filepath = path.join(uploadsDir, filename);
+
+      // Save file to disk
+      await fs.writeFile(filepath, req.file.buffer);
+
+      // Create photo URL
+      const url = `/uploads/photos/${filename}`;
+
+      // Store photo metadata in database
       const validated = insertPhotoSchema.parse({
-        ...req.body,
         projectId: req.params.projectId,
+        url,
+        caption: req.body.caption || req.file.originalname,
       });
+      
       const photo = await storage.createPhoto(validated);
       res.status(201).json(photo);
     } catch (error: any) {
+      console.error('Photo upload error:', error);
       res.status(400).json({ error: error.message });
     }
   });
