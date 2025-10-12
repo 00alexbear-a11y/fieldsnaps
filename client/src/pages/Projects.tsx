@@ -279,7 +279,16 @@ export default function Projects() {
                     {project.address && (
                       <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
                         <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate" data-testid={`text-address-${project.id}`}>{project.address}</span>
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="truncate hover:text-primary hover:underline transition-colors"
+                          data-testid={`link-address-${project.id}`}
+                        >
+                          {project.address}
+                        </a>
                       </div>
                     )}
 

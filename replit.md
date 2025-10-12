@@ -5,13 +5,14 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
 
 ## Recent Changes (October 2025)
 ### Phase 2: Enhanced Project Management & Comments
-- **Projects Enhancement:** Added address field to projects, cover photo selection via project settings dialog
+- **Projects Enhancement:** Added address field to projects (clickable to open Google Maps), cover photo selection via project settings dialog
 - **Photographer Attribution:** Photos now track photographer ID and name, displayed as overlays on thumbnails
 - **Camera Workflow:** Redesigned with bottom-fixed controls (quick capture, edit capture, close)
 - **Quick Capture Mode:** Single-tap photo capture that saves and continues shooting
 - **Edit-on-Capture Mode:** Captures and navigates to annotation editor with resilient blob URL lifecycle
 - **Comments System:** Integrated sliding panel in PhotoGestureViewer with real-time comments on photos
 - **Search & Navigation:** Top nav bar with global search (projects, addresses, captions) and settings dropdown
+- **Google Maps Integration:** Project addresses are clickable links that open location in Google Maps (new tab)
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
