@@ -37,6 +37,7 @@ export default function Camera() {
   const [isActive, setIsActive] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<QualityPreset>('standard');
   const [selectedProject, setSelectedProject] = useState<string>('');
+  const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
@@ -61,22 +62,20 @@ export default function Camera() {
     const projectIdFromUrl = urlParams.get('projectId');
     
     if (projects.length > 0 && !selectedProject) {
-      // If projectId in URL and it exists in projects, use it
+      // If projectId in URL and it exists in projects, use it and skip selection screen
       if (projectIdFromUrl && projects.some(p => p.id === projectIdFromUrl)) {
         setSelectedProject(projectIdFromUrl);
-      } else {
-        // Otherwise use first project as default
-        setSelectedProject(projects[0].id);
+        setShowProjectSelection(false);
       }
     }
   }, [projects, selectedProject]);
 
-  // Auto-start camera when projects are loaded and camera is not yet active
+  // Auto-start camera when project is selected and camera is not yet active
   useEffect(() => {
-    if (projects.length > 0 && !isActive && !permissionDenied) {
+    if (selectedProject && !showProjectSelection && !isActive && !permissionDenied) {
       startCamera();
     }
-  }, [projects, cameraFacing]);
+  }, [selectedProject, showProjectSelection, cameraFacing]);
 
   // Cleanup camera when component unmounts
   useEffect(() => {
@@ -410,6 +409,62 @@ export default function Camera() {
     );
   }
 
+  // Project selection screen
+  if (showProjectSelection) {
+    return (
+      <div className="flex flex-col h-full bg-background">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h1 className="text-xl font-semibold" data-testid="text-select-project">
+            Select Project
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation('/')}
+            data-testid="button-cancel-project-selection"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Project List */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="max-w-2xl mx-auto space-y-3">
+            {projects.map((project) => (
+              <button
+                key={project.id}
+                onClick={() => {
+                  setSelectedProject(project.id);
+                  setShowProjectSelection(false);
+                }}
+                className="w-full text-left p-6 rounded-xl border-2 border-border hover-elevate active-elevate-2 transition-all"
+                data-testid={`button-select-project-${project.id}`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <FolderOpen className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold truncate">
+                      {project.name}
+                    </h3>
+                    {project.description && (
+                      <p className="text-sm text-muted-foreground truncate">
+                        {project.description}
+                      </p>
+                    )}
+                  </div>
+                  <CameraIcon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Permission denied state
   if (permissionDenied) {
     return (
@@ -501,30 +556,6 @@ export default function Camera() {
                     <span className="font-medium">{preset.label}</span>
                     <span className="text-xs text-muted-foreground">{preset.description}</span>
                   </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Project Selector - Top center, compact */}
-      <div className="absolute top-14 left-0 right-0 px-3 z-10">
-        <div className="max-w-xs mx-auto">
-          <Select value={selectedProject} onValueChange={setSelectedProject}>
-            <SelectTrigger
-              className="w-full bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
-              data-testid="select-project-camera"
-            >
-              <div className="flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" />
-                <SelectValue placeholder="Select project" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project: any) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
                 </SelectItem>
               ))}
             </SelectContent>
