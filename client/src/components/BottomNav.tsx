@@ -31,11 +31,12 @@ export default function BottomNav() {
     return false;
   };
 
-  // Hide bottom nav when on Camera page, project detail page, or share pages
+  // Hide bottom nav when on Camera page, project detail page, photo edit page, or share pages
   const isOnCamera = location.startsWith('/camera');
   const isOnProjectDetail = /^\/projects\/[^/]+$/.test(location);
+  const isOnPhotoEdit = location.startsWith('/photo/') && location.endsWith('/edit');
   const isOnSharePage = location.startsWith('/share/');
-  const shouldHideNav = isOnCamera || isOnProjectDetail || isOnSharePage;
+  const shouldHideNav = isOnCamera || isOnProjectDetail || isOnPhotoEdit || isOnSharePage;
 
   return (
     <nav

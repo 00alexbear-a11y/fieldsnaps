@@ -399,20 +399,20 @@ export function PhotoAnnotationEditor({
     ctx.lineTo(toX, toY);
     ctx.stroke();
 
-    // Draw filled arrowhead with simpler triangle
+    // Draw filled arrowhead with sharper triangle (20 degrees instead of 30)
     ctx.beginPath();
     ctx.moveTo(toX, toY); // Arrow tip
     
-    // Left wing
+    // Left wing - sharper angle (PI/9 = 20 degrees)
     ctx.lineTo(
-      toX - headLength * Math.cos(angle - Math.PI / 6),
-      toY - headLength * Math.sin(angle - Math.PI / 6)
+      toX - headLength * Math.cos(angle - Math.PI / 9),
+      toY - headLength * Math.sin(angle - Math.PI / 9)
     );
     
-    // Right wing  
+    // Right wing - sharper angle (PI/9 = 20 degrees)
     ctx.lineTo(
-      toX - headLength * Math.cos(angle + Math.PI / 6),
-      toY - headLength * Math.sin(angle + Math.PI / 6)
+      toX - headLength * Math.cos(angle + Math.PI / 9),
+      toY - headLength * Math.sin(angle + Math.PI / 9)
     );
     
     ctx.closePath();
@@ -652,8 +652,16 @@ export function PhotoAnnotationEditor({
     setStartPos({ x, y });
 
     if (tool === "text") {
-      // Use canvas coordinates for drawing, display coordinates for input overlay
-      const newTextPos = { canvasX: x, canvasY: y, screenX: displayX, screenY: displayY };
+      // Calculate proper screen position accounting for canvas scaling
+      const canvasRect = canvasRef.current.getBoundingClientRect();
+      const scaleX = canvasRect.width / canvasRef.current.width;
+      const scaleY = canvasRect.height / canvasRef.current.height;
+      
+      // Convert canvas coordinates to screen coordinates relative to canvas element
+      const screenX = x * scaleX;
+      const screenY = y * scaleY;
+      
+      const newTextPos = { canvasX: x, canvasY: y, screenX, screenY };
       console.log("Text tool clicked - setting textPosition to:", newTextPos);
       setTextPosition(newTextPos);
       setIsCreating(false);
