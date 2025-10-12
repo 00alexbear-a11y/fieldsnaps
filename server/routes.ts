@@ -26,6 +26,43 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from public directory (PWA assets: manifest, icons, sw)
+  // This MUST be first to prevent Vite catch-all from intercepting these files
+  const publicPath = path.join(process.cwd(), 'public');
+  app.use(express.static(publicPath));
+  
+  // Serve PWA files (fallback if static doesn't work)
+  app.get('/sw.js', async (req, res) => {
+    const swPath = path.join(process.cwd(), 'public', 'sw.js');
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.sendFile(swPath);
+  });
+  
+  app.get('/manifest.json', async (req, res) => {
+    try {
+      const manifestPath = path.join(process.cwd(), 'public', 'manifest.json');
+      const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+      res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+      res.send(manifestContent);
+    } catch (error) {
+      console.error('[Routes] Error serving manifest:', error);
+      res.status(500).json({ error: 'Failed to load manifest' });
+    }
+  });
+  
+  app.get('/icon-:size.png', async (req, res) => {
+    try {
+      const iconPath = path.join(process.cwd(), 'public', `icon-${req.params.size}.png`);
+      const iconBuffer = await fs.readFile(iconPath);
+      res.setHeader('Content-Type', 'image/png');
+      res.send(iconBuffer);
+    } catch (error) {
+      console.error(`[Routes] Error serving icon-${req.params.size}:`, error);
+      res.status(500).json({ error: 'Failed to load icon' });
+    }
+  });
+  
   // Serve uploaded photos
   const uploadsPath = path.join(process.cwd(), 'uploads');
   app.use('/uploads', express.static(uploadsPath));
