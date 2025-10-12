@@ -1,5 +1,5 @@
 import { useState, useRef, TouchEvent } from "react";
-import { Trash2, FolderOpen, Camera, MapPin, Clock } from "lucide-react";
+import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project, Photo } from "../../../shared/schema";
 
@@ -140,17 +140,23 @@ export default function SwipeableProjectCard({
           </h3>
           
           {project.address && (
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 mt-1 text-sm text-muted-foreground hover:text-primary transition-colors py-1.5 -mx-1 px-1 rounded"
-              data-testid={`link-address-${project.id}`}
-            >
-              <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate underline">{project.address}</span>
-            </a>
+            <div className="flex items-center gap-2 mt-1">
+              <MapPin className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground truncate flex-1">{project.address}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 flex-shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                }}
+                data-testid={`button-open-map-${project.id}`}
+                aria-label="Open in Google Maps"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Button>
+            </div>
           )}
 
           <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
