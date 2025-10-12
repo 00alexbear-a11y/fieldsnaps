@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -7,11 +7,14 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import { syncManager } from '@/lib/syncManager';
 import { useAuth } from '@/hooks/useAuth';
+import { useWebAuthn } from '@/hooks/useWebAuthn';
 
 export default function Settings() {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { registerBiometric, authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [isDark, setIsDark] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [biometricSupported, setBiometricSupported] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
     pending: number;
     projects: number;
@@ -25,6 +28,9 @@ export default function Settings() {
 
     // Load sync status
     loadSyncStatus();
+
+    // Check biometric support
+    checkBiometricSupport().then(setBiometricSupported);
 
     // Update online status
     const handleOnline = () => setIsOnline(true);
@@ -135,6 +141,32 @@ export default function Settings() {
                 )}
               </div>
             </div>
+            
+            {biometricSupported && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Fingerprint className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Biometric Login</span>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full"
+                  onClick={registerBiometric}
+                  disabled={isWebAuthnLoading}
+                  data-testid="button-register-biometric"
+                >
+                  <Fingerprint className="w-4 h-4 mr-2" />
+                  {isWebAuthnLoading ? 'Setting up...' : 'Enable Biometric Login'}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Use Touch ID, Face ID, or Windows Hello to sign in
+                </p>
+              </div>
+            )}
+            
             <Button
               variant="outline"
               size="default"
@@ -151,15 +183,35 @@ export default function Settings() {
             <p className="text-sm text-muted-foreground">
               Sign in to sync your photos across devices
             </p>
+            
+            {biometricSupported && (
+              <Button
+                variant="default"
+                size="default"
+                className="w-full"
+                onClick={async () => {
+                  const user = await authenticateWithBiometric();
+                  if (user) {
+                    window.location.reload();
+                  }
+                }}
+                disabled={isWebAuthnLoading}
+                data-testid="button-biometric-login"
+              >
+                <Fingerprint className="w-4 h-4 mr-2" />
+                {isWebAuthnLoading ? 'Authenticating...' : 'Sign In with Biometrics'}
+              </Button>
+            )}
+            
             <Button
-              variant="default"
+              variant={biometricSupported ? "outline" : "default"}
               size="default"
               className="w-full"
               onClick={() => window.location.href = '/api/login'}
               data-testid="button-login"
             >
               <LogIn className="w-4 h-4 mr-2" />
-              Sign In
+              Sign In with Replit
             </Button>
           </div>
         )}
