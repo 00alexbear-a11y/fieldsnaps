@@ -91,8 +91,6 @@ export default function Camera() {
         }
         
         setHasPermission(true);
-        setIsActive(true);
-        console.log('[Camera] isActive set to true, loading overlay should hide');
 
         // Wait for video metadata to load so dimensions are available
         await new Promise<void>((resolve) => {
@@ -104,12 +102,14 @@ export default function Camera() {
 
           // If metadata already loaded, resolve immediately
           if (video.videoWidth > 0 && video.videoHeight > 0) {
+            console.log('[Camera] Metadata already loaded, dimensions:', video.videoWidth, 'x', video.videoHeight);
             resolve();
             return;
           }
 
           // Otherwise wait for loadedmetadata event
           const handleLoadedMetadata = () => {
+            console.log('[Camera] Metadata loaded, dimensions:', video.videoWidth, 'x', video.videoHeight);
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
             resolve();
           };
@@ -117,10 +117,15 @@ export default function Camera() {
 
           // Timeout after 5 seconds
           setTimeout(() => {
+            console.warn('[Camera] Metadata load timeout after 5 seconds');
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
             resolve();
           }, 5000);
         });
+
+        // NOW set isActive after metadata has loaded
+        setIsActive(true);
+        console.log('[Camera] isActive set to true, loading overlay should hide');
       }
     } catch (error) {
       console.error('Camera error:', error);
