@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2 } from "lucide-react";
@@ -23,6 +23,7 @@ import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import LazyImage from "@/components/LazyImage";
 import type { Photo, Project } from "../../../shared/schema";
+import { format } from "date-fns";
 
 export default function ProjectPhotos() {
   const { id: projectId } = useParams();
@@ -65,6 +66,32 @@ export default function ProjectPhotos() {
   const { data: photos = [], isLoading } = useQuery<Photo[]>({
     queryKey: ["/api/projects", projectId, "photos"],
   });
+
+  // Group photos by date (newest first)
+  const photosByDate = useMemo(() => {
+    if (!photos.length) return [];
+
+    // Sort photos by timestamp (newest first)
+    const sortedPhotos = [...photos].sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
+    // Group by date
+    const groups = new Map<string, Photo[]>();
+    sortedPhotos.forEach(photo => {
+      const date = format(new Date(photo.timestamp), 'MMMM d, yyyy');
+      if (!groups.has(date)) {
+        groups.set(date, []);
+      }
+      groups.get(date)!.push(photo);
+    });
+
+    // Convert to array of { date, photos }
+    return Array.from(groups.entries()).map(([date, photos]) => ({
+      date,
+      photos,
+    }));
+  }, [photos]);
 
   const { data: annotations = [] } = useQuery<any[]>({
     queryKey: ["/api/photos", selectedPhoto?.id, "annotations"],
@@ -250,27 +277,42 @@ export default function ProjectPhotos() {
             <p className="text-muted-foreground mb-6">Add your first photo to get started</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {photos.map((photo, index) => (
-              <div
-                key={photo.id}
-                className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback"
-                onClick={() => setViewerPhotoIndex(index)}
-                data-testid={`photo-${photo.id}`}
-              >
-                <LazyImage
-                  src={photo.url}
-                  alt={photo.caption || "Photo"}
-                  className="w-full h-full object-cover"
-                />
-                {photo.photographerName && (
-                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-[10px] font-medium">
-                      {photo.photographerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                    </div>
-                    <span className="font-medium">{photo.photographerName.split(' ')[0]}</span>
-                  </div>
-                )}
+          <div className="space-y-8">
+            {photosByDate.map(({ date, photos: datePhotos }) => (
+              <div key={date} data-testid={`date-group-${date}`}>
+                {/* Date Header */}
+                <h2 className="text-lg font-semibold mb-4 text-foreground">
+                  {date}
+                </h2>
+                
+                {/* Photos Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {datePhotos.map((photo) => {
+                    const photoIndex = photos.findIndex(p => p.id === photo.id);
+                    return (
+                      <div
+                        key={photo.id}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback"
+                        onClick={() => setViewerPhotoIndex(photoIndex)}
+                        data-testid={`photo-${photo.id}`}
+                      >
+                        <LazyImage
+                          src={photo.url}
+                          alt={photo.caption || "Photo"}
+                          className="w-full h-full object-cover"
+                        />
+                        {photo.photographerName && (
+                          <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-[10px] font-medium">
+                              {photo.photographerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                            </div>
+                            <span className="font-medium">{photo.photographerName.split(' ')[0]}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </div>
