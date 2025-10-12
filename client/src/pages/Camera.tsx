@@ -470,51 +470,41 @@ export default function Camera() {
         data-testid="video-camera-stream"
       />
 
-      {/* Top Controls - Minimal */}
+      {/* Top Controls - Centered camera flip with quality on right */}
       <div className="absolute top-0 left-0 right-0 p-3 z-10">
         <div className="flex items-center justify-between max-w-screen-sm mx-auto">
+          <div className="w-28" />
+          
+          {/* Camera switch - centered */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation('/')}
+            onClick={switchCamera}
             className="text-white hover:bg-white/20 bg-black/30 backdrop-blur-md"
-            data-testid="button-close-camera"
+            data-testid="button-switch-camera"
           >
-            <X className="w-6 h-6" />
+            <SwitchCamera className="w-5 h-5" />
           </Button>
 
-          <div className="flex items-center gap-2">
-            {/* Camera switch */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={switchCamera}
-              className="text-white hover:bg-white/20 bg-black/30 backdrop-blur-md"
-              data-testid="button-switch-camera"
+          {/* Quality selector */}
+          <Select value={selectedQuality} onValueChange={(v) => setSelectedQuality(v as QualityPreset)}>
+            <SelectTrigger
+              className="w-28 bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
+              data-testid="select-quality"
             >
-              <SwitchCamera className="w-5 h-5" />
-            </Button>
-
-            {/* Quality selector */}
-            <Select value={selectedQuality} onValueChange={(v) => setSelectedQuality(v as QualityPreset)}>
-              <SelectTrigger
-                className="w-28 bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
-                data-testid="select-quality"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {QUALITY_PRESETS.map((preset) => (
-                  <SelectItem key={preset.value} value={preset.value}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{preset.label}</span>
-                      <span className="text-xs text-muted-foreground">{preset.description}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {QUALITY_PRESETS.map((preset) => (
+                <SelectItem key={preset.value} value={preset.value}>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{preset.label}</span>
+                    <span className="text-xs text-muted-foreground">{preset.description}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
