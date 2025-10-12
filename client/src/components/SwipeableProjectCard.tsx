@@ -105,7 +105,7 @@ export default function SwipeableProjectCard({
       {/* Project Card - swipes left to reveal delete */}
       <div
         ref={cardRef}
-        className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover-elevate active-elevate-2 cursor-pointer bg-card/60 backdrop-blur-xl border border-border/50 mx-3 my-2 rounded-2xl overflow-visible"
+        className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover-elevate active-elevate-2 cursor-pointer bg-card/60 dark:bg-background/80 backdrop-blur-xl border border-border/50 mx-3 my-2 rounded-2xl overflow-visible"
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
