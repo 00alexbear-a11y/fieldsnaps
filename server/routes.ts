@@ -117,6 +117,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/projects/:id", async (req, res) => {
+    try {
+      // Validate with partial schema (all fields optional)
+      const validated = insertProjectSchema.partial().parse(req.body);
+      const updated = await storage.updateProject(req.params.id, validated);
+      if (!updated) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
   // Photos
   app.get("/api/projects/:projectId/photos", async (req, res) => {
     try {
@@ -127,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", upload.single('photo'), async (req, res) => {
+  app.post("/api/projects/:projectId/photos", upload.single('photo'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No photo file provided" });
@@ -147,11 +161,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create photo URL
       const url = `/uploads/photos/${filename}`;
 
+      // Get photographer info from auth or request body (for offline support)
+      let photographerId = req.body.photographerId;
+      let photographerName = req.body.photographerName;
+      
+      if (req.user) {
+        photographerId = req.user.claims.sub;
+        photographerName = req.user.claims.name || req.user.claims.email;
+      }
+
       // Store photo metadata in database
       const validated = insertPhotoSchema.parse({
         projectId: req.params.projectId,
         url,
         caption: req.body.caption || req.file.originalname,
+        photographerId,
+        photographerName,
       });
       
       const photo = await storage.createPhoto(validated);

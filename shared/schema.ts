@@ -41,6 +41,8 @@ export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
+  address: text("address"), // Job site address
+  coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
   userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -51,6 +53,8 @@ export const photos = pgTable("photos", {
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   caption: text("caption"),
+  photographerId: varchar("photographer_id").references(() => users.id), // Who took the photo
+  photographerName: varchar("photographer_name"), // Cached name for offline display
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
