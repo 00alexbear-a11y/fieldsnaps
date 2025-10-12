@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -33,6 +34,8 @@ export default function ProjectPhotos() {
   const [showSettings, setShowSettings] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editedProject, setEditedProject] = useState({ name: "", description: "", address: "", coverPhotoId: "" });
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -71,15 +74,15 @@ export default function ProjectPhotos() {
   const photosByDate = useMemo(() => {
     if (!photos.length) return [];
 
-    // Sort photos by timestamp (newest first)
+    // Sort photos by createdAt (newest first)
     const sortedPhotos = [...photos].sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     // Group by date
     const groups = new Map<string, Photo[]>();
     sortedPhotos.forEach(photo => {
-      const date = format(new Date(photo.timestamp), 'MMMM d, yyyy');
+      const date = format(new Date(photo.createdAt), 'MMMM d, yyyy');
       if (!groups.has(date)) {
         groups.set(date, []);
       }
@@ -181,6 +184,65 @@ export default function ProjectPhotos() {
     uploadMutation.mutate(file);
   };
 
+  const toggleSelectMode = () => {
+    setIsSelectMode(!isSelectMode);
+    if (isSelectMode) {
+      // Clear selection when exiting select mode
+      setSelectedPhotoIds(new Set());
+    }
+  };
+
+  const togglePhotoSelection = (photoId: string) => {
+    const newSelected = new Set(selectedPhotoIds);
+    if (newSelected.has(photoId)) {
+      newSelected.delete(photoId);
+    } else {
+      newSelected.add(photoId);
+    }
+    setSelectedPhotoIds(newSelected);
+  };
+
+  const toggleDateSelection = (datePhotos: Photo[]) => {
+    const newSelected = new Set(selectedPhotoIds);
+    const datePhotoIds = datePhotos.map(p => p.id);
+    const allSelected = datePhotoIds.every(id => newSelected.has(id));
+    
+    if (allSelected) {
+      // Deselect all photos from this date
+      datePhotoIds.forEach(id => newSelected.delete(id));
+    } else {
+      // Select all photos from this date
+      datePhotoIds.forEach(id => newSelected.add(id));
+    }
+    setSelectedPhotoIds(newSelected);
+  };
+
+  const isDateFullySelected = (datePhotos: Photo[]) => {
+    return datePhotos.every(photo => selectedPhotoIds.has(photo.id));
+  };
+
+  const isDatePartiallySelected = (datePhotos: Photo[]) => {
+    const selectedCount = datePhotos.filter(photo => selectedPhotoIds.has(photo.id)).length;
+    return selectedCount > 0 && selectedCount < datePhotos.length;
+  };
+
+  const handleShareSelected = () => {
+    if (selectedPhotoIds.size === 0) {
+      toast({
+        title: 'No photos selected',
+        description: 'Please select at least one photo to share',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // TODO: Implement share functionality in next phase
+    toast({
+      title: 'Share feature coming soon',
+      description: `Ready to share ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'}`,
+    });
+  };
+
   const handleSaveAnnotations = async (annotations: any[]) => {
     if (!selectedPhoto) return;
 
@@ -233,37 +295,58 @@ export default function ProjectPhotos() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSettings(true)}
-            data-testid="button-project-settings"
-          >
-            <SettingsIcon className="w-5 h-5" />
-          </Button>
-          <Button
-            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
-            data-testid="button-open-camera"
-          >
-            <Camera className="w-5 h-5 mr-2" />
-            Camera
-          </Button>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="photo-upload"
-          />
-          <label htmlFor="photo-upload">
-            <Button asChild disabled={uploadMutation.isPending} variant="outline">
-              <span>
+          {!isSelectMode && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSettings(true)}
+                data-testid="button-project-settings"
+              >
+                <SettingsIcon className="w-5 h-5" />
+              </Button>
+              <Button
+                onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+                data-testid="button-open-camera"
+              >
                 <Camera className="w-5 h-5 mr-2" />
-                {uploadMutation.isPending ? "Uploading..." : "Upload"}
-              </span>
+                Camera
+              </Button>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="photo-upload"
+              />
+              <label htmlFor="photo-upload">
+                <Button asChild disabled={uploadMutation.isPending} variant="outline">
+                  <span>
+                    <Camera className="w-5 h-5 mr-2" />
+                    {uploadMutation.isPending ? "Uploading..." : "Upload"}
+                  </span>
+                </Button>
+              </label>
+              {photos.length > 0 && (
+                <Button
+                  onClick={toggleSelectMode}
+                  data-testid="button-select-mode"
+                >
+                  Select
+                </Button>
+              )}
+            </>
+          )}
+          {isSelectMode && (
+            <Button
+              onClick={toggleSelectMode}
+              variant="outline"
+              data-testid="button-cancel-select"
+            >
+              Cancel
             </Button>
-          </label>
+          )}
         </div>
       </header>
 
@@ -280,28 +363,58 @@ export default function ProjectPhotos() {
           <div className="space-y-8">
             {photosByDate.map(({ date, photos: datePhotos }) => (
               <div key={date} data-testid={`date-group-${date}`}>
-                {/* Date Header */}
-                <h2 className="text-lg font-semibold mb-4 text-foreground">
-                  {date}
-                </h2>
+                {/* Date Header with Checkbox */}
+                <div className="flex items-center gap-3 mb-4">
+                  {isSelectMode && (
+                    <Checkbox
+                      checked={isDateFullySelected(datePhotos)}
+                      onCheckedChange={() => toggleDateSelection(datePhotos)}
+                      data-testid={`checkbox-date-${date}`}
+                      className="w-5 h-5"
+                    />
+                  )}
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {date}
+                  </h2>
+                </div>
                 
                 {/* Photos Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {datePhotos.map((photo) => {
                     const photoIndex = photos.findIndex(p => p.id === photo.id);
+                    const isSelected = selectedPhotoIds.has(photo.id);
                     return (
                       <div
                         key={photo.id}
-                        className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback"
-                        onClick={() => setViewerPhotoIndex(photoIndex)}
+                        className={`relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
+                          isSelectMode && isSelected ? 'ring-4 ring-primary' : ''
+                        }`}
+                        onClick={() => {
+                          if (isSelectMode) {
+                            togglePhotoSelection(photo.id);
+                          } else {
+                            setViewerPhotoIndex(photoIndex);
+                          }
+                        }}
                         data-testid={`photo-${photo.id}`}
                       >
+                        {isSelectMode && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => togglePhotoSelection(photo.id)}
+                              data-testid={`checkbox-photo-${photo.id}`}
+                              className="w-6 h-6 bg-white/90 backdrop-blur-sm border-2"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
                         <LazyImage
                           src={photo.url}
                           alt={photo.caption || "Photo"}
                           className="w-full h-full object-cover"
                         />
-                        {photo.photographerName && (
+                        {photo.photographerName && !isSelectMode && (
                           <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1.5">
                             <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-[10px] font-medium">
                               {photo.photographerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
@@ -318,6 +431,27 @@ export default function ProjectPhotos() {
           </div>
         )}
       </main>
+
+      {/* Selection Toolbar */}
+      {isSelectMode && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
+          <div className="max-w-screen-sm mx-auto flex items-center justify-between gap-4">
+            <span className="text-sm font-medium">
+              {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} selected
+            </span>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleShareSelected}
+                disabled={selectedPhotoIds.size === 0}
+                data-testid="button-share-selected"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Gesture-enabled Photo Viewer */}
       {viewerPhotoIndex !== null && (
