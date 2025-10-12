@@ -31,9 +31,14 @@ export default function BottomNav() {
     return false;
   };
 
+  // Hide bottom nav when on Camera page or any camera-related route
+  const isOnCamera = location.startsWith('/camera');
+
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border safe-area-inset-bottom"
+      className={`fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border safe-area-inset-bottom transition-transform duration-300 ease-in-out ${
+        isOnCamera ? 'translate-y-full' : 'translate-y-0'
+      }`}
       data-testid="nav-bottom"
     >
       <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto">
