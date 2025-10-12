@@ -736,12 +736,12 @@ export default function ProjectPhotos() {
             className="hidden"
             id="photo-upload-fab"
           />
-          {/* Main FAB - Camera */}
+          {/* Main FAB - Camera (centered at bottom) */}
           <Button
             onClick={() => setLocation(`/camera?projectId=${projectId}`)}
             data-testid="button-add-photo-fab"
             size="lg"
-            className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-xl z-20 hover:scale-110 transition-transform"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full shadow-xl z-20 hover:scale-110 transition-transform"
           >
             <Camera className="w-6 h-6" />
           </Button>
