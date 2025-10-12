@@ -93,7 +93,8 @@ export default function Camera() {
     setIsActive(false);
   };
 
-  const capturePhoto = async () => {
+  // Quick capture mode: Capture photo and continue shooting
+  const quickCapture = async () => {
     if (!videoRef.current || !selectedProject || isCapturing) return;
 
     setIsCapturing(true);
@@ -139,23 +140,24 @@ export default function Camera() {
       // Queue for sync
       await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
 
-      // Show success
+      // Show brief success toast
       toast({
-        title: 'Photo Captured',
-        description: `Saved with ${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
+        title: '✓ Captured',
+        description: `${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
+        duration: 1500, // Brief toast for quick mode
       });
 
-      // Simulate haptic feedback with a brief visual pulse
-      const captureButton = document.getElementById('capture-button');
-      if (captureButton) {
-        captureButton.style.transform = 'scale(0.95)';
+      // Visual feedback - pulse quick capture button
+      const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
+      if (quickButton) {
+        quickButton.style.transform = 'scale(0.9)';
         setTimeout(() => {
-          captureButton.style.transform = 'scale(1)';
-        }, 100);
+          quickButton.style.transform = 'scale(1)';
+        }, 150);
       }
 
     } catch (error) {
-      console.error('Capture error:', error);
+      console.error('Quick capture error:', error);
       toast({
         title: 'Capture Failed',
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -164,6 +166,12 @@ export default function Camera() {
     } finally {
       setIsCapturing(false);
     }
+  };
+
+  // Capture and edit mode: Will be implemented in Task 6
+  const captureAndEdit = async () => {
+    // TODO: Implement in Task 6 - capture photo then navigate to editor
+    await quickCapture();
   };
 
   if (!hasPermission || !isActive) {
@@ -287,9 +295,9 @@ export default function Camera() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={capturePhoto}
+            onClick={quickCapture}
             disabled={isCapturing}
-            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50"
+            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50 transition-transform"
             data-testid="button-quick-capture"
           >
             <CameraIcon className="w-8 h-8" />
@@ -299,7 +307,7 @@ export default function Camera() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={capturePhoto}
+            onClick={captureAndEdit}
             disabled={isCapturing}
             className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50"
             data-testid="button-capture-edit"
