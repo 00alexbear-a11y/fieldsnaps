@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 
@@ -298,6 +298,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(comment);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Shares - Photo sharing via link
+  app.post("/api/shares", async (req, res) => {
+    try {
+      // Generate a unique token
+      const token = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
+      
+      // Set expiration to 30 days from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+      
+      const validated = insertShareSchema.parse({
+        ...req.body,
+        token,
+        expiresAt,
+      });
+      
+      const share = await storage.createShare(validated);
+      res.status(201).json(share);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Public route - no auth required
+  app.get("/api/shares/:token", async (req, res) => {
+    try {
+      const share = await storage.getShareByToken(req.params.token);
+      if (!share) {
+        return res.status(404).json({ error: "Share not found" });
+      }
+      
+      // Check if expired
+      if (new Date() > new Date(share.expiresAt)) {
+        return res.status(410).json({ error: "Share link has expired" });
+      }
+      
+      // Get the photos for this share
+      const photos = await storage.getPhotosByIds(share.photoIds);
+      
+      // Get project info
+      const project = await storage.getProject(share.projectId);
+      
+      res.json({
+        share,
+        photos,
+        project,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/shares/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteShare(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Share not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

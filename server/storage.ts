@@ -1,12 +1,12 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments, users, credentials } from "../shared/schema";
+import { projects, photos, photoAnnotations, comments, users, credentials, shares } from "../shared/schema";
 import type {
   User, UpsertUser,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment
+  Project, Photo, PhotoAnnotation, Comment, Share,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare
 } from "../shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -41,6 +41,12 @@ export interface IStorage {
   // Comments
   getPhotoComments(photoId: string): Promise<Comment[]>;
   createComment(data: InsertComment): Promise<Comment>;
+  
+  // Shares
+  createShare(data: InsertShare): Promise<Share>;
+  getShareByToken(token: string): Promise<Share | undefined>;
+  getPhotosByIds(photoIds: string[]): Promise<Photo[]>;
+  deleteShare(id: string): Promise<boolean>;
 }
 
 export class DbStorage implements IStorage {
@@ -169,6 +175,27 @@ export class DbStorage implements IStorage {
   async createComment(data: InsertComment): Promise<Comment> {
     const result = await db.insert(comments).values(data).returning();
     return result[0];
+  }
+
+  // Shares
+  async createShare(data: InsertShare): Promise<Share> {
+    const result = await db.insert(shares).values(data).returning();
+    return result[0];
+  }
+
+  async getShareByToken(token: string): Promise<Share | undefined> {
+    const result = await db.select().from(shares).where(eq(shares.token, token));
+    return result[0];
+  }
+
+  async getPhotosByIds(photoIds: string[]): Promise<Photo[]> {
+    if (photoIds.length === 0) return [];
+    return await db.select().from(photos).where(inArray(photos.id, photoIds));
+  }
+
+  async deleteShare(id: string): Promise<boolean> {
+    const result = await db.delete(shares).where(eq(shares.id, id)).returning();
+    return result.length > 0;
   }
 }
 
