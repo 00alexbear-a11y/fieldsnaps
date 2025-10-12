@@ -42,10 +42,10 @@ const colors = [
 ];
 
 const strokeSizes = [
-  { name: "XS", value: 2 },
-  { name: "S", value: 4 },
-  { name: "M", value: 6 },
-  { name: "L", value: 10 },
+  { name: "XS", value: 3 },
+  { name: "S", value: 5 },
+  { name: "M", value: 8 },
+  { name: "L", value: 12 },
 ];
 
 interface PhotoAnnotationEditorProps {
@@ -384,11 +384,10 @@ export function PhotoAnnotationEditor({
     const thickerLineWidth = lineWidth * 1.5;
     const arrowLength = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
     
-    // Arrowhead should be visible - minimum 15px
-    const headLength = Math.max(15, Math.min(thickerLineWidth * 3, arrowLength * 0.35));
+    // Arrowhead scales proportionally - never exceeds 35% of arrow length
+    // Cap at 30px for very long arrows
+    const headLength = Math.min(arrowLength * 0.35, 30);
     const angle = Math.atan2(toY - fromY, toX - fromX);
-
-    console.log("Drawing arrow:", { fromX, fromY, toX, toY, headLength, color, lineWidth: thickerLineWidth });
 
     // Draw thick arrow shaft
     ctx.lineCap = "round";
@@ -419,8 +418,6 @@ export function PhotoAnnotationEditor({
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
-    
-    console.log("Arrowhead drawn with fillStyle:", color);
   };
 
   const getHandleAtPoint = (anno: Annotation, x: number, y: number): ResizeHandle | null => {
@@ -1007,162 +1004,6 @@ export function PhotoAnnotationEditor({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Compact Toolbar */}
-      <div className="border-b p-2 bg-background">
-        {/* Row 1: Drawing Tools */}
-        <div className="flex items-center gap-1 mb-2">
-          <Button
-            variant={tool === "text" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTool("text")}
-            data-testid="button-tool-text"
-            className="flex-1 text-xs"
-            aria-label="Text tool"
-          >
-            <Type className="w-3 h-3 sm:mr-1" />
-            <span className="hidden sm:inline">Text</span>
-          </Button>
-          <Button
-            variant={tool === "arrow" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTool("arrow")}
-            data-testid="button-tool-arrow"
-            className="flex-1 text-xs"
-            aria-label="Arrow tool"
-          >
-            <ArrowUpRight className="w-3 h-3 sm:mr-1" />
-            <span className="hidden sm:inline">Arrow</span>
-          </Button>
-          <Button
-            variant={tool === "line" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTool("line")}
-            data-testid="button-tool-line"
-            className="flex-1 text-xs"
-            aria-label="Line tool"
-          >
-            <Minus className="w-3 h-3 sm:mr-1" />
-            <span className="hidden sm:inline">Line</span>
-          </Button>
-          <Button
-            variant={tool === "circle" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTool("circle")}
-            data-testid="button-tool-circle"
-            className="flex-1 text-xs"
-            aria-label="Circle tool"
-          >
-            <Circle className="w-3 h-3 sm:mr-1" />
-            <span className="hidden sm:inline">Circle</span>
-          </Button>
-          <Button
-            variant={tool === "pen" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTool("pen")}
-            data-testid="button-tool-pen"
-            className="flex-1 text-xs"
-            aria-label="Pen tool"
-          >
-            <Pen className="w-3 h-3 sm:mr-1" />
-            <span className="hidden sm:inline">Pen</span>
-          </Button>
-        </div>
-
-        {/* Row 2: Size, Color, and Actions */}
-        <div className="flex items-center gap-1">
-          {/* Stroke Size */}
-          <ToggleGroup
-            type="single"
-            value={strokeWidth.toString()}
-            onValueChange={(value) => value && setStrokeWidth(parseInt(value))}
-            className="gap-1"
-          >
-            {strokeSizes.map((size) => (
-              <ToggleGroupItem
-                key={size.value}
-                value={size.value.toString()}
-                aria-label={`Size ${size.name}`}
-                data-testid={`button-size-${size.name.toLowerCase()}`}
-                className="h-7 px-2 text-xs"
-              >
-                {size.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-
-          {/* Color Picker */}
-          <Select value={selectedColor} onValueChange={setSelectedColor}>
-            <SelectTrigger className="h-7 w-[100px] text-xs" data-testid="select-color">
-              <div className="flex items-center gap-1">
-                <div
-                  className="w-3 h-3 rounded border"
-                  style={{ backgroundColor: selectedColor }}
-                />
-                <span className="hidden sm:inline text-xs">
-                  {colors.find((c) => c.value === selectedColor)?.name}
-                </span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {colors.map((color) => (
-                <SelectItem key={color.value} value={color.value}>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded border border-border"
-                      style={{ backgroundColor: color.value }}
-                    />
-                    {color.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Actions */}
-          <div className="flex gap-1 ml-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleUndo}
-              disabled={historyIndex === 0}
-              data-testid="button-undo"
-              className="h-7 px-2"
-              aria-label="Undo last annotation"
-            >
-              <Undo className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearAll}
-              data-testid="button-clear-all"
-              className="h-7 px-2"
-              aria-label="Clear all annotations"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              data-testid="button-download"
-              className="h-7 px-2 hidden sm:flex"
-              aria-label="Download annotated photo"
-            >
-              <Download className="w-3 h-3" />
-            </Button>
-            <Button 
-              size="sm" 
-              onClick={handleSave} 
-              data-testid="button-save-annotations"
-              className="h-7 px-3 text-xs"
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Canvas - fills remaining space */}
       <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-2">
         <div className="relative max-w-full max-h-full flex items-center justify-center">
@@ -1236,6 +1077,160 @@ export function PhotoAnnotationEditor({
               />
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Toolbar - Moved to Bottom */}
+      <div className="border-t p-3 bg-background/95 backdrop-blur-sm">
+        {/* Row 1: Drawing Tools - Bigger Icons */}
+        <div className="flex items-center gap-2 mb-3">
+          <Button
+            variant={tool === "text" ? "default" : "outline"}
+            size="default"
+            onClick={() => setTool("text")}
+            data-testid="button-tool-text"
+            className="flex-1"
+            aria-label="Text tool"
+          >
+            <Type className="w-5 h-5 sm:mr-2" />
+            <span className="hidden sm:inline">Text</span>
+          </Button>
+          <Button
+            variant={tool === "arrow" ? "default" : "outline"}
+            size="default"
+            onClick={() => setTool("arrow")}
+            data-testid="button-tool-arrow"
+            className="flex-1"
+            aria-label="Arrow tool"
+          >
+            <ArrowUpRight className="w-5 h-5 sm:mr-2" />
+            <span className="hidden sm:inline">Arrow</span>
+          </Button>
+          <Button
+            variant={tool === "line" ? "default" : "outline"}
+            size="default"
+            onClick={() => setTool("line")}
+            data-testid="button-tool-line"
+            className="flex-1"
+            aria-label="Line tool"
+          >
+            <Minus className="w-5 h-5 sm:mr-2" />
+            <span className="hidden sm:inline">Line</span>
+          </Button>
+          <Button
+            variant={tool === "circle" ? "default" : "outline"}
+            size="default"
+            onClick={() => setTool("circle")}
+            data-testid="button-tool-circle"
+            className="flex-1"
+            aria-label="Circle tool"
+          >
+            <Circle className="w-5 h-5 sm:mr-2" />
+            <span className="hidden sm:inline">Circle</span>
+          </Button>
+          <Button
+            variant={tool === "pen" ? "default" : "outline"}
+            size="default"
+            onClick={() => setTool("pen")}
+            data-testid="button-tool-pen"
+            className="flex-1"
+            aria-label="Pen tool"
+          >
+            <Pen className="w-5 h-5 sm:mr-2" />
+            <span className="hidden sm:inline">Pen</span>
+          </Button>
+        </div>
+
+        {/* Row 2: Size, Color, and Actions - Bigger Controls */}
+        <div className="flex items-center gap-2">
+          {/* Stroke Size - Bigger Buttons */}
+          <ToggleGroup
+            type="single"
+            value={strokeWidth.toString()}
+            onValueChange={(value) => value && setStrokeWidth(parseInt(value))}
+            className="gap-1"
+          >
+            {strokeSizes.map((size) => (
+              <ToggleGroupItem
+                key={size.value}
+                value={size.value.toString()}
+                aria-label={`Size ${size.name}`}
+                data-testid={`button-size-${size.name.toLowerCase()}`}
+                className="min-h-9 px-3"
+              >
+                {size.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          {/* Color Picker - Bigger */}
+          <Select value={selectedColor} onValueChange={setSelectedColor}>
+            <SelectTrigger className="min-h-9 w-[120px]" data-testid="select-color">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded border"
+                  style={{ backgroundColor: selectedColor }}
+                />
+                <span className="hidden sm:inline">
+                  {colors.find((c) => c.value === selectedColor)?.name}
+                </span>
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {colors.map((color) => (
+                <SelectItem key={color.value} value={color.value}>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded border border-border"
+                      style={{ backgroundColor: color.value }}
+                    />
+                    {color.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Actions - Bigger Icons */}
+          <div className="flex gap-2 ml-auto">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleUndo}
+              disabled={historyIndex === 0}
+              data-testid="button-undo"
+              aria-label="Undo last annotation"
+            >
+              <Undo className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleClearAll}
+              data-testid="button-clear-all"
+              aria-label="Clear all annotations"
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleDownload}
+              data-testid="button-download"
+              className="hidden sm:flex"
+              aria-label="Download annotated photo"
+            >
+              <Download className="w-5 h-5" />
+            </Button>
+            <Button 
+              size="default" 
+              onClick={handleSave} 
+              data-testid="button-save-annotations"
+              className="px-4"
+            >
+              Save
+            </Button>
+          </div>
         </div>
       </div>
     </div>
