@@ -991,7 +991,7 @@ export function PhotoAnnotationEditor({
           <div className="flex gap-2">
             <Button
               variant={tool === "text" ? "default" : "outline"}
-              size="sm"
+              size="default"
               onClick={() => setTool("text")}
               data-testid="button-tool-text"
             >
@@ -1000,7 +1000,7 @@ export function PhotoAnnotationEditor({
             </Button>
             <Button
               variant={tool === "arrow" ? "default" : "outline"}
-              size="sm"
+              size="default"
               onClick={() => setTool("arrow")}
               data-testid="button-tool-arrow"
             >
@@ -1009,7 +1009,7 @@ export function PhotoAnnotationEditor({
             </Button>
             <Button
               variant={tool === "line" ? "default" : "outline"}
-              size="sm"
+              size="default"
               onClick={() => setTool("line")}
               data-testid="button-tool-line"
             >
@@ -1018,7 +1018,7 @@ export function PhotoAnnotationEditor({
             </Button>
             <Button
               variant={tool === "circle" ? "default" : "outline"}
-              size="sm"
+              size="default"
               onClick={() => setTool("circle")}
               data-testid="button-tool-circle"
             >
@@ -1027,7 +1027,7 @@ export function PhotoAnnotationEditor({
             </Button>
             <Button
               variant={tool === "pen" ? "default" : "outline"}
-              size="sm"
+              size="default"
               onClick={() => setTool("pen")}
               data-testid="button-tool-pen"
             >
@@ -1081,7 +1081,7 @@ export function PhotoAnnotationEditor({
           <div className="flex gap-2 ml-auto">
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               onClick={handleUndo}
               disabled={historyIndex === 0}
               data-testid="button-undo"
@@ -1092,7 +1092,7 @@ export function PhotoAnnotationEditor({
             {selectedAnnotation && (
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={handleDeleteSelected}
                 data-testid="button-delete-selected"
               >
@@ -1102,7 +1102,7 @@ export function PhotoAnnotationEditor({
             )}
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               onClick={handleClearAll}
               data-testid="button-clear-all"
             >
@@ -1111,14 +1111,14 @@ export function PhotoAnnotationEditor({
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               onClick={handleDownload}
               data-testid="button-download"
             >
               <Download className="w-4 h-4 mr-2" />
               Download
             </Button>
-            <Button size="sm" onClick={handleSave} data-testid="button-save-annotations">
+            <Button size="default" onClick={handleSave} data-testid="button-save-annotations">
               Save Annotations
             </Button>
           </div>
