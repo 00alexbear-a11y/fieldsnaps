@@ -23,6 +23,7 @@ export interface IStorage {
   getProjects(): Promise<Project[]>;
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
+  updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
   
   // Photos
   getProjectPhotos(projectId: string): Promise<Photo[]>;
@@ -93,6 +94,14 @@ export class DbStorage implements IStorage {
 
   async createProject(data: InsertProject): Promise<Project> {
     const result = await db.insert(projects).values(data).returning();
+    return result[0];
+  }
+
+  async updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined> {
+    const result = await db.update(projects)
+      .set(data)
+      .where(eq(projects.id, id))
+      .returning();
     return result[0];
   }
 
