@@ -41,6 +41,7 @@ export default function Camera() {
   const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState<1 | 2 | 3>(1);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -461,8 +462,11 @@ export default function Camera() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ zIndex: 5 }}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
+        style={{ 
+          zIndex: 5,
+          transform: `scale(${zoomLevel})`,
+        }}
         data-testid="video-camera-stream"
       />
 
@@ -536,6 +540,24 @@ export default function Camera() {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Zoom Selector - Above mode selector */}
+      <div className="absolute bottom-52 left-0 right-0 flex justify-center gap-2 z-10">
+        {[1, 2, 3].map((level) => (
+          <Button
+            key={level}
+            variant="ghost"
+            size="sm"
+            onClick={() => setZoomLevel(level as 1 | 2 | 3)}
+            className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
+              zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
+            }`}
+            data-testid={`button-zoom-${level}x`}
+          >
+            {level}x
+          </Button>
+        ))}
       </div>
 
       {/* Mode Selector - Bottom center above capture button */}
