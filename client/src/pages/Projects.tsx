@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { Plus, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,6 +60,9 @@ export default function Projects() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
+              <DialogDescription>
+                Enter a name and optional description for your new construction project.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -83,7 +86,12 @@ export default function Projects() {
                   rows={3}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={createMutation.isPending}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={createMutation.isPending}
+                data-testid="button-submit-project"
+              >
                 {createMutation.isPending ? "Creating..." : "Create Project"}
               </Button>
             </form>
