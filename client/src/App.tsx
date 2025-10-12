@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Camera from "./pages/Camera";
 import Projects from "./pages/Projects";
 import ProjectPhotos from "./pages/ProjectPhotos";
+import PhotoEdit from "./pages/PhotoEdit";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="/camera" component={Camera} />
               <Route path="/" component={Projects} />
               <Route path="/projects/:id" component={ProjectPhotos} />
+              <Route path="/photo/:id/edit" component={PhotoEdit} />
               <Route path="/settings" component={Settings} />
               <Route component={NotFound} />
             </Switch>
