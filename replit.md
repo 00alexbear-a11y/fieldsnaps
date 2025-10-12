@@ -4,6 +4,48 @@
 This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
+### Phase 6: Photo Sharing & Timeline View (October 12, 2025)
+- **Share Link Dialog:** Enhanced UX for sharing photos with visible link display
+  - After selecting photos and clicking Share, a dialog displays the full share URL
+  - Read-only input field shows the link for manual copying if needed
+  - "Copy" button in dialog copies link to clipboard with toast feedback
+  - Automatic clipboard copy on share creation with success/failure toasts
+  - Clear instructions: "Link will expire in 30 days"
+  - Graceful fallback when clipboard API is unavailable
+- **Multi-Photo Sharing:** Complete workflow for sharing multiple photos
+  - Select mode activated by "Select" button (visible when photos exist)
+  - Date header checkboxes to select/deselect all photos for that date
+  - Individual photo checkboxes for granular selection
+  - Selected photos highlighted with blue ring indicator
+  - Bottom toolbar shows count and Share button
+  - Share creates public link accessible without authentication
+- **Public Share View:** Read-only page for viewing shared photos
+  - Accessible via /share/:token route (no login required)
+  - Displays project name and "Shared with you" header
+  - Photos shown in same date-grouped timeline format
+  - Full-screen photo viewer with download capability
+  - Share links expire after 30 days
+  - Bottom nav and sync banner hidden on public share pages
+- **Date-Grouped Timeline:** Photos organized by capture date
+  - Photos sorted newest first within each date group
+  - Date headers in "MMMM d, yyyy" format (e.g., "October 12, 2025")
+  - Clean visual hierarchy with grouped photo grids
+  - Consistent display on both project and share pages
+- **Sync Status Banner:** Visible upload status at top of pages
+  - Shows pending upload count with manual sync button
+  - Poll-based status updates every 3 seconds
+  - Sticky positioning at top of all pages except Camera and share pages
+  - Clear visual indicator when photos need uploading
+- **Camera Pre-Selection:** Direct camera access from project view
+  - Camera button in project header with ?projectId= parameter
+  - Pre-selects project folder for instant photo capture
+  - Streamlined workflow: view project → open camera → capture → back to project
+- **Bottom Nav Behavior:** Contextual hiding for immersive experiences
+  - Hidden on Camera page for full-screen viewfinder
+  - Hidden on project detail pages for photo browsing
+  - Hidden on public share pages (no navigation needed)
+  - Smooth slide animations for show/hide transitions
+
 ### Phase 5: Camera Auto-Start & Instant Capture (October 12, 2025)
 - **Camera Auto-Start:** Camera now starts automatically when Camera tab is opened
   - Shows "Starting Camera..." loading state while initializing
