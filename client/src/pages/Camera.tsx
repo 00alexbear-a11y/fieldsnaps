@@ -52,6 +52,13 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
+  // Auto-start camera when projects are loaded and camera is not yet active
+  useEffect(() => {
+    if (projects.length > 0 && !isActive) {
+      startCamera();
+    }
+  }, [projects]);
+
   // Cleanup camera when component unmounts
   useEffect(() => {
     return () => {
@@ -125,27 +132,13 @@ export default function Camera() {
     setIsActive(false);
   };
 
-  // Start camera if not already started before capturing
-  const ensureCameraStarted = async () => {
-    if (!isActive) {
-      try {
-        await startCamera();
-      } catch (error) {
-        // Camera failed to start, error already shown in startCamera
-        throw new Error('Camera not available');
-      }
-    }
-  };
-
   // Quick capture mode: Capture photo and continue shooting
   const quickCapture = async () => {
-    if (!selectedProject || isCapturing) return;
+    if (!selectedProject || isCapturing || !isActive) return;
 
     setIsCapturing(true);
 
     try {
-      // Start camera if needed
-      await ensureCameraStarted();
       if (!videoRef.current) {
         throw new Error('Video element not available');
       }
@@ -224,13 +217,11 @@ export default function Camera() {
 
   // Capture and edit mode: Capture photo then open annotation editor
   const captureAndEdit = async () => {
-    if (!selectedProject || isCapturing) return;
+    if (!selectedProject || isCapturing || !isActive) return;
 
     setIsCapturing(true);
 
     try {
-      // Start camera if needed
-      await ensureCameraStarted();
       if (!videoRef.current) {
         throw new Error('Video element not available');
       }
@@ -319,31 +310,20 @@ export default function Camera() {
 
   return (
     <div className="relative h-full w-full bg-black overflow-hidden">
-      {/* Start Camera Prompt (shown when camera is not active) */}
+      {/* Loading state while camera starts */}
       {!isActive && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 z-30">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 z-30 bg-black">
           <div className="text-center space-y-4">
-            <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
               <CameraIcon className="w-12 h-12 text-primary" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-white">Ready to Capture</h2>
+              <h2 className="text-xl font-semibold text-white">Starting Camera...</h2>
               <p className="text-white/60 text-sm">
-                Tap the camera button to start taking photos
+                Getting ready to capture
               </p>
             </div>
           </div>
-          
-          {selectedProject && (
-            <div className="text-center space-y-2">
-              <p className="text-white/40 text-xs">Saving to</p>
-              <div className="px-4 py-2 bg-white/10 rounded-lg border border-white/20">
-                <p className="text-white font-medium">
-                  {projects.find(p => p.id === selectedProject)?.name}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -363,7 +343,7 @@ export default function Camera() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={stopCamera}
+            onClick={() => setLocation('/projects')}
             className="text-white hover:bg-white/20"
             data-testid="button-close-camera"
           >
@@ -450,7 +430,7 @@ export default function Camera() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={stopCamera}
+            onClick={() => setLocation('/projects')}
             className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
             data-testid="button-close-camera-bottom"
           >
