@@ -277,6 +277,13 @@ export default function ProjectPhotos() {
           initialIndex={viewerPhotoIndex}
           onClose={() => setViewerPhotoIndex(null)}
           onDelete={(photoId) => deleteMutation.mutate(photoId)}
+          onAnnotate={(photo) => {
+            const fullPhoto = photos.find(p => p.id === photo.id);
+            if (fullPhoto) {
+              setViewerPhotoIndex(null);
+              setSelectedPhoto(fullPhoto);
+            }
+          }}
           onShare={(photo) => {
             if (navigator.clipboard && window.isSecureContext) {
               toast({ title: "Photo URL copied to clipboard" });

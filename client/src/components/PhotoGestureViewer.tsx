@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,7 @@ interface PhotoGestureViewerProps {
   onClose: () => void;
   onDelete?: (photoId: string) => void;
   onShare?: (photo: Photo) => void;
+  onAnnotate?: (photo: Photo) => void;
 }
 
 export function PhotoGestureViewer({
@@ -46,6 +47,7 @@ export function PhotoGestureViewer({
   onClose,
   onDelete,
   onShare,
+  onAnnotate,
 }: PhotoGestureViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [scale, setScale] = useState(1);
@@ -425,6 +427,17 @@ export function PhotoGestureViewer({
           </div>
 
           <div className="flex gap-2">
+            {onAnnotate && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onAnnotate(currentPhoto)}
+                className="text-white hover:bg-white/20"
+                data-testid="button-annotate"
+              >
+                <Brush className="w-5 h-5" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -444,7 +457,7 @@ export function PhotoGestureViewer({
               size="icon"
               onClick={handleEditCaption}
               className="text-white hover:bg-white/20"
-              data-testid="button-edit-photo"
+              data-testid="button-edit-caption"
             >
               <Pencil className="w-5 h-5" />
             </Button>
