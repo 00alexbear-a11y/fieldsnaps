@@ -214,7 +214,7 @@ export function PhotoGrid({ photos, onUpload, onDelete, onAnnotate }: PhotoGridP
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Project Photos</h3>
-        <Button onClick={onUpload} size="sm" data-testid="button-upload-photo">
+        <Button onClick={onUpload} size="default" data-testid="button-upload-photo">
           <Upload className="h-4 w-4 mr-2" />
           Upload Photo
         </Button>
@@ -325,7 +325,7 @@ export function PhotoGrid({ photos, onUpload, onDelete, onAnnotate }: PhotoGridP
               <CardTitle>{selectedPhoto.caption}</CardTitle>
               <div className="flex gap-2">
                 <Button
-                  size="sm"
+                  size="default"
                   variant="outline"
                   onClick={() => {
                     setAnnotatingPhoto(selectedPhoto);
