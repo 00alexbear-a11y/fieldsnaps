@@ -86,6 +86,21 @@ export function PhotoAnnotationEditor({
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
+  const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } => {
+    if (!canvasRef.current) return { x: 0, y: 0 };
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    return { x, y };
+  };
+
   useEffect(() => {
     if (!canvasRef.current || !imageRef.current) return;
 
@@ -95,8 +110,16 @@ export function PhotoAnnotationEditor({
     if (!ctx) return;
 
     const handleImageLoad = () => {
-      const width = img.naturalWidth || img.width || 800; // Default to 800px if no image
-      const height = img.naturalHeight || img.height || 600; // Default to 600px if no image
+      let width = img.naturalWidth || img.width || 800;
+      let height = img.naturalHeight || img.height || 600;
+      
+      const MAX_CANVAS_WIDTH = 1200;
+      if (width > MAX_CANVAS_WIDTH) {
+        const scale = MAX_CANVAS_WIDTH / width;
+        width = MAX_CANVAS_WIDTH;
+        height = Math.round(height * scale);
+      }
+      
       canvas.width = width;
       canvas.height = height;
       redrawCanvas();
@@ -588,9 +611,7 @@ export function PhotoAnnotationEditor({
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCanvasCoordinates(e);
 
     // Check if clicking on a selected annotation's handle
     if (selectedAnnotation) {
@@ -668,9 +689,7 @@ export function PhotoAnnotationEditor({
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCanvasCoordinates(e);
 
     // Always update cursor based on hover position
     updateCursor(x, y);
@@ -805,9 +824,7 @@ export function PhotoAnnotationEditor({
   const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getCanvasCoordinates(e);
 
     if (isDragging || isResizing) {
       addToHistory(annotations);
