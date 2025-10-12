@@ -105,7 +105,7 @@ export default function SwipeableProjectCard({
       {/* Project Card - swipes left to reveal delete */}
       <div
         ref={cardRef}
-        className="flex gap-4 p-4 hover-elevate active-elevate-2 cursor-pointer bg-background"
+        className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover-elevate active-elevate-2 cursor-pointer bg-card/60 backdrop-blur-xl border border-border/50 mx-3 my-2 rounded-2xl overflow-visible"
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -113,7 +113,7 @@ export default function SwipeableProjectCard({
         onTouchCancel={handleTouchEnd}
         style={{
           transform: `translateX(-${Math.max(0, swipeDistance)}px)`,
-          transition: isSwiping ? "none" : "transform 0.3s ease-out",
+          transition: isSwiping ? "none" : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
         data-testid={`card-project-${project.id}`}
       >
@@ -123,12 +123,12 @@ export default function SwipeableProjectCard({
             <img
               src={coverPhoto.url}
               alt={project.name}
-              className="w-20 h-20 rounded-md object-cover"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover"
               data-testid={`img-cover-${project.id}`}
             />
           ) : (
-            <div className="w-20 h-20 rounded-md bg-muted flex items-center justify-center">
-              <FolderOpen className="w-8 h-8 text-muted-foreground" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-muted/50 backdrop-blur-sm flex items-center justify-center border border-border/30">
+              <FolderOpen className="w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground/70" />
             </div>
           )}
         </div>
