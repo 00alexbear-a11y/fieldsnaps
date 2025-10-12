@@ -46,9 +46,18 @@ export default function Camera() {
   });
 
   useEffect(() => {
-    // Set first project as default
+    // Check for projectId query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectIdFromUrl = urlParams.get('projectId');
+    
     if (projects.length > 0 && !selectedProject) {
-      setSelectedProject(projects[0].id);
+      // If projectId in URL and it exists in projects, use it
+      if (projectIdFromUrl && projects.some(p => p.id === projectIdFromUrl)) {
+        setSelectedProject(projectIdFromUrl);
+      } else {
+        // Otherwise use first project as default
+        setSelectedProject(projects[0].id);
+      }
     }
   }, [projects, selectedProject]);
 
