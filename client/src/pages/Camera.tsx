@@ -544,7 +544,7 @@ export default function Camera() {
           variant="ghost"
           size="sm"
           onClick={() => setCameraMode('photo')}
-          className={`text-white ${cameraMode === 'photo' ? 'bg-white/20' : 'bg-transparent'}`}
+          className={`text-white backdrop-blur-md ${cameraMode === 'photo' ? 'bg-white/20' : 'bg-white/10'}`}
           data-testid="button-mode-photo"
         >
           <CameraIcon className="w-4 h-4 mr-2" />
@@ -554,7 +554,7 @@ export default function Camera() {
           variant="ghost"
           size="sm"
           onClick={() => setCameraMode('video')}
-          className={`text-white ${cameraMode === 'video' ? 'bg-white/20' : 'bg-transparent'}`}
+          className={`text-white backdrop-blur-md ${cameraMode === 'video' ? 'bg-white/20' : 'bg-white/10'}`}
           data-testid="button-mode-video"
         >
           <Video className="w-4 h-4 mr-2" />
