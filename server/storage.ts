@@ -29,6 +29,7 @@ export interface IStorage {
   getProjectPhotos(projectId: string): Promise<Photo[]>;
   getPhoto(id: string): Promise<Photo | undefined>;
   createPhoto(data: InsertPhoto): Promise<Photo>;
+  updatePhoto(id: string, data: Partial<InsertPhoto>): Promise<Photo | undefined>;
   deletePhoto(id: string): Promise<boolean>;
   
   // Photo Annotations
@@ -119,6 +120,14 @@ export class DbStorage implements IStorage {
 
   async createPhoto(data: InsertPhoto): Promise<Photo> {
     const result = await db.insert(photos).values(data).returning();
+    return result[0];
+  }
+
+  async updatePhoto(id: string, data: Partial<InsertPhoto>): Promise<Photo | undefined> {
+    const result = await db.update(photos)
+      .set(data)
+      .where(eq(photos.id, id))
+      .returning();
     return result[0];
   }
 

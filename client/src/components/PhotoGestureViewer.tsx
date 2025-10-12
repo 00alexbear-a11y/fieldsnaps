@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Comment } from "../../../shared/schema";
@@ -16,6 +17,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Photo {
   id: string;
@@ -45,6 +54,8 @@ export function PhotoGestureViewer({
   const [showControls, setShowControls] = useState(true);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [showCaptionDialog, setShowCaptionDialog] = useState(false);
+  const [editedCaption, setEditedCaption] = useState("");
   const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,6 +105,30 @@ export function PhotoGestureViewer({
   const handleAddComment = () => {
     if (!newComment.trim()) return;
     createCommentMutation.mutate(newComment);
+  };
+
+  // Update caption mutation
+  const updateCaptionMutation = useMutation({
+    mutationFn: async (caption: string) => {
+      return await apiRequest("PATCH", `/api/photos/${currentPhoto.id}`, { caption });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      setShowCaptionDialog(false);
+      toast({ title: "Caption updated" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to update caption", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleEditCaption = () => {
+    setEditedCaption(currentPhoto.caption || "");
+    setShowCaptionDialog(true);
+  };
+
+  const handleSaveCaption = () => {
+    updateCaptionMutation.mutate(editedCaption);
   };
 
   // Reset zoom when photo changes
@@ -404,6 +439,15 @@ export function PhotoGestureViewer({
                 </span>
               )}
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleEditCaption}
+              className="text-white hover:bg-white/20"
+              data-testid="button-edit-photo"
+            >
+              <Pencil className="w-5 h-5" />
+            </Button>
             {onShare && (
               <Button
                 variant="ghost"
@@ -526,6 +570,44 @@ export function PhotoGestureViewer({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Caption Dialog */}
+      <Dialog open={showCaptionDialog} onOpenChange={setShowCaptionDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Caption</DialogTitle>
+            <DialogDescription>
+              Update the caption for this photo
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={editedCaption}
+              onChange={(e) => setEditedCaption(e.target.value)}
+              placeholder="Add a caption..."
+              className="min-h-[100px]"
+              data-testid="input-edit-caption"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCaptionDialog(false)}
+              disabled={updateCaptionMutation.isPending}
+              data-testid="button-cancel-edit-caption"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveCaption}
+              disabled={updateCaptionMutation.isPending}
+              data-testid="button-save-caption"
+            >
+              {updateCaptionMutation.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Comments Panel */}
       <div
