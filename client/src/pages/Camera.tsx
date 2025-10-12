@@ -80,15 +80,19 @@ export default function Camera() {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         
+        console.log('[Camera] Stream set, videoRef dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+        
         // Explicitly play the video (required for iOS Safari)
         try {
           await videoRef.current.play();
+          console.log('[Camera] Video play() successful');
         } catch (playError) {
-          console.warn('Video play error:', playError);
+          console.error('[Camera] Video play error:', playError);
         }
         
         setHasPermission(true);
         setIsActive(true);
+        console.log('[Camera] isActive set to true, loading overlay should hide');
 
         // Wait for video metadata to load so dimensions are available
         await new Promise<void>((resolve) => {
@@ -342,6 +346,7 @@ export default function Camera() {
         playsInline
         muted
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 5 }}
         data-testid="video-camera-stream"
       />
 
