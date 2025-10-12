@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, FolderOpen, Camera, MapPin, Clock } from "lucide-react";
+import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
@@ -10,11 +10,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Project, Photo } from "../../../shared/schema";
 
 export default function Projects() {
   const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
@@ -65,6 +74,24 @@ export default function Projects() {
     return 0;
   };
 
+  // Filter projects based on search query
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) return projects;
+    
+    const query = searchQuery.toLowerCase();
+    return projects.filter(project => 
+      project.name.toLowerCase().includes(query) ||
+      (project.address?.toLowerCase()?.includes(query) ?? false) ||
+      (project.description?.toLowerCase()?.includes(query) ?? false)
+    );
+  }, [projects, searchQuery]);
+
+  // Toggle theme
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  };
+
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string }) => {
       const res = await apiRequest("POST", "/api/projects", data);
@@ -92,67 +119,107 @@ export default function Projects() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <h1 className="text-2xl font-semibold">Projects</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="default" data-testid="button-create-project">
-              <Plus className="w-4 h-4 mr-2" />
-              New Project
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription>
-                Enter details for your new construction project.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Project Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter project name"
-                  data-testid="input-project-name"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Job site address"
-                  data-testid="input-project-address"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description (optional)</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter project description"
-                  rows={3}
-                  data-testid="input-project-description"
-                />
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={createMutation.isPending}
-                data-testid="button-submit-project"
-              >
-                {createMutation.isPending ? "Creating..." : "Create Project"}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+      {/* Top Navigation Bar */}
+      <div className="flex flex-col border-b">
+        <div className="flex items-center justify-between p-4">
+          <h1 className="text-2xl font-semibold">Projects</h1>
+          <div className="flex items-center gap-2">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="default" data-testid="button-create-project">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Project</DialogTitle>
+                  <DialogDescription>
+                    Enter details for your new construction project.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Project Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter project name"
+                      data-testid="input-project-name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Job site address"
+                      data-testid="input-project-address"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Description (optional)</Label>
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Enter project description"
+                      rows={3}
+                      data-testid="input-project-description"
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={createMutation.isPending}
+                    data-testid="button-submit-project"
+                  >
+                    {createMutation.isPending ? "Creating..." : "Create Project"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" data-testid="button-settings-menu">
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Options</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={toggleTheme} data-testid="menu-toggle-theme">
+                  <Moon className="w-4 h-4 mr-2 dark:hidden" />
+                  <Sun className="w-4 h-4 mr-2 hidden dark:inline" />
+                  Toggle Theme
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLocation('/settings')} data-testid="menu-settings">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        
+        {/* Search Bar */}
+        <div className="px-4 pb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+              data-testid="input-search-projects"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Projects List */}
@@ -167,9 +234,15 @@ export default function Projects() {
             <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
             <p className="text-muted-foreground mb-6 text-center">Create your first project to get started</p>
           </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <Search className="w-16 h-16 mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-semibold mb-2">No results found</h2>
+            <p className="text-muted-foreground mb-6 text-center">Try a different search term</p>
+          </div>
         ) : (
           <div className="divide-y">
-            {projects.map((project) => {
+            {filteredProjects.map((project) => {
               const coverPhoto = getCoverPhoto(project);
               const photoCount = photosByProject[project.id]?.length || 0;
               const pendingSyncCount = getPendingSyncCount(project.id);
