@@ -33,9 +33,20 @@ export default function ProjectPhotos() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      // For now, create blob URL - TODO: Add proper cloud storage
-      const url = URL.createObjectURL(file);
-      const res = await apiRequest("POST", `/api/projects/${projectId}/photos`, { url, caption: file.name });
+      // Upload photo using multipart/form-data
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('caption', file.name);
+      
+      const res = await fetch(`/api/projects/${projectId}/photos`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Upload failed: ${res.statusText}`);
+      }
+      
       return await res.json();
     },
     onSuccess: () => {
