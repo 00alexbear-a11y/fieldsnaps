@@ -80,12 +80,23 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Shares table - for generating shareable photo links
+export const shares = pgTable("shares", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  token: varchar("token", { length: 32 }).notNull().unique(), // Unique share link token
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  photoIds: text("photo_ids").array().$type<string[]>().notNull(), // Array of photo IDs to share
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(), // 30 days default
+});
+
 // Zod schemas for validation
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
+export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type User = typeof users.$inferSelect;
@@ -96,11 +107,13 @@ export type Project = typeof projects.$inferSelect;
 export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
+export type Share = typeof shares.$inferSelect;
 
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
 export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type InsertShare = z.infer<typeof insertShareSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
