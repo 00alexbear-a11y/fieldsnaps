@@ -1,6 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2 } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import type { Comment } from "../../../shared/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +43,9 @@ export function PhotoGestureViewer({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -59,10 +67,40 @@ export function PhotoGestureViewer({
 
   const currentPhoto = photos[currentIndex];
 
+  // Fetch comments for current photo
+  const { data: comments = [], isLoading: commentsLoading } = useQuery<Comment[]>({
+    queryKey: [`/api/photos/${currentPhoto.id}/comments`],
+    enabled: !!currentPhoto.id,
+  });
+
+  // Create comment mutation
+  const createCommentMutation = useMutation({
+    mutationFn: async (content: string) => {
+      return await apiRequest("POST", `/api/photos/${currentPhoto.id}/comments`, {
+        content,
+        mentions: [],
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/photos/${currentPhoto.id}/comments`] });
+      setNewComment("");
+      toast({ title: "Comment added" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to add comment", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    createCommentMutation.mutate(newComment);
+  };
+
   // Reset zoom when photo changes
   useEffect(() => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
+    setShowComments(false); // Close comments when changing photos
   }, [currentIndex]);
 
   // Auto-hide controls with timer
@@ -352,6 +390,20 @@ export function PhotoGestureViewer({
           </div>
 
           <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowComments(!showComments)}
+              className="text-white hover:bg-white/20 relative"
+              data-testid="button-comments"
+            >
+              <MessageSquare className="w-5 h-5" />
+              {comments.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {comments.length}
+                </span>
+              )}
+            </Button>
             {onShare && (
               <Button
                 variant="ghost"
@@ -474,6 +526,77 @@ export function PhotoGestureViewer({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Comments Panel */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-background border-t max-h-[50vh] flex flex-col transition-transform duration-300 ${
+          showComments ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="p-4 border-b flex items-center justify-between">
+          <h3 className="font-semibold flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            Comments ({comments.length})
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowComments(false)}
+            data-testid="button-close-comments"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {commentsLoading ? (
+            <p className="text-center text-muted-foreground py-8">
+              Loading comments...
+            </p>
+          ) : comments.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              No comments yet. Be the first to comment!
+            </p>
+          ) : (
+            comments.map((comment) => (
+              <div
+                key={comment.id}
+                className="bg-muted p-3 rounded-lg"
+                data-testid={`comment-${comment.id}`}
+              >
+                <p className="text-sm">{comment.content}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {new Date(comment.createdAt).toLocaleString()}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="p-4 border-t flex gap-2">
+          <Input
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleAddComment();
+              }
+            }}
+            disabled={createCommentMutation.isPending}
+            data-testid="input-new-comment"
+          />
+          <Button
+            onClick={handleAddComment}
+            disabled={!newComment.trim() || createCommentMutation.isPending}
+            size="icon"
+            data-testid="button-send-comment"
+          >
+            <Send className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
