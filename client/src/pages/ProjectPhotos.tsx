@@ -214,6 +214,13 @@ export default function ProjectPhotos() {
           >
             <SettingsIcon className="w-5 h-5" />
           </Button>
+          <Button
+            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+            data-testid="button-open-camera"
+          >
+            <Camera className="w-5 h-5 mr-2" />
+            Camera
+          </Button>
           <input
             type="file"
             accept="image/*"
@@ -223,10 +230,10 @@ export default function ProjectPhotos() {
             id="photo-upload"
           />
           <label htmlFor="photo-upload">
-            <Button asChild disabled={uploadMutation.isPending}>
+            <Button asChild disabled={uploadMutation.isPending} variant="outline">
               <span>
                 <Camera className="w-5 h-5 mr-2" />
-                {uploadMutation.isPending ? "Uploading..." : "Add Photo"}
+                {uploadMutation.isPending ? "Uploading..." : "Upload"}
               </span>
             </Button>
           </label>
