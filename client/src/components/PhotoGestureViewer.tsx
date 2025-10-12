@@ -283,8 +283,8 @@ export function PhotoGestureViewer({
       }
     }
 
-    // Reset zoom if too small
-    if (scale < 1.2) {
+    // Reset zoom only if very close to 1x (prevents tiny accidental zooms)
+    if (scale < 1.05) {
       setScale(1);
       setPosition({ x: 0, y: 0 });
     }
