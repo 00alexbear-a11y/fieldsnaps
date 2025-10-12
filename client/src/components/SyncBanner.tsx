@@ -145,14 +145,14 @@ export default function SyncBanner() {
     );
   }
 
-  // Pending banner (yellow/warning)
+  // Pending banner (orange)
   return (
     <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
-      <div className="h-1 bg-yellow-600" />
+      <div className="h-1 bg-orange-600" />
       <div className="px-4 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CloudUpload className="w-4 h-4 text-yellow-600" />
-          <span className="text-sm font-medium text-yellow-600">
+          <CloudUpload className="w-4 h-4 text-orange-600" />
+          <span className="text-sm font-medium text-orange-600">
             {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'} pending upload
           </span>
         </div>
@@ -161,7 +161,7 @@ export default function SyncBanner() {
           size="sm"
           onClick={handleSync}
           disabled={isSyncing}
-          className="h-7 text-yellow-600 hover:bg-yellow-600/10"
+          className="h-7 text-orange-600 hover:bg-orange-600/10"
           data-testid="button-sync-now"
         >
           <RefreshCw className="w-3 h-3 mr-1" />
