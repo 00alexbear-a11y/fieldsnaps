@@ -301,7 +301,13 @@ export default function ProjectPhotos() {
       {/* Annotation Editor Dialog (can be accessed via long-press in future) */}
       {selectedPhoto && (
         <Dialog open={true} onOpenChange={() => setSelectedPhoto(null)}>
-          <DialogContent className="max-w-5xl max-h-[90vh] p-0">
+          <DialogContent className="max-w-full md:max-w-5xl h-screen max-h-screen md:h-auto md:max-h-[90vh] p-0 sm:rounded-none md:sm:rounded-lg gap-0">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Photo Annotation Editor</DialogTitle>
+              <DialogDescription>
+                Draw, annotate, and markup this photo with arrows, text, lines, and freehand drawing
+              </DialogDescription>
+            </DialogHeader>
             <PhotoAnnotationEditor
               photoUrl={selectedPhoto.url}
               photoId={selectedPhoto.id}
