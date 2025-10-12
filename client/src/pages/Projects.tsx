@@ -120,10 +120,9 @@ export default function Projects() {
   return (
     <div className="flex flex-col h-full">
       {/* Top Navigation Bar */}
-      <div className="flex flex-col border-b">
-        <div className="flex items-center justify-between p-4">
-          <h1 className="text-2xl font-semibold">Projects</h1>
-          <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h1 className="text-2xl font-semibold">Projects</h1>
+        <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="default" data-testid="button-create-project">
@@ -203,27 +202,11 @@ export default function Projects() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        </div>
-        
-        {/* Search Bar */}
-        <div className="px-4 pb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-projects"
-            />
-          </div>
         </div>
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto pb-20">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
@@ -277,19 +260,17 @@ export default function Projects() {
                     </h3>
                     
                     {project.address && (
-                      <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-                        <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="truncate hover:text-primary hover:underline transition-colors"
-                          data-testid={`link-address-${project.id}`}
-                        >
-                          {project.address}
-                        </a>
-                      </div>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 mt-1 text-sm text-muted-foreground hover:text-primary transition-colors py-1.5 -mx-1 px-1 rounded"
+                        data-testid={`link-address-${project.id}`}
+                      >
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate underline">{project.address}</span>
+                      </a>
                     )}
 
                     <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
@@ -313,6 +294,21 @@ export default function Projects() {
             })}
           </div>
         )}
+      </div>
+
+      {/* Search Bar - Fixed at bottom for thumb reach */}
+      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 z-40">
+        <div className="relative max-w-screen-sm mx-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search projects..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+            data-testid="input-search-projects"
+          />
+        </div>
       </div>
     </div>
   );

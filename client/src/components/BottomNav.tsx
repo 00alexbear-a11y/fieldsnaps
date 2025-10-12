@@ -6,10 +6,10 @@ export default function BottomNav() {
 
   const tabs = [
     {
-      id: 'camera',
-      label: 'Camera',
-      icon: Camera,
-      path: '/camera',
+      id: 'settings',
+      label: 'Settings',
+      icon: Settings,
+      path: '/settings',
     },
     {
       id: 'projects',
@@ -18,10 +18,10 @@ export default function BottomNav() {
       path: '/',
     },
     {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      path: '/settings',
+      id: 'camera',
+      label: 'Camera',
+      icon: Camera,
+      path: '/camera',
     },
   ];
 

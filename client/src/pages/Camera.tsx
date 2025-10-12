@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -52,7 +52,9 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
+  // Auto-start camera when component mounts
   useEffect(() => {
+    startCamera();
     return () => {
       stopCamera();
     };
@@ -234,7 +236,7 @@ export default function Camera() {
     }
   };
 
-  if (!hasPermission || !isActive) {
+  if (projects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full px-4 bg-background">
         <div className="max-w-md text-center space-y-6">
@@ -247,46 +249,9 @@ export default function Camera() {
               Camera
             </h1>
             <p className="text-muted-foreground" data-testid="text-camera-description">
-              Capture construction photos offline with automatic compression and sync.
+              Create a project first to start taking photos.
             </p>
           </div>
-
-          {projects.length === 0 ? (
-            <div className="p-4 bg-muted rounded-md">
-              <p className="text-sm text-muted-foreground">
-                Create a project first to start taking photos.
-              </p>
-            </div>
-          ) : (
-            <div className="w-full space-y-3">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Select Project</label>
-                <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger data-testid="select-project">
-                    <SelectValue placeholder="Select a project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {projects.map((project: any) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                variant="default"
-                size="lg"
-                className="w-full"
-                onClick={startCamera}
-                disabled={!selectedProject}
-                data-testid="button-start-camera"
-              >
-                Start Camera
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -341,15 +306,30 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Project Info */}
-      <div className="absolute bottom-24 left-0 right-0 flex justify-center z-10">
-        <div className="text-white text-sm font-medium bg-black/40 px-4 py-2 rounded-full">
-          {projects.find((p: any) => p.id === selectedProject)?.name}
-        </div>
-      </div>
-
       {/* Bottom Fixed Controls */}
       <div className="fixed bottom-0 left-0 right-0 pb-safe bg-black/80 backdrop-blur-sm z-20">
+        {/* Project Selector */}
+        <div className="px-4 pt-3 pb-2 max-w-md mx-auto">
+          <Select value={selectedProject} onValueChange={setSelectedProject}>
+            <SelectTrigger
+              className="w-full bg-white/10 border-white/20 text-white"
+              data-testid="select-project-camera"
+            >
+              <div className="flex items-center gap-2">
+                <FolderOpen className="w-4 h-4" />
+                <SelectValue placeholder="Select project folder" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((project: any) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
         <div className="flex items-center justify-around px-8 py-4 max-w-md mx-auto">
           {/* Quick Capture Button */}
           <Button
