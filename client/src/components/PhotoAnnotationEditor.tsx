@@ -193,7 +193,8 @@ export function PhotoAnnotationEditor({
 
     // Draw image if loaded, otherwise draw fallback background
     if (img.complete && img.naturalWidth > 0) {
-      ctx.drawImage(img, 0, 0);
+      // Draw image scaled to fit canvas dimensions
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     } else {
       // Draw fallback background for failed image
       ctx.fillStyle = "#374151";
