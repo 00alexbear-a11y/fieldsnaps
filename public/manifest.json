@@ -1,11 +1,11 @@
 {
-  "name": "PhotoPWA - Professional Photo Management",
-  "short_name": "PhotoPWA",
-  "description": "Professional photo management with annotations",
+  "name": "Construction Photo Documentation",
+  "short_name": "Construction Photos",
+  "description": "Offline-first photo documentation for construction sites. Capture, compress, and sync photos even with poor connectivity.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#FFFFFF",
+  "theme_color": "#007AFF",
   "orientation": "portrait",
   "icons": [
     {
@@ -21,12 +21,5 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "photo", "business"],
-  "screenshots": [
-    {
-      "src": "/screenshot-1.png",
-      "sizes": "540x720",
-      "type": "image/png"
-    }
-  ]
+  "categories": ["productivity", "photo", "business", "utilities"]
 }
