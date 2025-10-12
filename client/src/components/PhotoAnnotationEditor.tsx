@@ -354,6 +354,12 @@ export function PhotoAnnotationEditor({
             annotation.position.x2 !== undefined &&
             annotation.position.y2 !== undefined
           ) {
+            // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
+            const lineScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = annotation.strokeWidth * lineScaleFactor;
             ctx.beginPath();
             ctx.moveTo(annotation.position.x, annotation.position.y);
             ctx.lineTo(annotation.position.x2, annotation.position.y2);
@@ -370,6 +376,12 @@ export function PhotoAnnotationEditor({
             annotation.position.y !== undefined &&
             annotation.position.width !== undefined
           ) {
+            // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
+            const circleScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = annotation.strokeWidth * circleScaleFactor;
             ctx.beginPath();
             ctx.arc(
               annotation.position.x,
@@ -388,10 +400,12 @@ export function PhotoAnnotationEditor({
           break;
         case "pen":
           if (annotation.position.points && annotation.position.points.length > 0) {
+            // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
+            const penScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth;
+            ctx.lineWidth = annotation.strokeWidth * penScaleFactor;
             ctx.beginPath();
             const points = annotation.position.points;
             ctx.moveTo(points[0].x, points[0].y);
@@ -438,7 +452,7 @@ export function PhotoAnnotationEditor({
     lineWidth: number,
     color: string
   ) => {
-    // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
+    // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x
     const scaleFactor = lineWidth >= 8 ? 4.5 : 1.5;
     const thickerLineWidth = lineWidth * scaleFactor;
     
@@ -589,9 +603,10 @@ export function PhotoAnnotationEditor({
               const unitX = dx / length;
               const unitY = dy / length;
               
-              const thickerLineWidth = anno.strokeWidth === "M" || anno.strokeWidth === "L" 
-                ? (anno.strokeWidth === "M" ? 3 : 5) * 3
-                : (anno.strokeWidth === "XS" ? 1 : 2) * 1.5;
+              // strokeWidth is a number: 3 (XS), 5 (S), 8 (M), or 12 (L)
+              // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x
+              const scaleFactor = anno.strokeWidth >= 8 ? 4.5 : 1.5;
+              const thickerLineWidth = anno.strokeWidth * scaleFactor;
               const arrowheadSize = thickerLineWidth * 3;
               
               const arrowTipX = anno.position.x2;
@@ -1172,6 +1187,11 @@ export function PhotoAnnotationEditor({
         },
       };
       setTempAnnotation(newAnnotation);
+      
+      // Show zoom circle when creating arrows
+      if (tool === "arrow") {
+        setZoomCirclePos({ x, y });
+      }
     }
   };
 
@@ -1209,6 +1229,7 @@ export function PhotoAnnotationEditor({
       setIsCreating(false);
       setIsDrawing(false);
       setStartPos(null);
+      setZoomCirclePos(null);
     }
   };
 
@@ -1353,7 +1374,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Left Toolbar - Colors and Sizes */}
-      <div className="fixed left-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+      <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
         {/* Color Picker - All Colors */}
         <div className="flex flex-col gap-2">
           {colors.map((color) => (

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -27,6 +27,7 @@ interface Project {
   id: string;
   name: string;
   description?: string;
+  address?: string;
 }
 
 type CameraMode = 'photo' | 'video';
@@ -43,7 +44,8 @@ export default function Camera() {
   const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState<1 | 2 | 3>(1);
+  const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
+  const [projectSearchQuery, setProjectSearchQuery] = useState('');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -412,6 +414,14 @@ export default function Camera() {
 
   // Project selection screen
   if (showProjectSelection) {
+    const filteredProjects = projectSearchQuery.trim() 
+      ? projects.filter(project => 
+          project.name.toLowerCase().includes(projectSearchQuery.toLowerCase()) ||
+          (project.address?.toLowerCase().includes(projectSearchQuery.toLowerCase())) ||
+          (project.description?.toLowerCase().includes(projectSearchQuery.toLowerCase()))
+        )
+      : projects;
+
     return (
       <div className="flex flex-col h-full bg-background">
         {/* Header */}
@@ -439,9 +449,9 @@ export default function Camera() {
         </div>
 
         {/* Project List */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 pb-20">
           <div className="max-w-2xl mx-auto space-y-3">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <button
                 key={project.id}
                 onClick={() => {
@@ -469,6 +479,23 @@ export default function Camera() {
                 </div>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Search Bar - Fixed at bottom */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t">
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                value={projectSearchQuery}
+                onChange={(e) => setProjectSearchQuery(e.target.value)}
+                placeholder="Search projects..."
+                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-border bg-background focus:outline-none focus:border-primary transition-colors"
+                data-testid="input-search-projects"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -573,14 +600,36 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Zoom Selector - Above mode selector */}
-      <div className="absolute bottom-52 left-0 right-0 flex justify-center gap-2 z-10">
-        {[1, 2, 3].map((level) => (
+      {/* Mode Selector - Right side, vertically centered */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCameraMode('photo')}
+          className={`text-white backdrop-blur-md rounded-xl ${cameraMode === 'photo' ? 'bg-white/25' : 'bg-white/10'}`}
+          data-testid="button-mode-photo"
+        >
+          <CameraIcon className="w-5 h-5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCameraMode('video')}
+          className={`text-white backdrop-blur-md rounded-xl ${cameraMode === 'video' ? 'bg-white/25' : 'bg-white/10'}`}
+          data-testid="button-mode-video"
+        >
+          <Video className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Zoom Selector - Center, lower position */}
+      <div className="absolute bottom-36 left-0 right-0 flex justify-center gap-2 z-10">
+        {[0.5, 1, 2, 3].map((level) => (
           <Button
             key={level}
             variant="ghost"
             size="sm"
-            onClick={() => setZoomLevel(level as 1 | 2 | 3)}
+            onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
             className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
               zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
             }`}
@@ -589,30 +638,6 @@ export default function Camera() {
             {level}x
           </Button>
         ))}
-      </div>
-
-      {/* Mode Selector - Bottom center above capture button */}
-      <div className="absolute bottom-32 left-0 right-0 flex justify-center gap-4 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCameraMode('photo')}
-          className={`text-white backdrop-blur-md ${cameraMode === 'photo' ? 'bg-white/20' : 'bg-white/10'}`}
-          data-testid="button-mode-photo"
-        >
-          <CameraIcon className="w-4 h-4 mr-2" />
-          Photo
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCameraMode('video')}
-          className={`text-white backdrop-blur-md ${cameraMode === 'video' ? 'bg-white/20' : 'bg-white/10'}`}
-          data-testid="button-mode-video"
-        >
-          <Video className="w-4 h-4 mr-2" />
-          Video
-        </Button>
       </div>
 
       {/* Bottom Capture Controls - Minimal, no background box */}
