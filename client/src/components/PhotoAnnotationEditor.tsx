@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowRight, Minus, Circle, Trash2, Download, Palette, Undo, Pen } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Download, Palette, Undo, Pen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -1030,7 +1030,7 @@ export function PhotoAnnotationEditor({
             className="flex-1 text-xs"
             aria-label="Arrow tool"
           >
-            <ArrowRight className="w-3 h-3 sm:mr-1" />
+            <ArrowUpRight className="w-3 h-3 sm:mr-1" />
             <span className="hidden sm:inline">Arrow</span>
           </Button>
           <Button
