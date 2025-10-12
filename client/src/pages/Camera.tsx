@@ -436,7 +436,7 @@ export default function Camera() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation('/projects')}
+            onClick={() => setLocation('/')}
             className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
             data-testid="button-close-camera-bottom"
           >

@@ -94,7 +94,7 @@ export default function SyncBanner() {
   // Success banner (green)
   if (showSuccessBanner) {
     return (
-      <div className="sticky top-0 z-50 bg-green-600 text-white px-4 py-2 flex items-center justify-between shadow-sm animate-in slide-in-from-top">
+      <div className="sticky top-0 z-50 bg-green-600 text-white px-4 py-1 flex items-center justify-between shadow-sm animate-in slide-in-from-top">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4" />
           <span className="text-sm font-medium">All photos synced</span>
@@ -106,7 +106,7 @@ export default function SyncBanner() {
   // Offline banner (red)
   if (!isOnline) {
     return (
-      <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2 flex items-center justify-between shadow-sm">
+      <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <CloudOff className="w-4 h-4" />
           <span className="text-sm font-medium">
@@ -120,7 +120,7 @@ export default function SyncBanner() {
   // Syncing banner (blue)
   if (isSyncing) {
     return (
-      <div className="sticky top-0 z-50 bg-blue-600 text-white px-4 py-2 flex items-center justify-between shadow-sm">
+      <div className="sticky top-0 z-50 bg-blue-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span className="text-sm font-medium">
@@ -133,7 +133,7 @@ export default function SyncBanner() {
 
   // Pending banner (yellow/warning)
   return (
-    <div className="sticky top-0 z-50 bg-yellow-600 text-white px-4 py-2 flex items-center justify-between shadow-sm">
+    <div className="sticky top-0 z-50 bg-yellow-600 text-white px-4 py-1 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-2">
         <CloudUpload className="w-4 h-4" />
         <span className="text-sm font-medium">
