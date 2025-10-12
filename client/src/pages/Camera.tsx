@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2 } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
@@ -273,34 +273,58 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Bottom Controls */}
-      <div className="absolute bottom-0 left-0 right-0 pb-24 pt-8 bg-gradient-to-t from-black/60 to-transparent z-10">
-        <div className="flex flex-col items-center gap-4">
-          {/* Project Info */}
-          <div className="text-white text-sm font-medium">
-            {projects.find((p: any) => p.id === selectedProject)?.name}
-          </div>
+      {/* Project Info */}
+      <div className="absolute bottom-24 left-0 right-0 flex justify-center z-10">
+        <div className="text-white text-sm font-medium bg-black/40 px-4 py-2 rounded-full">
+          {projects.find((p: any) => p.id === selectedProject)?.name}
+        </div>
+      </div>
 
-          {/* Capture Button */}
-          <button
-            id="capture-button"
+      {/* Bottom Fixed Controls */}
+      <div className="fixed bottom-0 left-0 right-0 pb-safe bg-black/80 backdrop-blur-sm z-20">
+        <div className="flex items-center justify-around px-8 py-4 max-w-md mx-auto">
+          {/* Quick Capture Button */}
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={capturePhoto}
             disabled={isCapturing}
-            className="w-20 h-20 rounded-full border-4 border-white bg-white/20 hover:bg-white/30 active:bg-white/40 transition-all disabled:opacity-50"
-            style={{ transition: 'transform 0.1s ease' }}
-            data-testid="button-capture"
+            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50"
+            data-testid="button-quick-capture"
           >
-            {isCapturing ? (
-              <div className="w-full h-full rounded-full bg-white animate-pulse" />
-            ) : (
-              <div className="w-full h-full rounded-full bg-white" />
-            )}
-          </button>
+            <CameraIcon className="w-8 h-8" />
+          </Button>
 
-          {/* Quality Info */}
-          <div className="text-white/80 text-xs">
-            {QUALITY_PRESETS.find(p => p.value === selectedQuality)?.description}
-          </div>
+          {/* Capture & Edit Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={capturePhoto}
+            disabled={isCapturing}
+            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50"
+            data-testid="button-capture-edit"
+          >
+            <div className="relative">
+              <CameraIcon className="w-8 h-8" />
+              <PenLine className="w-4 h-4 absolute -bottom-1 -right-1" />
+            </div>
+          </Button>
+
+          {/* Close Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={stopCamera}
+            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
+            data-testid="button-close-camera-bottom"
+          >
+            <X className="w-8 h-8" />
+          </Button>
+        </div>
+
+        {/* Quality indicator */}
+        <div className="text-center text-white/60 text-xs pb-2">
+          {QUALITY_PRESETS.find(p => p.value === selectedQuality)?.description}
         </div>
       </div>
     </div>
