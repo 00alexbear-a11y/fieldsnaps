@@ -15,6 +15,11 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
   - Capture & Edit: One tap captures photo and opens annotation editor immediately
   - After editing, save returns to camera which auto-starts for next photo
   - Streamlined workflow optimized for rapid field documentation
+- **Bottom Navigation Auto-Hide:** Apple-inspired fluid animation for immersive camera experience
+  - Bottom navigation smoothly slides down and hides when Camera tab is opened
+  - Provides full-screen viewfinder without UI distractions
+  - Slides back up with smooth animation when leaving Camera
+  - 300ms ease-in-out animation matches iOS design language
 - **iOS Safari Video Display Fix:** Fixed blank video screen issue on iOS devices
   - Added explicit `video.play()` call after setting MediaStream srcObject
   - iOS Safari requires explicit play() - autoPlay attribute alone is insufficient
