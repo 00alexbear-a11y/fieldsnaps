@@ -86,7 +86,7 @@ export function setupWebAuthn(app: Express) {
 
         await storage.createCredential({
           userId,
-          credentialId: Buffer.from(credential.id).toString("base64url"),
+          credentialId: credential.id,
           publicKey: Buffer.from(credential.publicKey).toString("base64url"),
           counter: credential.counter,
           transports: body.response.transports,

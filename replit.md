@@ -65,14 +65,25 @@ Authentication is **completely optional** to preserve offline-first functionalit
 - **No Auth Required** - App works fully offline without login
 - **Optional Cloud Sync** - Sign in to sync photos across devices  
 - **Replit Auth** - Simple OAuth with Google, GitHub, email
+- **Biometric Login** - Touch ID, Face ID, Windows Hello support
 - **User-Owned Data** - Photos stored locally, synced when authenticated
 
 ### Implementation
 - Replit Auth with OpenID Connect
 - PostgreSQL session storage
+- WebAuthn/FIDO2 biometric authentication
+- SimpleWebAuthn library for browser/server integration
 - useAuth() hook for frontend state
 - isAuthenticated middleware for protected routes
 - Avatar with profile image support
+
+### Biometric Authentication (WebAuthn)
+- **Platform Authenticators**: Touch ID (macOS/iOS), Face ID (iOS), Windows Hello
+- **Registration Flow**: Users can enable biometric login after signing in with Replit Auth
+- **Authentication Flow**: One-tap sign-in using biometrics
+- **Fallback**: Replit Auth always available as backup
+- **Security**: FIDO2-compliant, phishing-resistant public-key cryptography
+- **Database**: Credentials table stores public keys, counter for clone detection
 
 ## 👋 3-Step Onboarding Flow
 
