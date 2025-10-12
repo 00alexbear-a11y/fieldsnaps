@@ -1273,75 +1273,11 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Vertical Toolbar - Right Side */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-lg">
-        {/* Tool Buttons */}
-        <Button
-          variant={tool === "text" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "text" ? null : "text")}
-          data-testid="button-tool-text"
-          className="rounded-xl hover-elevate"
-          aria-label="Text tool"
-        >
-          <Type className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "arrow" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "arrow" ? null : "arrow")}
-          data-testid="button-tool-arrow"
-          className="rounded-xl hover-elevate"
-          aria-label="Arrow tool"
-        >
-          <ArrowUpRight className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "line" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "line" ? null : "line")}
-          data-testid="button-tool-line"
-          className="rounded-xl hover-elevate"
-          aria-label="Line tool"
-        >
-          <Minus className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "circle" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "circle" ? null : "circle")}
-          data-testid="button-tool-circle"
-          className="rounded-xl hover-elevate"
-          aria-label="Circle tool"
-        >
-          <Circle className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "pen" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "pen" ? null : "pen")}
-          data-testid="button-tool-pen"
-          className="rounded-xl hover-elevate"
-          aria-label="Pen tool"
-        >
-          <Pen className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "select" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "select" ? null : "select")}
-          data-testid="button-tool-select"
-          className="rounded-xl hover-elevate"
-          aria-label="Select/Move tool"
-        >
-          <Hand className="w-5 h-5" />
-        </Button>
-
-        <div className="w-full h-px bg-white/20 my-1" />
-
-        {/* Color Picker - Compact */}
+      {/* Left Toolbar - Colors and Sizes */}
+      <div className="fixed left-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+        {/* Color Picker - All Colors */}
         <div className="flex flex-col gap-2">
-          {colors.slice(0, 4).map((color) => (
+          {colors.map((color) => (
             <button
               key={color.value}
               onClick={() => setSelectedColor(color.value)}
@@ -1366,13 +1302,78 @@ export function PhotoAnnotationEditor({
               size="icon"
               onClick={() => setStrokeWidth(size.value)}
               data-testid={`button-size-${size.name.toLowerCase()}`}
-              className="rounded-lg hover-elevate text-xs font-bold"
+              className="rounded-lg hover-elevate text-xs font-bold w-8 h-8"
               aria-label={`Size ${size.name}`}
             >
               {size.name}
             </Button>
           ))}
         </div>
+      </div>
+
+      {/* Right Toolbar - Tools and Actions */}
+      <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+        {/* Tool Buttons */}
+        <Button
+          variant={tool === "text" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "text" ? null : "text")}
+          data-testid="button-tool-text"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Text tool"
+        >
+          <Type className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "arrow" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "arrow" ? null : "arrow")}
+          data-testid="button-tool-arrow"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Arrow tool"
+        >
+          <ArrowUpRight className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "line" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "line" ? null : "line")}
+          data-testid="button-tool-line"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Line tool"
+        >
+          <Minus className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "circle" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "circle" ? null : "circle")}
+          data-testid="button-tool-circle"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Circle tool"
+        >
+          <Circle className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "pen" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "pen" ? null : "pen")}
+          data-testid="button-tool-pen"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Pen tool"
+        >
+          <Pen className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={tool === "select" ? "default" : "ghost"}
+          size="icon"
+          onClick={() => setTool(tool === "select" ? null : "select")}
+          data-testid="button-tool-select"
+          className="rounded-xl hover-elevate w-9 h-9"
+          aria-label="Select/Move tool"
+        >
+          <Hand className="w-5 h-5" />
+        </Button>
 
         <div className="w-full h-px bg-white/20 my-1" />
 
@@ -1383,7 +1384,7 @@ export function PhotoAnnotationEditor({
           onClick={handleUndo}
           disabled={historyIndex === 0}
           data-testid="button-undo"
-          className="rounded-xl hover-elevate"
+          className="rounded-xl hover-elevate w-9 h-9"
           aria-label="Undo"
         >
           <Undo className="w-5 h-5" />
@@ -1394,7 +1395,7 @@ export function PhotoAnnotationEditor({
           onClick={handleDeleteSelected}
           disabled={!selectedAnnotation}
           data-testid="button-delete"
-          className="rounded-xl hover-elevate"
+          className="rounded-xl hover-elevate w-9 h-9"
           aria-label="Delete selected"
         >
           <Trash2 className="w-5 h-5" />
