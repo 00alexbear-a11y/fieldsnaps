@@ -1,114 +1,7 @@
 # Construction Photo PWA
 
 ## Overview
-This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience. The vision is to offer a fast, reliable, and user-friendly solution for field conditions, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
-
-## Recent Changes (October 2025)
-### Phase 6: Photo Sharing & Timeline View (October 12, 2025)
-- **Share Link Dialog:** Enhanced UX for sharing photos with visible link display
-  - After selecting photos and clicking Share, a dialog displays the full share URL
-  - Read-only input field shows the link for manual copying if needed
-  - "Copy" button in dialog copies link to clipboard with toast feedback
-  - Automatic clipboard copy on share creation with success/failure toasts
-  - Clear instructions: "Link will expire in 30 days"
-  - Graceful fallback when clipboard API is unavailable
-- **Multi-Photo Sharing:** Complete workflow for sharing multiple photos
-  - Select mode activated by "Select" button (visible when photos exist)
-  - Date header checkboxes to select/deselect all photos for that date
-  - Individual photo checkboxes for granular selection
-  - Selected photos highlighted with blue ring indicator
-  - Bottom toolbar shows count and Share button
-  - Share creates public link accessible without authentication
-- **Public Share View:** Read-only page for viewing shared photos
-  - Accessible via /share/:token route (no login required)
-  - Displays project name and "Shared with you" header
-  - Photos shown in same date-grouped timeline format
-  - Full-screen photo viewer with download capability
-  - Share links expire after 30 days
-  - Bottom nav and sync banner hidden on public share pages
-- **Date-Grouped Timeline:** Photos organized by capture date
-  - Photos sorted newest first within each date group
-  - Date headers in "MMMM d, yyyy" format (e.g., "October 12, 2025")
-  - Clean visual hierarchy with grouped photo grids
-  - Consistent display on both project and share pages
-- **Sync Status Banner:** Visible upload status at top of pages
-  - Shows pending upload count with manual sync button
-  - Poll-based status updates every 3 seconds
-  - Sticky positioning at top of all pages except Camera and share pages
-  - Clear visual indicator when photos need uploading
-- **Camera Pre-Selection:** Direct camera access from project view
-  - Camera button in project header with ?projectId= parameter
-  - Pre-selects project folder for instant photo capture
-  - Streamlined workflow: view project → open camera → capture → back to project
-- **Bottom Nav Behavior:** Contextual hiding for immersive experiences
-  - Hidden on Camera page for full-screen viewfinder
-  - Hidden on project detail pages for photo browsing
-  - Hidden on public share pages (no navigation needed)
-  - Smooth slide animations for show/hide transitions
-
-### Phase 5: Camera Auto-Start & Instant Capture (October 12, 2025)
-- **Camera Auto-Start:** Camera now starts automatically when Camera tab is opened
-  - Shows "Starting Camera..." loading state while initializing
-  - Camera starts immediately when projects are loaded
-  - No manual "start camera" step required - ready to capture instantly
-  - Close buttons navigate away to properly cleanup camera resources
-- **Instant Capture Workflow:** Capture buttons work immediately without extra steps
-  - Quick Capture: One tap captures photo and saves to selected folder (stays on camera for next shot)
-  - Capture & Edit: One tap captures photo and opens annotation editor immediately
-  - After editing, save returns to camera which auto-starts for next photo
-  - Streamlined workflow optimized for rapid field documentation
-- **Bottom Navigation Auto-Hide:** Apple-inspired fluid animation for immersive camera experience
-  - Bottom navigation smoothly slides down and hides when Camera tab is opened
-  - Provides full-screen viewfinder without UI distractions
-  - Slides back up with smooth animation when leaving Camera
-  - 300ms ease-in-out animation matches iOS design language
-  - Works for all camera-related routes (handles query params and sub-paths)
-- **Save Function Verification:** Confirmed both capture modes save correctly
-  - Quick Capture: Saves photo to selected project folder, stays on camera for next shot
-  - Capture & Edit: Saves photo to selected project folder, opens annotation editor
-  - Both use `projectId: selectedProject` to ensure proper folder association
-- **Arrow Tool Icon:** Improved arrow annotation tool visual design
-  - Changed from right-pointing arrow to diagonal up-right arrow icon
-  - Better represents multi-directional annotation capability
-  - More intuitive for users drawing arrows in any direction
-- **iOS Safari Video Display Fix:** Fixed blank video screen issue on iOS devices
-  - Added explicit `video.play()` call after setting MediaStream srcObject
-  - iOS Safari requires explicit play() - autoPlay attribute alone is insufficient
-  - Fixed timing issue: now waits for video metadata to load before hiding loading overlay
-  - Previously hiding overlay when video dimensions were 0x0, causing blank white screen
-  - Loading overlay now stays visible until video has actual dimensions
-  - Fixed viewport height issue: changed from `h-full` to `fixed inset-0` with `100dvh` height
-  - Dynamic viewport height (`100dvh`) accounts for iOS Safari's dynamic address bar
-  - Camera feed now displays correctly on iOS Safari browsers
-
-### Phase 4: Camera & Photo Display Fixes (October 12, 2025)
-- **Photo Display Fix:** Photos now display fully without cropping in annotation editor
-  - Changed canvas drawing to scale full image: `ctx.drawImage(img, 0, 0, canvas.width, canvas.height)`
-  - Maintains proper aspect ratio while ensuring complete visibility
-  - Annotation coordinates still work correctly with scaled image
-- **Zoom Removal:** Removed all zoom functionality from photo viewer per user request
-  - Removed pinch-to-zoom, double-tap zoom, and mouse wheel zoom
-  - Photos display at full size constrained to screen
-  - Simplified photo viewer for easier use
-- **Camera Reliability:** Enhanced camera initialization and error handling
-  - Waits for video metadata to load before allowing capture
-  - Validates video dimensions before capture to prevent blob creation errors
-  - Uses rear/environment camera by default (facingMode: 'environment')
-
-### Phase 3: Mobile Annotation & Swipe Gestures (October 12, 2025)
-- **Canvas Scaling Fix:** Fixed critical coordinate transformation bug in PhotoAnnotationEditor
-  - Implemented `getCanvasCoordinates()` helper to properly scale display coordinates to canvas coordinates
-  - Limited canvas width to 1200px to prevent memory issues while maintaining quality
-  - Text overlay positioning now uses separate display coordinates for accurate placement
-  - Touch events properly delegated to mouse handlers for consistent behavior
-- **Swipe-to-Delete:** Added intuitive swipe gesture for project deletion
-  - Left swipe on project cards reveals delete button (100px threshold)
-  - Delete button stays visible after 150px swipe
-  - Confirmation dialog with project details before deletion
-  - Smooth animations and touch-optimized thresholds
-
-### Phase 2: Enhanced Project Management & Comments
-- **Projects Enhancement:** Added address field to projects
+This Progressive Web App (PWA) is designed as an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -125,30 +18,27 @@ This Progressive Web App (PWA) is designed to be an Apple-inspired, premium tool
 ## System Architecture
 
 ### UI/UX Decisions
-The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence (San Francisco-inspired), and consistent 8px grid spacing.
+The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and consistent 8px grid spacing. Key elements include a grayscale theme for destructive actions, a full-screen photo editor, contextual sync banner visibility, and a relocated camera Floating Action Button (FAB).
 - **Color Palette**: Primary iOS Blue (`#007AFF`), Secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Amber (`#FF9500`), Background Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`).
-- **Interaction Design**: Fluid 0.3s easing animations, haptic feedback for key actions, natural gesture navigation, progressive disclosure of advanced features, and smart defaults.
+- **Interaction Design**: Fluid 0.3s easing animations, haptic feedback for key actions, natural gesture navigation, progressive disclosure of advanced features, and smart defaults, including swipe-to-delete functionality.
 - **Component Design**: Rounded buttons (8px), subtle card shadows, clean forms with floating labels, and a tab bar navigation with SF Symbols-inspired icons.
 
 ### Technical Implementations
-- **Offline-First**: Service Worker with intelligent caching, IndexedDB for local photo storage (Blob storage), and complete app functionality without internet.
-- **Background Sync**: Uses the Background Sync API for queued uploads with retry logic and batch operations.
-- **Performance Optimizations**:
-    - **Lazy Loading**: Implemented with Intersection Observer API for photos, including skeleton loading and smooth transitions.
-    - **Web Workers**: For non-blocking image compression using `createImageBitmap()` and OffscreenCanvas, ensuring a responsive UI during CPU-intensive tasks.
-    - **URL Lifecycle Management**: Strict revocation of temporary object URLs to prevent memory leaks.
-- **Intelligent Photo System**:
-    - Three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API compression and progressive JPEG optimization.
-    - Instant thumbnail generation (150x150px) and smart aspect ratio preservation.
-- **Authentication**: Optional Replit Auth with OpenID Connect, supporting biometric login (WebAuthn/FIDO2) for Touch ID, Face ID, and Windows Hello. PostgreSQL for session storage.
-- **Onboarding**: A 3-step interactive onboarding flow for new users, managed by a localStorage flag.
-- **PWA Installation**: Contextual install prompts after user engagement.
+- **Offline-First**: Service Worker with intelligent caching, IndexedDB for local photo storage, and complete app functionality without internet.
+- **Background Sync**: Uses the Background Sync API for queued uploads with retry logic.
+- **Performance Optimizations**: Lazy Loading with Intersection Observer API, Web Workers for non-blocking image compression, and strict URL lifecycle management to prevent memory leaks.
+- **Intelligent Photo System**: Three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API, instant thumbnail generation, and aspect ratio preservation. Photos display fully without cropping in the annotation editor.
+- **Camera Functionality**: Auto-starts camera on tab open, instant capture workflow (Quick Capture, Capture & Edit), camera pre-selection for projects, and bottom navigation auto-hide for immersive experiences. Enhanced camera reliability with proper initialization and error handling.
+- **Photo Sharing**: Multi-photo selection, date-grouped timeline view, and public read-only share pages with a share link dialog and copy-to-clipboard functionality.
+- **Authentication**: Optional Replit Auth with OpenID Connect, supporting biometric login (WebAuthn/FIDO2).
+- **Onboarding**: A 3-step interactive onboarding flow.
+- **PWA Installation**: Contextual install prompts.
 
 ### Feature Specifications
 - **Main Navigation**: 3 tabs – Camera, Projects, Settings.
 - **Camera Interface**: Full-screen viewfinder, floating capture button, quality selector, recent photos carousel, quick project select.
-- **Project Organization**: Card-based layout, photo count, search functionality, simple folder metaphor.
-- **Photo Management**: Grid view, pinch-to-zoom, swipe actions, batch select, timeline view.
+- **Project Organization**: Card-based layout, photo count, search, address field, and simple folder metaphor.
+- **Photo Management**: Grid view, swipe actions, batch select, timeline view, and an improved arrow tool icon in the annotation editor. Zoom functionality has been removed.
 - **Upload Status**: Subtle progress indicators, smart notifications, and clear visual hierarchy for upload states.
 - **Error Handling**: Graceful degradation, clear error messages, automatic retry logic, and offline mode indicators.
 
