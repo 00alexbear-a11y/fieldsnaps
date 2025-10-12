@@ -50,7 +50,7 @@ export function setupWebAuthn(app: Express) {
         },
         supportedAlgorithmIDs: [-7, -257],
         excludeCredentials: userCredentials.map((cred) => ({
-          id: cred.credentialId,
+          id: Buffer.from(cred.credentialId, "base64url"),
           transports: cred.transports as ("ble" | "cable" | "hybrid" | "internal" | "nfc" | "smart-card" | "usb")[] | undefined,
         })),
       });
