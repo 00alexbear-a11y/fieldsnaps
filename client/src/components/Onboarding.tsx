@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Image, Settings, ChevronRight, X } from 'lucide-react';
+import logoPath from '@assets/Fieldsnaps logo v1.1_1760310332933.png';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -12,10 +13,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   const steps = [
     {
-      title: 'Welcome to Construction Photos',
+      title: 'Welcome to FieldSnaps',
       description: 'Document your job sites with ease. Capture, compress, and organize photos - even offline.',
       icon: Camera,
       color: 'text-primary',
+      showLogo: true,
     },
     {
       title: 'Smart Photo Quality',
@@ -59,9 +61,18 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </button>
 
         <div className="flex flex-col items-center text-center space-y-4 pt-4">
-          <div className={`w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ${currentStep.color}`}>
-            <Icon className="w-10 h-10" />
-          </div>
+          {currentStep.showLogo ? (
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-16 w-auto object-contain"
+              data-testid="img-fieldsnaps-logo"
+            />
+          ) : (
+            <div className={`w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ${currentStep.color}`}>
+              <Icon className="w-10 h-10" />
+            </div>
+          )}
 
           <h2 className="text-2xl font-semibold" data-testid={`text-onboarding-title-${step}`}>
             {currentStep.title}

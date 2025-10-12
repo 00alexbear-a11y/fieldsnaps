@@ -1,7 +1,7 @@
-# Construction Photo PWA
+# FieldSnaps - Construction Photo PWA
 
 ## Overview
-This Progressive Web App (PWA) is designed as an Apple-inspired, premium tool for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
+FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -19,7 +19,8 @@ This Progressive Web App (PWA) is designed as an Apple-inspired, premium tool fo
 
 ### UI/UX Decisions
 The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and consistent 8px grid spacing. Key elements include a grayscale theme for destructive actions, a full-screen photo editor, contextual sync banner visibility, and a relocated camera Floating Action Button (FAB).
-- **Color Palette**: Primary iOS Blue (`#007AFF`), Secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Amber (`#FF9500`), Background Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`).
+- **Branding**: FieldSnaps logo displayed prominently on Projects page, Settings page, Camera project selection screen, and onboarding flow.
+- **Color Palette**: Primary iOS Blue (`#007AFF`), Secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Orange (`#FF9500` - updated from amber), Background Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`).
 - **Interaction Design**: Fluid 0.3s easing animations, haptic feedback for key actions, natural gesture navigation, progressive disclosure of advanced features, and smart defaults, including swipe-to-delete functionality.
 - **Component Design**: Rounded buttons (8px), subtle card shadows, clean forms with floating labels, and a tab bar navigation with SF Symbols-inspired icons.
 
@@ -36,9 +37,10 @@ The design philosophy is "Apple-inspired," emphasizing extreme minimalism, conte
 
 ### Feature Specifications
 - **Main Navigation**: 3 tabs – Camera, Projects, Settings.
-- **Camera Interface**: Full-screen viewfinder, floating capture button, quality selector, recent photos carousel, quick project select.
-- **Project Organization**: Card-based layout, photo count, search, address field, and simple folder metaphor.
-- **Photo Management**: Grid view, swipe actions, batch select, timeline view, and an improved arrow tool icon in the annotation editor. Zoom functionality has been removed.
+- **Camera Interface**: Project selection screen before camera opens, full-screen viewfinder with glassmorphic controls, floating capture button, quality selector, zoom level selector (1x/2x/3x), centered camera flip button. Project selector removed from camera view.
+- **Project Organization**: Card-based layout with FieldSnaps logo header, photo count, search, address button (prevents accidental map navigation), and simple folder metaphor.
+- **Photo Management**: Grid view, swipe actions, batch select, timeline view. Photo viewer controls (Edit, Share, Comment, Delete, Rename) relocated to bottom bar for better accessibility.
+- **Photo Annotation Editor**: Left sidebar with all 7 colors, right sidebar with tools (arrow, circle, line, pen, text). Arrow tool includes 5x magnified zoom circle in top-right corner for precision placement. Tools positioned close to screen edges for easier thumb access.
 - **Upload Status**: Subtle progress indicators, smart notifications, and clear visual hierarchy for upload states.
 - **Error Handling**: Graceful degradation, clear error messages, automatic retry logic, and offline mode indicators.
 
