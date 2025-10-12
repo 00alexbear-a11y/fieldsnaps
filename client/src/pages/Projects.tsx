@@ -5,6 +5,16 @@ import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
 
 export default function Projects() {
@@ -27,6 +38,8 @@ export default function Projects() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const { toast } = useToast();
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery<Project[]>({
@@ -99,7 +112,6 @@ export default function Projects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      // Invalidate photos query to refresh counts (will refetch due to projectIds change)
       queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
       setDialogOpen(false);
       setName("");
@@ -109,10 +121,37 @@ export default function Projects() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      await apiRequest("DELETE", `/api/projects/${projectId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
+      setDeleteDialogOpen(false);
+      setProjectToDelete(null);
+      toast({ 
+        title: "Project deleted",
+        description: "The project and all its photos have been removed"
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     createMutation.mutate({ name, description, address });
+  };
+
+  const handleDeleteProject = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (projectToDelete) {
+      deleteMutation.mutate(projectToDelete.id);
+    }
   };
 
   const isLoading = projectsLoading;
@@ -231,65 +270,15 @@ export default function Projects() {
               const pendingSyncCount = getPendingSyncCount(project.id);
               
               return (
-                <div
+                <SwipeableProjectCard
                   key={project.id}
-                  className="flex gap-4 p-4 hover-elevate active-elevate-2 cursor-pointer"
+                  project={project}
+                  coverPhoto={coverPhoto}
+                  photoCount={photoCount}
+                  pendingSyncCount={pendingSyncCount}
                   onClick={() => setLocation(`/projects/${project.id}`)}
-                  data-testid={`card-project-${project.id}`}
-                >
-                  {/* Cover Photo */}
-                  <div className="flex-shrink-0">
-                    {coverPhoto ? (
-                      <img
-                        src={coverPhoto.url}
-                        alt={project.name}
-                        className="w-20 h-20 rounded-md object-cover"
-                        data-testid={`img-cover-${project.id}`}
-                      />
-                    ) : (
-                      <div className="w-20 h-20 rounded-md bg-muted flex items-center justify-center">
-                        <FolderOpen className="w-8 h-8 text-muted-foreground" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Project Info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold truncate" data-testid={`text-project-name-${project.id}`}>
-                      {project.name}
-                    </h3>
-                    
-                    {project.address && (
-                      <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1 mt-1 text-sm text-muted-foreground hover:text-primary transition-colors py-1.5 -mx-1 px-1 rounded"
-                        data-testid={`link-address-${project.id}`}
-                      >
-                        <MapPin className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate underline">{project.address}</span>
-                      </a>
-                    )}
-
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Camera className="w-3.5 h-3.5" />
-                        <span data-testid={`text-photo-count-${project.id}`}>
-                          {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
-                        </span>
-                      </div>
-                      
-                      {pendingSyncCount > 0 && (
-                        <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{pendingSyncCount} pending</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  onDelete={() => handleDeleteProject(project)}
+                />
               );
             })}
           </div>
@@ -310,6 +299,29 @@ export default function Projects() {
           />
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent data-testid="dialog-delete-project">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{projectToDelete?.name}"? This will permanently remove the project and all {photosByProject[projectToDelete?.id || '']?.length || 0} of its photos. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
