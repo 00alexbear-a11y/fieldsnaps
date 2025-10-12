@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -28,15 +28,24 @@ interface Project {
   description?: string;
 }
 
+type CameraMode = 'photo' | 'video';
+type CameraFacing = 'environment' | 'user';
+
 export default function Camera() {
   const [hasPermission, setHasPermission] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<QualityPreset>('standard');
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [isCapturing, setIsCapturing] = useState(false);
+  const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
+  const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
+  const [isRecording, setIsRecording] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -63,10 +72,10 @@ export default function Camera() {
 
   // Auto-start camera when projects are loaded and camera is not yet active
   useEffect(() => {
-    if (projects.length > 0 && !isActive) {
+    if (projects.length > 0 && !isActive && !permissionDenied) {
       startCamera();
     }
-  }, [projects]);
+  }, [projects, cameraFacing]);
 
   // Cleanup camera when component unmounts
   useEffect(() => {
@@ -79,7 +88,7 @@ export default function Camera() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment',
+          facingMode: cameraFacing,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
         },
@@ -100,6 +109,7 @@ export default function Camera() {
         }
         
         setHasPermission(true);
+        setPermissionDenied(false);
 
         // Wait for video metadata to load so dimensions are available
         await new Promise<void>((resolve) => {
@@ -138,16 +148,21 @@ export default function Camera() {
       }
     } catch (error) {
       console.error('Camera error:', error);
+      setPermissionDenied(true);
+      setHasPermission(false);
+      setIsActive(false);
       toast({
-        title: 'Camera Error',
+        title: 'Camera Access Denied',
         description: 'Unable to access camera. Please check permissions.',
         variant: 'destructive',
       });
-      throw error; // Re-throw so caller knows it failed
     }
   };
 
   const stopCamera = () => {
+    if (isRecording) {
+      stopRecording();
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -156,6 +171,61 @@ export default function Camera() {
       videoRef.current.srcObject = null;
     }
     setIsActive(false);
+  };
+
+  const switchCamera = async () => {
+    stopCamera();
+    setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
+  };
+
+  const startRecording = async () => {
+    if (!streamRef.current || isRecording) return;
+    
+    try {
+      recordedChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(streamRef.current, {
+        mimeType: 'video/webm',
+      });
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        // For now, just show a toast - video storage can be added later
+        toast({
+          title: 'Video Recorded',
+          description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video ready`,
+        });
+      };
+
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+      setIsRecording(true);
+      
+      toast({
+        title: 'Recording Started',
+        description: 'Tap again to stop recording',
+      });
+    } catch (error) {
+      console.error('Recording error:', error);
+      toast({
+        title: 'Recording Failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+      setIsRecording(false);
+    }
   };
 
   // Quick capture mode: Capture photo and continue shooting
@@ -329,6 +399,38 @@ export default function Camera() {
               Create a project first to start taking photos.
             </p>
           </div>
+          
+          <Button onClick={() => setLocation('/')} data-testid="button-go-home">
+            <Home className="w-4 h-4 mr-2" />
+            Go to Projects
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Permission denied state
+  if (permissionDenied) {
+    return (
+      <div className="fixed inset-0 w-full bg-black overflow-hidden flex items-center justify-center" style={{ height: '100dvh', minHeight: '100vh' }}>
+        <div className="text-center space-y-6 p-8">
+          <div className="w-24 h-24 mx-auto bg-red-600/20 rounded-full flex items-center justify-center">
+            <CameraIcon className="w-12 h-12 text-red-600" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-white">Camera Access Denied</h2>
+            <p className="text-white/60 text-sm max-w-sm">
+              Please enable camera permissions in your browser settings to take photos.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setLocation('/')} 
+            variant="default"
+            data-testid="button-go-home-denied"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Go Home
+          </Button>
         </div>
       </div>
     );
@@ -364,24 +466,35 @@ export default function Camera() {
         data-testid="video-camera-stream"
       />
 
-      {/* Top Controls */}
-      <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10">
+      {/* Top Controls - Minimal */}
+      <div className="absolute top-0 left-0 right-0 p-3 z-10">
         <div className="flex items-center justify-between max-w-screen-sm mx-auto">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation('/projects')}
-            className="text-white hover:bg-white/20"
+            onClick={() => setLocation('/')}
+            className="text-white hover:bg-white/20 bg-black/30 backdrop-blur-md"
             data-testid="button-close-camera"
           >
             <X className="w-6 h-6" />
           </Button>
 
           <div className="flex items-center gap-2">
-            <Settings2 className="w-5 h-5 text-white" />
+            {/* Camera switch */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={switchCamera}
+              className="text-white hover:bg-white/20 bg-black/30 backdrop-blur-md"
+              data-testid="button-switch-camera"
+            >
+              <SwitchCamera className="w-5 h-5" />
+            </Button>
+
+            {/* Quality selector */}
             <Select value={selectedQuality} onValueChange={(v) => setSelectedQuality(v as QualityPreset)}>
               <SelectTrigger
-                className="w-32 bg-white/10 border-white/20 text-white"
+                className="w-28 bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
                 data-testid="select-quality"
               >
                 <SelectValue />
@@ -401,59 +514,17 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Bottom Fixed Controls */}
-      <div className="fixed bottom-0 left-0 right-0 pb-safe bg-black/80 backdrop-blur-sm z-20">
-        {/* Capture Buttons */}
-        <div className="flex items-center justify-around px-8 py-4 max-w-md mx-auto">
-          {/* Quick Capture Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={quickCapture}
-            disabled={isCapturing}
-            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50 transition-transform"
-            data-testid="button-quick-capture"
-          >
-            <CameraIcon className="w-8 h-8" />
-          </Button>
-
-          {/* Capture & Edit Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={captureAndEdit}
-            disabled={isCapturing}
-            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50"
-            data-testid="button-capture-edit"
-          >
-            <div className="relative">
-              <CameraIcon className="w-8 h-8" />
-              <PenLine className="w-4 h-4 absolute -bottom-1 -right-1" />
-            </div>
-          </Button>
-
-          {/* Close Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/')}
-            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
-            data-testid="button-close-camera-bottom"
-          >
-            <X className="w-8 h-8" />
-          </Button>
-        </div>
-
-        {/* Project Selector - Below Capture Buttons */}
-        <div className="px-4 pb-3 max-w-md mx-auto">
+      {/* Project Selector - Top center, compact */}
+      <div className="absolute top-14 left-0 right-0 px-3 z-10">
+        <div className="max-w-xs mx-auto">
           <Select value={selectedProject} onValueChange={setSelectedProject}>
             <SelectTrigger
-              className="w-full bg-white/10 border-white/20 text-white"
+              className="w-full bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
               data-testid="select-project-camera"
             >
               <div className="flex items-center gap-2">
                 <FolderOpen className="w-4 h-4" />
-                <SelectValue placeholder="Select project folder" />
+                <SelectValue placeholder="Select project" />
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -465,12 +536,103 @@ export default function Camera() {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Quality indicator */}
-        <div className="text-center text-white/60 text-xs pb-2">
-          {QUALITY_PRESETS.find(p => p.value === selectedQuality)?.description}
-        </div>
       </div>
+
+      {/* Mode Selector - Bottom center above capture button */}
+      <div className="absolute bottom-32 left-0 right-0 flex justify-center gap-4 z-10">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setCameraMode('photo')}
+          className={`text-white ${cameraMode === 'photo' ? 'bg-white/20' : 'bg-transparent'}`}
+          data-testid="button-mode-photo"
+        >
+          <CameraIcon className="w-4 h-4 mr-2" />
+          Photo
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setCameraMode('video')}
+          className={`text-white ${cameraMode === 'video' ? 'bg-white/20' : 'bg-transparent'}`}
+          data-testid="button-mode-video"
+        >
+          <Video className="w-4 h-4 mr-2" />
+          Video
+        </Button>
+      </div>
+
+      {/* Bottom Capture Controls - Minimal, no background box */}
+      <div className="absolute bottom-6 left-0 right-0 pb-safe z-20">
+        {cameraMode === 'photo' ? (
+          <div className="flex items-center justify-center gap-8 px-8 max-w-md mx-auto">
+            {/* Quick Capture Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={quickCapture}
+              disabled={isCapturing}
+              className="w-14 h-14 rounded-full bg-white/90 hover:bg-white active:bg-white/80 text-black disabled:opacity-50 transition-transform shadow-lg"
+              data-testid="button-quick-capture"
+            >
+              <CameraIcon className="w-7 h-7" />
+            </Button>
+
+            {/* Capture & Edit Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={captureAndEdit}
+              disabled={isCapturing}
+              className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50 shadow-lg"
+              data-testid="button-capture-edit"
+            >
+              <div className="relative">
+                <CameraIcon className="w-8 h-8" />
+                <PenLine className="w-4 h-4 absolute -bottom-1 -right-1" />
+              </div>
+            </Button>
+
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation('/')}
+              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white shadow-lg"
+              data-testid="button-close-camera-bottom"
+            >
+              <X className="w-7 h-7" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center px-8 max-w-md mx-auto">
+            {/* Video Record/Stop Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`w-20 h-20 rounded-full ${isRecording ? 'bg-red-600' : 'bg-white/90'} hover:scale-105 active:scale-95 transition-all shadow-lg`}
+              data-testid="button-record-video"
+            >
+              {isRecording ? (
+                <div className="w-6 h-6 bg-white rounded-sm" />
+              ) : (
+                <div className="w-5 h-5 bg-red-600 rounded-full" />
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Recording indicator */}
+      {isRecording && (
+        <div className="absolute top-24 left-0 right-0 flex justify-center z-10">
+          <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 animate-pulse">
+            <div className="w-2 h-2 bg-white rounded-full" />
+            Recording
+          </div>
+        </div>
+      )}
     </div>
   );
 }
