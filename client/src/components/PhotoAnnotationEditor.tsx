@@ -983,64 +983,76 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Toolbar */}
-      <Card className="p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Tools */}
-          <div className="flex gap-2">
-            <Button
-              variant={tool === "text" ? "default" : "outline"}
-              size="default"
-              onClick={() => setTool("text")}
-              data-testid="button-tool-text"
-            >
-              <Type className="w-4 h-4 mr-2" />
-              Text
-            </Button>
-            <Button
-              variant={tool === "arrow" ? "default" : "outline"}
-              size="default"
-              onClick={() => setTool("arrow")}
-              data-testid="button-tool-arrow"
-            >
-              <ArrowRight className="w-4 h-4 mr-2" />
-              Arrow
-            </Button>
-            <Button
-              variant={tool === "line" ? "default" : "outline"}
-              size="default"
-              onClick={() => setTool("line")}
-              data-testid="button-tool-line"
-            >
-              <Minus className="w-4 h-4 mr-2" />
-              Line
-            </Button>
-            <Button
-              variant={tool === "circle" ? "default" : "outline"}
-              size="default"
-              onClick={() => setTool("circle")}
-              data-testid="button-tool-circle"
-            >
-              <Circle className="w-4 h-4 mr-2" />
-              Circle
-            </Button>
-            <Button
-              variant={tool === "pen" ? "default" : "outline"}
-              size="default"
-              onClick={() => setTool("pen")}
-              data-testid="button-tool-pen"
-            >
-              <Pen className="w-4 h-4 mr-2" />
-              Pen
-            </Button>
-          </div>
+    <div className="flex flex-col h-full">
+      {/* Compact Toolbar */}
+      <div className="border-b p-2 bg-background">
+        {/* Row 1: Drawing Tools */}
+        <div className="flex items-center gap-1 mb-2">
+          <Button
+            variant={tool === "text" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTool("text")}
+            data-testid="button-tool-text"
+            className="flex-1 text-xs"
+            aria-label="Text tool"
+          >
+            <Type className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">Text</span>
+          </Button>
+          <Button
+            variant={tool === "arrow" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTool("arrow")}
+            data-testid="button-tool-arrow"
+            className="flex-1 text-xs"
+            aria-label="Arrow tool"
+          >
+            <ArrowRight className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">Arrow</span>
+          </Button>
+          <Button
+            variant={tool === "line" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTool("line")}
+            data-testid="button-tool-line"
+            className="flex-1 text-xs"
+            aria-label="Line tool"
+          >
+            <Minus className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">Line</span>
+          </Button>
+          <Button
+            variant={tool === "circle" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTool("circle")}
+            data-testid="button-tool-circle"
+            className="flex-1 text-xs"
+            aria-label="Circle tool"
+          >
+            <Circle className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">Circle</span>
+          </Button>
+          <Button
+            variant={tool === "pen" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTool("pen")}
+            data-testid="button-tool-pen"
+            className="flex-1 text-xs"
+            aria-label="Pen tool"
+          >
+            <Pen className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">Pen</span>
+          </Button>
+        </div>
 
+        {/* Row 2: Size, Color, and Actions */}
+        <div className="flex items-center gap-1">
           {/* Stroke Size */}
           <ToggleGroup
             type="single"
             value={strokeWidth.toString()}
             onValueChange={(value) => value && setStrokeWidth(parseInt(value))}
+            className="gap-1"
           >
             {strokeSizes.map((size) => (
               <ToggleGroupItem
@@ -1048,6 +1060,7 @@ export function PhotoAnnotationEditor({
                 value={size.value.toString()}
                 aria-label={`Size ${size.name}`}
                 data-testid={`button-size-${size.name.toLowerCase()}`}
+                className="h-7 px-2 text-xs"
               >
                 {size.name}
               </ToggleGroupItem>
@@ -1056,10 +1069,15 @@ export function PhotoAnnotationEditor({
 
           {/* Color Picker */}
           <Select value={selectedColor} onValueChange={setSelectedColor}>
-            <SelectTrigger className="w-[140px]" data-testid="select-color">
-              <div className="flex items-center gap-2">
-                <Palette className="w-4 h-4" />
-                <SelectValue />
+            <SelectTrigger className="h-7 w-[100px] text-xs" data-testid="select-color">
+              <div className="flex items-center gap-1">
+                <div
+                  className="w-3 h-3 rounded border"
+                  style={{ backgroundColor: selectedColor }}
+                />
+                <span className="hidden sm:inline text-xs">
+                  {colors.find((c) => c.value === selectedColor)?.name}
+                </span>
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -1078,56 +1096,53 @@ export function PhotoAnnotationEditor({
           </Select>
 
           {/* Actions */}
-          <div className="flex gap-2 ml-auto">
+          <div className="flex gap-1 ml-auto">
             <Button
               variant="outline"
-              size="default"
+              size="sm"
               onClick={handleUndo}
               disabled={historyIndex === 0}
               data-testid="button-undo"
+              className="h-7 px-2"
+              aria-label="Undo last annotation"
             >
-              <Undo className="w-4 h-4 mr-2" />
-              Undo
+              <Undo className="w-3 h-3" />
             </Button>
-            {selectedAnnotation && (
-              <Button
-                variant="outline"
-                size="default"
-                onClick={handleDeleteSelected}
-                data-testid="button-delete-selected"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </Button>
-            )}
             <Button
               variant="outline"
-              size="default"
+              size="sm"
               onClick={handleClearAll}
               data-testid="button-clear-all"
+              className="h-7 px-2"
+              aria-label="Clear all annotations"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear All
+              <Trash2 className="w-3 h-3" />
             </Button>
             <Button
               variant="outline"
-              size="default"
+              size="sm"
               onClick={handleDownload}
               data-testid="button-download"
+              className="h-7 px-2 hidden sm:flex"
+              aria-label="Download annotated photo"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download
+              <Download className="w-3 h-3" />
             </Button>
-            <Button size="default" onClick={handleSave} data-testid="button-save-annotations">
-              Save Annotations
+            <Button 
+              size="sm" 
+              onClick={handleSave} 
+              data-testid="button-save-annotations"
+              className="h-7 px-3 text-xs"
+            >
+              Save
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Canvas */}
-      <Card className="p-4">
-        <div className="relative inline-block">
+      {/* Canvas - fills remaining space */}
+      <div className="flex-1 overflow-hidden bg-muted/30 flex items-center justify-center p-2">
+        <div className="relative max-w-full max-h-full flex items-center justify-center">
           <img
             ref={imageRef}
             src={photoUrl}
@@ -1145,8 +1160,14 @@ export function PhotoAnnotationEditor({
             onTouchMove={handleCanvasTouchMove}
             onTouchEnd={handleCanvasTouchEnd}
             onTouchCancel={handleCanvasTouchEnd}
-            style={{ cursor: cursorStyle, transition: "cursor 0.1s ease" }}
-            className="max-w-full border rounded"
+            style={{ 
+              cursor: cursorStyle, 
+              transition: "cursor 0.1s ease",
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain"
+            }}
+            className="rounded shadow-lg touch-none"
             data-testid="canvas-annotation"
           />
           
@@ -1160,7 +1181,6 @@ export function PhotoAnnotationEditor({
                 transform: 'translate(0, -50%)',
                 zIndex: 10000,
                 pointerEvents: 'auto',
-                background: 'rgba(255, 0, 0, 0.3)', // Debug: more visible red tint
               }}
               data-testid="text-input-wrapper"
             >
@@ -1185,29 +1205,15 @@ export function PhotoAnnotationEditor({
                 }}
                 autoFocus
                 data-testid="input-text-annotation"
-                className="min-w-[200px] bg-background/90 backdrop-blur-sm rounded-lg border-2 border-primary shadow-lg"
+                className="min-w-[200px] bg-background/90 backdrop-blur-sm rounded-lg border-2 border-primary shadow-lg text-sm"
                 style={{
-                  fontSize: `${20 + strokeWidth * 3}px`,
+                  fontSize: `${Math.max(14, 16 + strokeWidth * 2)}px`,
                   color: selectedColor,
                 }}
               />
             </div>
           )}
         </div>
-      </Card>
-
-      <div className="text-sm text-muted-foreground">
-        <p>💡 Tips:</p>
-        <ul className="list-disc list-inside space-y-1 mt-2">
-          <li><strong>Arrow tool:</strong> Click and drag to draw arrow with visible arrowhead</li>
-          <li><strong>Line/Circle:</strong> Click and drag to draw</li>
-          <li><strong>Pen tool:</strong> Click and drag to draw freehand - follow your finger or cursor!</li>
-          <li><strong>Text:</strong> Click to place, then type and press Enter</li>
-          <li>Click existing annotations to select them, then drag to move</li>
-          <li>Drag the blue handles on selected annotations to resize them</li>
-          <li>Use size buttons (XS, S, M, L) to change stroke width for new annotations</li>
-          <li>Click Undo to revert the last action</li>
-        </ul>
       </div>
     </div>
   );
