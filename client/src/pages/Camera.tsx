@@ -403,28 +403,7 @@ export default function Camera() {
 
       {/* Bottom Fixed Controls */}
       <div className="fixed bottom-0 left-0 right-0 pb-safe bg-black/80 backdrop-blur-sm z-20">
-        {/* Project Selector */}
-        <div className="px-4 pt-3 pb-2 max-w-md mx-auto">
-          <Select value={selectedProject} onValueChange={setSelectedProject}>
-            <SelectTrigger
-              className="w-full bg-white/10 border-white/20 text-white"
-              data-testid="select-project-camera"
-            >
-              <div className="flex items-center gap-2">
-                <FolderOpen className="w-4 h-4" />
-                <SelectValue placeholder="Select project folder" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project: any) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
+        {/* Capture Buttons */}
         <div className="flex items-center justify-around px-8 py-4 max-w-md mx-auto">
           {/* Quick Capture Button */}
           <Button
@@ -463,6 +442,28 @@ export default function Camera() {
           >
             <X className="w-8 h-8" />
           </Button>
+        </div>
+
+        {/* Project Selector - Below Capture Buttons */}
+        <div className="px-4 pb-3 max-w-md mx-auto">
+          <Select value={selectedProject} onValueChange={setSelectedProject}>
+            <SelectTrigger
+              className="w-full bg-white/10 border-white/20 text-white"
+              data-testid="select-project-camera"
+            >
+              <div className="flex items-center gap-2">
+                <FolderOpen className="w-4 h-4" />
+                <SelectValue placeholder="Select project folder" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((project: any) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Quality indicator */}
