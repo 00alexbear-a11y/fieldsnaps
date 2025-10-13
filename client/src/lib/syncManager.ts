@@ -98,10 +98,18 @@ class SyncManager {
         return result;
       }
 
-      console.log(`[Sync] Processing ${queueItems.length} items`);
+      // Sort items to ensure projects are synced before photos
+      const sortedItems = [...queueItems].sort((a, b) => {
+        // Projects first, then photos
+        if (a.type === 'project' && b.type !== 'project') return -1;
+        if (a.type !== 'project' && b.type === 'project') return 1;
+        return 0;
+      });
+
+      console.log(`[Sync] Processing ${sortedItems.length} items`);
 
       // Process each item
-      for (const item of queueItems) {
+      for (const item of sortedItems) {
         try {
           const success = await this.processSyncItem(item);
           

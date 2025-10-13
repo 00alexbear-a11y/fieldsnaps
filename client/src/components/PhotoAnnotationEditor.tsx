@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, Hand, X, Check } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -383,6 +383,14 @@ export function PhotoAnnotationEditor({
             annotation.position.y !== undefined &&
             annotation.position.width !== undefined
           ) {
+            // Calculate center as midpoint between two edge points
+            const centerX = annotation.position.x2 !== undefined 
+              ? (annotation.position.x + annotation.position.x2) / 2
+              : annotation.position.x;
+            const centerY = annotation.position.y2 !== undefined
+              ? (annotation.position.y + annotation.position.y2) / 2
+              : annotation.position.y;
+            
             // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
             const circleScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
             ctx.lineCap = "round";
@@ -391,17 +399,17 @@ export function PhotoAnnotationEditor({
             ctx.lineWidth = annotation.strokeWidth * circleScaleFactor;
             ctx.beginPath();
             ctx.arc(
-              annotation.position.x,
-              annotation.position.y,
+              centerX,
+              centerY,
               annotation.position.width,
               0,
               2 * Math.PI
             );
             ctx.stroke();
-            if (isSelected) {
-              const radius = annotation.position.width;
-              drawHandle(ctx, annotation.position.x + radius, annotation.position.y, "#3b82f6");
+            if (isSelected && annotation.position.x2 !== undefined && annotation.position.y2 !== undefined) {
+              // Draw handles at edge points for edge-to-edge circle
               drawHandle(ctx, annotation.position.x, annotation.position.y, "#3b82f6");
+              drawHandle(ctx, annotation.position.x2, annotation.position.y2, "#3b82f6");
             }
           }
           break;
@@ -546,15 +554,19 @@ export function PhotoAnnotationEditor({
         }
         break;
       case "circle":
-        if (anno.position.width !== undefined) {
-          const radius = anno.position.width;
-          const handleX = anno.position.x + radius;
-          const handleY = anno.position.y;
-          const distanceToHandle = Math.sqrt(
-            Math.pow(x - handleX, 2) + Math.pow(y - handleY, 2)
+        // Check edge point handles for edge-to-edge circle
+        if (anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
+          const distanceToStart = Math.sqrt(
+            Math.pow(x - anno.position.x, 2) + Math.pow(y - anno.position.y, 2)
           );
-          if (distanceToHandle <= handleSize / 2) {
-            return "radius";
+          if (distanceToStart <= handleSize / 2) {
+            return "start";
+          }
+          const distanceToEnd = Math.sqrt(
+            Math.pow(x - anno.position.x2, 2) + Math.pow(y - anno.position.y2, 2)
+          );
+          if (distanceToEnd <= handleSize / 2) {
+            return "end";
           }
         }
         break;
@@ -634,9 +646,12 @@ export function PhotoAnnotationEditor({
           }
           break;
         case "circle":
-          if (anno.position.width !== undefined) {
+          if (anno.position.width !== undefined && anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
+            // Calculate center from edge points
+            const centerX = (anno.position.x + anno.position.x2) / 2;
+            const centerY = (anno.position.y + anno.position.y2) / 2;
             const distance = Math.sqrt(
-              Math.pow(x - anno.position.x, 2) + Math.pow(y - anno.position.y, 2)
+              Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
             );
             const tolerance = 10;
             if (Math.abs(distance - anno.position.width) < tolerance) {
@@ -737,7 +752,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    setCursorStyle(tool && tool !== "select" ? "crosshair" : "default");
+    setCursorStyle(tool ? "crosshair" : "default");
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -775,8 +790,8 @@ export function PhotoAnnotationEditor({
 
     setSelectedAnnotation(null);
 
-    // Don't create new annotations if select tool is active
-    if (!tool || tool === "select") return;
+    // Don't create new annotations if no tool is selected
+    if (!tool) return;
 
     setIsCreating(true);
     setStartPos({ x, y });
@@ -827,6 +842,20 @@ export function PhotoAnnotationEditor({
                 x: initialAnnoState.position.x + dx,
                 y: initialAnnoState.position.y + dy,
               };
+            } else if (a.type === "circle") {
+              // Edge-to-edge circle: update first edge point and recalculate radius
+              const newX = initialAnnoState.position.x + dx;
+              const newY = initialAnnoState.position.y + dy;
+              const newRadius = Math.sqrt(
+                Math.pow(initialAnnoState.position.x2! - newX, 2) + 
+                Math.pow(initialAnnoState.position.y2! - newY, 2)
+              ) / 2;
+              updated.position = {
+                ...a.position,
+                x: newX,
+                y: newY,
+                width: Math.max(10, newRadius),
+              };
             }
             break;
           case "end":
@@ -835,6 +864,20 @@ export function PhotoAnnotationEditor({
                 ...a.position,
                 x2: initialAnnoState.position.x2! + dx,
                 y2: initialAnnoState.position.y2! + dy,
+              };
+            } else if (a.type === "circle") {
+              // Edge-to-edge circle: update second edge point and recalculate radius
+              const newX2 = initialAnnoState.position.x2! + dx;
+              const newY2 = initialAnnoState.position.y2! + dy;
+              const newRadius = Math.sqrt(
+                Math.pow(newX2 - initialAnnoState.position.x, 2) + 
+                Math.pow(newY2 - initialAnnoState.position.y, 2)
+              ) / 2;
+              updated.position = {
+                ...a.position,
+                x2: newX2,
+                y2: newY2,
+                width: Math.max(10, newRadius),
               };
             }
             break;
@@ -944,8 +987,9 @@ export function PhotoAnnotationEditor({
           y: startPos.y,
           x2: x,
           y2: y,
+          // For circle: store both edge points, radius calculated as half distance
           width: tool === "circle" 
-            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2))
+            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2)) / 2
             : undefined,
         },
       };
@@ -993,6 +1037,7 @@ export function PhotoAnnotationEditor({
       setIsDrawing(false);
       setStartPos(null);
       setZoomCirclePos(null);
+      setTool(null); // Auto-deselect tool after creating annotation
     }
   };
 
@@ -1076,6 +1121,20 @@ export function PhotoAnnotationEditor({
                 x: initialAnnoState.position.x + dx,
                 y: initialAnnoState.position.y + dy,
               };
+            } else if (a.type === "circle") {
+              // Edge-to-edge circle: update first edge point and recalculate radius
+              const newX = initialAnnoState.position.x + dx;
+              const newY = initialAnnoState.position.y + dy;
+              const newRadius = Math.sqrt(
+                Math.pow(initialAnnoState.position.x2! - newX, 2) + 
+                Math.pow(initialAnnoState.position.y2! - newY, 2)
+              ) / 2;
+              updated.position = {
+                ...a.position,
+                x: newX,
+                y: newY,
+                width: Math.max(10, newRadius),
+              };
             }
             break;
           case "end":
@@ -1084,6 +1143,20 @@ export function PhotoAnnotationEditor({
                 ...a.position,
                 x2: initialAnnoState.position.x2! + dx,
                 y2: initialAnnoState.position.y2! + dy,
+              };
+            } else if (a.type === "circle") {
+              // Edge-to-edge circle: update second edge point and recalculate radius
+              const newX2 = initialAnnoState.position.x2! + dx;
+              const newY2 = initialAnnoState.position.y2! + dy;
+              const newRadius = Math.sqrt(
+                Math.pow(newX2 - initialAnnoState.position.x, 2) + 
+                Math.pow(newY2 - initialAnnoState.position.y, 2)
+              ) / 2;
+              updated.position = {
+                ...a.position,
+                x2: newX2,
+                y2: newY2,
+                width: Math.max(10, newRadius),
               };
             }
             break;
@@ -1181,8 +1254,9 @@ export function PhotoAnnotationEditor({
           y: startPos.y,
           x2: x,
           y2: y,
+          // For circle: store both edge points, radius calculated as half distance
           width: tool === "circle" 
-            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2))
+            ? Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2)) / 2
             : undefined,
         },
       };
@@ -1230,6 +1304,7 @@ export function PhotoAnnotationEditor({
       setIsDrawing(false);
       setStartPos(null);
       setZoomCirclePos(null);
+      setTool(null); // Auto-deselect tool after creating annotation
     }
   };
 
@@ -1342,7 +1417,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Left Toolbar - Colors and Sizes */}
-      <div className="fixed left-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+      <div className="fixed left-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/80 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
         {/* Color Picker - All Colors */}
         <div className="flex flex-col gap-2">
           {colors.map((color) => (
@@ -1370,7 +1445,7 @@ export function PhotoAnnotationEditor({
               size="icon"
               onClick={() => setStrokeWidth(size.value)}
               data-testid={`button-size-${size.name.toLowerCase()}`}
-              className="rounded-lg hover-elevate text-xs font-bold w-8 h-8"
+              className={`rounded-lg hover-elevate text-xs font-bold w-8 h-8 ${strokeWidth === size.value ? "" : "text-white"}`}
               aria-label={`Size ${size.name}`}
             >
               {size.name}
@@ -1380,14 +1455,14 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Right Toolbar - Tools and Actions */}
-      <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
+      <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3 bg-black/80 backdrop-blur-md rounded-2xl p-2.5 shadow-lg">
         {/* Tool Buttons */}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setTextDialogOpen(true)}
           data-testid="button-tool-text"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className="rounded-xl hover-elevate w-9 h-9 text-white"
           aria-label="Add text"
         >
           <Type className="w-5 h-5" />
@@ -1397,7 +1472,7 @@ export function PhotoAnnotationEditor({
           size="icon"
           onClick={() => setTool(tool === "arrow" ? null : "arrow")}
           data-testid="button-tool-arrow"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className={`rounded-xl hover-elevate w-9 h-9 ${tool === "arrow" ? "" : "text-white"}`}
           aria-label="Arrow tool"
         >
           <ArrowUpRight className="w-5 h-5" />
@@ -1407,7 +1482,7 @@ export function PhotoAnnotationEditor({
           size="icon"
           onClick={() => setTool(tool === "line" ? null : "line")}
           data-testid="button-tool-line"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className={`rounded-xl hover-elevate w-9 h-9 ${tool === "line" ? "" : "text-white"}`}
           aria-label="Line tool"
         >
           <Minus className="w-5 h-5" />
@@ -1417,7 +1492,7 @@ export function PhotoAnnotationEditor({
           size="icon"
           onClick={() => setTool(tool === "circle" ? null : "circle")}
           data-testid="button-tool-circle"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className={`rounded-xl hover-elevate w-9 h-9 ${tool === "circle" ? "" : "text-white"}`}
           aria-label="Circle tool"
         >
           <Circle className="w-5 h-5" />
@@ -1427,20 +1502,10 @@ export function PhotoAnnotationEditor({
           size="icon"
           onClick={() => setTool(tool === "pen" ? null : "pen")}
           data-testid="button-tool-pen"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className={`rounded-xl hover-elevate w-9 h-9 ${tool === "pen" ? "" : "text-white"}`}
           aria-label="Pen tool"
         >
           <Pen className="w-5 h-5" />
-        </Button>
-        <Button
-          variant={tool === "select" ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setTool(tool === "select" ? null : "select")}
-          data-testid="button-tool-select"
-          className="rounded-xl hover-elevate w-9 h-9"
-          aria-label="Select/Move tool"
-        >
-          <Hand className="w-5 h-5" />
         </Button>
 
         <div className="w-full h-px bg-white/20 my-1" />
@@ -1452,7 +1517,7 @@ export function PhotoAnnotationEditor({
           onClick={handleUndo}
           disabled={historyIndex === 0}
           data-testid="button-undo"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className="rounded-xl hover-elevate w-9 h-9 text-white"
           aria-label="Undo"
         >
           <Undo className="w-5 h-5" />
@@ -1463,7 +1528,7 @@ export function PhotoAnnotationEditor({
           onClick={handleDeleteSelected}
           disabled={!selectedAnnotation}
           data-testid="button-delete"
-          className="rounded-xl hover-elevate w-9 h-9"
+          className="rounded-xl hover-elevate w-9 h-9 text-white"
           aria-label="Delete selected"
         >
           <Trash2 className="w-5 h-5" />
@@ -1477,7 +1542,7 @@ export function PhotoAnnotationEditor({
           size="lg"
           onClick={handleCancel}
           data-testid="button-cancel"
-          className="bg-black/20 dark:bg-white/10 backdrop-blur-md hover-elevate rounded-2xl px-6"
+          className="bg-black/80 backdrop-blur-md hover-elevate rounded-2xl px-6 text-white"
         >
           <X className="w-5 h-5 mr-2" />
           Cancel
@@ -1490,7 +1555,7 @@ export function PhotoAnnotationEditor({
           size="lg"
           onClick={handleSave}
           data-testid="button-save-annotations"
-          className="bg-black/20 dark:bg-white/10 backdrop-blur-md hover-elevate rounded-2xl px-6"
+          className="bg-black/80 backdrop-blur-md hover-elevate rounded-2xl px-6 text-white"
         >
           <Check className="w-5 h-5 mr-2" />
           Save

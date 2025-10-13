@@ -103,7 +103,8 @@ export default function PhotoEdit() {
         photoUrlRef.current = null;
       }
 
-      setLocation('/camera');
+      // Return to camera with project selected
+      setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
     } catch (error) {
       console.error('Error saving annotations:', error);
       toast({
@@ -121,7 +122,8 @@ export default function PhotoEdit() {
       URL.revokeObjectURL(photoUrlRef.current);
       photoUrlRef.current = null;
     }
-    setLocation('/camera');
+    // Return to camera with project selected
+    setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
   };
 
   if (!photoUrl) {
