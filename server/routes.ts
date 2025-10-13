@@ -85,8 +85,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Projects (no auth required - offline-first design)
-  app.get("/api/projects", async (req, res) => {
+  // Projects - protected routes
+  app.get("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const projects = await storage.getProjects();
       res.json(projects);
@@ -95,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:id", async (req, res) => {
+  app.get("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const project = await storage.getProject(req.params.id);
       if (!project) {
@@ -107,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", async (req, res) => {
+  app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const validated = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(validated);
@@ -117,7 +117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id", async (req, res) => {
+  app.patch("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       // Validate with partial schema (all fields optional)
       const validated = insertProjectSchema.partial().parse(req.body);
@@ -131,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", async (req, res) => {
+  app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteProject(req.params.id);
       if (!deleted) {
@@ -144,7 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photos
-  app.get("/api/projects/:projectId/photos", async (req, res) => {
+  app.get("/api/projects/:projectId/photos", isAuthenticated, async (req, res) => {
     try {
       const photos = await storage.getProjectPhotos(req.params.projectId);
       res.json(photos);
@@ -153,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/photos/:id", async (req, res) => {
+  app.get("/api/photos/:id", isAuthenticated, async (req, res) => {
     try {
       const photo = await storage.getPhoto(req.params.id);
       if (!photo) {
@@ -165,7 +165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", upload.single('photo'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/photos", isAuthenticated, upload.single('photo'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No photo file provided" });
@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/photos/:id", async (req, res) => {
+  app.patch("/api/photos/:id", isAuthenticated, async (req, res) => {
     try {
       const validated = insertPhotoSchema.partial().parse(req.body);
       const updated = await storage.updatePhoto(req.params.id, validated);
@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:id", async (req, res) => {
+  app.delete("/api/photos/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deletePhoto(req.params.id);
       if (!deleted) {
@@ -244,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photo Annotations
-  app.get("/api/photos/:photoId/annotations", async (req, res) => {
+  app.get("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
     try {
       const annotations = await storage.getPhotoAnnotations(req.params.photoId);
       res.json(annotations);
@@ -253,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/annotations", async (req, res) => {
+  app.post("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
     try {
       const validated = insertPhotoAnnotationSchema.parse({
         ...req.body,
@@ -266,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/annotations/:id", async (req, res) => {
+  app.delete("/api/annotations/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deletePhotoAnnotation(req.params.id);
       if (!deleted) {
@@ -279,7 +279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Comments
-  app.get("/api/photos/:photoId/comments", async (req, res) => {
+  app.get("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
     try {
       const comments = await storage.getPhotoComments(req.params.photoId);
       res.json(comments);
@@ -288,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/comments", async (req, res) => {
+  app.post("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
     try {
       const validated = insertCommentSchema.parse({
         ...req.body,
@@ -302,7 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trash operations - 30-day soft delete
-  app.get("/api/trash/projects", async (req, res) => {
+  app.get("/api/trash/projects", isAuthenticated, async (req, res) => {
     try {
       const projects = await storage.getDeletedProjects();
       res.json(projects);
@@ -311,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/trash/photos", async (req, res) => {
+  app.get("/api/trash/photos", isAuthenticated, async (req, res) => {
     try {
       const photos = await storage.getDeletedPhotos();
       res.json(photos);
@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/projects/:id/restore", async (req, res) => {
+  app.post("/api/trash/projects/:id/restore", isAuthenticated, async (req, res) => {
     try {
       const restored = await storage.restoreProject(req.params.id);
       if (!restored) {
@@ -332,7 +332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/photos/:id/restore", async (req, res) => {
+  app.post("/api/trash/photos/:id/restore", isAuthenticated, async (req, res) => {
     try {
       const restored = await storage.restorePhoto(req.params.id);
       if (!restored) {
@@ -344,7 +344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/trash/projects/:id", async (req, res) => {
+  app.delete("/api/trash/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.permanentlyDeleteProject(req.params.id);
       if (!deleted) {
@@ -356,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/trash/photos/:id", async (req, res) => {
+  app.delete("/api/trash/photos/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.permanentlyDeletePhoto(req.params.id);
       if (!deleted) {
@@ -368,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/cleanup", async (req, res) => {
+  app.post("/api/trash/cleanup", isAuthenticated, async (req, res) => {
     try {
       await storage.cleanupOldDeletedItems();
       res.status(204).send();
@@ -378,7 +378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Shares - Photo sharing via link
-  app.post("/api/shares", async (req, res) => {
+  app.post("/api/shares", isAuthenticated, async (req, res) => {
     try {
       // Generate a unique token
       const token = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
@@ -429,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/shares/:id", async (req, res) => {
+  app.delete("/api/shares/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteShare(req.params.id);
       if (!deleted) {
