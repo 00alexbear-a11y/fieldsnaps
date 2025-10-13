@@ -6,7 +6,7 @@ import type {
   Project, Photo, PhotoAnnotation, Comment, Share,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare
 } from "../shared/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, isNull, isNotNull, and, lt } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -24,14 +24,23 @@ export interface IStorage {
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
-  deleteProject(id: string): Promise<boolean>;
+  deleteProject(id: string): Promise<boolean>; // Soft delete
   
   // Photos
   getProjectPhotos(projectId: string): Promise<Photo[]>;
   getPhoto(id: string): Promise<Photo | undefined>;
   createPhoto(data: InsertPhoto): Promise<Photo>;
   updatePhoto(id: string, data: Partial<InsertPhoto>): Promise<Photo | undefined>;
-  deletePhoto(id: string): Promise<boolean>;
+  deletePhoto(id: string): Promise<boolean>; // Soft delete
+  
+  // Trash operations
+  getDeletedProjects(): Promise<Project[]>;
+  getDeletedPhotos(): Promise<Photo[]>;
+  restoreProject(id: string): Promise<boolean>;
+  restorePhoto(id: string): Promise<boolean>;
+  permanentlyDeleteProject(id: string): Promise<boolean>;
+  permanentlyDeletePhoto(id: string): Promise<boolean>;
+  cleanupOldDeletedItems(): Promise<void>;
   
   // Photo Annotations
   getPhotoAnnotations(photoId: string): Promise<PhotoAnnotation[]>;
@@ -92,11 +101,14 @@ export class DbStorage implements IStorage {
 
   // Projects
   async getProjects(): Promise<Project[]> {
-    return await db.select().from(projects).orderBy(projects.createdAt);
+    return await db.select().from(projects)
+      .where(isNull(projects.deletedAt))
+      .orderBy(projects.createdAt);
   }
 
   async getProject(id: string): Promise<Project | undefined> {
-    const result = await db.select().from(projects).where(eq(projects.id, id));
+    const result = await db.select().from(projects)
+      .where(and(eq(projects.id, id), isNull(projects.deletedAt)));
     return result[0];
   }
 
@@ -114,19 +126,24 @@ export class DbStorage implements IStorage {
   }
 
   async deleteProject(id: string): Promise<boolean> {
-    const result = await db.delete(projects).where(eq(projects.id, id)).returning();
+    // Soft delete - set deletedAt timestamp
+    const result = await db.update(projects)
+      .set({ deletedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
     return result.length > 0;
   }
 
   // Photos
   async getProjectPhotos(projectId: string): Promise<Photo[]> {
     return await db.select().from(photos)
-      .where(eq(photos.projectId, projectId))
+      .where(and(eq(photos.projectId, projectId), isNull(photos.deletedAt)))
       .orderBy(photos.createdAt);
   }
 
   async getPhoto(id: string): Promise<Photo | undefined> {
-    const result = await db.select().from(photos).where(eq(photos.id, id));
+    const result = await db.select().from(photos)
+      .where(and(eq(photos.id, id), isNull(photos.deletedAt)));
     return result[0];
   }
 
@@ -144,7 +161,11 @@ export class DbStorage implements IStorage {
   }
 
   async deletePhoto(id: string): Promise<boolean> {
-    const result = await db.delete(photos).where(eq(photos.id, id)).returning();
+    // Soft delete - set deletedAt timestamp
+    const result = await db.update(photos)
+      .set({ deletedAt: new Date() })
+      .where(eq(photos.id, id))
+      .returning();
     return result.length > 0;
   }
 
@@ -190,12 +211,71 @@ export class DbStorage implements IStorage {
 
   async getPhotosByIds(photoIds: string[]): Promise<Photo[]> {
     if (photoIds.length === 0) return [];
-    return await db.select().from(photos).where(inArray(photos.id, photoIds));
+    return await db.select().from(photos)
+      .where(and(inArray(photos.id, photoIds), isNull(photos.deletedAt)));
   }
 
   async deleteShare(id: string): Promise<boolean> {
     const result = await db.delete(shares).where(eq(shares.id, id)).returning();
     return result.length > 0;
+  }
+
+  // Trash operations
+  async getDeletedProjects(): Promise<Project[]> {
+    return await db.select().from(projects)
+      .where(isNotNull(projects.deletedAt))
+      .orderBy(projects.deletedAt);
+  }
+
+  async getDeletedPhotos(): Promise<Photo[]> {
+    return await db.select().from(photos)
+      .where(isNotNull(photos.deletedAt))
+      .orderBy(photos.deletedAt);
+  }
+
+  async restoreProject(id: string): Promise<boolean> {
+    const result = await db.update(projects)
+      .set({ deletedAt: null })
+      .where(eq(projects.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async restorePhoto(id: string): Promise<boolean> {
+    const result = await db.update(photos)
+      .set({ deletedAt: null })
+      .where(eq(photos.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async permanentlyDeleteProject(id: string): Promise<boolean> {
+    const result = await db.delete(projects).where(eq(projects.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async permanentlyDeletePhoto(id: string): Promise<boolean> {
+    const result = await db.delete(photos).where(eq(photos.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async cleanupOldDeletedItems(): Promise<void> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Delete projects older than 30 days
+    await db.delete(projects)
+      .where(and(
+        isNotNull(projects.deletedAt),
+        lt(projects.deletedAt, thirtyDaysAgo)
+      ));
+
+    // Delete photos older than 30 days
+    await db.delete(photos)
+      .where(and(
+        isNotNull(photos.deletedAt),
+        lt(photos.deletedAt, thirtyDaysAgo)
+      ));
   }
 }
 

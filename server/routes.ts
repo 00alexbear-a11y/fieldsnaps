@@ -301,6 +301,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trash operations - 30-day soft delete
+  app.get("/api/trash/projects", async (req, res) => {
+    try {
+      const projects = await storage.getDeletedProjects();
+      res.json(projects);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/trash/photos", async (req, res) => {
+    try {
+      const photos = await storage.getDeletedPhotos();
+      res.json(photos);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/trash/projects/:id/restore", async (req, res) => {
+    try {
+      const restored = await storage.restoreProject(req.params.id);
+      if (!restored) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/trash/photos/:id/restore", async (req, res) => {
+    try {
+      const restored = await storage.restorePhoto(req.params.id);
+      if (!restored) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/trash/projects/:id", async (req, res) => {
+    try {
+      const deleted = await storage.permanentlyDeleteProject(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/trash/photos/:id", async (req, res) => {
+    try {
+      const deleted = await storage.permanentlyDeletePhoto(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/trash/cleanup", async (req, res) => {
+    try {
+      await storage.cleanupOldDeletedItems();
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Shares - Photo sharing via link
   app.post("/api/shares", async (req, res) => {
     try {
