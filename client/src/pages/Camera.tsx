@@ -532,14 +532,22 @@ export default function Camera() {
       // Revoke temporary URL from worker (not stored in IndexedDB)
       URL.revokeObjectURL(compressionResult.url);
 
-      // Queue for sync
-      await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
-
       // Show brief success toast
       toast({
         title: '✓ Captured',
         description: `${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
         duration: 1500, // Brief toast for quick mode
+      });
+
+      // Queue for sync (non-blocking but show error if queueing fails)
+      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+        console.error('[Camera] Sync queue error:', err);
+        toast({
+          title: 'Sync queue failed',
+          description: 'Photo saved locally but not queued for upload. Try manual sync.',
+          variant: 'destructive',
+          duration: 3000,
+        });
       });
 
       // Visual feedback - pulse quick capture button
@@ -622,8 +630,16 @@ export default function Camera() {
       // Revoke temporary URL from worker
       URL.revokeObjectURL(compressionResult.url);
 
-      // Queue for sync
-      await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
+      // Queue for sync (non-blocking but show error if queueing fails)
+      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+        console.error('[Camera] Sync queue error:', err);
+        toast({
+          title: 'Sync queue failed',
+          description: 'Photo saved locally but not queued for upload. Try manual sync.',
+          variant: 'destructive',
+          duration: 3000,
+        });
+      });
 
       // Stop camera before navigating
       stopCamera();
