@@ -42,6 +42,8 @@ export const projects = pgTable("projects", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   address: text("address"), // Job site address
+  latitude: text("latitude"), // GPS latitude for map view
+  longitude: text("longitude"), // GPS longitude for map view
   coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
   userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
   createdAt: timestamp("created_at").defaultNow().notNull(),
