@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import { syncManager } from '@/lib/syncManager';
+import { indexedDB as indexedDBService } from '@/lib/indexeddb';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -21,14 +22,19 @@ export default function Settings() {
     projects: number;
     photos: number;
   } | null>(null);
+  const [storageUsage, setStorageUsage] = useState<{
+    mb: number;
+    photoCount: number;
+  } | null>(null);
 
   useEffect(() => {
     // Check initial theme
     const root = document.documentElement;
     setIsDark(root.classList.contains('dark'));
 
-    // Load sync status
+    // Load sync status and storage usage
     loadSyncStatus();
+    calculateStorageUsage();
 
     // Check biometric support
     checkBiometricSupport().then(setBiometricSupported);
@@ -49,6 +55,37 @@ export default function Settings() {
   const loadSyncStatus = async () => {
     const status = await syncManager.getSyncStatus();
     setSyncStatus(status);
+  };
+
+  const calculateStorageUsage = async () => {
+    try {
+      // Get all projects first
+      const projects = await indexedDBService.getAllProjects();
+      
+      // Get photos for all projects
+      let totalBytes = 0;
+      let totalPhotoCount = 0;
+      
+      for (const project of projects) {
+        const photos = await indexedDBService.getProjectPhotos(project.id);
+        totalPhotoCount += photos.length;
+        
+        photos.forEach((photo) => {
+          if (photo.blob) {
+            totalBytes += photo.blob.size;
+          }
+        });
+      }
+      
+      const totalMB = totalBytes / (1024 * 1024);
+      setStorageUsage({
+        mb: parseFloat(totalMB.toFixed(2)),
+        photoCount: totalPhotoCount
+      });
+    } catch (error) {
+      console.error('Failed to calculate storage usage:', error);
+      setStorageUsage({ mb: 0, photoCount: 0 });
+    }
   };
 
   const toggleTheme = () => {
@@ -276,6 +313,32 @@ export default function Settings() {
         >
           Sync Now
         </Button>
+      </Card>
+
+      {/* Storage */}
+      <Card className="p-4 space-y-4">
+        <h2 className="text-lg font-semibold">Storage</h2>
+        
+        {storageUsage ? (
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Used:</span>
+              <span className="font-medium text-lg" data-testid="text-storage-mb">
+                {storageUsage.mb} MB
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Photos:</span>
+              <span className="font-medium" data-testid="text-storage-photo-count">
+                {storageUsage.photoCount}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-2">
+            <div className="animate-spin rounded-full w-5 h-5 border-b-2 border-primary"></div>
+          </div>
+        )}
       </Card>
 
       {/* About */}
