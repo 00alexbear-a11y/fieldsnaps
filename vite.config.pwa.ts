@@ -9,6 +9,10 @@ export default mergeConfig(
     plugins: [
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: 'script', // Inject registration script into HTML
+        devOptions: {
+          enabled: false, // Disable in dev (Vite dev server can't work offline)
+        },
         workbox: {
           // Cache all bundled assets (JS, CSS, HTML, fonts, images)
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,ttf,jpg,jpeg}'],
