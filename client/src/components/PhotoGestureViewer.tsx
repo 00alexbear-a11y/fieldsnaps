@@ -323,20 +323,22 @@ export function PhotoGestureViewer({
         />
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - Bottom positioned */}
       {photos.length > 1 && (
-        <>
+        <div
+          className={`absolute bottom-24 left-0 right-0 flex justify-between px-4 transition-opacity duration-300 ${
+            showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
           <Button
             variant="ghost"
             size="icon"
             onClick={navigatePrev}
             disabled={currentIndex === 0}
-            className={`absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-0 transition-opacity duration-300 ${
-              showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
+            className="text-white hover:bg-white/20 disabled:opacity-30 bg-black/40 backdrop-blur-sm w-12 h-12"
             data-testid="button-prev-photo"
           >
-            <ChevronLeft className="w-8 h-8" />
+            <ChevronLeft className="w-7 h-7" />
           </Button>
 
           <Button
@@ -344,14 +346,12 @@ export function PhotoGestureViewer({
             size="icon"
             onClick={navigateNext}
             disabled={currentIndex === photos.length - 1}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-0 transition-opacity duration-300 ${
-              showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
+            className="text-white hover:bg-white/20 disabled:opacity-30 bg-black/40 backdrop-blur-sm w-12 h-12"
             data-testid="button-next-photo"
           >
-            <ChevronRight className="w-8 h-8" />
+            <ChevronRight className="w-7 h-7" />
           </Button>
-        </>
+        </div>
       )}
 
       {/* Bottom Controls and Caption */}
