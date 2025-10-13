@@ -627,19 +627,18 @@ export default function Camera() {
       : projects;
 
     return (
-      <div className="flex flex-col h-screen bg-black text-white">
+      <div className="flex flex-col h-screen bg-background">
         {/* Minimal Header */}
-        <div className="flex items-center justify-between px-4 py-6 border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-6 border-b border-border">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setLocation('/')}
-            className="text-white hover:bg-white/10"
             data-testid="button-back-to-home"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <h1 className="text-lg font-medium text-white/80" data-testid="text-select-project">
+          <h1 className="text-lg font-medium text-muted-foreground" data-testid="text-select-project">
             Tap to Capture
           </h1>
           <div className="w-10" />
@@ -655,7 +654,7 @@ export default function Camera() {
                   setSelectedProject(project.id);
                   setShowProjectSelection(false);
                 }}
-                className="group w-full p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-all"
+                className="group w-full p-5 rounded-2xl bg-card border border-border hover-elevate active-elevate-2 transition-all"
                 data-testid={`button-select-project-${project.id}`}
               >
                 <div className="flex items-center gap-4">
@@ -665,7 +664,7 @@ export default function Camera() {
                   </div>
                   {/* Just the name */}
                   <div className="flex-1 text-left">
-                    <h3 className="text-lg font-medium text-white">
+                    <h3 className="text-lg font-medium text-foreground">
                       {project.name}
                     </h3>
                   </div>
@@ -676,16 +675,16 @@ export default function Camera() {
         </div>
 
         {/* Minimal Search Bar - Fixed at bottom */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/95 backdrop-blur-xl border-t border-white/10">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t border-border">
           <div className="max-w-2xl mx-auto">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
                 value={projectSearchQuery}
                 onChange={(e) => setProjectSearchQuery(e.target.value)}
                 placeholder="Search projects..."
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-primary focus:bg-white/10 transition-all"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-card border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
                 data-testid="input-search-projects"
               />
             </div>
