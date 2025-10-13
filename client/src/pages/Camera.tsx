@@ -488,12 +488,19 @@ export default function Camera() {
       // Compress photo using Web Worker (non-blocking)
       const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
+      // Generate auto-caption: [ProjectName]_[Date]_[Time]
+      const project = projects.find(p => p.id === selectedProject);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
+      const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
+
       // Save to IndexedDB (blob only - URL created on-demand when loading)
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
         quality: selectedQuality,
-        caption: '',
+        caption: autoCaption,
         timestamp: Date.now(),
         syncStatus: 'pending',
         retryCount: 0,
@@ -571,12 +578,19 @@ export default function Camera() {
       // Compress photo using Web Worker
       const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
+      // Generate auto-caption: [ProjectName]_[Date]_[Time]
+      const project = projects.find(p => p.id === selectedProject);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
+      const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
+
       // Save to IndexedDB
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
         quality: selectedQuality,
-        caption: '',
+        caption: autoCaption,
         timestamp: Date.now(),
         syncStatus: 'pending',
         retryCount: 0,
