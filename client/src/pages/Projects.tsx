@@ -158,7 +158,7 @@ export default function Projects() {
   const isLoading = projectsLoading;
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
       <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-xl">
         <img 
