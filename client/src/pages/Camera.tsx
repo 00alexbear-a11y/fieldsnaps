@@ -295,12 +295,75 @@ export default function Camera() {
     const targetCamera = availableCameras.find(c => c.zoomLevel === level);
     
     if (targetCamera && targetCamera.deviceId !== currentDeviceId) {
+      // Stop current stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      setIsActive(false);
+      
+      // Update state
       setZoomLevel(level);
       setCurrentDeviceId(targetCamera.deviceId);
       
-      // Restart camera with new device
-      stopCamera();
-      // Camera will auto-restart via useEffect dependency on currentDeviceId
+      // Restart camera with new device after state updates
+      try {
+        const constraints: MediaStreamConstraints = {
+          video: {
+            deviceId: { exact: targetCamera.deviceId },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+          
+          await videoRef.current.play();
+          
+          // Wait for metadata
+          await new Promise<void>((resolve) => {
+            const video = videoRef.current;
+            if (!video) {
+              resolve();
+              return;
+            }
+            
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+              resolve();
+              return;
+            }
+            
+            const handleLoadedMetadata = () => {
+              video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+              resolve();
+            };
+            video.addEventListener('loadedmetadata', handleLoadedMetadata);
+            
+            setTimeout(() => {
+              video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+              resolve();
+            }, 5000);
+          });
+          
+          setIsActive(true);
+        }
+      } catch (error) {
+        console.error('Camera switch error:', error);
+        toast({
+          title: 'Camera Switch Failed',
+          description: 'Unable to switch camera lens',
+          variant: 'destructive',
+        });
+        // Fall back to original camera
+        startCamera();
+      }
     } else {
       // If camera already selected or not found, just update zoom level state
       setZoomLevel(level);
