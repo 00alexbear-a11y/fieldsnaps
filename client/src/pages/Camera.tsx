@@ -291,82 +291,97 @@ export default function Camera() {
   };
 
   const switchZoomLevel = async (level: 0.5 | 1 | 2 | 3) => {
-    // Find the camera with the requested zoom level
-    const targetCamera = availableCameras.find(c => c.zoomLevel === level);
+    // Don't switch if already at this level
+    if (zoomLevel === level) return;
     
-    if (targetCamera && targetCamera.deviceId !== currentDeviceId) {
-      // Stop current stream
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      setIsActive(false);
+    // Stop current stream
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setIsActive(false);
+    
+    // Update zoom level state
+    setZoomLevel(level);
+    
+    // Restart camera with new zoom constraint
+    try {
+      // Use zoom constraint to request specific physical lens
+      // iOS Safari and modern browsers will map this to the appropriate camera
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: cameraFacing,
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+          advanced: [{ zoom: level }]
+        },
+      };
       
-      // Update state
-      setZoomLevel(level);
-      setCurrentDeviceId(targetCamera.deviceId);
+      let stream: MediaStream;
       
-      // Restart camera with new device after state updates
       try {
-        const constraints: MediaStreamConstraints = {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (zoomError) {
+        // If zoom constraint fails, try without it (fallback for unsupported browsers)
+        console.warn('Zoom constraint not supported, falling back to basic constraints:', zoomError);
+        const fallbackConstraints: MediaStreamConstraints = {
           video: {
-            deviceId: { exact: targetCamera.deviceId },
+            facingMode: cameraFacing,
             width: { ideal: 1920 },
             height: { ideal: 1080 },
           },
         };
-        
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          streamRef.current = stream;
-          
-          await videoRef.current.play();
-          
-          // Wait for metadata
-          await new Promise<void>((resolve) => {
-            const video = videoRef.current;
-            if (!video) {
-              resolve();
-              return;
-            }
-            
-            if (video.videoWidth > 0 && video.videoHeight > 0) {
-              resolve();
-              return;
-            }
-            
-            const handleLoadedMetadata = () => {
-              video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-              resolve();
-            };
-            video.addEventListener('loadedmetadata', handleLoadedMetadata);
-            
-            setTimeout(() => {
-              video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-              resolve();
-            }, 5000);
-          });
-          
-          setIsActive(true);
-        }
-      } catch (error) {
-        console.error('Camera switch error:', error);
-        toast({
-          title: 'Camera Switch Failed',
-          description: 'Unable to switch camera lens',
-          variant: 'destructive',
-        });
-        // Fall back to original camera
-        startCamera();
+        stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
       }
-    } else {
-      // If camera already selected or not found, just update zoom level state
-      setZoomLevel(level);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        
+        await videoRef.current.play();
+        
+        // Wait for metadata
+        await new Promise<void>((resolve) => {
+          const video = videoRef.current;
+          if (!video) {
+            resolve();
+            return;
+          }
+          
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            resolve();
+            return;
+          }
+          
+          const handleLoadedMetadata = () => {
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            resolve();
+          };
+          video.addEventListener('loadedmetadata', handleLoadedMetadata);
+          
+          setTimeout(() => {
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            resolve();
+          }, 5000);
+        });
+        
+        setIsActive(true);
+      }
+    } catch (error) {
+      console.error('Camera switch error:', error instanceof Error ? error.message : String(error));
+      console.error('Full error object:', error);
+      toast({
+        title: 'Camera Switch Failed',
+        description: error instanceof Error ? error.message : 'Unable to switch camera lens',
+        variant: 'destructive',
+      });
+      // Fall back to original camera at 1x zoom
+      setZoomLevel(1);
+      await startCamera();
     }
   };
 
