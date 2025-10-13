@@ -711,7 +711,7 @@ export default function ProjectPhotos() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{project?.name}" and all its photos. This action cannot be undone.
+              "{project?.name}" and all its photos will be moved to trash for 30 days before permanent deletion.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

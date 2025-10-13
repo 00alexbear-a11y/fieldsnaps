@@ -291,7 +291,7 @@ export default function Trash() {
             <AlertDialogAction
               onClick={handlePermanentDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              data-testid="button-confirm-delete"
+              data-testid="button-confirm-permanent-delete"
             >
               Delete Permanently
             </AlertDialogAction>
