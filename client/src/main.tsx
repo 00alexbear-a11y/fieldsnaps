@@ -4,41 +4,39 @@ import "./index.css";
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
-  // Register immediately, don't wait for load event (more reliable in dev mode)
-  navigator.serviceWorker
-    .register('/sw.js', { scope: '/' })
-    .then((registration) => {
-      console.log('[PWA] Service Worker registered:', registration.scope);
-      
-      // Log SW state
-      console.log('[PWA] SW state:', registration.active?.state);
-      
-      // Check for updates periodically
-      setInterval(() => {
-        registration.update().then(() => {
-          console.log('[PWA] SW update check completed');
+  if (import.meta.env.PROD) {
+    // Production: Use vite-plugin-pwa generated Service Worker
+    import('virtual:pwa-register')
+      .then(({ registerSW }) => {
+        registerSW({
+          onNeedRefresh() {
+            console.log('[PWA] New content available, reload to update');
+          },
+          onOfflineReady() {
+            console.log('[PWA] App ready to work offline');
+          },
+          onRegistered(registration: ServiceWorkerRegistration | undefined) {
+            console.log('[PWA] Service Worker registered:', registration?.scope);
+          },
+          onRegisterError(error: Error) {
+            console.error('[PWA] Service Worker registration failed:', error);
+          },
         });
-      }, 60 * 60 * 1000);
-      
-      // Listen for SW updates
-      registration.addEventListener('updatefound', () => {
-        console.log('[PWA] SW update found');
-        const newWorker = registration.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            console.log('[PWA] SW state changed to:', newWorker.state);
-          });
-        }
+      })
+      .catch((error) => {
+        console.error('[PWA] Failed to load PWA module:', error);
       });
-    })
-    .catch((error) => {
-      console.error('[PWA] Service Worker registration failed:', error);
-    });
-
-  // Listen for controller changes
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('[PWA] Service Worker controller changed');
-  });
+  } else {
+    // Development: Use manual Service Worker (limited offline support)
+    navigator.serviceWorker
+      .register('/sw.js', { scope: '/' })
+      .then((registration) => {
+        console.log('[PWA] Dev SW registered:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('[PWA] Dev SW registration failed:', error);
+      });
+  }
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
