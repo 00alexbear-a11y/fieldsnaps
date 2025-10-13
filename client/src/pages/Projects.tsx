@@ -251,7 +251,7 @@ export default function Projects() {
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-auto pb-20">
+      <div className="flex-1 overflow-auto pb-20 bg-white dark:bg-black">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
