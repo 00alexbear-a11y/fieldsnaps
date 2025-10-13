@@ -17,8 +17,10 @@ const IMAGE_CACHE = `${CACHE_PREFIX}-images-${APP_VERSION}`;
 // Assets to pre-cache on install
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
 ];
 
 // Cache size limits (in items)
@@ -137,6 +139,7 @@ async function cacheFirst(request, cacheName) {
   const cachedResponse = await caches.match(request);
   
   if (cachedResponse) {
+    console.log('[SW] Cache hit:', request.url);
     return cachedResponse;
   }
   
@@ -144,6 +147,7 @@ async function cacheFirst(request, cacheName) {
     const networkResponse = await fetch(request);
     
     if (networkResponse.ok) {
+      console.log('[SW] Caching:', request.url);
       const cache = await caches.open(cacheName);
       cache.put(request, networkResponse.clone());
       await limitCacheSize(cacheName);
@@ -151,12 +155,16 @@ async function cacheFirst(request, cacheName) {
     
     return networkResponse;
   } catch (error) {
-    console.error('[SW] Cache-first fetch failed:', error);
+    console.error('[SW] Cache-first fetch failed for:', request.url, error);
     
     // Return offline fallback for HTML
     if (request.destination === 'document') {
+      console.log('[SW] Returning offline fallback');
       const cache = await caches.open(STATIC_CACHE);
-      return cache.match('/');
+      const fallback = await cache.match('/');
+      if (fallback) {
+        return fallback;
+      }
     }
     
     throw error;
