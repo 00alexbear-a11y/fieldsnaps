@@ -26,6 +26,8 @@ interface Annotation {
   color: string;
   strokeWidth: number;
   fontSize?: number;
+  rotation?: number; // in degrees
+  scale?: number; // scale multiplier
   position: {
     x: number;
     y: number;
@@ -126,7 +128,7 @@ interface PhotoAnnotationEditorProps {
   onCancel?: () => void;
 }
 
-type ResizeHandle = "start" | "end" | "radius" | "corner";
+type ResizeHandle = "start" | "end" | "radius" | "corner" | "rotate";
 
 export function PhotoAnnotationEditor({
   photoUrl,
@@ -303,32 +305,53 @@ export function PhotoAnnotationEditor({
         case "text":
           if (annotation.content && annotation.position.x !== undefined) {
             const fontSize = annotation.fontSize || 20;
-            ctx.font = `${fontSize}px Arial`;
+            const rotation = annotation.rotation || 0;
+            const scale = annotation.scale || 1;
             
+            ctx.save();
+            
+            // Apply transformations
+            ctx.translate(annotation.position.x, annotation.position.y);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale(scale, scale);
+            
+            ctx.font = `${fontSize}px Arial`;
             const textMetrics = ctx.measureText(annotation.content);
             const textWidth = textMetrics.width;
             const textHeight = fontSize;
             const padding = 8;
             const borderRadius = 6;
             
-            const boxX = annotation.position.x - padding;
-            const boxY = annotation.position.y - textHeight - padding;
+            const boxX = -padding;
+            const boxY = -textHeight - padding;
             const boxWidth = textWidth + padding * 2;
             const boxHeight = textHeight + padding * 2;
             
-            ctx.save();
+            // Draw background box
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.beginPath();
             ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
             ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = annotation.color;
+            ctx.fillText(annotation.content, 0, 0);
+            
             ctx.restore();
             
-            ctx.fillStyle = annotation.color;
-            ctx.fillText(annotation.content, annotation.position.x, annotation.position.y);
-            
+            // Draw handles (outside transformation)
             if (isSelected) {
-              drawHandle(ctx, annotation.position.x + textWidth, annotation.position.y, "#3b82f6");
-              drawHandle(ctx, annotation.position.x + textWidth / 2, annotation.position.y - textHeight / 2, "#3b82f6");
+              ctx.save();
+              ctx.translate(annotation.position.x, annotation.position.y);
+              ctx.rotate((rotation * Math.PI) / 180);
+              ctx.scale(scale, scale);
+              
+              // Scale handle (right side)
+              drawHandle(ctx, textWidth, 0, "#3b82f6");
+              // Rotation handle (top center)
+              drawHandle(ctx, textWidth / 2, -textHeight / 2 - 20, "#22c55e");
+              
+              ctx.restore();
             }
           }
           break;
@@ -522,15 +545,38 @@ export function PhotoAnnotationEditor({
           const ctx = canvas?.getContext("2d");
           if (ctx) {
             const fontSize = anno.fontSize || 20;
+            const rotation = anno.rotation || 0;
+            const scale = anno.scale || 1;
+            
             ctx.font = `${fontSize}px Arial`;
             const textMetrics = ctx.measureText(anno.content);
             const textWidth = textMetrics.width;
-            const cornerX = anno.position.x + textWidth;
-            const cornerY = anno.position.y;
-            const distanceToCorner = Math.sqrt(
-              Math.pow(x - cornerX, 2) + Math.pow(y - cornerY, 2)
+            const textHeight = fontSize;
+            
+            // Transform point to text's local coordinate system
+            const dx = x - anno.position.x;
+            const dy = y - anno.position.y;
+            const rad = (-rotation * Math.PI) / 180;
+            const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
+            const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
+            
+            // Check rotation handle (top center)
+            const rotateHandleX = textWidth / 2;
+            const rotateHandleY = -textHeight / 2 - 20;
+            const distanceToRotate = Math.sqrt(
+              Math.pow(localX - rotateHandleX, 2) + Math.pow(localY - rotateHandleY, 2)
             );
-            if (distanceToCorner <= handleSize / 2) {
+            if (distanceToRotate <= handleSize / 2) {
+              return "rotate";
+            }
+            
+            // Check scale handle (right side)
+            const scaleHandleX = textWidth;
+            const scaleHandleY = 0;
+            const distanceToScale = Math.sqrt(
+              Math.pow(localX - scaleHandleX, 2) + Math.pow(localY - scaleHandleY, 2)
+            );
+            if (distanceToScale <= handleSize / 2) {
               return "corner";
             }
           }
@@ -585,16 +631,28 @@ export function PhotoAnnotationEditor({
             const ctx = canvas?.getContext("2d");
             if (ctx) {
               const fontSize = anno.fontSize || 20;
+              const rotation = anno.rotation || 0;
+              const scale = anno.scale || 1;
+              
               ctx.font = `${fontSize}px Arial`;
               const textMetrics = ctx.measureText(anno.content);
               const textWidth = textMetrics.width;
               const textHeight = fontSize;
               
+              // Transform click point to text's local coordinate system
+              const dx = x - anno.position.x;
+              const dy = y - anno.position.y;
+              const rad = (-rotation * Math.PI) / 180;
+              const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
+              const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
+              
+              // Check if click is within text bounds in local space
+              const padding = 8;
               if (
-                x >= anno.position.x &&
-                x <= anno.position.x + textWidth &&
-                y >= anno.position.y - textHeight &&
-                y <= anno.position.y
+                localX >= -padding &&
+                localX <= textWidth + padding &&
+                localY >= -textHeight - padding &&
+                localY <= padding
               ) {
                 return anno;
               }
@@ -894,14 +952,39 @@ export function PhotoAnnotationEditor({
             break;
           case "corner":
             if (a.type === "text" && a.content) {
-              const canvas = canvasRef.current;
-              const ctx = canvas?.getContext("2d");
-              if (ctx) {
-                const currentFontSize = a.fontSize || 20;
-                const scaleFactor = Math.max(0.5, 1 + dx / 100);
-                const newFontSize = Math.max(12, Math.min(72, currentFontSize * scaleFactor));
-                updated.fontSize = newFontSize;
-              }
+              // Scale text using the scale property
+              const currentScale = initialAnnoState.scale || 1;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const direction = dx >= 0 ? 1 : -1;
+              const scaleFactor = 1 + (direction * distance) / 150;
+              const newScale = Math.max(0.5, Math.min(3, currentScale * scaleFactor));
+              updated.scale = newScale;
+            }
+            break;
+          case "rotate":
+            if (a.type === "text" && a.content) {
+              // Calculate rotation angle
+              const centerX = initialAnnoState.position.x;
+              const centerY = initialAnnoState.position.y;
+              const currentRotation = initialAnnoState.rotation || 0;
+              
+              // Calculate angle from center to current mouse position
+              const angleToMouse = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+              
+              // Calculate initial angle when drag started
+              const angleToStart = Math.atan2(dragStartPos.y - centerY, dragStartPos.x - centerX) * (180 / Math.PI);
+              
+              // Calculate rotation delta
+              const rotationDelta = angleToMouse - angleToStart;
+              
+              // Apply rotation
+              let newRotation = currentRotation + rotationDelta;
+              
+              // Normalize to -180 to 180
+              while (newRotation > 180) newRotation -= 360;
+              while (newRotation < -180) newRotation += 360;
+              
+              updated.rotation = newRotation;
             }
             break;
         }
@@ -1171,6 +1254,43 @@ export function PhotoAnnotationEditor({
               };
             }
             break;
+          case "corner":
+            if (a.type === "text" && a.content) {
+              // Scale text using the scale property
+              const currentScale = initialAnnoState.scale || 1;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const direction = dx >= 0 ? 1 : -1;
+              const scaleFactor = 1 + (direction * distance) / 150;
+              const newScale = Math.max(0.5, Math.min(3, currentScale * scaleFactor));
+              updated.scale = newScale;
+            }
+            break;
+          case "rotate":
+            if (a.type === "text" && a.content) {
+              // Calculate rotation angle
+              const centerX = initialAnnoState.position.x;
+              const centerY = initialAnnoState.position.y;
+              const currentRotation = initialAnnoState.rotation || 0;
+              
+              // Calculate angle from center to current mouse position
+              const angleToMouse = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+              
+              // Calculate initial angle when drag started
+              const angleToStart = Math.atan2(dragStartPos.y - centerY, dragStartPos.x - centerX) * (180 / Math.PI);
+              
+              // Calculate rotation delta
+              const rotationDelta = angleToMouse - angleToStart;
+              
+              // Apply rotation
+              let newRotation = currentRotation + rotationDelta;
+              
+              // Normalize to -180 to 180
+              while (newRotation > 180) newRotation -= 360;
+              while (newRotation < -180) newRotation += 360;
+              
+              updated.rotation = newRotation;
+            }
+            break;
         }
         
         return updated;
@@ -1322,6 +1442,8 @@ export function PhotoAnnotationEditor({
       color: selectedColor,
       strokeWidth,
       fontSize: Math.max(16, 20 + strokeWidth * 2),
+      rotation: 0,
+      scale: 1,
       position: {
         x: centerX,
         y: centerY,

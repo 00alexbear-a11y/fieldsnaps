@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowLeft } from "lucide-react";
+import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -288,6 +288,7 @@ export default function Projects() {
                   pendingSyncCount={pendingSyncCount}
                   onClick={() => setLocation(`/projects/${project.id}`)}
                   onDelete={() => handleDeleteProject(project)}
+                  onCameraClick={() => setLocation(`/camera?projectId=${project.id}`)}
                 />
               );
             })}
@@ -297,16 +298,7 @@ export default function Projects() {
 
       {/* Search Bar - Fixed at bottom for thumb reach */}
       <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 z-40">
-        <div className="relative max-w-screen-sm mx-auto flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/camera')}
-            data-testid="button-back-to-camera"
-            className="flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+        <div className="relative max-w-screen-sm mx-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input

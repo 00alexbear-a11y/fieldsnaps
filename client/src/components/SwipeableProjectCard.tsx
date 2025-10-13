@@ -10,6 +10,7 @@ interface SwipeableProjectCardProps {
   pendingSyncCount: number;
   onClick: () => void;
   onDelete: () => void;
+  onCameraClick: () => void;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -22,6 +23,7 @@ export default function SwipeableProjectCard({
   pendingSyncCount,
   onClick,
   onDelete,
+  onCameraClick,
 }: SwipeableProjectCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
@@ -157,23 +159,41 @@ export default function SwipeableProjectCard({
             </div>
           </div>
 
-          {/* Open in Maps Button */}
-          {project.address && (
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Camera Button - Always visible */}
             <Button
-              variant="outline"
-              size="sm"
-              className="flex-shrink-0 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+              variant="ghost"
+              size="icon"
+              className="w-11 h-11"
               onClick={(e) => {
                 e.stopPropagation();
-                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                onCameraClick();
               }}
-              data-testid={`button-open-map-${project.id}`}
-              aria-label="Open in Google Maps"
+              data-testid={`button-camera-${project.id}`}
+              aria-label={`Open camera for ${project.name}`}
             >
-              <MapPin className="w-3.5 h-3.5 mr-1.5" />
-              Open in Maps
+              <Camera className="w-5 h-5" />
             </Button>
-          )}
+
+            {/* Open in Maps Button */}
+            {project.address && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-shrink-0 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                }}
+                data-testid={`button-open-map-${project.id}`}
+                aria-label="Open in Google Maps"
+              >
+                <MapPin className="w-3.5 h-3.5 mr-1.5" />
+                Open in Maps
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

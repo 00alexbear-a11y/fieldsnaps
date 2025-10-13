@@ -1,18 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { indexedDB as indexedDBService, type SyncQueueItem } from '@/lib/indexeddb';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { indexedDB as indexedDBService, type SyncQueueItem, type LocalPhoto, createPhotoUrl } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
 import { format } from 'date-fns';
 
+interface EnhancedSyncItem extends SyncQueueItem {
+  photoUrl?: string;
+  projectName?: string;
+}
+
 export default function SyncStatus() {
   const [, setLocation] = useLocation();
-  const [syncItems, setSyncItems] = useState<SyncQueueItem[]>([]);
+  const [syncItems, setSyncItems] = useState<EnhancedSyncItem[]>([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncing, setSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; projectName?: string } | null>(null);
+  const photoUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
     loadSyncItems();
@@ -26,14 +34,65 @@ export default function SyncStatus() {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      // Clean up all photo URLs on unmount
+      photoUrlsRef.current.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+      photoUrlsRef.current = [];
     };
   }, []);
 
   const loadSyncItems = async () => {
     try {
       setLoading(true);
+      
+      // Close preview dialog to prevent showing revoked URLs
+      setSelectedPhoto(null);
+      
+      // Revoke old URLs before creating new ones
+      photoUrlsRef.current.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+      photoUrlsRef.current = [];
+      
       const items = await indexedDBService.getPendingSyncItems();
-      setSyncItems(items);
+      
+      // Enhance items with photo URLs and project names
+      const enhancedItems = await Promise.all(
+        items.map(async (item) => {
+          const enhanced: EnhancedSyncItem = { ...item };
+          
+          // For photo items, fetch the photo and create URL
+          if (item.type === 'photo' && item.localId) {
+            try {
+              const photo = await indexedDBService.getPhoto(item.localId);
+              if (photo) {
+                const url = createPhotoUrl(photo);
+                enhanced.photoUrl = url;
+                photoUrlsRef.current.push(url);
+              }
+            } catch (error) {
+              console.error('Failed to load photo:', error);
+            }
+          }
+          
+          // Fetch project name if projectId exists
+          if (item.projectId) {
+            try {
+              const project = await indexedDBService.getProject(item.projectId);
+              if (project) {
+                enhanced.projectName = project.name;
+              }
+            } catch (error) {
+              console.error('Failed to load project:', error);
+            }
+          }
+          
+          return enhanced;
+        })
+      );
+      
+      setSyncItems(enhancedItems);
     } catch (error) {
       console.error('Failed to load sync items:', error);
     } finally {
@@ -138,12 +197,34 @@ export default function SyncStatus() {
               Photos ({photoItems.length})
             </h3>
             {photoItems.map((item) => (
-              <Card key={item.id} className="p-3" data-testid={`card-sync-photo-${item.id}`}>
-                <div className="flex items-start justify-between">
+              <Card 
+                key={item.id} 
+                className="p-3 cursor-pointer hover-elevate active-elevate-2" 
+                data-testid={`card-sync-photo-${item.id}`}
+                onClick={() => item.photoUrl && setSelectedPhoto({ url: item.photoUrl, projectName: item.projectName })}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Photo Thumbnail */}
+                  {item.photoUrl && (
+                    <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                      <img 
+                        src={item.photoUrl} 
+                        alt="Photo preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Photo Info */}
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm truncate">
                       Photo {item.localId?.substring(0, 8)}...
                     </div>
+                    {item.projectName && (
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                        Project: {item.projectName}
+                      </div>
+                    )}
                     <div className="text-xs text-muted-foreground mt-1">
                       {format(new Date(item.createdAt), 'MMM d, yyyy h:mm a')}
                     </div>
@@ -153,7 +234,9 @@ export default function SyncStatus() {
                       </div>
                     )}
                   </div>
-                  <div className="ml-3">
+                  
+                  {/* Status Badge */}
+                  <div className="ml-3 flex-shrink-0">
                     {item.error ? (
                       <span className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive">
                         Error
@@ -218,6 +301,26 @@ export default function SyncStatus() {
           </div>
         )}
       </div>
+
+      {/* Photo Preview Dialog */}
+      <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
+        <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
+          {selectedPhoto && (
+            <div className="relative">
+              <img 
+                src={selectedPhoto.url} 
+                alt="Photo preview" 
+                className="w-full h-auto"
+              />
+              {selectedPhoto.projectName && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm text-white p-4">
+                  <p className="text-sm font-medium">Project: {selectedPhoto.projectName}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
