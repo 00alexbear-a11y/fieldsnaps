@@ -74,6 +74,7 @@ export default function Map() {
     googleMapRef.current = new window.google.maps.Map(mapRef.current, {
       center: defaultCenter,
       zoom: 12,
+      gestureHandling: 'greedy', // Enable one-finger panning on mobile
       mapTypeControl: true,
       streetViewControl: false,
       fullscreenControl: false,
