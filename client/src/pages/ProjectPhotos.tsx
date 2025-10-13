@@ -117,8 +117,16 @@ export default function ProjectPhotos() {
       formData.append('photo', file);
       formData.append('caption', file.name);
       
+      // Prepare headers with skip auth if needed
+      const headers: Record<string, string> = {};
+      if (sessionStorage.getItem('skipAuth') === 'true') {
+        headers['x-skip-auth'] = 'true';
+      }
+      
       const res = await fetch(`/api/projects/${projectId}/photos`, {
         method: 'POST',
+        headers,
+        credentials: 'include',
         body: formData,
       });
       
