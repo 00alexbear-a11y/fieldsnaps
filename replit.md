@@ -4,7 +4,10 @@
 FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
-- **Photo Editor UI Redesign**: Redesigned annotation controls with colors on left sidebar, tools on right sidebar, and checkmark button fixed in bottom-right corner (no longer on horizontal scroll bar). Vertical sidebars provide better thumb access and cleaner full-screen editing experience.
+- **Annotation Save Bug Fixed**: Annotations now correctly render onto photo canvas and save as annotated blob to both IndexedDB and server. Fixed double-spreading issue in updatePhoto calls.
+- **Photo Editor UI Redesign (v3)**: All controls consolidated to bottom toolbar for one-thumb operation. Left sidebar shows only colors (scaled to 32px from 44px). Bottom toolbar contains all tools, sizes, actions, and save button. Right side completely clear for maximum photo visibility.
+- **Photo Navigation Enhancement**: Navigation arrows relocated from middle sides to bottom placement (above control bar) for easier thumb access and better UX consistency.
+- **Auto Photo Naming**: All captured photos automatically named with format: [ProjectName]_[Date]_[Time] (e.g., "Downtown Office_01-13-2025_14-30") for better organization.
 - **Text Annotation Enhancements**: Increased default text size from 20px to 40px for better readability. Scale limits expanded to 0.6-4x (24-160px range). Visual handles increased to 12px radius with 40px hit detection diameter for easier thumb interaction.
 - **Camera Flip Fix**: Fixed camera orientation toggle to properly switch between front/back cameras without requesting permissions repeatedly. Dedicated useEffect handles facing changes while skipping initial mount.
 - **Sync Upload Fix**: Fixed photo sync by using server project IDs directly instead of attempting IndexedDB lookups. Photos now upload successfully to server after capture. Added consistent auth headers across all sync operations.
