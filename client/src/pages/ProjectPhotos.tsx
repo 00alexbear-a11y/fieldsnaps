@@ -161,6 +161,24 @@ export default function ProjectPhotos() {
     },
   });
 
+  const setCoverPhotoMutation = useMutation({
+    mutationFn: async (photoId: string) => {
+      return await apiRequest("PATCH", `/api/projects/${projectId}`, { coverPhotoId: photoId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "Project icon updated" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to update project icon", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
   const deleteProjectMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("DELETE", `/api/projects/${projectId}`);
@@ -509,6 +527,7 @@ export default function ProjectPhotos() {
               });
             }
           }}
+          onSetCoverPhoto={(photoId) => setCoverPhotoMutation.mutate(photoId)}
         />
       )}
 
