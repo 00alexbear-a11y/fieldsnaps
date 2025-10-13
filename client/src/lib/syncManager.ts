@@ -155,7 +155,8 @@ class SyncManager {
     }
 
     // Calculate retry delay with exponential backoff
-    if (item.lastAttempt) {
+    // Only apply delay if we've already retried (retryCount > 0) and we're offline
+    if (item.lastAttempt && item.retryCount > 0 && !navigator.onLine) {
       const delay = Math.min(
         INITIAL_RETRY_DELAY * Math.pow(2, item.retryCount),
         MAX_RETRY_DELAY
@@ -310,7 +311,13 @@ class SyncManager {
     const project = await idb.getProject(photo.projectId);
     
     if (!project || !project.serverId) {
-      console.warn('[Sync] Photo project not synced yet, skipping photo:', item.localId);
+      // Don't count as failure - just waiting for project to sync
+      // Reset retry count so it doesn't accumulate
+      await idb.updateSyncQueueItem(item.id, {
+        retryCount: 0,
+        lastAttempt: Date.now(),
+      });
+      console.warn('[Sync] Photo project not synced yet, will retry after project syncs:', item.localId);
       return false;
     }
 
@@ -385,7 +392,14 @@ class SyncManager {
       retryCount: 0,
     });
 
-    await this.registerBackgroundSync();
+    // If online, sync immediately. Otherwise use background sync
+    if (navigator.onLine) {
+      console.log('[Sync] Online - syncing immediately');
+      this.syncNow();
+    } else {
+      console.log('[Sync] Offline - registering background sync');
+      await this.registerBackgroundSync();
+    }
   }
 
   /**
@@ -401,7 +415,14 @@ class SyncManager {
       retryCount: 0,
     });
 
-    await this.registerBackgroundSync();
+    // If online, sync immediately. Otherwise use background sync
+    if (navigator.onLine) {
+      console.log('[Sync] Online - syncing immediately');
+      this.syncNow();
+    } else {
+      console.log('[Sync] Offline - registering background sync');
+      await this.registerBackgroundSync();
+    }
   }
 
   /**
