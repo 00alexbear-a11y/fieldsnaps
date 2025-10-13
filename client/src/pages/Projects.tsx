@@ -63,9 +63,18 @@ export default function Projects() {
   const { data: allPhotos = [] } = useQuery<Photo[]>({
     queryKey: ["/api/photos/all", projectIds],
     queryFn: async () => {
+      // Prepare headers with skip auth if needed
+      const headers: Record<string, string> = {};
+      if (sessionStorage.getItem('skipAuth') === 'true') {
+        headers['x-skip-auth'] = 'true';
+      }
+      
       // Fetch photos for all projects
       const photoPromises = projects.map(p => 
-        fetch(`/api/projects/${p.id}/photos`).then(r => r.json())
+        fetch(`/api/projects/${p.id}/photos`, {
+          credentials: 'include',
+          headers,
+        }).then(r => r.json())
       );
       const photoArrays = await Promise.all(photoPromises);
       return photoArrays.flat();
@@ -150,6 +159,14 @@ export default function Projects() {
       setDescription("");
       setAddress("");
       toast({ title: "Project created successfully" });
+    },
+    onError: (error: any) => {
+      console.error('Project creation error:', error);
+      toast({ 
+        title: "Error creating project", 
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
     },
   });
 
