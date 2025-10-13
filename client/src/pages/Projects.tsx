@@ -121,7 +121,8 @@ export default function Projects() {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          // Oldest first (ascending)
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         default:
           return 0;
       }
