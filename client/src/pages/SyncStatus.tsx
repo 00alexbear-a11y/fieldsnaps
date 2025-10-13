@@ -37,6 +37,8 @@ export default function SyncStatus() {
   const [swipedItemId, setSwipedItemId] = useState<string | null>(null);
   const touchStartX = useRef<number>(0);
   const touchCurrentX = useRef<number>(0);
+  const [showMoveDialog, setShowMoveDialog] = useState(false);
+  const [photoToMove, setPhotoToMove] = useState<{ syncItemId: string; photoId: string } | null>(null);
 
   useEffect(() => {
     loadSyncItems();

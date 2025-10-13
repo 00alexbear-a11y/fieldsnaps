@@ -177,7 +177,15 @@ class SyncManager {
         const photo = await idb.getPhoto(item.localId);
         if (photo) {
           const project = await idb.getProject(photo.projectId);
-          if (!project || !project.serverId) {
+          if (!project) {
+            // Project was deleted - mark with special error
+            await idb.updateSyncQueueItem(item.id, {
+              error: 'PROJECT_DELETED',
+            });
+            console.warn('[Sync] Project deleted for photo:', item.localId);
+            return false;
+          }
+          if (!project.serverId) {
             // Just waiting for project - don't increment retry count
             console.warn('[Sync] Photo waiting for project to sync:', item.localId);
             return false;
@@ -229,6 +237,21 @@ class SyncManager {
   /**
    * Sync a project to the server
    */
+  /**
+   * Get headers for sync requests with auth
+   */
+  private getSyncHeaders(contentType?: string): Record<string, string> {
+    const headers: Record<string, string> = {};
+    if (contentType) {
+      headers['Content-Type'] = contentType;
+    }
+    // Add skip auth header if needed (development only)
+    if (sessionStorage.getItem('skipAuth') === 'true') {
+      headers['x-skip-auth'] = 'true';
+    }
+    return headers;
+  }
+
   private async syncProject(item: SyncQueueItem): Promise<boolean> {
     const project = await idb.getProject(item.localId);
     
@@ -241,7 +264,8 @@ class SyncManager {
       if (item.action === 'create') {
         const response = await fetch('/api/projects', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: this.getSyncHeaders('application/json'),
+          credentials: 'include',
           body: JSON.stringify({
             name: project.name,
             description: project.description,
@@ -267,7 +291,8 @@ class SyncManager {
       if (item.action === 'update' && project.serverId) {
         const response = await fetch(`/api/projects/${project.serverId}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: this.getSyncHeaders('application/json'),
+          credentials: 'include',
           body: JSON.stringify({
             name: project.name,
             description: project.description,
@@ -289,6 +314,8 @@ class SyncManager {
       if (item.action === 'delete' && project.serverId) {
         const response = await fetch(`/api/projects/${project.serverId}`, {
           method: 'DELETE',
+          headers: this.getSyncHeaders(),
+          credentials: 'include',
         });
 
         if (!response.ok && response.status !== 404) {
@@ -338,8 +365,13 @@ class SyncManager {
           formData.append('caption', photo.caption);
         }
 
+        // Get headers (without Content-Type for FormData)
+        const headers = this.getSyncHeaders();
+
         const response = await fetch(`/api/projects/${project.serverId}/photos`, {
           method: 'POST',
+          headers,
+          credentials: 'include',
           body: formData,
         });
 
@@ -359,6 +391,8 @@ class SyncManager {
       if (item.action === 'delete' && photo.serverId) {
         const response = await fetch(`/api/photos/${photo.serverId}`, {
           method: 'DELETE',
+          headers: this.getSyncHeaders(),
+          credentials: 'include',
         });
 
         if (!response.ok && response.status !== 404) {
