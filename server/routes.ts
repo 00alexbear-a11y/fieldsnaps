@@ -377,6 +377,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/trash/delete-all", isAuthenticated, async (req, res) => {
+    try {
+      const result = await storage.permanentlyDeleteAllTrash();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Shares - Photo sharing via link
   app.post("/api/shares", isAuthenticated, async (req, res) => {
     try {
