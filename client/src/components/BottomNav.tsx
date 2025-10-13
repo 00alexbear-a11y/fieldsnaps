@@ -53,7 +53,7 @@ export default function BottomNav() {
           return (
             <Link key={tab.id} href={tab.path}>
               <button
-                className="flex flex-col items-center justify-center min-w-[88px] h-full space-y-0.5 transition-colors"
+                className="flex flex-col items-center justify-center min-w-[88px] h-full space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 data-testid={`button-tab-${tab.id}`}
               >
                 <Icon
