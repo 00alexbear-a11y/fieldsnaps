@@ -3,11 +3,15 @@ import App from "./App";
 import "./index.css";
 
 // Register service worker for PWA functionality
+// Note: Production builds use vite.config.pwa.ts which provides the PWA module
 if ('serviceWorker' in navigator) {
   if (import.meta.env.PROD) {
     // Production: Use vite-plugin-pwa generated Service Worker
-    import('virtual:pwa-register')
-      .then(({ registerSW }) => {
+    // Dynamic import with variable to prevent Vite from analyzing in dev mode
+    const pwaModule = 'virtual:pwa-register';
+    // @ts-ignore - virtual module only exists in production builds
+    import(/* @vite-ignore */ pwaModule)
+      .then(({ registerSW }: any) => {
         registerSW({
           onNeedRefresh() {
             console.log('[PWA] New content available, reload to update');
@@ -23,19 +27,13 @@ if ('serviceWorker' in navigator) {
           },
         });
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error('[PWA] Failed to load PWA module:', error);
       });
   } else {
-    // Development: Use manual Service Worker (limited offline support)
-    navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
-      .then((registration) => {
-        console.log('[PWA] Dev SW registered:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('[PWA] Dev SW registration failed:', error);
-      });
+    // Development: No Service Worker in dev mode (Vite dev server cannot work offline)
+    console.log('[PWA] Service Worker disabled in development mode');
+    console.log('[PWA] To test offline: run ./build-pwa.sh and NODE_ENV=production node dist/index.js');
   }
 }
 
