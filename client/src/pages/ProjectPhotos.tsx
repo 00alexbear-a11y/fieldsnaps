@@ -299,10 +299,17 @@ export default function ProjectPhotos() {
     }
     
     try {
+      // Get auth headers (skip-auth for testing)
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const skipAuth = sessionStorage.getItem('skipAuth');
+      if (skipAuth) {
+        headers['x-skip-auth'] = 'true';
+      }
+
       // Create share via API
       const response = await fetch('/api/shares', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           projectId,
           photoIds: Array.from(selectedPhotoIds),
@@ -343,6 +350,45 @@ export default function ProjectPhotos() {
       console.error('Share error:', error);
       toast({
         title: 'Failed to create share link',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedPhotoIds.size === 0) {
+      toast({
+        title: 'No photos selected',
+        description: 'Please select at least one photo to delete',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Confirm deletion
+    if (!window.confirm(`Are you sure you want to delete ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'}?`)) {
+      return;
+    }
+
+    try {
+      // Delete each selected photo
+      for (const photoId of Array.from(selectedPhotoIds)) {
+        await deleteMutation.mutateAsync(photoId);
+      }
+
+      toast({
+        title: 'Photos deleted',
+        description: `${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'} deleted successfully`,
+      });
+
+      // Exit select mode
+      setIsSelectMode(false);
+      setSelectedPhotoIds(new Set());
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast({
+        title: 'Failed to delete photos',
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });
@@ -540,6 +586,15 @@ export default function ProjectPhotos() {
               >
                 <FolderInput className="w-4 h-4 mr-2" />
                 Move
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDeleteSelected}
+                disabled={selectedPhotoIds.size === 0}
+                data-testid="button-delete-selected"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
               </Button>
               <Button
                 onClick={handleShareSelected}
