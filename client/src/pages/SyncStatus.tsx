@@ -1,12 +1,22 @@
 import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, FolderOpen } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, FolderOpen, Trash2, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { indexedDB as indexedDBService, type SyncQueueItem, type LocalPhoto, createPhotoUrl } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
 import { format } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface EnhancedSyncItem extends SyncQueueItem {
   photoUrl?: string;
@@ -21,6 +31,12 @@ export default function SyncStatus() {
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; projectName?: string } | null>(null);
   const photoUrlsRef = useRef<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [swipedItemId, setSwipedItemId] = useState<string | null>(null);
+  const touchStartX = useRef<number>(0);
+  const touchCurrentX = useRef<number>(0);
 
   useEffect(() => {
     loadSyncItems();
@@ -110,6 +126,71 @@ export default function SyncStatus() {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent, itemId: string) => {
+    if (isSelectMode) return;
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent, itemId: string) => {
+    if (isSelectMode) return;
+    touchCurrentX.current = e.touches[0].clientX;
+    const diff = touchStartX.current - touchCurrentX.current;
+    if (diff > 50) {
+      setSwipedItemId(itemId);
+    } else if (diff < -10) {
+      setSwipedItemId(null);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isSelectMode) return;
+    touchStartX.current = 0;
+    touchCurrentX.current = 0;
+  };
+
+  const handleDeleteSwipedItem = async () => {
+    if (!swipedItemId) return;
+    
+    try {
+      await indexedDBService.removeFromSyncQueue(swipedItemId);
+      await loadSyncItems();
+      setSwipedItemId(null);
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+    }
+  };
+
+  const toggleSelectMode = () => {
+    setIsSelectMode(!isSelectMode);
+    setSelectedItems(new Set());
+    setSwipedItemId(null);
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId);
+    } else {
+      newSelected.add(itemId);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const handleBatchDelete = async () => {
+    try {
+      const itemsArray = Array.from(selectedItems);
+      for (const itemId of itemsArray) {
+        await indexedDBService.removeFromSyncQueue(itemId);
+      }
+      await loadSyncItems();
+      setSelectedItems(new Set());
+      setIsSelectMode(false);
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error('Failed to delete items:', error);
+    }
+  };
+
   const photoItems = syncItems.filter(item => item.type === 'photo');
   const projectItems = syncItems.filter(item => item.type === 'project');
 
@@ -127,13 +208,50 @@ export default function SyncStatus() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-semibold" data-testid="text-page-title">Sync Status</h1>
+          <h1 className="text-xl font-semibold" data-testid="text-page-title">
+            {isSelectMode ? `${selectedItems.size} Selected` : 'Sync Status'}
+          </h1>
         </div>
         <div className="flex items-center gap-2">
-          {isOnline ? (
-            <Wifi className="w-5 h-5 text-green-500" data-testid="icon-online" />
+          {isSelectMode ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={selectedItems.size === 0}
+                data-testid="button-delete-selected"
+              >
+                <Trash2 className="w-4 h-4 mr-1" />
+                Delete
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSelectMode}
+                data-testid="button-cancel-select"
+              >
+                Cancel
+              </Button>
+            </>
           ) : (
-            <WifiOff className="w-5 h-5 text-destructive" data-testid="icon-offline" />
+            <>
+              {syncItems.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleSelectMode}
+                  data-testid="button-select-mode"
+                >
+                  Select
+                </Button>
+              )}
+              {isOnline ? (
+                <Wifi className="w-5 h-5 text-green-500" data-testid="icon-online" />
+              ) : (
+                <WifiOff className="w-5 h-5 text-destructive" data-testid="icon-offline" />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -197,62 +315,104 @@ export default function SyncStatus() {
               Photos ({photoItems.length})
             </h3>
             {photoItems.map((item) => (
-              <Card 
-                key={item.id} 
-                className="p-3 cursor-pointer hover-elevate active-elevate-2" 
-                data-testid={`card-sync-photo-${item.id}`}
-                onClick={() => item.photoUrl && setSelectedPhoto({ url: item.photoUrl, projectName: item.projectName })}
+              <div 
+                key={item.id}
+                className="relative overflow-hidden"
+                onTouchStart={(e) => handleTouchStart(e, item.id)}
+                onTouchMove={(e) => handleTouchMove(e, item.id)}
+                onTouchEnd={handleTouchEnd}
               >
-                <div className="flex items-start gap-3">
-                  {/* Photo Thumbnail */}
-                  {item.photoUrl && (
-                    <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                      <img 
-                        src={item.photoUrl} 
-                        alt="Photo preview" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Photo Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">
-                      Photo {item.localId?.substring(0, 8)}...
-                    </div>
-                    {item.projectName && (
-                      <div className="text-xs text-muted-foreground mt-0.5 truncate">
-                        Project: {item.projectName}
+                {/* Swipe Delete Button */}
+                {swipedItemId === item.id && !isSelectMode && (
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 z-10">
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={handleDeleteSwipedItem}
+                      data-testid={`button-delete-${item.id}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+                
+                <Card 
+                  className={`p-3 transition-transform ${
+                    swipedItemId === item.id && !isSelectMode ? '-translate-x-20' : 'translate-x-0'
+                  } ${!isSelectMode ? 'cursor-pointer hover-elevate active-elevate-2' : ''}`}
+                  data-testid={`card-sync-photo-${item.id}`}
+                  onClick={() => {
+                    if (isSelectMode) {
+                      toggleItemSelection(item.id);
+                    } else if (item.photoUrl) {
+                      setSelectedPhoto({ url: item.photoUrl, projectName: item.projectName });
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Select Checkbox (in select mode) */}
+                    {isSelectMode && (
+                      <div className="flex-shrink-0 pt-1">
+                        {selectedItems.has(item.id) ? (
+                          <CheckSquare className="w-5 h-5 text-primary" data-testid={`checkbox-selected-${item.id}`} />
+                        ) : (
+                          <Square className="w-5 h-5 text-muted-foreground" data-testid={`checkbox-unselected-${item.id}`} />
+                        )}
                       </div>
                     )}
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(item.createdAt), 'MMM d, yyyy h:mm a')}
+                    
+                    {/* Photo Thumbnail */}
+                    {item.photoUrl && (
+                      <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                        <img 
+                          src={item.photoUrl} 
+                          alt="Photo preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Photo Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">
+                        Photo {item.localId?.substring(0, 8)}...
+                      </div>
+                      {item.projectName && (
+                        <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                          Project: {item.projectName}
+                        </div>
+                      )}
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {format(new Date(item.createdAt), 'MMM d, yyyy h:mm a')}
+                      </div>
+                      {item.error && (
+                        <div className="text-xs text-destructive mt-1">
+                          Error: {item.error}
+                        </div>
+                      )}
                     </div>
-                    {item.error && (
-                      <div className="text-xs text-destructive mt-1">
-                        Error: {item.error}
+                    
+                    {/* Status Badge */}
+                    {!isSelectMode && (
+                      <div className="ml-3 flex-shrink-0">
+                        {item.error ? (
+                          <span className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive">
+                            Error
+                          </span>
+                        ) : item.retryCount > 0 ? (
+                          <span className="text-xs px-2 py-1 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-500">
+                            Retry {item.retryCount}
+                          </span>
+                        ) : (
+                          <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-500">
+                            Pending
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
-                  
-                  {/* Status Badge */}
-                  <div className="ml-3 flex-shrink-0">
-                    {item.error ? (
-                      <span className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive">
-                        Error
-                      </span>
-                    ) : item.retryCount > 0 ? (
-                      <span className="text-xs px-2 py-1 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-500">
-                        Retry {item.retryCount}
-                      </span>
-                    ) : (
-                      <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-500">
-                        Pending
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             ))}
           </div>
         )}
@@ -321,6 +481,29 @@ export default function SyncStatus() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent data-testid="dialog-confirm-delete">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove from Sync Queue?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'items'} from the sync queue. 
+              These items will not be uploaded to the server.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleBatchDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
