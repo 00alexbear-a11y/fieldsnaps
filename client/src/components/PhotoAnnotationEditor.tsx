@@ -71,7 +71,7 @@ function ZoomCircle({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const zoomFactor = 5;
+    const zoomFactor = 2;
     const sourceSize = 128 / zoomFactor;
 
     ctx.clearRect(0, 0, 128, 128);
@@ -111,7 +111,7 @@ function ZoomCircle({
           className="w-full h-full"
         />
         <div className="absolute bottom-1 left-0 right-0 text-center text-white text-xs font-bold bg-black/60 py-0.5">
-          5x
+          2x
         </div>
       </div>
     </div>
