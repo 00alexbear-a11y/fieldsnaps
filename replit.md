@@ -21,25 +21,33 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 - Added TypeScript types for PWA virtual modules
 
 **Build & Test Instructions:**
+
+**IMPORTANT:** The development preview URL (*.picard.replit.dev) will NEVER work offline. You MUST use the production build to test offline functionality.
+
+**Step 1: Build the Production PWA**
 ```bash
-# Build production PWA with offline support
 ./build-pwa.sh
-
-# Or manually:
-vite build --config vite.config.pwa.ts
-esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-
-# Start production server
-NODE_ENV=production node dist/index.js
 ```
 
-**Testing Offline on iPhone:**
-1. Build and run production version (see above)
-2. Open the production URL in Safari (NOT dev preview)
-3. Add to Home Screen: Share button → "Add to Home Screen"
-4. Close Safari and open the home screen app
-5. Enable Airplane Mode
-6. App should work fully offline ✓
+**Step 2: Start the Production Server**
+```bash
+./start-production.sh
+```
+
+This will start the production server on port 5000. You'll see a different URL in your browser (not the dev preview).
+
+**Step 3: Test Offline on iPhone**
+1. **Remove old app** from home screen (the dev preview one that doesn't work)
+2. **Open the production server URL** in Safari (the URL from step 2, NOT the dev preview)
+3. **Add to Home Screen**: Share button → "Add to Home Screen"  
+4. **Open from home screen** (not from Safari)
+5. **Enable Airplane Mode** ✈️
+6. **App works offline!** ✅
+
+**Troubleshooting:**
+- If you see "nc5d7i5pn8nb.picard.replit.dev" in the URL bar → You're on the dev preview (won't work offline)
+- If you added the dev preview to home screen → Delete it and add the production URL instead
+- Make sure you run `./start-production.sh` before testing
 
 **Technical Details:**
 - Workbox precaches all static assets (JS, CSS, HTML, fonts, images)
