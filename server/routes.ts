@@ -110,6 +110,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const validated = insertProjectSchema.parse(req.body);
+      
+      // Geocode address if provided
+      if (validated.address) {
+        try {
+          const apiKey = process.env.VITE_GOOGLE_MAPS_API_KEY;
+          if (apiKey) {
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(validated.address)}&key=${apiKey}`;
+            const geocodeResponse = await fetch(geocodeUrl);
+            const geocodeData = await geocodeResponse.json();
+            
+            if (geocodeData.status === 'OK' && geocodeData.results.length > 0) {
+              const location = geocodeData.results[0].geometry.location;
+              validated.latitude = location.lat.toString();
+              validated.longitude = location.lng.toString();
+            } else {
+              console.warn('Geocoding failed:', geocodeData.status);
+            }
+          }
+        } catch (geocodeError) {
+          console.error('Geocoding error:', geocodeError);
+          // Continue without geocoding if it fails
+        }
+      }
+      
       const project = await storage.createProject(validated);
       res.status(201).json(project);
     } catch (error: any) {
@@ -121,6 +145,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate with partial schema (all fields optional)
       const validated = insertProjectSchema.partial().parse(req.body);
+      
+      // Geocode address if provided
+      if (validated.address) {
+        try {
+          const apiKey = process.env.VITE_GOOGLE_MAPS_API_KEY;
+          if (apiKey) {
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(validated.address)}&key=${apiKey}`;
+            const geocodeResponse = await fetch(geocodeUrl);
+            const geocodeData = await geocodeResponse.json();
+            
+            if (geocodeData.status === 'OK' && geocodeData.results.length > 0) {
+              const location = geocodeData.results[0].geometry.location;
+              validated.latitude = location.lat.toString();
+              validated.longitude = location.lng.toString();
+            } else {
+              console.warn('Geocoding failed:', geocodeData.status);
+            }
+          }
+        } catch (geocodeError) {
+          console.error('Geocoding error:', geocodeError);
+          // Continue without geocoding if it fails
+        }
+      }
+      
       const updated = await storage.updateProject(req.params.id, validated);
       if (!updated) {
         return res.status(404).json({ error: "Project not found" });
