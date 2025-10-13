@@ -5,6 +5,33 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 
 ## Recent Changes
 
+### Auto-Sync Improvements & Manual Sync Button (October 13, 2025)
+Enhanced background sync system with faster auto-sync and manual control:
+
+**Auto-Sync Improvements:**
+- Made photo sync non-blocking for immediate UI responsiveness after capture
+- Sync now triggers instantly without blocking the capture flow or navigation
+- Added proper error handling with user-facing toast notifications when sync queueing fails
+- Error toast instructs users to "Try manual sync" if auto-sync queue fails
+- Console logging maintained for debugging sync issues
+
+**Manual Sync Button:**
+- Added small sync button (RefreshCw icon, h-8 w-8) to Projects page header
+- Positioned before "New Project" button for easy access
+- Shows spinning animation while sync is in progress
+- Provides detailed toast feedback:
+  - "✓ Synced" with item count when items uploaded successfully
+  - "Up to date" when all items are already synced
+  - "Sync incomplete" with failure count when some items fail
+  - "Sync failed" with error message on complete failure
+- Automatically refreshes project and photo lists after successful sync
+
+**Technical Implementation:**
+- Both quick capture and capture-edit flows use fire-and-forget pattern for sync queueing
+- Sync errors surface to users immediately while preserving snappy UX
+- Query invalidation ensures UI reflects server state after manual sync
+- E2E tests verified sync button functionality and toast messaging
+
 ### Photo Annotation Editor UI Redesign v4 (October 13, 2025)
 Completed comprehensive redesign of the photo annotation editor with improved layout and bug fixes:
 
