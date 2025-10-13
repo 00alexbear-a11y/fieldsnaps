@@ -273,15 +273,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/photos/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/photos/:id", isAuthenticated, upload.single('photo'), async (req: any, res) => {
     try {
-      const validated = insertPhotoSchema.partial().parse(req.body);
+      let updateData: any = {};
+      
+      // Handle file upload if provided (annotated photo)
+      if (req.file) {
+        const uploadsDir = path.join(process.cwd(), 'uploads', 'photos');
+        await fs.mkdir(uploadsDir, { recursive: true });
+
+        const filename = `${Date.now()}-${crypto.randomUUID()}${path.extname(req.file.originalname || '.jpg')}`;
+        const filepath = path.join(uploadsDir, filename);
+
+        await fs.writeFile(filepath, req.file.buffer);
+
+        updateData.url = `/uploads/photos/${filename}`;
+      }
+      
+      // Handle annotations
+      if (req.body.annotations !== undefined) {
+        updateData.annotations = req.body.annotations || null;
+      }
+      
+      // Handle caption
+      if (req.body.caption !== undefined) {
+        updateData.caption = req.body.caption;
+      }
+      
+      const validated = insertPhotoSchema.partial().parse(updateData);
       const updated = await storage.updatePhoto(req.params.id, validated);
       if (!updated) {
         return res.status(404).json({ error: "Photo not found" });
       }
       res.json(updated);
     } catch (error: any) {
+      console.error('Photo update error:', error);
       res.status(400).json({ error: error.message });
     }
   });

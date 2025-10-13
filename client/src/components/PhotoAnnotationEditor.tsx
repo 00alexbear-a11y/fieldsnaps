@@ -124,7 +124,7 @@ interface PhotoAnnotationEditorProps {
   photoUrl: string;
   photoId: string;
   existingAnnotations?: Annotation[];
-  onSave: (annotations: Annotation[]) => void;
+  onSave: (annotations: Annotation[], annotatedBlob: Blob) => void;
   onCancel?: () => void;
 }
 
@@ -1489,8 +1489,150 @@ export function PhotoAnnotationEditor({
     });
   };
 
-  const handleSave = () => {
-    onSave(annotations);
+  const handleSave = async () => {
+    // Render final annotated image to canvas
+    const canvas = canvasRef.current;
+    const image = imageRef.current;
+    
+    if (!canvas || !image) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear and redraw everything - photo + annotations
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    // Draw all annotations (same logic as redrawCanvas but without selection handles)
+    annotations.forEach((annotation) => {
+      ctx.strokeStyle = annotation.color;
+      ctx.fillStyle = annotation.color;
+      ctx.lineWidth = annotation.strokeWidth;
+
+      switch (annotation.type) {
+        case "text":
+          if (annotation.content && annotation.position.x !== undefined) {
+            const fontSize = annotation.fontSize || 40;
+            const rotation = annotation.rotation || 0;
+            const scale = annotation.scale || 1;
+            
+            ctx.save();
+            ctx.translate(annotation.position.x, annotation.position.y);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale(scale, scale);
+            
+            ctx.font = `${fontSize}px Arial`;
+            const textMetrics = ctx.measureText(annotation.content);
+            const textWidth = textMetrics.width;
+            const textHeight = fontSize;
+            const padding = 8;
+            const borderRadius = 6;
+            
+            const boxX = -padding;
+            const boxY = -textHeight - padding;
+            const boxWidth = textWidth + padding * 2;
+            const boxHeight = textHeight + padding * 2;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.beginPath();
+            ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
+            ctx.fill();
+            
+            ctx.fillStyle = annotation.color;
+            ctx.fillText(annotation.content, 0, 0);
+            ctx.restore();
+          }
+          break;
+        case "arrow":
+          if (
+            annotation.position.x !== undefined &&
+            annotation.position.y !== undefined &&
+            annotation.position.x2 !== undefined &&
+            annotation.position.y2 !== undefined
+          ) {
+            drawArrow(
+              ctx,
+              annotation.position.x,
+              annotation.position.y,
+              annotation.position.x2,
+              annotation.position.y2,
+              annotation.strokeWidth,
+              annotation.color
+            );
+          }
+          break;
+        case "line":
+          if (
+            annotation.position.x !== undefined &&
+            annotation.position.y !== undefined &&
+            annotation.position.x2 !== undefined &&
+            annotation.position.y2 !== undefined
+          ) {
+            const lineScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = annotation.strokeWidth * lineScaleFactor;
+            ctx.beginPath();
+            ctx.moveTo(annotation.position.x, annotation.position.y);
+            ctx.lineTo(annotation.position.x2, annotation.position.y2);
+            ctx.stroke();
+          }
+          break;
+        case "circle":
+          if (
+            annotation.position.x !== undefined &&
+            annotation.position.y !== undefined &&
+            annotation.position.width !== undefined
+          ) {
+            const centerX = annotation.position.x2 !== undefined 
+              ? (annotation.position.x + annotation.position.x2) / 2
+              : annotation.position.x;
+            const centerY = annotation.position.y2 !== undefined
+              ? (annotation.position.y + annotation.position.y2) / 2
+              : annotation.position.y;
+            
+            const circleScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = annotation.strokeWidth * circleScaleFactor;
+            ctx.beginPath();
+            ctx.arc(
+              centerX,
+              centerY,
+              annotation.position.width,
+              0,
+              2 * Math.PI
+            );
+            ctx.stroke();
+          }
+          break;
+        case "pen":
+          if (annotation.position.points && annotation.position.points.length > 0) {
+            const penScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = annotation.strokeWidth * penScaleFactor;
+            ctx.beginPath();
+            const points = annotation.position.points;
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+          }
+          break;
+      }
+    });
+
+    // Convert canvas to blob
+    canvas.toBlob((blob) => {
+      if (blob) {
+        onSave(annotations, blob);
+      }
+    }, 'image/jpeg', 0.92);
   };
 
   const handleCancel = () => {
@@ -1540,30 +1682,16 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Left Sidebar - Colors */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 pb-safe">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-4 shadow-lg flex flex-col items-center gap-3 max-h-[70vh] overflow-y-auto">
-          {/* Cancel Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancel}
-            data-testid="button-cancel"
-            className="rounded-full hover-elevate w-11 h-11 text-white flex-shrink-0"
-            aria-label="Cancel"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-
-          <div className="w-8 h-px bg-white/20 my-1" />
-
-          {/* Color Picker */}
+      {/* Left Sidebar - Colors Only (scaled down) */}
+      <div className="fixed left-2 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 pb-safe">
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-2 py-3 shadow-lg flex flex-col items-center gap-2.5 max-h-[70vh] overflow-y-auto">
+          {/* Color Picker - Smaller */}
           {colors.map((color) => (
             <button
               key={color.value}
               onClick={() => setSelectedColor(color.value)}
-              className={`w-11 h-11 rounded-full border-2 hover-elevate transition-all flex-shrink-0 ${
-                selectedColor === color.value ? 'border-white scale-110' : 'border-transparent'
+              className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                selectedColor === color.value ? 'border-white border-2' : 'border-transparent border-2'
               }`}
               style={{ backgroundColor: color.value }}
               data-testid={`button-color-${color.name.toLowerCase()}`}
@@ -1573,9 +1701,23 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Right Sidebar - Tools & Sizes */}
-      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 pb-safe">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-4 shadow-lg flex flex-col items-center gap-3 max-h-[70vh] overflow-y-auto">
+      {/* Bottom Toolbar - All tools */}
+      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2">
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5 max-w-full overflow-x-auto">
+          {/* Cancel Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCancel}
+            data-testid="button-cancel"
+            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+            aria-label="Cancel"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+
+          <div className="h-6 w-px bg-white/20 mx-0.5" />
+
           {/* Stroke Sizes */}
           {strokeSizes.map((size) => (
             <Button
@@ -1584,14 +1726,14 @@ export function PhotoAnnotationEditor({
               size="icon"
               onClick={() => setStrokeWidth(size.value)}
               data-testid={`button-size-${size.name.toLowerCase()}`}
-              className={`rounded-full hover-elevate text-xs font-bold w-11 h-11 flex-shrink-0 ${strokeWidth === size.value ? "" : "text-white"}`}
+              className={`rounded-full text-xs font-bold w-10 h-10 flex-shrink-0 ${strokeWidth === size.value ? "hover-elevate" : "text-white hover-elevate"}`}
               aria-label={`Size ${size.name}`}
             >
               {size.name}
             </Button>
           ))}
 
-          <div className="w-8 h-px bg-white/20 my-1" />
+          <div className="h-6 w-px bg-white/20 mx-0.5" />
 
           {/* Tool Buttons */}
           <Button
@@ -1599,7 +1741,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTextDialogOpen(true)}
             data-testid="button-tool-text"
-            className="rounded-full hover-elevate w-11 h-11 text-white flex-shrink-0"
+            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
             aria-label="Add text"
           >
             <Type className="w-5 h-5" />
@@ -1609,7 +1751,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "arrow" ? null : "arrow")}
             data-testid="button-tool-arrow"
-            className={`rounded-full hover-elevate w-11 h-11 flex-shrink-0 ${tool === "arrow" ? "" : "text-white"}`}
+            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
             aria-label="Arrow tool"
           >
             <ArrowUpRight className="w-5 h-5" />
@@ -1619,7 +1761,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "line" ? null : "line")}
             data-testid="button-tool-line"
-            className={`rounded-full hover-elevate w-11 h-11 flex-shrink-0 ${tool === "line" ? "" : "text-white"}`}
+            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
             aria-label="Line tool"
           >
             <Minus className="w-5 h-5" />
@@ -1629,7 +1771,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "circle" ? null : "circle")}
             data-testid="button-tool-circle"
-            className={`rounded-full hover-elevate w-11 h-11 flex-shrink-0 ${tool === "circle" ? "" : "text-white"}`}
+            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
             aria-label="Circle tool"
           >
             <Circle className="w-5 h-5" />
@@ -1639,13 +1781,13 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "pen" ? null : "pen")}
             data-testid="button-tool-pen"
-            className={`rounded-full hover-elevate w-11 h-11 flex-shrink-0 ${tool === "pen" ? "" : "text-white"}`}
+            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
             aria-label="Pen tool"
           >
             <Pen className="w-5 h-5" />
           </Button>
 
-          <div className="w-8 h-px bg-white/20 my-1" />
+          <div className="h-6 w-px bg-white/20 mx-0.5" />
 
           {/* Actions */}
           <Button
@@ -1654,7 +1796,7 @@ export function PhotoAnnotationEditor({
             onClick={handleUndo}
             disabled={historyIndex === 0}
             data-testid="button-undo"
-            className="rounded-full hover-elevate w-11 h-11 text-white flex-shrink-0"
+            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
             aria-label="Undo"
           >
             <Undo className="w-5 h-5" />
@@ -1665,25 +1807,25 @@ export function PhotoAnnotationEditor({
             onClick={handleDeleteSelected}
             disabled={!selectedAnnotation}
             data-testid="button-delete"
-            className="rounded-full hover-elevate w-11 h-11 text-white flex-shrink-0"
+            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
             aria-label="Delete selected"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
-        </div>
-      </div>
 
-      {/* Fixed Checkmark Button - Bottom Right */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <Button
-          size="icon"
-          onClick={handleSave}
-          data-testid="button-save-annotations"
-          className="rounded-full hover-elevate w-14 h-14 shadow-lg"
-          aria-label="Save"
-        >
-          <Check className="w-6 h-6" />
-        </Button>
+          <div className="h-6 w-px bg-white/20 mx-0.5" />
+
+          {/* Save Button */}
+          <Button
+            size="icon"
+            onClick={handleSave}
+            data-testid="button-save-annotations"
+            className="rounded-full hover-elevate w-10 h-10 flex-shrink-0"
+            aria-label="Save"
+          >
+            <Check className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       {/* Text Input Dialog */}
