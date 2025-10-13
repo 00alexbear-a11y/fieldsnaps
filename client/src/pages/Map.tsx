@@ -213,7 +213,7 @@ export default function Map() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-black">
+    <div className="flex flex-col h-screen bg-white dark:bg-black">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h1 className="text-xl font-semibold" data-testid="text-page-title">Project Map</h1>
@@ -225,7 +225,7 @@ export default function Map() {
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0">
         {!isMapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
             <div className="text-center">
@@ -237,7 +237,7 @@ export default function Map() {
         
         <div 
           ref={mapRef} 
-          className="w-full h-full"
+          className="absolute inset-0 w-full h-full"
           data-testid="map-container"
         />
 
