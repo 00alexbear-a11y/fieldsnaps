@@ -172,27 +172,6 @@ class SyncManager {
     try {
       console.log(`[Sync] Processing ${item.type} ${item.action} ${item.localId}`);
 
-      // Check if photo's project is ready (to avoid incrementing retry count while waiting)
-      if (item.type === 'photo') {
-        const photo = await idb.getPhoto(item.localId);
-        if (photo) {
-          const project = await idb.getProject(photo.projectId);
-          if (!project) {
-            // Project was deleted - mark with special error
-            await idb.updateSyncQueueItem(item.id, {
-              error: 'PROJECT_DELETED',
-            });
-            console.warn('[Sync] Project deleted for photo:', item.localId);
-            return false;
-          }
-          if (!project.serverId) {
-            // Just waiting for project - don't increment retry count
-            console.warn('[Sync] Photo waiting for project to sync:', item.localId);
-            return false;
-          }
-        }
-      }
-
       let success = false;
 
       switch (item.type) {
@@ -347,17 +326,19 @@ class SyncManager {
       return false;
     }
 
-    // Get project (dependency check already done in processSyncItem)
-    const project = await idb.getProject(photo.projectId);
+    // Photo's projectId is the SERVER project ID (not a local IndexedDB ID)
+    // since projects are created server-first in this app
+    const serverProjectId = photo.projectId;
     
-    if (!project || !project.serverId) {
-      // This shouldn't happen since we check earlier, but fail gracefully
-      console.error('[Sync] Photo project missing or not synced:', item.localId);
+    if (!serverProjectId) {
+      console.error('[Sync] Photo missing project ID:', item.localId);
       return false;
     }
 
     try {
       if (item.action === 'create') {
+        console.log('[Sync] Starting photo upload for:', item.localId, 'to project:', serverProjectId);
+        
         // Create FormData for multipart upload
         const formData = new FormData();
         formData.append('photo', photo.blob, `photo-${photo.id}.jpg`);
@@ -367,19 +348,26 @@ class SyncManager {
 
         // Get headers (without Content-Type for FormData)
         const headers = this.getSyncHeaders();
+        console.log('[Sync] Upload headers:', headers);
+        console.log('[Sync] Upload URL:', `/api/projects/${serverProjectId}/photos`);
 
-        const response = await fetch(`/api/projects/${project.serverId}/photos`, {
+        const response = await fetch(`/api/projects/${serverProjectId}/photos`, {
           method: 'POST',
           headers,
           credentials: 'include',
           body: formData,
         });
 
+        console.log('[Sync] Upload response status:', response.status);
+
         if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+          const errorText = await response.text();
+          console.error('[Sync] Upload failed:', response.status, errorText);
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('[Sync] Upload successful, server response:', data);
         
         // Update local photo with server ID and sync status
         await idb.updatePhotoSyncStatus(item.localId, 'synced', data.id);
@@ -448,6 +436,8 @@ class SyncManager {
    * Queue a photo for sync
    */
   async queuePhotoSync(photoId: string, projectId: string, action: 'create' | 'delete'): Promise<void> {
+    console.log('[Sync] Queuing photo for sync:', { photoId, projectId, action, online: navigator.onLine });
+    
     await idb.addToSyncQueue({
       type: 'photo',
       localId: photoId,
@@ -456,6 +446,8 @@ class SyncManager {
       data: {},
       retryCount: 0,
     });
+
+    console.log('[Sync] Photo added to queue successfully');
 
     // If online, sync immediately. Otherwise use background sync
     if (navigator.onLine) {

@@ -85,11 +85,26 @@ export default function Camera() {
   // Don't run on mount because labels aren't available until permission granted
 
   // Auto-start camera when project is selected and camera is not yet active
+  // Don't include currentDeviceId as dependency to avoid repeated permission requests
   useEffect(() => {
     if (selectedProject && !showProjectSelection && !isActive && !permissionDenied) {
       startCamera();
     }
-  }, [selectedProject, showProjectSelection, currentDeviceId, cameraFacing]);
+  }, [selectedProject, showProjectSelection]);
+  
+  // Restart camera when user explicitly changes facing mode (but not on mount)
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    if (selectedProject && !showProjectSelection && !permissionDenied) {
+      stopCamera();
+      setTimeout(() => startCamera(), 100);
+    }
+  }, [cameraFacing]);
 
   // Cleanup camera when component unmounts
   useEffect(() => {
@@ -286,7 +301,7 @@ export default function Camera() {
   };
 
   const switchCamera = async () => {
-    stopCamera();
+    // Just toggle facing mode - the useEffect will handle restarting the camera
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
   };
 

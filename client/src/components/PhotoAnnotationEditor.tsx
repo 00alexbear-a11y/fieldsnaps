@@ -468,7 +468,7 @@ export function PhotoAnnotationEditor({
 
   const drawHandle = (ctx: CanvasRenderingContext2D, x: number, y: number, color: string) => {
     ctx.beginPath();
-    ctx.arc(x, y, 8, 0, 2 * Math.PI);
+    ctx.arc(x, y, 12, 0, 2 * Math.PI); // Larger visual handle (12px radius) for better visibility
     ctx.fillStyle = "white";
     ctx.fill();
     ctx.strokeStyle = "#e5e7eb";
@@ -536,7 +536,7 @@ export function PhotoAnnotationEditor({
   };
 
   const getHandleAtPoint = (anno: Annotation, x: number, y: number): ResizeHandle | null => {
-    const handleSize = 16;
+    const handleSize = 40; // Larger hit area for easier selection (40px diameter = 20px radius)
     
     switch (anno.type) {
       case "text":
@@ -957,7 +957,8 @@ export function PhotoAnnotationEditor({
               const distance = Math.sqrt(dx * dx + dy * dy);
               const direction = dx >= 0 ? 1 : -1;
               const scaleFactor = 1 + (direction * distance) / 150;
-              const newScale = Math.max(0.5, Math.min(3, currentScale * scaleFactor));
+              // Scale limits: min 0.6x (24px with 40px base) to max 4x (160px with 40px base)
+              const newScale = Math.max(0.6, Math.min(4, currentScale * scaleFactor));
               updated.scale = newScale;
             }
             break;
@@ -1261,7 +1262,8 @@ export function PhotoAnnotationEditor({
               const distance = Math.sqrt(dx * dx + dy * dy);
               const direction = dx >= 0 ? 1 : -1;
               const scaleFactor = 1 + (direction * distance) / 150;
-              const newScale = Math.max(0.5, Math.min(3, currentScale * scaleFactor));
+              // Scale limits: min 0.6x (24px with 40px base) to max 4x (160px with 40px base)
+              const newScale = Math.max(0.6, Math.min(4, currentScale * scaleFactor));
               updated.scale = newScale;
             }
             break;
@@ -1441,7 +1443,7 @@ export function PhotoAnnotationEditor({
       content: textInput,
       color: selectedColor,
       strokeWidth,
-      fontSize: Math.max(16, 20 + strokeWidth * 2),
+      fontSize: Math.max(32, 40 + strokeWidth * 2), // Larger default for better readability
       rotation: 0,
       scale: 1,
       position: {
@@ -1538,9 +1540,9 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Bottom Toolbar - All tools in one compact bar */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-4 py-2.5 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto">
+      {/* Left Sidebar - Colors */}
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 pb-safe">
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-4 shadow-lg flex flex-col items-center gap-3 max-h-[70vh] overflow-y-auto">
           {/* Cancel Button */}
           <Button
             variant="ghost"
@@ -1553,7 +1555,7 @@ export function PhotoAnnotationEditor({
             <X className="w-5 h-5" />
           </Button>
 
-          <div className="h-8 w-px bg-white/20 mx-1" />
+          <div className="w-8 h-px bg-white/20 my-1" />
 
           {/* Color Picker */}
           {colors.map((color) => (
@@ -1568,9 +1570,12 @@ export function PhotoAnnotationEditor({
               aria-label={`Color ${color.name}`}
             />
           ))}
+        </div>
+      </div>
 
-          <div className="h-8 w-px bg-white/20 mx-1" />
-
+      {/* Right Sidebar - Tools & Sizes */}
+      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 pb-safe">
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-4 shadow-lg flex flex-col items-center gap-3 max-h-[70vh] overflow-y-auto">
           {/* Stroke Sizes */}
           {strokeSizes.map((size) => (
             <Button
@@ -1586,7 +1591,7 @@ export function PhotoAnnotationEditor({
             </Button>
           ))}
 
-          <div className="h-8 w-px bg-white/20 mx-1" />
+          <div className="w-8 h-px bg-white/20 my-1" />
 
           {/* Tool Buttons */}
           <Button
@@ -1640,7 +1645,7 @@ export function PhotoAnnotationEditor({
             <Pen className="w-5 h-5" />
           </Button>
 
-          <div className="h-8 w-px bg-white/20 mx-1" />
+          <div className="w-8 h-px bg-white/20 my-1" />
 
           {/* Actions */}
           <Button
@@ -1665,20 +1670,20 @@ export function PhotoAnnotationEditor({
           >
             <Trash2 className="w-5 h-5" />
           </Button>
-
-          <div className="h-8 w-px bg-white/20 mx-1" />
-
-          {/* Save Button */}
-          <Button
-            size="icon"
-            onClick={handleSave}
-            data-testid="button-save-annotations"
-            className="rounded-full hover-elevate w-11 h-11 flex-shrink-0"
-            aria-label="Save"
-          >
-            <Check className="w-5 h-5" />
-          </Button>
         </div>
+      </div>
+
+      {/* Fixed Checkmark Button - Bottom Right */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button
+          size="icon"
+          onClick={handleSave}
+          data-testid="button-save-annotations"
+          className="rounded-full hover-elevate w-14 h-14 shadow-lg"
+          aria-label="Save"
+        >
+          <Check className="w-6 h-6" />
+        </Button>
       </div>
 
       {/* Text Input Dialog */}
