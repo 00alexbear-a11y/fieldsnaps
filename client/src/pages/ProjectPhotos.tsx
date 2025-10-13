@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { indexedDB as idb } from "@/lib/indexeddb";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import LazyImage from "@/components/LazyImage";
@@ -395,35 +396,70 @@ export default function ProjectPhotos() {
     }
   };
 
-  const handleSaveAnnotations = async (annotations: any[]) => {
-    if (!selectedPhoto) return;
+  const handleSaveAnnotations = async (annotations: any[], annotatedBlob: Blob) => {
+    if (!selectedPhoto || !projectId) return;
 
     try {
-      // Delete existing annotations
-      const existingRes = await fetch(`/api/photos/${selectedPhoto.id}/annotations`);
-      const existing = await existingRes.json();
+      // Check if photo exists in IndexedDB
+      let existingPhoto = await idb.getPhoto(selectedPhoto.id);
       
-      for (const anno of existing) {
-        await apiRequest("DELETE", `/api/annotations/${anno.id}`);
-      }
-
-      // Save new annotations
-      for (const anno of annotations) {
-        await apiRequest("POST", `/api/photos/${selectedPhoto.id}/annotations`, {
-          type: anno.type,
-          content: anno.content,
-          color: anno.color,
-          strokeWidth: anno.strokeWidth,
-          fontSize: anno.fontSize,
-          position: anno.position,
+      // If photo not in IndexedDB (e.g., it's a server-synced photo), create it first
+      if (!existingPhoto) {
+        // Fetch the original photo blob from server
+        const response = await fetch(selectedPhoto.url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch photo from server');
+        }
+        const originalBlob = await response.blob();
+        
+        // Create photo entry in IndexedDB with correct ID using helper method
+        existingPhoto = await idb.savePhotoWithId(selectedPhoto.id, {
+          projectId: projectId,
+          blob: originalBlob,
+          thumbnailBlob: originalBlob,
+          caption: selectedPhoto.caption || null,
+          annotations: null,
+          serverId: selectedPhoto.id,
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["/api/photos", selectedPhoto.id, "annotations"] });
-      toast({ title: `${annotations.length} annotation${annotations.length === 1 ? '' : 's'} saved successfully` });
+      // Update the photo with annotated version
+      await idb.updatePhoto(selectedPhoto.id, {
+        blob: annotatedBlob,
+        annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+      });
+
+      // Add to sync queue to upload the annotated photo to server
+      await idb.addToSyncQueue({
+        type: 'photo',
+        localId: selectedPhoto.id,
+        projectId: projectId,
+        action: 'update',
+        data: { 
+          blob: annotatedBlob,
+          annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+        },
+        retryCount: 0,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/projects', projectId, 'photos'] });
+      
+      toast({ 
+        title: '✓ Saved',
+        description: annotations.length > 0 
+          ? `Annotations saved and will sync when online`
+          : 'Photo saved',
+        duration: 1500,
+      });
+      
       setSelectedPhoto(null);
     } catch (error: any) {
-      toast({ title: "Failed to save annotations", variant: "destructive", description: error.message });
+      console.error('[ProjectPhotos] Error saving annotations:', error);
+      toast({ 
+        title: "Failed to save annotations", 
+        variant: "destructive", 
+        description: error.message || 'Unknown error'
+      });
     }
   };
 
