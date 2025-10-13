@@ -5,6 +5,51 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 
 ## Recent Changes
 
+### Offline PWA Fix - Production Build Required (October 13, 2025)
+**CRITICAL FIX:** Resolved offline functionality issue on iPhone and other devices.
+
+**Problem Identified:**
+- Development preview URLs cannot work offline (Vite dev server limitation)
+- Vite dev mode uses ES modules, HMR, and dynamic imports that require network connection
+- Manual Service Worker couldn't properly cache Vite-generated bundles
+- Users testing from dev preview would always see failures in airplane mode
+
+**Solution Implemented:**
+- Created `vite.config.pwa.ts` - Production PWA config extending locked base config
+- Integrated `vite-plugin-pwa` with Workbox for proper asset precaching
+- Updated Service Worker registration to use plugin in production, manual SW in dev
+- Added TypeScript types for PWA virtual modules
+
+**Build & Test Instructions:**
+```bash
+# Build production PWA with offline support
+./build-pwa.sh
+
+# Or manually:
+vite build --config vite.config.pwa.ts
+esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+# Start production server
+NODE_ENV=production node dist/index.js
+```
+
+**Testing Offline on iPhone:**
+1. Build and run production version (see above)
+2. Open the production URL in Safari (NOT dev preview)
+3. Add to Home Screen: Share button → "Add to Home Screen"
+4. Close Safari and open the home screen app
+5. Enable Airplane Mode
+6. App should work fully offline ✓
+
+**Technical Details:**
+- Workbox precaches all static assets (JS, CSS, HTML, fonts, images)
+- API requests: NetworkFirst strategy (10s timeout, then cache fallback)
+- Images: CacheFirst strategy (up to 300 items, 30 days)
+- Fonts: CacheFirst strategy (up to 30 items, 1 year)
+- Maximum cached file size: 5MB (for photos)
+
+**IMPORTANT:** Dev preview URLs will NEVER work offline - this is a Vite limitation, not a bug.
+
 ### Auto-Sync Improvements & Manual Sync Button (October 13, 2025)
 Enhanced background sync system with faster auto-sync and manual control:
 
