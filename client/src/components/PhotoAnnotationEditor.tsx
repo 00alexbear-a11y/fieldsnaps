@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,16 +41,18 @@ interface Annotation {
 
 const colors = [
   { name: "Red", value: "#ef4444" },
-  { name: "Blue", value: "#3b82f6" },
-  { name: "Green", value: "#22c55e" },
+  { name: "Orange", value: "#f97316" },
   { name: "Yellow", value: "#eab308" },
+  { name: "Green", value: "#22c55e" },
+  { name: "Blue", value: "#3b82f6" },
   { name: "Purple", value: "#a855f7" },
+  { name: "Pink", value: "#ec4899" },
   { name: "Black", value: "#000000" },
+  { name: "Gray", value: "#6b7280" },
   { name: "White", value: "#ffffff" },
 ];
 
 const strokeSizes = [
-  { name: "XS", value: 3 },
   { name: "S", value: 5 },
   { name: "M", value: 8 },
   { name: "L", value: 12 },
@@ -1682,59 +1684,104 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Left Sidebar - Colors Only (scaled down) */}
+      {/* Left Sidebar - Scrollable Color Picker */}
       <div className="fixed left-2 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 pb-safe">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-2 py-3 shadow-lg flex flex-col items-center gap-2.5 max-h-[70vh] overflow-y-auto">
-          {/* Color Picker - Smaller */}
-          {colors.map((color) => (
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
+          {/* Up arrow indicator */}
+          <button
+            className="w-8 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+            onClick={() => {
+              const container = document.getElementById('color-scroll-container');
+              if (container) container.scrollBy({ top: -40, behavior: 'smooth' });
+            }}
+            aria-label="Scroll up"
+          >
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          
+          {/* Scrollable color container - 4 visible */}
+          <div 
+            id="color-scroll-container"
+            className="flex flex-col gap-2.5 overflow-y-auto py-1"
+            style={{ maxHeight: '180px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {colors.map((color) => (
+              <button
+                key={color.value}
+                onClick={() => setSelectedColor(color.value)}
+                className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-transparent border-2'
+                }`}
+                style={{ backgroundColor: color.value }}
+                data-testid={`button-color-${color.name.toLowerCase()}`}
+                aria-label={`Color ${color.name}`}
+              />
+            ))}
+          </div>
+
+          {/* Down arrow indicator */}
+          <button
+            className="w-8 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+            onClick={() => {
+              const container = document.getElementById('color-scroll-container');
+              if (container) container.scrollBy({ top: 40, behavior: 'smooth' });
+            }}
+            aria-label="Scroll down"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Fixed Cancel and Save Buttons - Top Corners */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleCancel}
+          data-testid="button-cancel"
+          className="rounded-full hover-elevate w-12 h-12 bg-black/80 backdrop-blur-md text-white"
+          aria-label="Cancel"
+        >
+          <X className="w-6 h-6" />
+        </Button>
+      </div>
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          size="icon"
+          onClick={handleSave}
+          data-testid="button-save-annotations"
+          className="rounded-full hover-elevate w-12 h-12 bg-primary text-primary-foreground shadow-lg"
+          aria-label="Save"
+        >
+          <Check className="w-6 h-6" />
+        </Button>
+      </div>
+
+      {/* Fixed Size Tabs Above Bottom Toolbar */}
+      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-2 px-2">
+        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
+          {strokeSizes.map((size) => (
             <button
-              key={color.value}
-              onClick={() => setSelectedColor(color.value)}
-              className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                selectedColor === color.value ? 'border-white border-2' : 'border-transparent border-2'
+              key={size.value}
+              onClick={() => setStrokeWidth(size.value)}
+              data-testid={`button-size-${size.name.toLowerCase()}`}
+              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                strokeWidth === size.value 
+                  ? 'bg-white text-black' 
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
-              style={{ backgroundColor: color.value }}
-              data-testid={`button-color-${color.name.toLowerCase()}`}
-              aria-label={`Color ${color.name}`}
-            />
+              aria-label={`Size ${size.name}`}
+            >
+              {size.name}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Bottom Toolbar - All tools */}
+      {/* Bottom Toolbar - Non-scrollable Tools */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5 max-w-full overflow-x-auto">
-          {/* Cancel Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleCancel}
-            data-testid="button-cancel"
-            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Cancel"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-
-          <div className="h-6 w-px bg-white/20 mx-0.5" />
-
-          {/* Stroke Sizes */}
-          {strokeSizes.map((size) => (
-            <Button
-              key={size.value}
-              variant={strokeWidth === size.value ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setStrokeWidth(size.value)}
-              data-testid={`button-size-${size.name.toLowerCase()}`}
-              className={`rounded-full text-xs font-bold w-10 h-10 flex-shrink-0 ${strokeWidth === size.value ? "hover-elevate" : "text-white hover-elevate"}`}
-              aria-label={`Size ${size.name}`}
-            >
-              {size.name}
-            </Button>
-          ))}
-
-          <div className="h-6 w-px bg-white/20 mx-0.5" />
-
+        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
           {/* Tool Buttons */}
           <Button
             variant="ghost"
@@ -1811,19 +1858,6 @@ export function PhotoAnnotationEditor({
             aria-label="Delete selected"
           >
             <Trash2 className="w-5 h-5" />
-          </Button>
-
-          <div className="h-6 w-px bg-white/20 mx-0.5" />
-
-          {/* Save Button */}
-          <Button
-            size="icon"
-            onClick={handleSave}
-            data-testid="button-save-annotations"
-            className="rounded-full hover-elevate w-10 h-10 flex-shrink-0"
-            aria-label="Save"
-          >
-            <Check className="w-5 h-5" />
           </Button>
         </div>
       </div>

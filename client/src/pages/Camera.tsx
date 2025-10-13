@@ -186,6 +186,25 @@ export default function Camera() {
 
   const startCamera = async () => {
     try {
+      // Check if permission is already granted to avoid repeated prompts
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
+        if (permissionStatus.state === 'denied') {
+          setPermissionDenied(true);
+          setHasPermission(false);
+          setIsActive(false);
+          toast({
+            title: 'Camera Access Denied',
+            description: 'Please enable camera access in your browser settings.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      } catch (permError) {
+        // Permission API not supported, continue with getUserMedia
+        console.log('Permission API not supported, continuing with getUserMedia');
+      }
+
       // Use deviceId only if it's a valid non-empty string, otherwise use facingMode
       const constraints: MediaStreamConstraints = {
         video: (currentDeviceId && currentDeviceId.trim()) ? {
@@ -301,6 +320,10 @@ export default function Camera() {
   };
 
   const switchCamera = async () => {
+    // Reset zoom to 1x when switching cameras
+    setZoomLevel(1);
+    setAvailableCameras([]);
+    setCurrentDeviceId(null);
     // Just toggle facing mode - the useEffect will handle restarting the camera
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
   };
