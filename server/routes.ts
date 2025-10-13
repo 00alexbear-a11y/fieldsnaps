@@ -101,6 +101,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!project) {
         return res.status(404).json({ error: "Project not found" });
       }
+      
+      // Update project's last activity timestamp when viewed
+      await storage.updateProject(req.params.id, { lastActivityAt: new Date() });
+      
       res.json(project);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -258,6 +262,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (project && !project.coverPhotoId) {
         await storage.updateProject(req.params.projectId, { coverPhotoId: photo.id });
       }
+      
+      // Update project's last activity timestamp
+      await storage.updateProject(req.params.projectId, { lastActivityAt: new Date() });
       
       res.status(201).json(photo);
     } catch (error: any) {

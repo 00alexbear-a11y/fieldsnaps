@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun } from "lucide-react";
+import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -29,13 +29,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
+
+type SortOption = 'lastActivity' | 'name' | 'created';
 
 export default function Projects() {
   const [, setLocation] = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
@@ -88,17 +98,37 @@ export default function Projects() {
     return 0;
   };
 
-  // Filter projects based on search query
+  // Filter and sort projects
   const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return projects;
+    let filtered = projects;
     
-    const query = searchQuery.toLowerCase();
-    return projects.filter(project => 
-      project.name.toLowerCase().includes(query) ||
-      (project.address?.toLowerCase()?.includes(query) ?? false) ||
-      (project.description?.toLowerCase()?.includes(query) ?? false)
-    );
-  }, [projects, searchQuery]);
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = projects.filter(project => 
+        project.name.toLowerCase().includes(query) ||
+        (project.address?.toLowerCase()?.includes(query) ?? false) ||
+        (project.description?.toLowerCase()?.includes(query) ?? false)
+      );
+    }
+    
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'lastActivity':
+          // Most recent activity first (top to bottom)
+          return new Date(b.lastActivityAt || b.createdAt).getTime() - new Date(a.lastActivityAt || a.createdAt).getTime();
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        default:
+          return 0;
+      }
+    });
+    
+    return sorted;
+  }, [projects, searchQuery, sortBy]);
 
   // Toggle theme
   const toggleTheme = () => {
@@ -296,9 +326,9 @@ export default function Projects() {
         )}
       </div>
 
-      {/* Search Bar - Fixed at bottom for thumb reach */}
+      {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
       <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 z-40">
-        <div className="relative max-w-screen-sm mx-auto">
+        <div className="relative max-w-screen-sm mx-auto flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -310,6 +340,17 @@ export default function Projects() {
               data-testid="input-search-projects"
             />
           </div>
+          <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+            <SelectTrigger className="w-[140px]" data-testid="select-sort">
+              <ArrowUpDown className="w-4 h-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="lastActivity">Recent Activity</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="created">Date Created</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
