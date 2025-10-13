@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2 } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
@@ -37,10 +38,17 @@ export default function ProjectPhotos() {
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [showMoveDialog, setShowMoveDialog] = useState(false);
+  const [targetProjectId, setTargetProjectId] = useState<string>("");
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/projects", projectId],
+  });
+
+  const { data: allProjects = [] } = useQuery<Project[]>({
+    queryKey: ["/api/projects"],
+    enabled: showMoveDialog,
   });
 
   // Sync editedProject with project data
@@ -173,6 +181,33 @@ export default function ProjectPhotos() {
     onError: (error: any) => {
       toast({ 
         title: "Failed to update project icon", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const movePhotosMutation = useMutation({
+    mutationFn: async ({ photoIds, targetProjectId }: { photoIds: string[]; targetProjectId: string }) => {
+      // Move each photo to the target project
+      await Promise.all(
+        photoIds.map(photoId => 
+          apiRequest("PATCH", `/api/photos/${photoId}`, { projectId: targetProjectId })
+        )
+      );
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "photos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", variables.targetProjectId, "photos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: `${variables.photoIds.length} photo${variables.photoIds.length === 1 ? '' : 's'} moved successfully` });
+      setShowMoveDialog(false);
+      setSelectedPhotoIds(new Set());
+      setIsSelectMode(false);
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to move photos", 
         description: error.message,
         variant: "destructive" 
       });
@@ -490,6 +525,15 @@ export default function ProjectPhotos() {
             </span>
             <div className="flex gap-2">
               <Button
+                variant="outline"
+                onClick={() => setShowMoveDialog(true)}
+                disabled={selectedPhotoIds.size === 0}
+                data-testid="button-move-selected"
+              >
+                <FolderInput className="w-4 h-4 mr-2" />
+                Move
+              </Button>
+              <Button
                 onClick={handleShareSelected}
                 disabled={selectedPhotoIds.size === 0}
                 data-testid="button-share-selected"
@@ -740,6 +784,66 @@ export default function ProjectPhotos() {
               data-testid="button-close-share-dialog"
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Move to Project Dialog */}
+      <Dialog open={showMoveDialog} onOpenChange={setShowMoveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Move Photos to Project</DialogTitle>
+            <DialogDescription>
+              Select a project to move {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} to.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="target-project">Target Project</Label>
+              <Select
+                value={targetProjectId}
+                onValueChange={setTargetProjectId}
+              >
+                <SelectTrigger id="target-project" data-testid="select-target-project">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allProjects
+                    .filter(p => p.id !== projectId)
+                    .map(project => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowMoveDialog(false);
+                setTargetProjectId("");
+              }}
+              data-testid="button-cancel-move"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (targetProjectId) {
+                  movePhotosMutation.mutate({
+                    photoIds: Array.from(selectedPhotoIds),
+                    targetProjectId,
+                  });
+                }
+              }}
+              disabled={!targetProjectId || movePhotosMutation.isPending}
+              data-testid="button-confirm-move"
+            >
+              {movePhotosMutation.isPending ? "Moving..." : "Move Photos"}
             </Button>
           </DialogFooter>
         </DialogContent>
