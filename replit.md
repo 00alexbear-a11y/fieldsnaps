@@ -4,6 +4,8 @@
 FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
+- **Automatic Address Geocoding**: Projects with addresses are now automatically geocoded to display on the interactive map. When you add or update a project address, the system uses Google Geocoding API to convert it to latitude/longitude coordinates. Projects appear as markers on the Map tab with click-to-navigate functionality.
+- **Trash Management Enhancements**: Added multi-select restore functionality for batch restoration of projects and photos. Added "Delete All Trash" button with confirmation dialog for permanently deleting all trash items at once.
 - **Authentication Gate**: Implemented required authentication before accessing any features. Users must sign in with Replit Auth or biometric login to access the app. Share links remain publicly accessible. Login page shows FieldSnaps branding with both biometric and Replit login options.
 - **Compact Maps Button**: Redesigned "Open in Maps" button to truly square (44x44px) positioned left of camera icon with two-line text layout ("Open [icon]" / "in Maps").
 - **Sync Status Enhancements**: Added swipe-to-delete (50px threshold) and multi-select batch deletion for photos in sync queue. Enhanced with photo thumbnail previews and proper object URL lifecycle management.
