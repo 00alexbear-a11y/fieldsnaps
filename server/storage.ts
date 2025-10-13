@@ -40,6 +40,7 @@ export interface IStorage {
   restorePhoto(id: string): Promise<boolean>;
   permanentlyDeleteProject(id: string): Promise<boolean>;
   permanentlyDeletePhoto(id: string): Promise<boolean>;
+  permanentlyDeleteAllTrash(): Promise<{ projectsDeleted: number; photosDeleted: number }>;
   cleanupOldDeletedItems(): Promise<void>;
   
   // Photo Annotations
@@ -257,6 +258,23 @@ export class DbStorage implements IStorage {
   async permanentlyDeletePhoto(id: string): Promise<boolean> {
     const result = await db.delete(photos).where(eq(photos.id, id)).returning();
     return result.length > 0;
+  }
+
+  async permanentlyDeleteAllTrash(): Promise<{ projectsDeleted: number; photosDeleted: number }> {
+    // Delete all soft-deleted projects
+    const deletedProjects = await db.delete(projects)
+      .where(isNotNull(projects.deletedAt))
+      .returning();
+    
+    // Delete all soft-deleted photos
+    const deletedPhotos = await db.delete(photos)
+      .where(isNotNull(photos.deletedAt))
+      .returning();
+    
+    return {
+      projectsDeleted: deletedProjects.length,
+      photosDeleted: deletedPhotos.length
+    };
   }
 
   async cleanupOldDeletedItems(): Promise<void> {
