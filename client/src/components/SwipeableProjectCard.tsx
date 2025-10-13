@@ -161,6 +161,27 @@ export default function SwipeableProjectCard({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Open in Maps Button - Compact square design */}
+            {project.address && (
+              <button
+                className="flex flex-col items-center justify-center w-[60px] h-11 rounded-lg bg-primary/10 border border-primary/20 text-primary hover-elevate active-elevate-2 flex-shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                }}
+                data-testid={`button-open-map-${project.id}`}
+                aria-label="Open in Google Maps"
+              >
+                <div className="flex items-center gap-0.5 text-[10px] font-medium leading-tight">
+                  <span>Open</span>
+                  <MapPin className="w-2.5 h-2.5" />
+                </div>
+                <div className="text-[10px] font-medium leading-tight -mt-0.5">
+                  in Maps
+                </div>
+              </button>
+            )}
+            
             {/* Camera Button - Always visible */}
             <Button
               variant="ghost"
@@ -175,24 +196,6 @@ export default function SwipeableProjectCard({
             >
               <Camera className="w-5 h-5" />
             </Button>
-
-            {/* Open in Maps Button */}
-            {project.address && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-shrink-0 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
-                }}
-                data-testid={`button-open-map-${project.id}`}
-                aria-label="Open in Google Maps"
-              >
-                <MapPin className="w-3.5 h-3.5 mr-1.5" />
-                Open in Maps
-              </Button>
-            )}
           </div>
         </div>
       </div>
