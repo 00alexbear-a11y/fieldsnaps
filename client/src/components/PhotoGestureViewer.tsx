@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush, Image } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ interface PhotoGestureViewerProps {
   onDelete?: (photoId: string) => void;
   onShare?: (photo: Photo) => void;
   onAnnotate?: (photo: Photo) => void;
+  onSetCoverPhoto?: (photoId: string) => void;
 }
 
 export function PhotoGestureViewer({
@@ -48,6 +49,7 @@ export function PhotoGestureViewer({
   onDelete,
   onShare,
   onAnnotate,
+  onSetCoverPhoto,
 }: PhotoGestureViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -124,6 +126,12 @@ export function PhotoGestureViewer({
 
   const handleSaveCaption = () => {
     updateCaptionMutation.mutate(editedCaption);
+  };
+
+  const handleSetCoverPhoto = () => {
+    if (onSetCoverPhoto) {
+      onSetCoverPhoto(currentPhoto.id);
+    }
   };
 
   // Close comments when photo changes
@@ -425,6 +433,18 @@ export function PhotoGestureViewer({
               <Pencil className="w-5 h-5" />
               <span className="text-[10px]">Rename</span>
             </Button>
+            {onSetCoverPhoto && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSetCoverPhoto}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+                data-testid="button-set-cover-photo"
+              >
+                <Image className="w-5 h-5" />
+                <span className="text-[10px]">Use as Icon</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
