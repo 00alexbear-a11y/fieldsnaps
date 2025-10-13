@@ -79,27 +79,54 @@ export default function PhotoEdit() {
     setIsSaving(true);
 
     try {
-      // Update the photo with the annotated version in IndexedDB
-      const existingPhoto = await idb.getPhoto(photoId);
-      if (existingPhoto) {
-        await idb.updatePhoto(photoId, {
-          blob: annotatedBlob,
-          annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
-        });
-
-        // Add to sync queue to upload the annotated photo to server
-        await idb.addToSyncQueue({
-          type: 'photo',
-          localId: photoId,
+      // Check if photo exists in IndexedDB
+      let existingPhoto = await idb.getPhoto(photoId);
+      
+      // If photo not in IndexedDB (e.g., it's a server-synced photo), create it first
+      if (!existingPhoto) {
+        // Fetch the original photo from server
+        const response = await fetch(`/api/photos/${photoId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch photo from server');
+        }
+        const serverPhoto = await response.json();
+        
+        // Fetch the photo blob
+        const blobResponse = await fetch(serverPhoto.url);
+        if (!blobResponse.ok) {
+          throw new Error('Failed to fetch photo blob from server');
+        }
+        const originalBlob = await blobResponse.blob();
+        
+        // Create photo entry in IndexedDB with correct ID using helper method
+        existingPhoto = await idb.savePhotoWithId(photoId, {
           projectId: projectId,
-          action: 'update',
-          data: { 
-            blob: annotatedBlob,
-            annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
-          },
-          retryCount: 0,
+          blob: originalBlob,
+          thumbnailBlob: originalBlob,
+          caption: serverPhoto.caption || null,
+          annotations: null,
+          serverId: photoId,
         });
       }
+
+      // Update the photo with the annotated version
+      await idb.updatePhoto(photoId, {
+        blob: annotatedBlob,
+        annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+      });
+
+      // Add to sync queue to upload the annotated photo to server
+      await idb.addToSyncQueue({
+        type: 'photo',
+        localId: photoId,
+        projectId: projectId,
+        action: 'update',
+        data: { 
+          blob: annotatedBlob,
+          annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+        },
+        retryCount: 0,
+      });
 
       toast({
         title: '✓ Saved',
@@ -117,9 +144,9 @@ export default function PhotoEdit() {
       // Return to camera with project selected
       setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
     } catch (error) {
-      console.error('Error saving annotations:', error);
+      console.error('[PhotoEdit] Error saving annotations:', error);
       toast({
-        title: 'Save failed',
+        title: 'Failed to save annotations',
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });

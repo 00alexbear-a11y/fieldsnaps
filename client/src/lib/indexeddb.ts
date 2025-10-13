@@ -153,31 +153,74 @@ class IndexedDBManager {
   }
 
   /**
-   * Update an existing photo in local storage
+   * Save or update photo with a specified ID (useful for server-synced photos)
    */
-  async updatePhoto(id: string, updates: Partial<LocalPhoto>): Promise<LocalPhoto> {
+  async savePhotoWithId(id: string, photo: Omit<LocalPhoto, 'id' | 'createdAt' | 'updatedAt'>): Promise<LocalPhoto> {
     const db = await this.init();
-    const existingPhoto = await this.getPhoto(id);
+    const now = Date.now();
     
-    if (!existingPhoto) {
-      throw new Error(`Photo ${id} not found`);
-    }
-
-    const updatedPhoto: LocalPhoto = {
-      ...existingPhoto,
-      ...updates,
-      id, // Ensure ID doesn't change
-      updatedAt: Date.now(),
+    // Check if photo already exists
+    const existing = await this.getPhoto(id);
+    
+    const localPhoto: LocalPhoto = {
+      ...photo,
+      id,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
     };
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORES.PHOTOS], 'readwrite');
       const store = transaction.objectStore(STORES.PHOTOS);
-      const request = store.put(updatedPhoto);
+      // Use put instead of add to allow updating existing records
+      const request = store.put(localPhoto);
 
-      request.onsuccess = () => resolve(updatedPhoto);
+      request.onsuccess = () => resolve(localPhoto);
       request.onerror = () => reject(request.error);
     });
+  }
+
+  /**
+   * Update an existing photo in local storage
+   */
+  async updatePhoto(id: string, updates: Partial<LocalPhoto>): Promise<LocalPhoto> {
+    const db = await this.init();
+    
+    try {
+      const existingPhoto = await this.getPhoto(id);
+      
+      if (!existingPhoto) {
+        console.error('[IndexedDB] Photo not found:', id);
+        throw new Error(`Photo ${id} not found`);
+      }
+
+      // Ensure existingPhoto is a proper object before spreading
+      if (typeof existingPhoto !== 'object' || existingPhoto === null) {
+        console.error('[IndexedDB] Invalid photo data:', { id, existingPhoto, type: typeof existingPhoto });
+        throw new Error(`Invalid photo data type: ${typeof existingPhoto}`);
+      }
+
+      console.log('[IndexedDB] Updating photo:', { id, hasBlob: !!existingPhoto.blob, hasAnnotations: !!existingPhoto.annotations });
+
+      const updatedPhoto: LocalPhoto = {
+        ...existingPhoto,
+        ...updates,
+        id, // Ensure ID doesn't change
+        updatedAt: Date.now(),
+      };
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORES.PHOTOS], 'readwrite');
+        const store = transaction.objectStore(STORES.PHOTOS);
+        const request = store.put(updatedPhoto);
+
+        request.onsuccess = () => resolve(updatedPhoto);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('[IndexedDB] updatePhoto error:', error);
+      throw error;
+    }
   }
 
   /**
