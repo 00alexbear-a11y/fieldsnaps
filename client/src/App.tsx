@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
+import Map from "./pages/Map";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -34,6 +35,7 @@ function AppContent() {
           <Route path="/settings" component={Settings} />
           <Route path="/sync-status" component={SyncStatus} />
           <Route path="/trash" component={Trash} />
+          <Route path="/map" component={Map} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
