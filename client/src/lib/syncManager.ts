@@ -172,6 +172,19 @@ class SyncManager {
     try {
       console.log(`[Sync] Processing ${item.type} ${item.action} ${item.localId}`);
 
+      // Check if photo's project is ready (to avoid incrementing retry count while waiting)
+      if (item.type === 'photo') {
+        const photo = await idb.getPhoto(item.localId);
+        if (photo) {
+          const project = await idb.getProject(photo.projectId);
+          if (!project || !project.serverId) {
+            // Just waiting for project - don't increment retry count
+            console.warn('[Sync] Photo waiting for project to sync:', item.localId);
+            return false;
+          }
+        }
+      }
+
       let success = false;
 
       switch (item.type) {
@@ -307,17 +320,12 @@ class SyncManager {
       return false;
     }
 
-    // Get project to ensure it's synced first
+    // Get project (dependency check already done in processSyncItem)
     const project = await idb.getProject(photo.projectId);
     
     if (!project || !project.serverId) {
-      // Don't count as failure - just waiting for project to sync
-      // Reset retry count so it doesn't accumulate
-      await idb.updateSyncQueueItem(item.id, {
-        retryCount: 0,
-        lastAttempt: Date.now(),
-      });
-      console.warn('[Sync] Photo project not synced yet, will retry after project syncs:', item.localId);
+      // This shouldn't happen since we check earlier, but fail gracefully
+      console.error('[Sync] Photo project missing or not synced:', item.localId);
       return false;
     }
 
