@@ -18,6 +18,46 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 - **Navigation Refinement**: Removed back button from main projects list view for cleaner UX, while maintaining it within individual project views.
 - **Text Annotation Enhancement**: Upgraded text tool with scaling (blue handle on right) and rotation (green handle on top) capabilities using visual drag handles.
 
+## Future Features (Planned - Not Yet Implemented)
+
+### Multi-Language Support
+- **Implementation**: Language selector with flags on login/start page
+- **Primary Languages**:
+  - English (default)
+  - Spanish (US + Latin America market)
+  - Russian (Eastern Europe, Central Asia)
+  - Portuguese (Brazil + Portugal)
+  - Chinese Simplified (China market)
+- **Secondary Languages** (lower priority):
+  - Arabic (Middle East construction)
+  - French (Canada, France, Africa)
+  - German (Germany, Austria, Switzerland)
+  - Japanese, Korean, Italian (based on demand)
+- **Approach**: Full app translation when selected, stored in user preferences
+
+### Subscription & Payment System
+- **Business Model**: Subscription-based service with 30-day free trial
+- **Payment Integration**: Use Replit's Stripe integration for payment processing
+- **Account Status Management**:
+  - User ID / login info properly tracked
+  - Account status: Active, Trial, Inactive/Expired
+  - Payment information stored securely
+- **Upload/Sync Restrictions**:
+  - Only allow photo uploads when account is active (trial or paid)
+  - Block sync functionality for inactive/expired accounts
+  - Prevent uploads without active subscription
+  - Clear messaging when account requires payment
+- **Trial Management**:
+  - 30-day free trial starts on account creation
+  - Automatic transition to paid requirement after trial
+  - Grace period considerations TBD
+- **Technical Requirements**:
+  - User authentication already in place (Replit Auth)
+  - Add subscription status to user profile
+  - Implement payment gateway integration
+  - Add middleware to check account status before upload/sync operations
+  - Client-side and server-side validation for active accounts
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
