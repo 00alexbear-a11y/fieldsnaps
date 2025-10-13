@@ -101,9 +101,18 @@ export default function Map() {
     const bounds = new window.google.maps.LatLngBounds();
 
     projectsWithCoords.forEach(project => {
+      // Validate coordinates are valid numbers
+      const lat = parseFloat(project.latitude!);
+      const lng = parseFloat(project.longitude!);
+      
+      if (!isFinite(lat) || !isFinite(lng)) {
+        console.warn('Invalid coordinates for project:', project.name);
+        return;
+      }
+
       const position = {
-        lat: parseFloat(project.latitude!),
-        lng: parseFloat(project.longitude!),
+        lat,
+        lng,
       };
 
       const marker = new window.google.maps.Marker({
@@ -112,29 +121,49 @@ export default function Map() {
         title: project.name,
       });
 
+      // Create info window content using DOM to prevent XSS
+      const infoContent = document.createElement('div');
+      infoContent.style.padding = '8px';
+      infoContent.style.minWidth = '200px';
+
+      const title = document.createElement('h3');
+      title.style.margin = '0 0 8px 0';
+      title.style.fontWeight = '600';
+      title.style.fontSize = '14px';
+      title.textContent = project.name;
+      infoContent.appendChild(title);
+
+      if (project.address) {
+        const address = document.createElement('p');
+        address.style.margin = '0 0 12px 0';
+        address.style.color = '#666';
+        address.style.fontSize = '12px';
+        address.textContent = project.address;
+        infoContent.appendChild(address);
+      }
+
+      const button = document.createElement('button');
+      button.textContent = 'Open in Maps';
+      button.style.background = '#007AFF';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.borderRadius = '8px';
+      button.style.padding = '8px 16px';
+      button.style.fontSize = '13px';
+      button.style.fontWeight = '500';
+      button.style.cursor = 'pointer';
+      button.style.width = '100%';
+      button.onclick = () => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const url = isIOS
+          ? `maps://maps.apple.com/?q=${lat},${lng}`
+          : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        window.open(url, '_blank');
+      };
+      infoContent.appendChild(button);
+
       const infoWindow = new window.google.maps.InfoWindow({
-        content: `
-          <div style="padding: 8px; min-width: 200px;">
-            <h3 style="margin: 0 0 8px 0; font-weight: 600; font-size: 14px;">${project.name}</h3>
-            ${project.address ? `<p style="margin: 0 0 12px 0; color: #666; font-size: 12px;">${project.address}</p>` : ''}
-            <button
-              onclick="window.openInMaps('${project.latitude}', '${project.longitude}')"
-              style="
-                background: #007AFF;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 8px 16px;
-                font-size: 13px;
-                font-weight: 500;
-                cursor: pointer;
-                width: 100%;
-              "
-            >
-              Open in Maps
-            </button>
-          </div>
-        `,
+        content: infoContent,
       });
 
       marker.addListener('click', () => {
@@ -162,20 +191,6 @@ export default function Map() {
     }
   }, [projectsWithCoords, isMapLoaded]);
 
-  // Global function to open maps app
-  useEffect(() => {
-    (window as any).openInMaps = (lat: string, lng: string) => {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const url = isIOS
-        ? `maps://maps.apple.com/?q=${lat},${lng}`
-        : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-      window.open(url, '_blank');
-    };
-
-    return () => {
-      delete (window as any).openInMaps;
-    };
-  }, []);
 
   if (isLoading) {
     return (
