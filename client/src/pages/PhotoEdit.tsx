@@ -83,7 +83,6 @@ export default function PhotoEdit() {
       const existingPhoto = await idb.getPhoto(photoId);
       if (existingPhoto) {
         await idb.updatePhoto(photoId, {
-          ...existingPhoto,
           blob: annotatedBlob,
           annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
         });
