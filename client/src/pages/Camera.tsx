@@ -688,8 +688,18 @@ export default function Camera() {
 
         {/* Search Bar - Fixed at bottom */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t">
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
+          <div className="max-w-2xl mx-auto flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation('/')}
+              data-testid="button-back-to-projects-bottom"
+              className="flex-shrink-0"
+              aria-label="Back to projects"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
@@ -886,6 +896,17 @@ export default function Camera() {
       <div className="absolute bottom-6 left-0 right-0 pb-safe z-20">
         {cameraMode === 'photo' ? (
           <div className="flex items-center justify-center gap-8 px-8 max-w-md mx-auto">
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation('/')}
+              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white shadow-lg"
+              data-testid="button-close-camera-bottom"
+            >
+              <X className="w-7 h-7" />
+            </Button>
+
             {/* Quick Capture Button */}
             <Button
               variant="ghost"
@@ -911,17 +932,6 @@ export default function Camera() {
                 <CameraIcon className="w-8 h-8" />
                 <PenLine className="w-4 h-4 absolute -bottom-1 -right-1" />
               </div>
-            </Button>
-
-            {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation('/')}
-              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white shadow-lg"
-              data-testid="button-close-camera-bottom"
-            >
-              <X className="w-7 h-7" />
             </Button>
           </div>
         ) : (

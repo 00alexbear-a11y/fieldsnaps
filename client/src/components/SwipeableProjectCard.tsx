@@ -134,46 +134,46 @@ export default function SwipeableProjectCard({
         </div>
 
         {/* Project Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold truncate" data-testid={`text-project-name-${project.id}`}>
-            {project.name}
-          </h3>
-          
-          {project.address && (
-            <div className="flex items-center gap-2 mt-1">
-              <MapPin className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground truncate flex-1">{project.address}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 flex-shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
-                }}
-                data-testid={`button-open-map-${project.id}`}
-                aria-label="Open in Google Maps"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Button>
-            </div>
-          )}
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold truncate" data-testid={`text-project-name-${project.id}`}>
+              {project.name}
+            </h3>
 
-          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Camera className="w-3.5 h-3.5" />
-              <span data-testid={`text-photo-count-${project.id}`}>
-                {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
-              </span>
-            </div>
-            
-            {pendingSyncCount > 0 && (
-              <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
-                <Clock className="w-3.5 h-3.5" />
-                <span>{pendingSyncCount} pending</span>
+            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Camera className="w-3.5 h-3.5" />
+                <span data-testid={`text-photo-count-${project.id}`}>
+                  {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
+                </span>
               </div>
-            )}
+              
+              {pendingSyncCount > 0 && (
+                <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{pendingSyncCount} pending</span>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Open in Maps Button */}
+          {project.address && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-shrink-0 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+              }}
+              data-testid={`button-open-map-${project.id}`}
+              aria-label="Open in Google Maps"
+            >
+              <MapPin className="w-3.5 h-3.5 mr-1.5" />
+              Open in Maps
+            </Button>
+          )}
         </div>
       </div>
     </div>
