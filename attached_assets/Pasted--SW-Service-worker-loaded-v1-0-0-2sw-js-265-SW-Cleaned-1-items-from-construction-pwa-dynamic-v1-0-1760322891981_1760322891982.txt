@@ -1,0 +1,134 @@
+[SW] Service worker loaded v1.0.0
+2sw.js:265 [SW] Cleaned 1 items from construction-pwa-dynamic-v1.0.0
+10The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+10The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+10The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+FieldSnaps:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+FieldSnaps:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+FieldSnaps:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+_app-4f38a9c7d036feda.js:28 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-4f38a9c7d036feda.js:28 [LaunchDarkly] LaunchDarkly client initialized
+framework-feb8d59901280d4c.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-feb8d59901280d4c.js:1Understand this error
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'battery'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+framework-feb8d59901280d4c.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-feb8d59901280d4c.js:1Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Ar24%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+sw.js:265 [SW] Cleaned 1 items from construction-pwa-dynamic-v1.0.0
+2chunk-3TFVT2CW.js?v=6e8ee513:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+printWarning @ chunk-3TFVT2CW.js?v=6e8ee513:136Understand this error
+chunk-3TFVT2CW.js?v=6e8ee513:1074 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-3TFVT2CW.js?v=6e8ee513:1074:29)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=6e8ee513:68:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=949abea6:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=949abea6:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=949abea6:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=949abea6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=949abea6:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=949abea6:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=949abea6:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=949abea6:19198:20)Understand this error
+2chunk-3TFVT2CW.js?v=6e8ee513:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+printWarning @ chunk-3TFVT2CW.js?v=6e8ee513:136Understand this error
+chunk-3TFVT2CW.js?v=6e8ee513:1074 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-3TFVT2CW.js?v=6e8ee513:1074:29)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=6e8ee513:68:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=949abea6:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=949abea6:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=949abea6:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=949abea6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=949abea6:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=949abea6:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=949abea6:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=949abea6:19198:20)Understand this error
+chunk-RPCDYKBN.js?v=949abea6:14032 The above error occurred in the <TooltipProvider> component:
+
+    at TooltipProvider (https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=6e8ee513:62:5)
+    at QueryClientProvider (https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=d9d09633:2805:3)
+    at App (https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/src/App.tsx?v=Ek5fHkXWfjy97TyWUkTr:106:47)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-RPCDYKBN.js?v=949abea6:14032Understand this error
+chunk-RPCDYKBN.js?v=949abea6:19413 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-3TFVT2CW.js?v=6e8ee513:1074:29)
+    at TooltipProvider (@radix-ui_react-tooltip.js?v=6e8ee513:68:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=949abea6:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=949abea6:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=949abea6:15914:22)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=949abea6:19753:22)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=949abea6:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=949abea6:19137:13)
+    at renderRootSync (chunk-RPCDYKBN.js?v=949abea6:19116:15)
+    at recoverFromConcurrentError (chunk-RPCDYKBN.js?v=949abea6:18736:28)Understand this error
+client:536 WebSocket connection to 'wss://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/?token=dFDRM2K7_fYm' failed: 
+setupWebSocket @ client:536Understand this error
+main.tsx:11 [PWA] Service Worker registered successfully: https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=dFDRM2K7_fYm' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)Understand this error
+FieldSnaps:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
