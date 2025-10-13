@@ -319,7 +319,7 @@ export default function Projects() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{projectToDelete?.name}"? This will permanently remove the project and all {photosByProject[projectToDelete?.id || '']?.length || 0} of its photos. This action cannot be undone.
+              Are you sure you want to delete "{projectToDelete?.name}"? The project and all {photosByProject[projectToDelete?.id || '']?.length || 0} of its photos will be moved to trash for 30 days before permanent deletion.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
