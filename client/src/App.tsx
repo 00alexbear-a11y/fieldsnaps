@@ -12,14 +12,42 @@ import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
 import SyncBanner from "./components/SyncBanner";
+import { useAuth } from "./hooks/useAuth";
 
 function AppContent() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
   const showSyncBanner = location === '/' || location === '/settings';
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/share/'];
+  const isPublicRoute = publicRoutes.some(route => location.startsWith(route));
+
+  // Redirect to login if not authenticated (except for public routes)
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !isPublicRoute) {
+      setLocation('/login');
+    }
+  }, [isAuthenticated, isLoading, isPublicRoute, setLocation]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated and not on a public route
+  if (!isAuthenticated && !isPublicRoute) {
+    return <Login />;
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-foreground flex flex-col">
@@ -36,6 +64,7 @@ function AppContent() {
           <Route path="/sync-status" component={SyncStatus} />
           <Route path="/trash" component={Trash} />
           <Route path="/map" component={Map} />
+          <Route path="/login" component={Login} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>

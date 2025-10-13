@@ -4,8 +4,11 @@
 FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments.
 
 ## Recent Changes (October 2025)
+- **Authentication Gate**: Implemented required authentication before accessing any features. Users must sign in with Replit Auth or biometric login to access the app. Share links remain publicly accessible. Login page shows FieldSnaps branding with both biometric and Replit login options.
+- **Compact Maps Button**: Redesigned "Open in Maps" button to truly square (44x44px) positioned left of camera icon with two-line text layout ("Open [icon]" / "in Maps").
+- **Sync Status Enhancements**: Added swipe-to-delete (50px threshold) and multi-select batch deletion for photos in sync queue. Enhanced with photo thumbnail previews and proper object URL lifecycle management.
 - **30-Day Trash Bin**: Implemented complete soft-delete system with 30-day retention. Deleted projects and photos move to trash and can be restored or permanently deleted. Automatic cleanup runs daily to remove items older than 30 days. Accessible from Settings page with clear visual indicators for days remaining.
-- **Enhanced Sync Status**: Added photo thumbnail previews to sync status page with project names and clickable full-screen view. Implemented proper object URL lifecycle management to prevent memory leaks.
+- **Interactive Map View**: Added new Map tab showing all projects as markers with GPS navigation to Google Maps. Includes XSS protection using DOM APIs.
 - **Bulk Photo Move**: Users can now select multiple photos and move them between projects via an intuitive dialog interface.
 - **Quick Camera Access**: Added camera icon buttons to each project card for instant camera access with that project pre-selected.
 - **Navigation Refinement**: Removed back button from main projects list view for cleaner UX, while maintaining it within individual project views.
@@ -39,7 +42,7 @@ The design philosophy is "Apple-inspired," emphasizing extreme minimalism, conte
 - **Intelligent Photo System**: Three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API, instant thumbnail generation, and aspect ratio preservation. Photos display fully without cropping in the annotation editor.
 - **Camera Functionality**: Auto-starts camera on tab open, instant capture workflow (Quick Capture, Capture & Edit), camera pre-selection for projects, and bottom navigation auto-hide for immersive experiences. Enhanced camera reliability with proper initialization and error handling.
 - **Photo Sharing**: Multi-photo selection, date-grouped timeline view, and public read-only share pages with a share link dialog and copy-to-clipboard functionality.
-- **Authentication**: Optional Replit Auth with OpenID Connect, supporting biometric login (WebAuthn/FIDO2).
+- **Authentication**: Required authentication gate using Replit Auth with OpenID Connect. All API routes are protected except auth routes and public share links. Supports biometric login (WebAuthn/FIDO2) for quick access after initial setup.
 - **Onboarding**: A 3-step interactive onboarding flow.
 - **PWA Installation**: Contextual install prompts.
 

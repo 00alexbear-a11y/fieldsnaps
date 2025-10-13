@@ -154,110 +154,68 @@ export default function Settings() {
       <Card className="p-4 space-y-4">
         <h2 className="text-lg font-semibold">Account</h2>
         
-        {isLoading ? (
-          <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          </div>
-        ) : (isAuthenticated && user) ? (
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Avatar className="w-12 h-12" data-testid="avatar-user">
-                <AvatarImage 
-                  src={user?.profileImageUrl || undefined} 
-                  alt={user?.email || 'User'} 
-                  className="object-cover"
-                />
-                <AvatarFallback>
-                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate" data-testid="text-user-name">
-                  {user?.firstName && user?.lastName 
-                    ? `${user.firstName} ${user.lastName}` 
-                    : user?.email || 'User'}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <Avatar className="w-12 h-12" data-testid="avatar-user">
+              <AvatarImage 
+                src={user?.profileImageUrl || undefined} 
+                alt={user?.email || 'User'} 
+                className="object-cover"
+              />
+              <AvatarFallback>
+                {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate" data-testid="text-user-name">
+                {user?.firstName && user?.lastName 
+                  ? `${user.firstName} ${user.lastName}` 
+                  : user?.email || 'User'}
+              </p>
+              {user?.email && (
+                <p className="text-sm text-muted-foreground truncate" data-testid="text-user-email">
+                  {user.email}
                 </p>
-                {user?.email && (
-                  <p className="text-sm text-muted-foreground truncate" data-testid="text-user-email">
-                    {user.email}
-                  </p>
-                )}
-              </div>
+              )}
             </div>
-            
-            {biometricSupported && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Fingerprint className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Biometric Login</span>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="default"
-                  className="w-full"
-                  onClick={registerBiometric}
-                  disabled={isWebAuthnLoading}
-                  data-testid="button-register-biometric"
-                >
-                  <Fingerprint className="w-4 h-4 mr-2" />
-                  {isWebAuthnLoading ? 'Setting up...' : 'Enable Biometric Login'}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  Use Touch ID, Face ID, or Windows Hello to sign in
-                </p>
-              </div>
-            )}
-            
-            <Button
-              variant="outline"
-              size="default"
-              className="w-full"
-              onClick={() => window.location.href = '/api/logout'}
-              data-testid="button-logout"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
           </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Sign in to sync your photos across devices
-            </p>
-            
-            {biometricSupported && (
+          
+          {biometricSupported && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Fingerprint className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Biometric Login</span>
+                </div>
+              </div>
               <Button
-                variant="default"
+                variant="outline"
                 size="default"
                 className="w-full"
-                onClick={async () => {
-                  const user = await authenticateWithBiometric();
-                  if (user) {
-                    window.location.reload();
-                  }
-                }}
+                onClick={registerBiometric}
                 disabled={isWebAuthnLoading}
-                data-testid="button-biometric-login"
+                data-testid="button-register-biometric"
               >
                 <Fingerprint className="w-4 h-4 mr-2" />
-                {isWebAuthnLoading ? 'Authenticating...' : 'Sign In with Biometrics'}
+                {isWebAuthnLoading ? 'Setting up...' : 'Enable Biometric Login'}
               </Button>
-            )}
-            
-            <Button
-              variant={biometricSupported ? "outline" : "default"}
-              size="default"
-              className="w-full"
-              onClick={() => window.location.href = '/api/login'}
-              data-testid="button-login"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In with Replit
-            </Button>
-          </div>
-        )}
+              <p className="text-xs text-muted-foreground">
+                Use Touch ID, Face ID, or Windows Hello to sign in
+              </p>
+            </div>
+          )}
+          
+          <Button
+            variant="outline"
+            size="default"
+            className="w-full"
+            onClick={() => window.location.href = '/api/logout'}
+            data-testid="button-logout"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       </Card>
 
       {/* Sync Status */}
