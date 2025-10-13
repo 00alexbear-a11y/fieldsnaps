@@ -47,6 +47,7 @@ export const projects = pgTable("projects", {
   coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
   userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
 });
 

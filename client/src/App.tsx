@@ -24,19 +24,22 @@ function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const showSyncBanner = location === '/' || location === '/settings';
 
+  // Check for skip auth flag (testing mode)
+  const skipAuth = sessionStorage.getItem('skipAuth') === 'true';
+
   // Public routes that don't require authentication
   const publicRoutes = ['/share/'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route));
 
-  // Redirect to login if not authenticated (except for public routes)
+  // Redirect to login if not authenticated (except for public routes or skip mode)
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !isPublicRoute) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute && !skipAuth) {
       setLocation('/login');
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, setLocation]);
+  }, [isAuthenticated, isLoading, isPublicRoute, skipAuth, setLocation]);
 
-  // Show loading state while checking authentication
-  if (isLoading) {
+  // Show loading state while checking authentication (skip if in skip mode)
+  if (isLoading && !skipAuth) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -44,8 +47,8 @@ function AppContent() {
     );
   }
 
-  // Show login page if not authenticated and not on a public route
-  if (!isAuthenticated && !isPublicRoute) {
+  // Show login page if not authenticated and not on a public route (skip if in skip mode)
+  if (!isAuthenticated && !isPublicRoute && !skipAuth) {
     return <Login />;
   }
 

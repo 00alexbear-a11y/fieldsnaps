@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Login() {
+  const [, setLocation] = useLocation();
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
 
@@ -18,6 +20,12 @@ export default function Login() {
     if (user) {
       window.location.href = '/';
     }
+  };
+
+  const handleSkip = () => {
+    // Store skip flag in sessionStorage
+    sessionStorage.setItem('skipAuth', 'true');
+    setLocation('/');
   };
 
   return (
@@ -74,6 +82,19 @@ export default function Login() {
               : 'Sign in with your Replit account to get started'}
           </p>
         </Card>
+
+        {/* Skip Button for Testing */}
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSkip}
+            className="text-muted-foreground hover:text-foreground"
+            data-testid="button-skip-auth"
+          >
+            Skip for now (Testing)
+          </Button>
+        </div>
 
         {/* Features List */}
         <div className="space-y-3 text-sm text-muted-foreground">
