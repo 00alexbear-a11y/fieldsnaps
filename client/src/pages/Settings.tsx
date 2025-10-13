@@ -1,10 +1,11 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { syncManager } from '@/lib/syncManager';
 import { indexedDB as indexedDBService } from '@/lib/indexeddb';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +13,7 @@ import { useWebAuthn } from '@/hooks/useWebAuthn';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Settings() {
+  const [, setLocation] = useLocation();
   const { user, isAuthenticated, isLoading } = useAuth();
   const { registerBiometric, authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [isDark, setIsDark] = useState(false);
@@ -259,8 +261,15 @@ export default function Settings() {
       </Card>
 
       {/* Sync Status */}
-      <Card className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Sync Status</h2>
+      <Card 
+        className="p-4 space-y-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
+        onClick={() => setLocation('/sync-status')}
+        data-testid="card-sync-status"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Sync Status</h2>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </div>
         
         <div className="flex items-center space-x-2">
           {isOnline ? (
@@ -307,7 +316,10 @@ export default function Settings() {
           variant="default"
           size="default"
           className="w-full"
-          onClick={handleSync}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSync();
+          }}
           disabled={!isOnline || (syncStatus?.pending === 0)}
           data-testid="button-sync-now"
         >
