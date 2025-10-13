@@ -20,11 +20,11 @@ function AppContent() {
   const showSyncBanner = location === '/' || location === '/settings';
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-black text-foreground flex flex-col">
       {/* Show sync banner only on Projects list and Settings pages */}
       {showSyncBanner && <SyncBanner />}
       
-      <main className="flex-1 overflow-auto pb-16">
+      <main className="flex-1 overflow-auto pb-16 bg-white dark:bg-black">
         <Switch>
           <Route path="/camera" component={Camera} />
           <Route path="/" component={Projects} />
