@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown } from "lucide-react";
+import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
+import { syncManager } from "@/lib/syncManager";
 
 type SortOption = 'lastActivity' | 'name' | 'created';
 
@@ -51,6 +52,7 @@ export default function Projects() {
   const [address, setAddress] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery<Project[]>({
@@ -203,6 +205,45 @@ export default function Projects() {
     }
   };
 
+  const handleSyncNow = async () => {
+    setIsSyncing(true);
+    try {
+      const result = await syncManager.syncNow();
+      if (result.synced > 0) {
+        toast({
+          title: '✓ Synced',
+          description: `${result.synced} item${result.synced > 1 ? 's' : ''} uploaded`,
+          duration: 2000,
+        });
+        // Refresh projects and photos
+        queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
+      } else if (result.failed > 0) {
+        toast({
+          title: 'Sync incomplete',
+          description: `${result.failed} item${result.failed > 1 ? 's' : ''} failed`,
+          variant: 'destructive',
+          duration: 2000,
+        });
+      } else {
+        toast({
+          title: 'Up to date',
+          description: 'All items are already synced',
+          duration: 1500,
+        });
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast({
+        title: 'Sync failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const isLoading = projectsLoading;
 
   return (
@@ -216,6 +257,17 @@ export default function Projects() {
           data-testid="img-fieldsnaps-logo"
         />
         <div className="flex items-center gap-2">
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={handleSyncNow}
+              disabled={isSyncing}
+              className="h-8 w-8"
+              data-testid="button-sync-now"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            </Button>
+            
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="default" data-testid="button-create-project">
