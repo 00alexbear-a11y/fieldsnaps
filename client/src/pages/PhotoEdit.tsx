@@ -73,19 +73,31 @@ export default function PhotoEdit() {
     };
   }, [photoId]);
 
-  const handleSave = async (annotations: Annotation[]) => {
+  const handleSave = async (annotations: Annotation[], annotatedBlob: Blob) => {
     if (!photoId || !projectId) return;
 
     setIsSaving(true);
 
     try {
-      if (annotations.length > 0) {
+      // Update the photo with the annotated version in IndexedDB
+      const existingPhoto = await idb.getPhoto(photoId);
+      if (existingPhoto) {
+        await idb.updatePhoto(photoId, {
+          ...existingPhoto,
+          blob: annotatedBlob,
+          annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+        });
+
+        // Add to sync queue to upload the annotated photo to server
         await idb.addToSyncQueue({
-          type: 'annotation',
+          type: 'photo',
           localId: photoId,
           projectId: projectId,
-          action: 'create',
-          data: { annotations },
+          action: 'update',
+          data: { 
+            blob: annotatedBlob,
+            annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+          },
           retryCount: 0,
         });
       }
@@ -93,7 +105,7 @@ export default function PhotoEdit() {
       toast({
         title: '✓ Saved',
         description: annotations.length > 0 
-          ? `${annotations.length} annotation${annotations.length === 1 ? '' : 's'} will sync when online`
+          ? `Annotations saved and will sync when online`
           : 'Photo saved',
         duration: 1500,
       });

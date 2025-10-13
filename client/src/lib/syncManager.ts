@@ -345,6 +345,9 @@ class SyncManager {
         if (photo.caption) {
           formData.append('caption', photo.caption);
         }
+        if (photo.annotations) {
+          formData.append('annotations', photo.annotations);
+        }
 
         // Get headers (without Content-Type for FormData)
         const headers = this.getSyncHeaders();
@@ -373,6 +376,44 @@ class SyncManager {
         await idb.updatePhotoSyncStatus(item.localId, 'synced', data.id);
 
         console.log(`[Sync] Photo uploaded: ${data.id}`);
+        return true;
+      }
+
+      if (item.action === 'update' && photo.serverId) {
+        console.log('[Sync] Updating photo:', photo.serverId);
+        
+        // Create FormData for multipart upload
+        const formData = new FormData();
+        
+        // Include updated blob from item.data if available
+        if (item.data.blob) {
+          formData.append('photo', item.data.blob, `photo-${photo.id}.jpg`);
+        }
+        
+        if (item.data.annotations !== undefined) {
+          formData.append('annotations', item.data.annotations || '');
+        }
+        
+        if (photo.caption) {
+          formData.append('caption', photo.caption);
+        }
+
+        const response = await fetch(`/api/photos/${photo.serverId}`, {
+          method: 'PATCH',
+          headers: this.getSyncHeaders(),
+          credentials: 'include',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[Sync] Update failed:', response.status, errorText);
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        await idb.updatePhotoSyncStatus(item.localId, 'synced');
+
+        console.log(`[Sync] Photo updated: ${photo.serverId}`);
         return true;
       }
 

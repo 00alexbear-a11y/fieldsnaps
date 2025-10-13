@@ -21,6 +21,7 @@ export interface LocalPhoto {
   syncError?: string;
   serverId?: string; // ID from server after successful upload
   retryCount: number;
+  annotations?: string | null; // JSON string of annotations
   createdAt: number;
   updatedAt: number;
 }
@@ -147,6 +148,34 @@ class IndexedDBManager {
       const request = store.add(localPhoto);
 
       request.onsuccess = () => resolve(localPhoto);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Update an existing photo in local storage
+   */
+  async updatePhoto(id: string, updates: Partial<LocalPhoto>): Promise<LocalPhoto> {
+    const db = await this.init();
+    const existingPhoto = await this.getPhoto(id);
+    
+    if (!existingPhoto) {
+      throw new Error(`Photo ${id} not found`);
+    }
+
+    const updatedPhoto: LocalPhoto = {
+      ...existingPhoto,
+      ...updates,
+      id, // Ensure ID doesn't change
+      updatedAt: Date.now(),
+    };
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORES.PHOTOS], 'readwrite');
+      const store = transaction.objectStore(STORES.PHOTOS);
+      const request = store.put(updatedPhoto);
+
+      request.onsuccess = () => resolve(updatedPhoto);
       request.onerror = () => reject(request.error);
     });
   }
