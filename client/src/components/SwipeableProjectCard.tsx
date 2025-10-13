@@ -84,7 +84,7 @@ export default function SwipeableProjectCard({
   };
 
   return (
-    <div className="relative overflow-hidden" data-testid={`swipeable-wrapper-${project.id}`}>
+    <div className="relative overflow-hidden mx-3 my-2 rounded-2xl" data-testid={`swipeable-wrapper-${project.id}`}>
       {/* Delete button - appears behind card */}
       <div
         className="absolute inset-0 bg-destructive flex items-center justify-end pr-6"
@@ -105,7 +105,7 @@ export default function SwipeableProjectCard({
       {/* Project Card - swipes left to reveal delete */}
       <div
         ref={cardRef}
-        className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover-elevate active-elevate-2 cursor-pointer bg-card backdrop-blur-xl border border-border/50 mx-3 my-2 rounded-2xl overflow-visible"
+        className="flex gap-3 sm:gap-4 p-3 sm:p-4 hover-elevate active-elevate-2 cursor-pointer bg-card backdrop-blur-xl border border-border/50 rounded-2xl overflow-visible"
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
