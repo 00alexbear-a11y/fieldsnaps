@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -67,5 +68,17 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Run trash cleanup on server start
+    storage.cleanupOldDeletedItems()
+      .then(() => log('Trash cleanup completed'))
+      .catch((err) => console.error('Trash cleanup failed:', err));
+    
+    // Schedule daily trash cleanup (every 24 hours)
+    setInterval(() => {
+      storage.cleanupOldDeletedItems()
+        .then(() => log('Scheduled trash cleanup completed'))
+        .catch((err) => console.error('Scheduled trash cleanup failed:', err));
+    }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
   });
 })();

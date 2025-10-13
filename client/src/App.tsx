@@ -9,6 +9,7 @@ import ProjectPhotos from "./pages/ProjectPhotos";
 import PhotoEdit from "./pages/PhotoEdit";
 import Settings from "./pages/Settings";
 import SyncStatus from "./pages/SyncStatus";
+import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
@@ -32,6 +33,7 @@ function AppContent() {
           <Route path="/photo/:id/edit" component={PhotoEdit} />
           <Route path="/settings" component={Settings} />
           <Route path="/sync-status" component={SyncStatus} />
+          <Route path="/trash" component={Trash} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>

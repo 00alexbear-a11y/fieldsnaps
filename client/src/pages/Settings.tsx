@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -325,6 +325,26 @@ export default function Settings() {
         >
           Sync Now
         </Button>
+      </Card>
+
+      {/* Trash */}
+      <Card 
+        className="p-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
+        onClick={() => setLocation('/trash')}
+        data-testid="card-trash"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Trash2 className="w-5 h-5 text-muted-foreground" />
+            <div>
+              <h2 className="text-lg font-semibold">Trash</h2>
+              <p className="text-sm text-muted-foreground">
+                Deleted items kept for 30 days
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </div>
       </Card>
 
       {/* Storage */}
