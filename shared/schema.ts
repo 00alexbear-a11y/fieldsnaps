@@ -34,7 +34,9 @@ export const credentials = pgTable("credentials", {
   counter: integer("counter").notNull().default(0), // For clone detection
   transports: text("transports").array().$type<string[]>(), // ['internal', 'usb', 'nfc', 'ble']
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("idx_credentials_user_id").on(table.userId),
+]);
 
 // Projects table - simplified for photo organization
 export const projects = pgTable("projects", {
@@ -49,7 +51,10 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
-});
+}, (table) => [
+  index("idx_projects_user_id").on(table.userId),
+  index("idx_projects_deleted_at").on(table.deletedAt),
+]);
 
 // Photos table
 export const photos = pgTable("photos", {
@@ -61,7 +66,11 @@ export const photos = pgTable("photos", {
   photographerName: varchar("photographer_name"), // Cached name for offline display
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
-});
+}, (table) => [
+  index("idx_photos_project_id").on(table.projectId),
+  index("idx_photos_photographer_id").on(table.photographerId),
+  index("idx_photos_deleted_at").on(table.deletedAt),
+]);
 
 // Photo annotations table
 export const photoAnnotations = pgTable("photo_annotations", {
@@ -74,7 +83,9 @@ export const photoAnnotations = pgTable("photo_annotations", {
   fontSize: integer("font_size"),
   position: jsonb("position").notNull(), // Stores x, y, x2, y2, width, points, etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("idx_photo_annotations_photo_id").on(table.photoId),
+]);
 
 // Comments table
 export const comments = pgTable("comments", {
@@ -83,7 +94,9 @@ export const comments = pgTable("comments", {
   content: text("content").notNull(),
   mentions: text("mentions").array().$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("idx_comments_photo_id").on(table.photoId),
+]);
 
 // Shares table - for generating shareable photo links
 export const shares = pgTable("shares", {
@@ -93,7 +106,10 @@ export const shares = pgTable("shares", {
   photoIds: text("photo_ids").array().$type<string[]>().notNull(), // Array of photo IDs to share
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(), // 30 days default
-});
+}, (table) => [
+  index("idx_shares_project_id").on(table.projectId),
+  index("idx_shares_token").on(table.token),
+]);
 
 // Zod schemas for validation
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
