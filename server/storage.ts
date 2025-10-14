@@ -325,14 +325,15 @@ export class DbStorage implements IStorage {
   }
 
   async permanentlyDeletePhoto(id: string): Promise<boolean> {
-    // Get the photo to retrieve its URL before deleting
-    const photo = await this.getPhoto(id);
+    // Get the photo to retrieve its URL before deleting (including soft-deleted items)
+    const photoResult = await db.select().from(photos).where(eq(photos.id, id));
+    const photo = photoResult[0];
     
     // Delete from database
     const result = await db.delete(photos).where(eq(photos.id, id)).returning();
     
     // Clean up object storage if the photo was stored there
-    if (photo?.url) {
+    if (photo?.url && result.length > 0) {
       await this.objectStorageService.deleteObjectEntity(photo.url);
     }
     
