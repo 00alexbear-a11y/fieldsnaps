@@ -367,12 +367,27 @@ export class DbStorage implements IStorage {
         lt(projects.deletedAt, thirtyDaysAgo)
       ));
 
-    // Delete photos older than 30 days
+    // Get photos older than 30 days for cleanup
+    const oldPhotos = await db.select()
+      .from(photos)
+      .where(and(
+        isNotNull(photos.deletedAt),
+        lt(photos.deletedAt, thirtyDaysAgo)
+      ));
+
+    // Delete photos from database
     await db.delete(photos)
       .where(and(
         isNotNull(photos.deletedAt),
         lt(photos.deletedAt, thirtyDaysAgo)
       ));
+
+    // Clean up object storage for deleted photos
+    for (const photo of oldPhotos) {
+      if (photo.url) {
+        await this.objectStorageService.deleteObjectEntity(photo.url);
+      }
+    }
   }
 
   // Tags
