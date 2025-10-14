@@ -332,7 +332,29 @@ export default function Camera() {
     // Don't switch if already at this level
     if (zoomLevel === level) return;
     
-    // Stop current stream
+    // Update zoom level state
+    setZoomLevel(level);
+    
+    // Try to apply constraints to existing track first (avoids permission re-prompt)
+    if (streamRef.current) {
+      const videoTrack = streamRef.current.getVideoTracks()[0];
+      if (videoTrack) {
+        try {
+          // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+          await videoTrack.applyConstraints({
+            advanced: [{ zoom: level }]
+          });
+          console.log(`[Camera] Applied zoom ${level}x via applyConstraints`);
+          return; // Success - no need to restart stream
+        } catch (constraintError) {
+          console.warn('[Camera] applyConstraints failed, will restart stream:', constraintError);
+          // Fall through to restart stream approach
+        }
+      }
+    }
+    
+    // Fallback: Restart stream with new zoom constraint
+    // (Required on iOS when switching physical lenses)
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -342,10 +364,6 @@ export default function Camera() {
     }
     setIsActive(false);
     
-    // Update zoom level state
-    setZoomLevel(level);
-    
-    // Restart camera with new zoom constraint
     try {
       // Use zoom constraint to request specific physical lens
       // iOS Safari and modern browsers will map this to the appropriate camera
