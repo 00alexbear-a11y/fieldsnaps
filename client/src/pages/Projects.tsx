@@ -233,6 +233,16 @@ export default function Projects() {
             >
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             </Button>
+
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={() => setLocation('/settings')}
+              className="h-8 w-8"
+              data-testid="button-settings"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
             
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>

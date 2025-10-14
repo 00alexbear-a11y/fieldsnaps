@@ -1,16 +1,10 @@
 import { Link, useLocation } from 'wouter';
-import { Camera, FolderOpen, Settings, MapPin } from 'lucide-react';
+import { Camera, FolderOpen, Bell, MapPin } from 'lucide-react';
 
 export default function BottomNav() {
   const [location] = useLocation();
 
   const tabs = [
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      path: '/settings',
-    },
     {
       id: 'map',
       label: 'Map',
@@ -22,6 +16,12 @@ export default function BottomNav() {
       label: 'Projects',
       icon: FolderOpen,
       path: '/',
+    },
+    {
+      id: 'inbox',
+      label: 'Inbox',
+      icon: Bell,
+      path: '/inbox',
     },
     {
       id: 'camera',
