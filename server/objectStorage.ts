@@ -213,8 +213,10 @@ export class ObjectStorageService {
     aclPolicy: ObjectAclPolicy
   ): Promise<string> {
     const normalizedPath = this.normalizeObjectEntityPath(rawPath);
-    if (!normalizedPath.startsWith("/")) {
-      return normalizedPath;
+    
+    // Security: Reject non-object storage paths to prevent arbitrary external URLs
+    if (!normalizedPath.startsWith("/objects/")) {
+      throw new Error("Invalid object storage path. Only Replit object storage URLs are allowed.");
     }
 
     const objectFile = await this.getObjectEntityFile(normalizedPath);
