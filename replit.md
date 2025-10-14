@@ -5,6 +5,28 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 
 ## Recent Changes
 
+### Performance Optimizations (October 14, 2025)
+Completed major performance optimizations to improve speed and user experience:
+
+**Database Query Optimization** ✓
+- **Eliminated N+1 Query Problem**: Created bulk `/api/projects/with-counts` endpoint using LEFT JOIN + COUNT aggregation
+- **Single Query Approach**: Projects.tsx now fetches all project photo counts in one database query instead of individual queries per project
+- **Backward Compatibility**: Maintained `/api/projects` endpoint for Map and camera selector usage
+- **Performance Impact**: Reduced database load from O(n) to O(1) queries for project listing
+
+**Sync Queue Optimization** ✓
+- **Batch Processing**: Implemented 10-item concurrent batches to prevent server overload
+- **Smart Prioritization**: Process newest items first within each type (projects→photos)
+- **Exponential Backoff**: Retry logic with 1s→2s→4s→8s→16s delays for failed syncs
+- **Real-time Progress**: Monotonic batch counting (1/5, 2/5, 3/5...) with accurate processed/total metrics
+- **UI Feedback**: SyncStatusNotifier shows live progress during background sync operations
+
+**Technical Details:**
+- Batched sync processes items in groups: ceil(projects/10) + ceil(photos/10) total batches
+- Progress events emit before/after each batch with actual synced+failed counts
+- Shared batch counter ensures strictly increasing batch numbers across phases
+- All changes architect-reviewed and approved with no LSP errors
+
 ### Bug Fixes and Feature Improvements (October 14, 2025)
 Completed comprehensive bug fixes and stability improvements:
 
