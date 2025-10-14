@@ -902,41 +902,43 @@ export default function Camera() {
         </Button>
       </div>
 
-      {/* Zoom Selector - Center, lower position - Only show available cameras */}
-      <div className="absolute bottom-36 left-0 right-0 flex justify-center gap-2 z-10">
-        {availableCameras.length > 0 ? (
-          availableCameras.map((camera) => (
-            <Button
-              key={camera.zoomLevel}
-              variant="ghost"
-              size="sm"
-              onClick={() => switchZoomLevel(camera.zoomLevel)}
-              className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
-                zoomLevel === camera.zoomLevel ? 'bg-white/25' : 'bg-white/10'
-              }`}
-              data-testid={`button-zoom-${camera.zoomLevel}x`}
-            >
-              {camera.zoomLevel}x
-            </Button>
-          ))
-        ) : (
-          // Fallback to basic zoom if camera detection failed
-          [1].map((level) => (
-            <Button
-              key={level}
-              variant="ghost"
-              size="sm"
-              onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
-              className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
-                zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
-              }`}
-              data-testid={`button-zoom-${level}x`}
-            >
-              {level}x
-            </Button>
-          ))
-        )}
-      </div>
+      {/* Zoom Selector - Center, lower position - Hide during video recording */}
+      {!(cameraMode === 'video' && isRecording) && (
+        <div className="absolute bottom-36 left-0 right-0 flex justify-center gap-2 z-10">
+          {availableCameras.length > 0 ? (
+            availableCameras.map((camera) => (
+              <Button
+                key={camera.zoomLevel}
+                variant="ghost"
+                size="sm"
+                onClick={() => switchZoomLevel(camera.zoomLevel)}
+                className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
+                  zoomLevel === camera.zoomLevel ? 'bg-white/25' : 'bg-white/10'
+                }`}
+                data-testid={`button-zoom-${camera.zoomLevel}x`}
+              >
+                {camera.zoomLevel}x
+              </Button>
+            ))
+          ) : (
+            // Fallback to basic zoom if camera detection failed
+            [1].map((level) => (
+              <Button
+                key={level}
+                variant="ghost"
+                size="sm"
+                onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
+                className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
+                  zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
+                }`}
+                data-testid={`button-zoom-${level}x`}
+              >
+                {level}x
+              </Button>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Bottom Capture Controls - Minimal, no background box */}
       <div className="absolute bottom-6 left-0 right-0 pb-safe z-20">

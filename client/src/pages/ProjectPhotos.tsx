@@ -33,9 +33,7 @@ export default function ProjectPhotos() {
   const [, setLocation] = useLocation();
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [editedProject, setEditedProject] = useState({ name: "", description: "", address: "", coverPhotoId: "" });
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
   const [shareLink, setShareLink] = useState<string | null>(null);
@@ -51,30 +49,6 @@ export default function ProjectPhotos() {
     queryKey: ["/api/projects"],
     enabled: showMoveDialog,
   });
-
-  // Sync editedProject with project data
-  useEffect(() => {
-    if (project) {
-      setEditedProject({
-        name: project.name || "",
-        description: project.description || "",
-        address: project.address || "",
-        coverPhotoId: project.coverPhotoId || "",
-      });
-    }
-  }, [project]);
-
-  // Reset form when dialog opens
-  useEffect(() => {
-    if (showSettings && project) {
-      setEditedProject({
-        name: project.name || "",
-        description: project.description || "",
-        address: project.address || "",
-        coverPhotoId: project.coverPhotoId || "",
-      });
-    }
-  }, [showSettings, project]);
 
   const { data: photos = [], isLoading } = useQuery<Photo[]>({
     queryKey: ["/api/projects", projectId, "photos"],
@@ -154,25 +128,6 @@ export default function ProjectPhotos() {
     onError: () => {
       toast({ 
         title: "Failed to delete photo", 
-        variant: "destructive" 
-      });
-    },
-  });
-
-  const updateProjectMutation = useMutation({
-    mutationFn: async (data: Partial<{ name: string; description: string; address: string; coverPhotoId: string }>) => {
-      return await apiRequest("PATCH", `/api/projects/${projectId}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "Project updated successfully" });
-      setShowSettings(false);
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "Failed to update project", 
-        description: error.message,
         variant: "destructive" 
       });
     },
@@ -486,15 +441,6 @@ export default function ProjectPhotos() {
         <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
           {!isSelectMode && (
             <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowSettings(true)}
-                data-testid="button-project-settings"
-                className="flex-shrink-0"
-              >
-                <SettingsIcon className="w-5 h-5" />
-              </Button>
               {photos.length > 0 && (
                 <Button
                   onClick={toggleSelectMode}
@@ -694,116 +640,6 @@ export default function ProjectPhotos() {
         </Dialog>
       )}
 
-      {/* Project Settings Dialog */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Project Settings</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="project-name">Project Name</Label>
-              <Input
-                id="project-name"
-                value={editedProject.name}
-                onChange={(e) => setEditedProject({ ...editedProject, name: e.target.value })}
-                placeholder="Enter project name"
-                data-testid="input-project-name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="project-address">Job Site Address</Label>
-              <Input
-                id="project-address"
-                value={editedProject.address}
-                onChange={(e) => setEditedProject({ ...editedProject, address: e.target.value })}
-                placeholder="Enter job site address"
-                data-testid="input-project-address"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="project-description">Description</Label>
-              <Textarea
-                id="project-description"
-                value={editedProject.description}
-                onChange={(e) => setEditedProject({ ...editedProject, description: e.target.value })}
-                placeholder="Enter project description"
-                rows={3}
-                data-testid="textarea-project-description"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Cover Photo</Label>
-              {photos.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Add photos to select a cover</p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {photos.map((photo) => (
-                    <div
-                      key={photo.id}
-                      className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 hover-elevate ${
-                        editedProject.coverPhotoId === photo.id
-                          ? "border-primary"
-                          : "border-transparent"
-                      }`}
-                      onClick={() => setEditedProject({ ...editedProject, coverPhotoId: photo.id })}
-                      data-testid={`cover-photo-option-${photo.id}`}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={photo.caption || "Photo"}
-                        className="w-full h-full object-cover"
-                      />
-                      {editedProject.coverPhotoId === photo.id && (
-                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                          <div className="bg-primary text-primary-foreground rounded-full p-1">
-                            <Check className="w-4 h-4" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter className="flex justify-between items-center">
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setShowDeleteConfirm(true);
-              }}
-              data-testid="button-delete-project"
-              className="mr-auto"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Project
-            </Button>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowSettings(false)}
-                data-testid="button-cancel-settings"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => updateProjectMutation.mutate(editedProject)}
-                disabled={updateProjectMutation.isPending || !editedProject.name}
-                data-testid="button-save-settings"
-              >
-                {updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
@@ -819,7 +655,6 @@ export default function ProjectPhotos() {
               onClick={() => {
                 deleteProjectMutation.mutate();
                 setShowDeleteConfirm(false);
-                setShowSettings(false);
               }}
               data-testid="button-confirm-delete"
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

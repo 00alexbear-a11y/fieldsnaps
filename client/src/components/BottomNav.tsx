@@ -51,7 +51,7 @@ export default function BottomNav() {
       }`}
       data-testid="nav-bottom"
     >
-      <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto">
+      <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);
