@@ -440,11 +440,52 @@ export default function Camera() {
 
       mediaRecorder.onstop = async () => {
         const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-        // For now, just show a toast - video storage can be added later
-        toast({
-          title: 'Video Recorded',
-          description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video ready`,
-        });
+        
+        if (!selectedProject) {
+          toast({
+            title: 'Video Recorded',
+            description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video ready but no project selected`,
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        try {
+          // Generate auto-caption: [ProjectName]_VIDEO_[Date]_[Time]
+          const project = projects.find(p => p.id === selectedProject);
+          const now = new Date();
+          const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+          const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
+          const autoCaption = project ? `${project.name}_VIDEO_${dateStr}_${timeStr}` : 'VIDEO';
+
+          // Save video to IndexedDB
+          const savedPhoto = await idb.savePhoto({
+            projectId: selectedProject,
+            blob: blob,
+            quality: 'standard',
+            caption: autoCaption,
+            timestamp: Date.now(),
+            syncStatus: 'pending',
+            retryCount: 0,
+          });
+
+          // Queue for sync (non-blocking)
+          syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+            console.error('[Camera] Video sync queue error:', err);
+          });
+
+          toast({
+            title: '✓ Video Saved',
+            description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video saved to ${project?.name || 'project'}`,
+          });
+        } catch (error) {
+          console.error('[Camera] Video save error:', error);
+          toast({
+            title: 'Video Save Failed',
+            description: error instanceof Error ? error.message : 'Failed to save video',
+            variant: 'destructive',
+          });
+        }
       };
 
       mediaRecorder.start();

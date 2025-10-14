@@ -307,7 +307,12 @@ export default function Settings() {
 
       {/* Storage */}
       <Card className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Storage</h2>
+        <div>
+          <h2 className="text-lg font-semibold">Offline Storage</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Photos captured on this device for offline access
+          </p>
+        </div>
         
         {storageUsage ? (
           <div className="space-y-2 text-sm">
@@ -318,7 +323,7 @@ export default function Settings() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Photos:</span>
+              <span className="text-muted-foreground">Local Photos:</span>
               <span className="font-medium" data-testid="text-storage-photo-count">
                 {storageUsage.photoCount}
               </span>
