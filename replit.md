@@ -5,51 +5,42 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 
 ## Recent Changes
 
-### Bug Fixes and Pinch-to-Zoom (October 14, 2025)
-Completed 7 critical bug fixes and feature implementations:
+### Bug Fixes and Feature Improvements (October 14, 2025)
+Completed comprehensive bug fixes and stability improvements:
 
-**1. Bottom Navigation Safe Area Padding** ✓
-- Added `pb-safe` class to bottom navigation inner div
-- Lifts navigation above iPhone curved screen edges
-- Prevents gesture bar overlap on iOS devices
+**Camera Stability (Tasks 1-3)** ✓
+- Fixed race conditions with session ID tracking system
+- Added 150ms debounce to prevent multiple simultaneous camera requests
+- Preserved user-selected zoom level across camera restarts
+- Zoom persistence uses userSelectedZoomRef to maintain lens choice
 
-**2. Video Recording Save Functionality** ✓
-- Implemented full video recording save to IndexedDB
-- Videos saved with auto-caption format: `[ProjectName]_VIDEO_[Date]_[Time]`
-- Uses same sync infrastructure as photos (IndexedDB + background sync)
-- Videos stored as LocalPhoto objects with video/webm blob
+**Memory Management (Task 4)** ✓
+- Verified all URL.createObjectURL() calls have proper cleanup
+- URL revocation implemented in Camera, PhotoEdit, ShareView, SyncStatus components
+- Prevents memory leaks from accumulated object URLs
 
-**3. Zoom Controls During Video Recording** ✓
-- Hid zoom buttons during active video recording
-- Prevents camera stream interruption when recording
-- Zoom controls remain available in photo mode and before/after recording
+**Performance Optimization (Task 5)** ✓
+- Optimized SwipeableProjectCard touch handlers for 60fps on Android
+- Uses requestAnimationFrame for smooth gesture tracking
+- Direct DOM manipulation via refs to avoid React re-renders
 
-**4. Storage Display Clarification** ✓
-- Changed "Storage" to "Offline Storage" with clarifying subtitle
-- Label now says "Local Photos" instead of "Photos"
-- Makes clear it only shows photos captured on this device
+**Cache & Sync (Tasks 6-7)** ✓
+- Fixed cache invalidation for trash restore operations
+- Predicate-based query invalidation for project photo lists
+- Added SyncStatusNotifier component for background sync feedback
+- Toast notifications for sync failures and completions
 
-**5. Project Settings Gear Icon Removal** ✓
-- Completely removed gear icon and settings dialog
-- All related code cleaned up with no orphaned references
-
-**6. Camera Permission Re-prompts Fix** ✓
-- Modified zoom switching to use `applyConstraints()` first
-- Only restarts camera stream if constraints fail (iOS physical lens switch)
-- Significantly reduces permission re-prompts on modern browsers
-
-**7. Pinch-to-Zoom Within Each Lens** ✓
-- Implemented continuous pinch-to-zoom gestures for fine control
-- Lens ranges: 0.5x (0.5-0.99x), 1x (1.0-1.99x), 2x (2.0-2.99x), 3x (3.0-3.99x)
-- Two-finger pinch gestures detected and mapped to zoom values
-- Visual feedback: zoom indicator (e.g., "1.5x") shown during pinch
-- Discrete lens buttons (0.5x, 1x, 2x, 3x) switch physical lenses
-- Smooth zoom application using `applyConstraints()` without stream restart
+**Infrastructure (Tasks 8-10)** ✓
+- Prevented Google Maps SDK duplication via script existence check
+- Automatic 30-day trash cleanup (runs on startup + every 24 hours)
+- Enhanced IndexedDB error handling with transaction-level logging
+- Added transaction.onerror handlers to prevent silent failures
 
 **Technical Implementation:**
-- All changes reviewed and approved by architect
+- All critical changes reviewed and approved by architect
 - No LSP errors or breaking changes
-- Proper error handling throughout
+- Proper error handling and logging throughout
+- Camera functionality requires manual testing on real devices (Playwright limitation)
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
