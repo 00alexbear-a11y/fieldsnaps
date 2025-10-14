@@ -51,6 +51,7 @@ export default function Camera() {
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
+  const [continuousZoom, setContinuousZoom] = useState<number>(1); // Actual zoom value within lens range
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
@@ -59,6 +60,8 @@ export default function Camera() {
   const streamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
+  const pinchStartDistanceRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef<number>(1);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -328,20 +331,39 @@ export default function Camera() {
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
   };
 
+  // Apply continuous zoom within current lens range
+  const applyContinuousZoom = async (zoom: number) => {
+    if (!streamRef.current) return;
+    
+    const videoTrack = streamRef.current.getVideoTracks()[0];
+    if (!videoTrack) return;
+    
+    try {
+      await videoTrack.applyConstraints({
+        // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+        advanced: [{ zoom }]
+      });
+      setContinuousZoom(zoom);
+    } catch (error) {
+      console.warn('[Camera] Continuous zoom constraint failed:', error);
+    }
+  };
+
   const switchZoomLevel = async (level: 0.5 | 1 | 2 | 3) => {
     // Don't switch if already at this level
     if (zoomLevel === level) return;
     
-    // Update zoom level state
+    // Update zoom level state and reset continuous zoom to lens base
     setZoomLevel(level);
+    setContinuousZoom(level);
     
     // Try to apply constraints to existing track first (avoids permission re-prompt)
     if (streamRef.current) {
       const videoTrack = streamRef.current.getVideoTracks()[0];
       if (videoTrack) {
         try {
-          // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
           await videoTrack.applyConstraints({
+            // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
             advanced: [{ zoom: level }]
           });
           console.log(`[Camera] Applied zoom ${level}x via applyConstraints`);
@@ -439,6 +461,54 @@ export default function Camera() {
       setZoomLevel(1);
       await startCamera();
     }
+  };
+
+  // Pinch-to-zoom gesture handlers
+  const handleTouchStart = (e: React.TouchEvent<HTMLVideoElement>) => {
+    if (e.touches.length === 2) {
+      // Two fingers detected - start pinch gesture
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      pinchStartDistanceRef.current = distance;
+      pinchStartZoomRef.current = continuousZoom;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLVideoElement>) => {
+    if (e.touches.length === 2 && pinchStartDistanceRef.current !== null) {
+      e.preventDefault(); // Prevent default pinch-zoom behavior
+      
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      
+      // Calculate zoom change based on distance change
+      const scale = distance / pinchStartDistanceRef.current;
+      let newZoom = pinchStartZoomRef.current * scale;
+      
+      // Constrain zoom within current lens range
+      // 0.5x lens: 0.5 to 0.99
+      // 1x lens: 1.0 to 1.99
+      // 2x lens: 2.0 to 2.99
+      // 3x lens: 3.0 to 3.99
+      const minZoom = zoomLevel;
+      const maxZoom = Math.floor(zoomLevel) + 0.99; // Ensures 0.5x caps at 0.99, 1x at 1.99, etc.
+      newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+      
+      // Apply zoom
+      applyContinuousZoom(newZoom);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    pinchStartDistanceRef.current = null;
   };
 
   const startRecording = async () => {
@@ -898,8 +968,18 @@ export default function Camera() {
         style={{ 
           zIndex: 5,
         }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         data-testid="video-camera-stream"
       />
+
+      {/* Zoom Indicator - Shows when pinching */}
+      {pinchStartDistanceRef.current !== null && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-black/60 backdrop-blur-md text-white px-6 py-3 rounded-full text-2xl font-semibold">
+          {continuousZoom.toFixed(1)}x
+        </div>
+      )}
 
       {/* Top Controls - Centered camera flip with quality on right */}
       <div className="absolute top-0 left-0 right-0 p-3 z-10">
