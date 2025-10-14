@@ -23,6 +23,10 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Subscription fields (for future Stripe integration)
+  subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled, none
+  stripeCustomerId: varchar("stripe_customer_id"),
+  trialEndDate: timestamp("trial_end_date"),
 });
 
 // WebAuthn credentials table (for biometric authentication)
@@ -140,6 +144,41 @@ export const photoTags = pgTable("photo_tags", {
   index("idx_photo_tags_tag_id").on(table.tagId),
 ]);
 
+// Subscriptions table - current state for future Stripe billing integration
+export const subscriptions = pgTable("subscriptions", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  stripeSubscriptionId: varchar("stripe_subscription_id").unique(),
+  stripePriceId: varchar("stripe_price_id"), // $19.99/month price ID
+  status: varchar("status").notNull(), // active, past_due, canceled, trialing
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: integer("cancel_at_period_end").default(0).notNull(), // boolean stored as integer (0/1)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_subscriptions_user_id").on(table.userId),
+  index("idx_subscriptions_stripe_id").on(table.stripeSubscriptionId),
+]);
+
+// Subscription events table - audit trail for billing history
+export const subscriptionEvents = pgTable("subscription_events", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  subscriptionId: varchar("subscription_id").notNull().references(() => subscriptions.id, { onDelete: "cascade" }),
+  eventType: varchar("event_type").notNull(), // subscription.created, subscription.updated, subscription.deleted, invoice.payment_succeeded, invoice.payment_failed
+  stripeEventId: varchar("stripe_event_id").unique(), // Stripe webhook event ID for idempotency
+  status: varchar("status"), // Subscription status at time of event
+  periodStart: timestamp("period_start"),
+  periodEnd: timestamp("period_end"),
+  amountPaid: integer("amount_paid"), // In cents (e.g., 1999 for $19.99)
+  metadata: jsonb("metadata"), // Additional webhook data
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_subscription_events_subscription_id").on(table.subscriptionId),
+  index("idx_subscription_events_stripe_event_id").on(table.stripeEventId),
+  index("idx_subscription_events_created_at").on(table.createdAt.desc()),
+]);
+
 // Zod schemas for validation
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
@@ -149,6 +188,8 @@ export const insertCredentialSchema = createInsertSchema(credentials).omit({ id:
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
 export const insertPhotoTagSchema = createInsertSchema(photoTags).omit({ id: true, createdAt: true });
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEvents).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type User = typeof users.$inferSelect;
@@ -162,6 +203,8 @@ export type Comment = typeof comments.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type PhotoTag = typeof photoTags.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type SubscriptionEvent = typeof subscriptionEvents.$inferSelect;
 
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
@@ -170,6 +213,8 @@ export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type InsertSubscriptionEvent = z.infer<typeof insertSubscriptionEventSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
