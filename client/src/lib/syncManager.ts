@@ -13,6 +13,7 @@ import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueIte
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
 const MAX_RETRY_DELAY = 60000; // 1 minute
+const BATCH_SIZE = 10; // Process up to 10 items concurrently
 
 interface SyncResult {
   success: boolean;
@@ -21,13 +22,23 @@ interface SyncResult {
   errors: string[];
 }
 
-export type SyncEventType = 'sync-complete' | 'sync-error' | 'item-error';
+export type SyncEventType = 'sync-complete' | 'sync-error' | 'item-error' | 'sync-progress';
+
+export interface SyncProgress {
+  total: number;
+  processed: number;
+  synced: number;
+  failed: number;
+  currentBatch: number;
+  totalBatches: number;
+}
 
 export interface SyncEvent {
   type: SyncEventType;
   result?: SyncResult;
   error?: string;
   itemType?: string;
+  progress?: SyncProgress;
 }
 
 type SyncEventListener = (event: SyncEvent) => void;
@@ -137,35 +148,30 @@ class SyncManager {
         return result;
       }
 
-      // Sort items to ensure projects are synced before photos
-      const sortedItems = [...queueItems].sort((a, b) => {
-        // Projects first, then photos
-        if (a.type === 'project' && b.type !== 'project') return -1;
-        if (a.type !== 'project' && b.type === 'project') return 1;
-        return 0;
-      });
+      // Separate items by type and sort newest first within each type
+      const projects = queueItems
+        .filter(item => item.type === 'project')
+        .sort((a, b) => b.createdAt - a.createdAt); // Newest first
+      
+      const photos = queueItems
+        .filter(item => item.type === 'photo')
+        .sort((a, b) => b.createdAt - a.createdAt); // Newest first
 
-      console.log(`[Sync] Processing ${sortedItems.length} items`);
+      const totalItems = projects.length + photos.length;
+      const projectBatches = Math.ceil(projects.length / BATCH_SIZE);
+      const photoBatches = Math.ceil(photos.length / BATCH_SIZE);
+      const totalBatches = projectBatches + photoBatches;
+      
+      console.log(`[Sync] Processing ${projects.length} projects, ${photos.length} photos (${totalBatches} batches)`);
 
-      // Process each item
-      for (const item of sortedItems) {
-        try {
-          const success = await this.processSyncItem(item);
-          
-          if (success) {
-            result.synced++;
-            await idb.removeFromSyncQueue(item.id);
-          } else {
-            result.failed++;
-            result.success = false;
-          }
-        } catch (error) {
-          result.failed++;
-          result.success = false;
-          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-          result.errors.push(`${item.type} ${item.localId}: ${errorMsg}`);
-        }
-      }
+      // Shared batch counter for monotonic progress
+      let batchCounter = { current: 0 };
+      
+      // Process projects first in batches (projects must exist before their photos)
+      await this.processBatch(projects, result, totalItems, totalBatches, batchCounter);
+
+      // Then process photos in batches
+      await this.processBatch(photos, result, totalItems, totalBatches, batchCounter);
 
       console.log(`[Sync] Complete: ${result.synced} synced, ${result.failed} failed`);
       
@@ -199,6 +205,75 @@ class SyncManager {
     }
 
     return result;
+  }
+
+  /**
+   * Process a batch of sync items concurrently
+   */
+  private async processBatch(
+    items: SyncQueueItem[], 
+    result: SyncResult, 
+    totalItems: number,
+    totalBatches: number,
+    batchCounter: { current: number }
+  ): Promise<void> {
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const batch = items.slice(i, i + BATCH_SIZE);
+      batchCounter.current++; // Increment for this batch
+      
+      console.log(`[Sync] Processing batch ${batchCounter.current}/${totalBatches} (${batch.length} items)`);
+      
+      // Emit progress event BEFORE batch (shows items completed so far)
+      this.emitEvent({
+        type: 'sync-progress',
+        progress: {
+          total: totalItems,
+          processed: result.synced + result.failed,
+          synced: result.synced,
+          failed: result.failed,
+          currentBatch: batchCounter.current,
+          totalBatches,
+        },
+      });
+      
+      // Process batch items concurrently
+      const results = await Promise.allSettled(
+        batch.map(item => this.processSyncItem(item))
+      );
+      
+      // Update results and remove successful items from queue
+      for (let j = 0; j < batch.length; j++) {
+        const item = batch[j];
+        const itemResult = results[j];
+        
+        if (itemResult.status === 'fulfilled' && itemResult.value) {
+          result.synced++;
+          await idb.removeFromSyncQueue(item.id);
+        } else {
+          result.failed++;
+          result.success = false;
+          
+          if (itemResult.status === 'rejected') {
+            const errorMsg = itemResult.reason instanceof Error ? 
+              itemResult.reason.message : 'Unknown error';
+            result.errors.push(`${item.type} ${item.localId}: ${errorMsg}`);
+          }
+        }
+      }
+      
+      // Emit progress event AFTER batch completes (shows updated totals)
+      this.emitEvent({
+        type: 'sync-progress',
+        progress: {
+          total: totalItems,
+          processed: result.synced + result.failed,
+          synced: result.synced,
+          failed: result.failed,
+          currentBatch: batchCounter.current,
+          totalBatches,
+        },
+      });
+    }
   }
 
   /**
