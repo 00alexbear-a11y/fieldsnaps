@@ -69,6 +69,11 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
     
+    // Seed predefined trade tags on server start
+    storage.seedPredefinedTags()
+      .then(() => log('Predefined tags seeded'))
+      .catch((err) => console.error('Tag seeding failed:', err));
+    
     // Run trash cleanup on server start
     storage.cleanupOldDeletedItems()
       .then(() => log('Trash cleanup completed'))

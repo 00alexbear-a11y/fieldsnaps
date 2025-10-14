@@ -391,6 +391,32 @@ export class DbStorage implements IStorage {
       .returning();
     return result.length > 0;
   }
+
+  // Seed predefined trade tags
+  async seedPredefinedTags(): Promise<void> {
+    const predefinedTags = [
+      { name: 'Electrician', color: 'red' },
+      { name: 'HVAC', color: 'yellow' },
+      { name: 'Plumber', color: 'blue' },
+      { name: 'Framer', color: 'orange' },
+      { name: 'General', color: 'gray' },
+    ];
+
+    for (const tag of predefinedTags) {
+      // Check if tag already exists
+      const existingTags = await db.select().from(tags)
+        .where(and(eq(tags.name, tag.name), isNull(tags.projectId)));
+      
+      if (existingTags.length === 0) {
+        // Create tag only if it doesn't exist
+        await db.insert(tags).values({
+          name: tag.name,
+          color: tag.color,
+          projectId: null, // Global tag
+        });
+      }
+    }
+  }
 }
 
 export const storage = new DbStorage();
