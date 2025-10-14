@@ -121,14 +121,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const userId = req.user?.claims?.sub;
+      
+      // Security: Verify photo ownership before allowing URL updates
+      const existingPhoto = await storage.getPhoto(req.params.photoId);
+      if (!existingPhoto) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      if (existingPhoto.photographerId !== userId) {
+        return res.status(403).json({ error: "You don't have permission to update this photo" });
+      }
+      
       const objectStorageService = new ObjectStorageService();
       
-      // Set ACL policy: owner is the uploader, visibility is public (photos can be shared)
+      // Set ACL policy: owner is the uploader, visibility is private by default
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
         req.body.photoURL,
         {
           owner: userId,
-          visibility: "public", // Photos are public for sharing
+          visibility: "private", // Photos are private by default, share flow can make them public
         },
       );
 
@@ -329,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadURL,
         {
           owner: userId,
-          visibility: "public", // Photos are public for sharing
+          visibility: "private", // Photos are private by default, share flow can make them public
         }
       );
 
@@ -371,11 +381,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/photos/:id", isAuthenticated, upload.single('photo'), async (req: any, res) => {
     try {
+      const userId = req.user?.claims?.sub;
+      
+      // Security: Verify photo ownership before allowing updates
+      const existingPhoto = await storage.getPhoto(req.params.id);
+      if (!existingPhoto) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      if (existingPhoto.photographerId !== userId) {
+        return res.status(403).json({ error: "You don't have permission to update this photo" });
+      }
+      
       let updateData: any = {};
       
       // Handle file upload if provided (annotated photo)
       if (req.file) {
-        const userId = req.user?.claims?.sub;
         const objectStorageService = new ObjectStorageService();
 
         // Get presigned upload URL for object storage
@@ -399,7 +419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           uploadURL,
           {
             owner: userId,
-            visibility: "public",
+            visibility: "private",
           }
         );
 
@@ -428,8 +448,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/photos/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user?.claims?.sub;
+      
+      // Security: Verify photo ownership before allowing deletion
+      const existingPhoto = await storage.getPhoto(req.params.id);
+      if (!existingPhoto) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+      if (existingPhoto.photographerId !== userId) {
+        return res.status(403).json({ error: "You don't have permission to delete this photo" });
+      }
+      
       const deleted = await storage.deletePhoto(req.params.id);
       if (!deleted) {
         return res.status(404).json({ error: "Photo not found" });
