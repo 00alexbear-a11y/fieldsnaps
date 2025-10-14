@@ -59,6 +59,13 @@ export default function Trash() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      // Invalidate project-specific photo queries so restored photos appear
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          Array.isArray(query.queryKey) && 
+          query.queryKey[0] === '/api/projects' && 
+          query.queryKey[2] === 'photos'
+      });
       toast({
         title: 'Photo restored',
         description: 'The photo has been restored successfully.',
@@ -145,6 +152,13 @@ export default function Trash() {
       queryClient.invalidateQueries({ queryKey: ['/api/trash/projects'] });
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      // Invalidate project-specific photo queries so restored photos appear
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          Array.isArray(query.queryKey) && 
+          query.queryKey[0] === '/api/projects' && 
+          query.queryKey[2] === 'photos'
+      });
       
       toast({
         title: 'Items restored',
