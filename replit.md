@@ -23,6 +23,8 @@ The design philosophy is "Apple-inspired," emphasizing extreme minimalism, conte
 ### Technical Implementations
 FieldSnaps is built as an offline-first PWA, leveraging Service Workers for intelligent caching and IndexedDB for local photo storage, ensuring full functionality without internet access. Background Sync API handles queued uploads with retry logic. Performance is optimized through lazy loading (Intersection Observer API), Web Workers for non-blocking image compression, and strict URL lifecycle management. The intelligent photo system offers three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API, instant thumbnail generation, and aspect ratio preservation.
 
+**Photo Storage Architecture:** Photos are stored using Replit Object Storage for persistent cloud storage. The upload flow uses presigned URLs for direct client-to-storage uploads, with server-side ACL policies ensuring proper access control. Each photo has an owner (user ID) and visibility setting (public for sharing). Object storage paths are normalized and stored in the database, while IndexedDB maintains local blob caches for offline access. The sync manager coordinates uploads from IndexedDB to object storage when connectivity is available.
+
 Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, and immersive full-screen viewfinders with glassmorphic controls. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication is managed via Replit Auth with OpenID Connect and supports biometric login (WebAuthn/FIDO2). An interactive 3-step onboarding flow guides new users, and contextual prompts support PWA installation. The application includes robust error resilience via React Error Boundaries and standardized API error handling. Service Worker updates are user-notified for new app versions.
 
 ### Feature Specifications
@@ -48,6 +50,7 @@ The build philosophy centers on simplicity and invisible interface design. The P
 - **Express.js**: Web application framework for Node.js.
 - **PostgreSQL**: Relational database (Replit built-in).
 - **Drizzle ORM**: TypeScript ORM for relational databases.
+- **Replit Object Storage**: Cloud object storage for persistent photo storage with ACL-based access control.
 
 ### PWA Technologies
 - **Service Worker API**: For offline caching and background processes.
