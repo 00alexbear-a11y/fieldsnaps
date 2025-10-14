@@ -340,6 +340,11 @@ export class DbStorage implements IStorage {
   }
 
   async permanentlyDeleteAllTrash(): Promise<{ projectsDeleted: number; photosDeleted: number }> {
+    // Get all soft-deleted photos for cleanup
+    const photosToDelete = await db.select()
+      .from(photos)
+      .where(isNotNull(photos.deletedAt));
+
     // Delete all soft-deleted projects
     const deletedProjects = await db.delete(projects)
       .where(isNotNull(projects.deletedAt))
@@ -349,6 +354,13 @@ export class DbStorage implements IStorage {
     const deletedPhotos = await db.delete(photos)
       .where(isNotNull(photos.deletedAt))
       .returning();
+    
+    // Clean up object storage for deleted photos
+    for (const photo of photosToDelete) {
+      if (photo.url) {
+        await this.objectStorageService.deleteObjectEntity(photo.url);
+      }
+    }
     
     return {
       projectsDeleted: deletedProjects.length,
