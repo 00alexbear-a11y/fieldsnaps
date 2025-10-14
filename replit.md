@@ -3,125 +3,6 @@
 ## Overview
 FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments, ultimately enhancing efficiency and reducing disputes in construction projects.
 
-## Recent Changes
-
-### Performance Optimizations (October 14, 2025)
-Completed comprehensive performance optimization achieving **94% code quality grade** (up from 88%):
-
-**Database Query Optimization** ✓
-- **Eliminated N+1 Query Problem**: Created bulk `/api/projects/with-counts` endpoint using LEFT JOIN + COUNT aggregation
-- **Single Query Approach**: Projects.tsx now fetches all project photo counts in one database query instead of individual queries per project
-- **Backward Compatibility**: Maintained `/api/projects` endpoint for Map and camera selector usage
-- **Performance Impact**: Reduced database load from O(n) to O(1) queries for project listing
-
-**Sync Queue Optimization** ✓
-- **Batch Processing**: Implemented 10-item concurrent batches to prevent server overload
-- **Smart Prioritization**: Process newest items first within each type (projects→photos)
-- **Exponential Backoff**: Retry logic with 1s→2s→4s→8s→16s delays for failed syncs
-- **Real-time Progress**: Monotonic batch counting (1/5, 2/5, 3/5...) with accurate processed/total metrics
-- **UI Feedback**: SyncStatusNotifier shows live progress during background sync operations
-
-**Database Indexing** ✓
-- **Foreign Key Indexes**: Added indexes for credentials.userId, projects.userId, photos.projectId, photos.photographerId, photoAnnotations.photoId, comments.photoId, shares.projectId
-- **Soft Delete Indexes**: Indexed projects.deletedAt and photos.deletedAt for efficient trash queries
-- **Token Lookup Index**: Indexed shares.token for fast share link resolution
-- **Query Performance**: Eliminates sequential scans on large tables, significantly improving join and filter operations
-
-**Lazy Loading** ✓ (Already Implemented)
-- Camera device enumeration only triggers when Camera page is accessed
-- Google Maps SDK loads only when Map page is opened
-- Optimized initial load time by deferring heavy resources
-
-**Quality Metrics (Architect Review):**
-- **Overall Grade: 94%** (Efficiency 96%, Cleanliness 92%, Maintainability 93%)
-- **Improvement**: +6 percentage points from previous 88% grade
-- **Key Wins**: Eliminated N+1 pattern, clearer sync architecture, comprehensive indexing
-- **E2E Tests**: All core flows validated (projects, navigation, map, settings, trash)
-
-**Technical Implementation:**
-- Batched sync processes items in groups: ceil(projects/10) + ceil(photos/10) total batches
-- Progress events emit before/after each batch with actual synced+failed counts
-- Shared batch counter ensures strictly increasing batch numbers across phases
-- All changes architect-reviewed and approved with no LSP errors
-- Database indexes defined in schema (apply via `npm run db:push` when Neon is stable)
-
-### Developer Experience Improvements (October 14, 2025)
-Completed code quality enhancements achieving **97% code quality grade** (up from 94%):
-
-**Centralized Theme Management** ✓
-- **useTheme Hook** (client/src/hooks/useTheme.ts): Eliminated duplicated theme logic across App.tsx, Settings.tsx, and Projects.tsx
-- **Single Source of Truth**: Centralized theme state, localStorage persistence, and DOM manipulation
-- **Consistent API**: Simple `toggleTheme()` function and `isDark` state accessible across all components
-- **Maintainability Win**: Theme changes now require editing only one file
-
-**Error Resilience** ✓
-- **ErrorBoundary Component** (client/src/components/ErrorBoundary.tsx): React error boundary catches rendering errors
-- **User-Friendly Fallback**: Displays actionable error UI instead of blank screen
-- **Developer Diagnostics**: Shows detailed error info in development mode
-- **Proper Cleanup**: Includes cleanup for all event listeners and intervals
-
-**API Error Handling** ✓
-- **Centralized Handler** (server/errorHandler.ts): Standardized error responses with specific error codes
-- **Error Codes**: NOT_FOUND, BAD_REQUEST, VALIDATION_ERROR, INTERNAL_ERROR, etc.
-- **Consistent Format**: All API errors return `{ code, message, details? }` structure
-- **Route Integration**: Updated key routes in server/routes.ts to use `handleError()` and `errors.*` helpers
-
-**Service Worker Updates** ✓
-- **Update Notifications** (client/src/components/ServiceWorkerUpdate.tsx): User-facing notifications when new app versions are available
-- **PWA Best Practices**: Hourly update checks with manual "Update Now" control
-- **Proper Cleanup**: Event listeners and intervals properly managed to prevent memory leaks
-- **User Control**: Users choose when to update via clear notification card
-
-**Quality Metrics (Architect Review):**
-- **Overall Grade: 97%** (Efficiency 97%, Cleanliness 96%, Maintainability 98%)
-- **Improvement**: +3 percentage points from previous 94% grade
-- **Key Wins**: Eliminated code duplication, consistent error handling, improved resilience
-- **E2E Tests**: Theme persistence validated across pages and reloads
-
-**Technical Implementation:**
-- Theme hook reduces code duplication by ~30 lines across 3 files
-- Error boundary provides graceful failure recovery for entire app
-- Standardized API errors ease client-side error handling
-- SW update flow follows PWA best practices with proper cleanup
-- All changes architect-reviewed (Grade A, 97%) with no LSP errors
-
-### Bug Fixes and Feature Improvements (October 14, 2025)
-Completed comprehensive bug fixes and stability improvements:
-
-**Camera Stability (Tasks 1-3)** ✓
-- Fixed race conditions with session ID tracking system
-- Added 150ms debounce to prevent multiple simultaneous camera requests
-- Preserved user-selected zoom level across camera restarts
-- Zoom persistence uses userSelectedZoomRef to maintain lens choice
-
-**Memory Management (Task 4)** ✓
-- Verified all URL.createObjectURL() calls have proper cleanup
-- URL revocation implemented in Camera, PhotoEdit, ShareView, SyncStatus components
-- Prevents memory leaks from accumulated object URLs
-
-**Performance Optimization (Task 5)** ✓
-- Optimized SwipeableProjectCard touch handlers for 60fps on Android
-- Uses requestAnimationFrame for smooth gesture tracking
-- Direct DOM manipulation via refs to avoid React re-renders
-
-**Cache & Sync (Tasks 6-7)** ✓
-- Fixed cache invalidation for trash restore operations
-- Predicate-based query invalidation for project photo lists
-- Added SyncStatusNotifier component for background sync feedback
-- Toast notifications for sync failures and completions
-
-**Infrastructure (Tasks 8-10)** ✓
-- Prevented Google Maps SDK duplication via script existence check
-- Automatic 30-day trash cleanup (runs on startup + every 24 hours)
-- Enhanced IndexedDB error handling with transaction-level logging
-- Added transaction.onerror handlers to prevent silent failures
-
-**Technical Implementation:**
-- All critical changes reviewed and approved by architect
-- No LSP errors or breaking changes
-- Proper error handling and logging throughout
-- Camera functionality requires manual testing on real devices (Playwright limitation)
-
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
@@ -137,24 +18,20 @@ Completed comprehensive bug fixes and stability improvements:
 ## System Architecture
 
 ### UI/UX Decisions
-The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and consistent 8px grid spacing. The color palette includes primary iOS Blue (`#007AFF`), secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Orange (`#FF9500`), and background colors Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`). Interaction design features fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete functionality. Components use rounded buttons (8px), subtle card shadows, clean forms with floating labels, and a tab bar navigation with SF Symbols-inspired icons. Branding features the FieldSnaps logo prominently across key screens.
+The design philosophy is "Apple-inspired," emphasizing extreme minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and consistent 8px grid spacing. The color palette includes primary iOS Blue (`#007AFF`), secondary Warm Gray (`#8E8E93`), Success Green (`#34C759`), Warning Orange (`#FF9500`), and background colors Pure White (`#FFFFFF`) and Light Gray (`#F2F2F7`). Interaction design features fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete functionality. Components use rounded buttons (8px), subtle card shadows, clean forms with floating labels, and a tab bar navigation with SF Symbols-inspired icons. Branding features the FieldSnaps logo prominently across key screens. The bottom navigation is restructured with "Map," "Projects," "Inbox," and "Camera" tabs, with Settings moved to the Projects page header.
 
 ### Technical Implementations
 FieldSnaps is built as an offline-first PWA, leveraging Service Workers for intelligent caching and IndexedDB for local photo storage, ensuring full functionality without internet access. Background Sync API handles queued uploads with retry logic. Performance is optimized through lazy loading (Intersection Observer API), Web Workers for non-blocking image compression, and strict URL lifecycle management. The intelligent photo system offers three compression levels (Standard 500KB, Detailed 1MB, Quick 200KB) using Canvas API, instant thumbnail generation, and aspect ratio preservation.
 
-Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, and immersive full-screen viewfinders with glassmorphic controls and a bottom navigation auto-hide. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication is managed via Replit Auth with OpenID Connect, securing API routes, and supports biometric login (WebAuthn/FIDO2). An interactive 3-step onboarding flow guides new users, and contextual prompts support PWA installation.
+Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, and immersive full-screen viewfinders with glassmorphic controls. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication is managed via Replit Auth with OpenID Connect and supports biometric login (WebAuthn/FIDO2). An interactive 3-step onboarding flow guides new users, and contextual prompts support PWA installation. The application includes robust error resilience via React Error Boundaries and standardized API error handling. Service Worker updates are user-notified for new app versions.
 
 ### Feature Specifications
-The application features a main navigation with "Camera," "Projects," and "Settings" tabs. The camera interface includes a project selection screen, full-screen viewfinder, floating capture button, quality selector, zoom levels (1x/2x/3x), and a centered camera flip button. Project organization uses a card-based layout with photo counts, search, and address buttons. Photo management provides grid and timeline views, swipe actions, batch selection, and bottom bar controls for editing, sharing, commenting, deleting, and renaming.
+The application features bottom navigation with "Map," "Projects," "Inbox," and "Camera" tabs (left to right). Settings moved to top-right header in Projects page. The camera interface includes a project selection screen, full-screen viewfinder, floating capture button, quality selector, zoom levels (1x/2x/3x), and a centered camera flip button. Project organization uses a card-based layout with photo counts, search, and address buttons. Photo management provides grid and timeline views, swipe actions, batch selection, and bottom bar controls for editing, sharing, commenting, deleting, and renaming.
 
-The Photo Annotation Editor v4 features a redesigned layout with fixed cancel (X) button in top-left and save (✓) button in top-right. The left sidebar contains a scrollable color picker displaying 12 colors with 4 visible at once and up/down chevron arrows for navigation. Size selection (S/M/L for 5px/8px/12px strokes) is implemented as fixed tab buttons positioned above the bottom toolbar, with white background indicating the selected size. The bottom toolbar is non-scrollable and contains all annotation tools (text, arrow, line, circle, pen) plus undo and delete buttons. Text annotations support scaling and rotation.
-
-Upload status is indicated by subtle progress, smart notifications, and clear visual hierarchy. Robust error handling ensures graceful degradation, clear messages, and automatic retry logic. Auto-naming of photos uses the format `[ProjectName]_[Date]_[Time]`.
-
-Key features include an interactive map view displaying geocoded projects, a 30-day trash bin for soft-deleted items with restore and permanent delete options, and bulk photo move functionality.
+The Photo Annotation Editor v4 features a redesigned layout with fixed cancel (X) button in top-left and save (✓) button in top-right. The left sidebar contains a scrollable color picker, and size selection (S/M/L) is implemented as fixed tab buttons. The bottom toolbar is non-scrollable and contains all annotation tools (text, arrow, line, circle, pen) plus undo and delete buttons. Text annotations support scaling and rotation. Upload status is indicated by subtle progress, smart notifications, and clear visual hierarchy. Auto-naming of photos uses the format `[ProjectName]_[Date]_[Time]`. Key features include an interactive map view displaying geocoded projects, a 30-day trash bin for soft-deleted items with restore and permanent delete options, and bulk photo move functionality.
 
 ### System Design Choices
-The build philosophy centers on simplicity and invisible interface design, allowing users to focus on their work. The PWA infrastructure relies on a Service Worker with hourly updates and offline caching. The storage strategy utilizes IndexedDB for Blob storage of photos, intelligent quota management, and automatic thumbnail cleanup.
+The build philosophy centers on simplicity and invisible interface design. The PWA infrastructure relies on a Service Worker with hourly updates and offline caching. The storage strategy utilizes IndexedDB for Blob storage of photos, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query optimization (eliminating N+1, single query approach), sync queue optimization (batch processing, smart prioritization, exponential backoff), and database indexing.
 
 ## External Dependencies
 
