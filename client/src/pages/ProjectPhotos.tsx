@@ -26,8 +26,11 @@ import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
 import LazyImage from "@/components/LazyImage";
-import type { Photo, Project } from "../../../shared/schema";
+import type { Photo as BasePhoto, Project, Tag } from "../../../shared/schema";
 import { format } from "date-fns";
+
+// Extend Photo to include tags
+type Photo = BasePhoto & { tags?: Tag[] };
 
 export default function ProjectPhotos() {
   const { id: projectId } = useParams();
@@ -534,6 +537,35 @@ export default function ProjectPhotos() {
                             />
                           </div>
                         )}
+                        
+                        {/* Tag indicators on left side */}
+                        {photo.tags && photo.tags.length > 0 && !isSelectMode && (
+                          <div 
+                            className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 z-10"
+                            data-testid={`tag-indicators-${photo.id}`}
+                          >
+                            {photo.tags.slice(0, 2).map((tag, idx) => (
+                              <div
+                                key={tag.id}
+                                className="w-1 flex-1 rounded-full"
+                                style={{ backgroundColor: tag.color }}
+                                title={tag.name}
+                                data-testid={`tag-bar-${photo.id}-${idx}`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* +N badge if more than 2 tags */}
+                        {photo.tags && photo.tags.length > 2 && !isSelectMode && (
+                          <div 
+                            className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full z-10"
+                            data-testid={`tag-overflow-badge-${photo.id}`}
+                          >
+                            +{photo.tags.length - 2}
+                          </div>
+                        )}
+                        
                         <LazyImage
                           src={photo.url}
                           alt={photo.caption || "Photo"}

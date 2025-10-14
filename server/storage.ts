@@ -174,9 +174,38 @@ export class DbStorage implements IStorage {
 
   // Photos
   async getProjectPhotos(projectId: string): Promise<Photo[]> {
-    return await db.select().from(photos)
+    // Get photos
+    const photoList = await db.select().from(photos)
       .where(and(eq(photos.projectId, projectId), isNull(photos.deletedAt)))
       .orderBy(photos.createdAt);
+    
+    if (photoList.length === 0) return [];
+    
+    // Get all tags for these photos in one query (ordered by name for stability)
+    const photoIds = photoList.map(p => p.id);
+    const photoTagsWithTags = await db.select({
+      photoId: photoTags.photoId,
+      tag: tags,
+    })
+      .from(photoTags)
+      .innerJoin(tags, eq(photoTags.tagId, tags.id))
+      .where(inArray(photoTags.photoId, photoIds))
+      .orderBy(tags.name);
+    
+    // Group tags by photoId
+    const tagsByPhotoId = new Map<string, Tag[]>();
+    for (const pt of photoTagsWithTags) {
+      if (!tagsByPhotoId.has(pt.photoId)) {
+        tagsByPhotoId.set(pt.photoId, []);
+      }
+      tagsByPhotoId.get(pt.photoId)!.push(pt.tag);
+    }
+    
+    // Attach tags to photos
+    return photoList.map(photo => ({
+      ...photo,
+      tags: tagsByPhotoId.get(photo.id) || [],
+    })) as any;
   }
 
   async getPhoto(id: string): Promise<Photo | undefined> {
