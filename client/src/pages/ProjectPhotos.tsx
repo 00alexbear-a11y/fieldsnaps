@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
+import TagPicker from "@/components/TagPicker";
 import LazyImage from "@/components/LazyImage";
 import type { Photo, Project } from "../../../shared/schema";
 import { format } from "date-fns";
@@ -39,6 +40,7 @@ export default function ProjectPhotos() {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [targetProjectId, setTargetProjectId] = useState<string>("");
+  const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -371,8 +373,11 @@ export default function ProjectPhotos() {
         existingPhoto = await idb.savePhotoWithId(selectedPhoto.id, {
           projectId: projectId,
           blob: originalBlob,
-          thumbnailBlob: originalBlob,
-          caption: selectedPhoto.caption || null,
+          caption: selectedPhoto.caption ?? undefined,
+          quality: 'standard',
+          timestamp: Date.now(),
+          syncStatus: 'synced',
+          retryCount: 0,
           annotations: null,
           serverId: selectedPhoto.id,
         });
@@ -605,6 +610,10 @@ export default function ProjectPhotos() {
               setSelectedPhoto(fullPhoto);
             }
           }}
+          onTag={(photo) => {
+            setViewerPhotoIndex(null);
+            setTagPickerPhotoId(photo.id);
+          }}
           onShare={(photo) => {
             if (navigator.clipboard && window.isSecureContext) {
               toast({ title: "Photo URL copied to clipboard" });
@@ -782,6 +791,15 @@ export default function ProjectPhotos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Tag Picker */}
+      {tagPickerPhotoId && projectId && (
+        <TagPicker
+          photoId={tagPickerPhotoId}
+          projectId={projectId}
+          onClose={() => setTagPickerPhotoId(null)}
+        />
+      )}
 
       {/* Floating Action Buttons (FABs) - Camera & Upload */}
       {!isSelectMode && (

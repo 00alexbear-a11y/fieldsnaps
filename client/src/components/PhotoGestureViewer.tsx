@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush, Image } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush, Image, Tag } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ interface PhotoGestureViewerProps {
   onDelete?: (photoId: string) => void;
   onShare?: (photo: Photo) => void;
   onAnnotate?: (photo: Photo) => void;
+  onTag?: (photo: Photo) => void;
   onSetCoverPhoto?: (photoId: string) => void;
 }
 
@@ -49,6 +50,7 @@ export function PhotoGestureViewer({
   onDelete,
   onShare,
   onAnnotate,
+  onTag,
   onSetCoverPhoto,
 }: PhotoGestureViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -382,6 +384,18 @@ export function PhotoGestureViewer({
               >
                 <Brush className="w-5 h-5" />
                 <span className="text-[10px]">Edit</span>
+              </Button>
+            )}
+            {onTag && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onTag(currentPhoto)}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
+                data-testid="button-tag-photo"
+              >
+                <Tag className="w-5 h-5" />
+                <span className="text-[10px]">Tag</span>
               </Button>
             )}
             {onShare && (
