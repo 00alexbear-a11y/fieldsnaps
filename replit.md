@@ -64,3 +64,82 @@ The build philosophy centers on simplicity and invisible interface design. The P
 
 ### Third-Party APIs
 - **Google Geocoding API**: For converting addresses to latitude/longitude coordinates.
+
+## Future: Production Infrastructure Strategy
+
+**Status**: Planned for after core UX refinement is complete  
+**Target**: Commercial SaaS product competing with CompanyCam ($387/month) at $19.99/month
+
+### Production Service Stack ($175/month + ~$0.88/user)
+
+**Revenue Engine:**
+- **Stripe**: Payment processing (2.9% + 30¢) = $19.11 profit per user
+
+**Infrastructure Services:**
+1. **Cloudflare Pro ($20/mo)**: Global CDN, SSL, DDoS protection
+2. **Supabase Pro ($25/mo)**: PostgreSQL with guaranteed performance SLAs
+3. **Cloudinary Advanced ($89/mo)**: Photo storage, optimization, global delivery CDN
+4. **Postmark Growth ($15/mo)**: Transactional email for billing/notifications
+5. **Sentry Business ($26/mo)**: Error monitoring and performance tracking
+
+### Migration Approach: Backend-First
+
+**Phase 1: Database & Auth (Week 1-2)**
+- Migrate to Supabase Pro with subscription schema
+- User fields: `subscription_status`, `stripe_customer_id`, `trial_end_date`
+- Subscription tracking: status, billing periods, payment methods
+
+**Phase 2: Photo Storage (Week 2-3)**
+- Migrate to Cloudinary Advanced for automatic optimization
+- Benefits: 60-80% bandwidth reduction, global CDN, auto-thumbnails, WebP/AVIF support
+- Photo schema: `cloudinary_public_id`, `cloudinary_url`, `thumbnail_url`
+
+**Phase 3: Billing Integration (Week 3-4)**
+- Stripe subscription system with 7-day free trial
+- Postmark email automation (welcome, trial reminders, payment notifications)
+- Webhook handlers for payment events
+
+**Phase 4: Production Launch (Week 5-7)**
+- Cloudflare CDN configuration
+- Sentry error monitoring
+- Production deployment with 99.9% uptime target
+
+### Business Logic
+
+**Subscription Model:**
+- Single tier: $19.99/month
+- 7-day free trial (no credit card required)
+- Trial reminders: 3 days, 1 day before expiration
+- Grace period for failed payments
+
+**Success Metrics:**
+- Photo upload success rate: >99%
+- Global photo load time: <500ms
+- Database query time: <100ms
+- Trial-to-paid conversion: >25%
+- App load time: <2 seconds
+
+### API Architecture (Production-Ready)
+
+**Authentication:**
+- `POST /api/auth/register`, `/login`, `/refresh-token`
+- `POST /api/auth/forgot-password`, `/reset-password`
+
+**Billing (Stripe):**
+- `POST /api/billing/create-subscription`
+- `POST /api/billing/cancel-subscription`
+- `POST /api/billing/update-payment-method`
+- `POST /api/billing/webhooks` (Stripe webhook handler)
+
+**User Management:**
+- `GET /api/user/profile`, `/subscription`
+- `PUT /api/user/profile`
+- `DELETE /api/user/account`
+
+**Core Features:** (Photos, Projects, Analytics remain similar with subscription checks)
+
+### Development Philosophy
+
+**Current Focus**: Core UX and feature fluidity  
+**Production Trigger**: When core experience feels "magical"  
+**Migration Strategy**: Backend infrastructure won't affect UI/UX improvements
