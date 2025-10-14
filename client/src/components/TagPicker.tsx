@@ -27,7 +27,7 @@ export default function TagPicker({ photoId, projectId, onClose }: TagPickerProp
 
   // Fetch available tags (global + project-specific)
   const { data: availableTags = [] } = useQuery<Tag[]>({
-    queryKey: ["/api/tags", { projectId }],
+    queryKey: ["/api/tags"],
   });
 
   // Fetch current photo tags
