@@ -9,6 +9,8 @@ import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, in
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -73,6 +75,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup WebAuthn biometric authentication
   setupWebAuthn(app);
+
+  // Object Storage routes - Referenced from blueprint:javascript_object_storage
+  // Endpoint for serving private objects (photos) with ACL checks
+  app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
+    const userId = req.user?.claims?.sub;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: ObjectPermission.READ,
+      });
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error accessing object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Endpoint for getting presigned upload URL
+  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error: any) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Endpoint for setting ACL policy after photo upload and updating photo URL
+  app.put("/api/photos/:photoId/object-url", isAuthenticated, async (req: any, res) => {
+    try {
+      if (!req.body.photoURL) {
+        return res.status(400).json({ error: "photoURL is required" });
+      }
+
+      const userId = req.user?.claims?.sub;
+      const objectStorageService = new ObjectStorageService();
+      
+      // Set ACL policy: owner is the uploader, visibility is public (photos can be shared)
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.photoURL,
+        {
+          owner: userId,
+          visibility: "public", // Photos are public for sharing
+        },
+      );
+
+      // Update photo URL in database
+      await storage.updatePhoto(req.params.photoId, { url: objectPath });
+
+      res.json({ objectPath });
+    } catch (error: any) {
+      console.error("Error setting photo object URL:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -234,19 +302,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw errors.badRequest("No photo file provided");
       }
 
-      // Create uploads directory if it doesn't exist
-      const uploadsDir = path.join(process.cwd(), 'uploads', 'photos');
-      await fs.mkdir(uploadsDir, { recursive: true });
+      const userId = req.user?.claims?.sub;
+      const objectStorageService = new ObjectStorageService();
 
-      // Generate unique filename
-      const filename = `${Date.now()}-${crypto.randomUUID()}${path.extname(req.file.originalname || '.jpg')}`;
-      const filepath = path.join(uploadsDir, filename);
+      // Get presigned upload URL for object storage
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
 
-      // Save file to disk
-      await fs.writeFile(filepath, req.file.buffer);
+      // Upload file directly to object storage using presigned URL
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: req.file.buffer,
+        headers: {
+          'Content-Type': req.file.mimetype,
+        },
+      });
 
-      // Create photo URL
-      const url = `/uploads/photos/${filename}`;
+      if (!uploadResponse.ok) {
+        throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+      }
+
+      // Set ACL policy and get normalized object path
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        uploadURL,
+        {
+          owner: userId,
+          visibility: "public", // Photos are public for sharing
+        }
+      );
 
       // Get photographer info from auth or request body (for offline support)
       let photographerId = req.body.photographerId;
@@ -257,10 +339,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         photographerName = req.user.claims.name || req.user.claims.email;
       }
 
-      // Store photo metadata in database
+      // Store photo metadata in database with object storage path
       const validated = insertPhotoSchema.parse({
         projectId: req.params.projectId,
-        url,
+        url: objectPath,
         caption: req.body.caption || req.file.originalname,
         photographerId,
         photographerName,
@@ -290,15 +372,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle file upload if provided (annotated photo)
       if (req.file) {
-        const uploadsDir = path.join(process.cwd(), 'uploads', 'photos');
-        await fs.mkdir(uploadsDir, { recursive: true });
+        const userId = req.user?.claims?.sub;
+        const objectStorageService = new ObjectStorageService();
 
-        const filename = `${Date.now()}-${crypto.randomUUID()}${path.extname(req.file.originalname || '.jpg')}`;
-        const filepath = path.join(uploadsDir, filename);
+        // Get presigned upload URL for object storage
+        const uploadURL = await objectStorageService.getObjectEntityUploadURL();
 
-        await fs.writeFile(filepath, req.file.buffer);
+        // Upload file directly to object storage using presigned URL
+        const uploadResponse = await fetch(uploadURL, {
+          method: 'PUT',
+          body: req.file.buffer,
+          headers: {
+            'Content-Type': req.file.mimetype,
+          },
+        });
 
-        updateData.url = `/uploads/photos/${filename}`;
+        if (!uploadResponse.ok) {
+          throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+        }
+
+        // Set ACL policy and get normalized object path
+        const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+          uploadURL,
+          {
+            owner: userId,
+            visibility: "public",
+          }
+        );
+
+        updateData.url = objectPath;
       }
       
       // Handle annotations
