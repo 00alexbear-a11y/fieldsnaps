@@ -27,6 +27,9 @@ function AppContent() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const showSyncBanner = location === '/' || location === '/settings';
+  
+  // Initialize theme (handles localStorage and DOM automatically)
+  useTheme();
 
   // Check for skip auth flag (testing mode)
   const skipAuth = sessionStorage.getItem('skipAuth') === 'true';
@@ -83,9 +86,6 @@ function AppContent() {
 
 export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
-  
-  // Initialize theme (handles localStorage and DOM automatically)
-  useTheme();
 
   // Check onboarding status
   useEffect(() => {
