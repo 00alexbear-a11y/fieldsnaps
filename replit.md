@@ -5,58 +5,71 @@ FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for 
 
 ## Recent Changes
 
-### Offline PWA Fix - Production Build Required (October 13, 2025)
-**CRITICAL FIX:** Resolved offline functionality issue on iPhone and other devices.
+### Offline PWA Implementation - Manual Service Worker (October 14, 2025)
+**IMPLEMENTATION:** Complete offline functionality using manual Service Worker approach.
 
-**Problem Identified:**
-- Development preview URLs cannot work offline (Vite dev server limitation)
-- Vite dev mode uses ES modules, HMR, and dynamic imports that require network connection
-- Manual Service Worker couldn't properly cache Vite-generated bundles
-- Users testing from dev preview would always see failures in airplane mode
+**Architecture:**
+- **Manual Service Worker** (`client/public/sw.js`) - Comprehensive offline-first implementation
+- **Registration Module** (`client/src/lib/registerServiceWorker.ts`) - Production-only registration with update handling
+- **Main.tsx Integration** - Automatic Service Worker registration on app load
+- Vite automatically copies `client/public/sw.js` to `dist/public/sw.js` during build
 
-**Solution Implemented:**
-- Created `vite.config.pwa.ts` - Production PWA config extending locked base config
-- Integrated `vite-plugin-pwa` with Workbox for proper asset precaching
-- Updated Service Worker registration to use plugin in production, manual SW in dev
-- Added TypeScript types for PWA virtual modules
+**Why Manual Service Worker?**
+- `vite.config.ts` and `package.json` are protected files (cannot be modified)
+- vite-plugin-pwa requires config changes, so manual SW is the workaround
+- Placing SW in `client/public/` ensures Vite copies it during standard build process
+- No build configuration changes needed - works with existing locked config
+
+**Service Worker Features:**
+- **Version:** v1.1.0 with automatic cache versioning
+- **Cache Strategies:**
+  - Static assets (JS, CSS, fonts): Cache-first
+  - API requests: Network-first with cache fallback
+  - HTML pages: Stale-while-revalidate
+  - Images: Cache-first with size limits
+- **Cache Limits:** 50 dynamic items, 100 images
+- **Background Sync:** Photo upload queue when connection returns
+- **Offline Fallbacks:** Graceful degradation for all resource types
 
 **Build & Test Instructions:**
 
-**IMPORTANT:** The development preview URL (*.picard.replit.dev) will NEVER work offline. You MUST use the production build to test offline functionality.
+**IMPORTANT:** The development preview URL will NEVER work offline (Vite dev server limitation). You MUST use the production build to test offline functionality.
 
-**Step 1: Build the Production PWA**
+**Quick Build & Test:**
 ```bash
-./build-pwa.sh
-```
+# Build production version (includes backend + frontend)
+vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
-**Step 2: Start the Production Server**
-```bash
+# Start production server (stops dev server automatically)
 ./start-production.sh
 ```
 
-This will start the production server on port 5000. You'll see a different URL in your browser (not the dev preview).
+**Or use the convenience script:**
+```bash
+./build-pwa.sh        # Builds everything
+./start-production.sh # Stops dev, starts production on port 5000
+```
 
-**Step 3: Test Offline on iPhone**
-1. **Remove old app** from home screen (the dev preview one that doesn't work)
-2. **Open the production server URL** in Safari (the URL from step 2, NOT the dev preview)
-3. **Add to Home Screen**: Share button → "Add to Home Screen"  
-4. **Open from home screen** (not from Safari)
+**Testing Offline on iPhone:**
+1. **Build & start production server** (see commands above)
+2. **Open production URL** in Safari (NOT the dev preview URL)
+3. **Add to Home Screen**: Share → "Add to Home Screen"
+4. **Open from home screen** (standalone mode)
 5. **Enable Airplane Mode** ✈️
 6. **App works offline!** ✅
 
 **Troubleshooting:**
-- If you see "nc5d7i5pn8nb.picard.replit.dev" in the URL bar → You're on the dev preview (won't work offline)
-- If you added the dev preview to home screen → Delete it and add the production URL instead
-- Make sure you run `./start-production.sh` before testing
+- Dev preview URL (*.picard.replit.dev) → Won't work offline (expected behavior)
+- If you added dev preview to home screen → Remove it and add production URL
+- Check browser console for `[PWA] Service Worker registered successfully`
+- Verify `sw.js` exists at production URL by visiting `/sw.js`
 
-**Technical Details:**
-- Workbox precaches all static assets (JS, CSS, HTML, fonts, images)
-- API requests: NetworkFirst strategy (10s timeout, then cache fallback)
-- Images: CacheFirst strategy (up to 300 items, 30 days)
-- Fonts: CacheFirst strategy (up to 30 items, 1 year)
-- Maximum cached file size: 5MB (for photos)
-
-**IMPORTANT:** Dev preview URLs will NEVER work offline - this is a Vite limitation, not a bug.
+**Technical Implementation:**
+- SW caches all static assets during install event
+- Intelligent fetch interception with strategy selection
+- Automatic cache cleanup on version updates
+- Message-based communication for sync coordination
+- Update notifications via `sw-update-available` event
 
 ### Auto-Sync Improvements & Manual Sync Button (October 13, 2025)
 Enhanced background sync system with faster auto-sync and manual control:
