@@ -55,51 +55,21 @@ export default function Projects() {
   const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
-  const { data: projects = [], isLoading: projectsLoading } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+  // Efficient bulk query - gets all projects with photo counts in one request
+  const { data: projectsWithCounts = [], isLoading: projectsLoading } = useQuery<(Project & { photoCount: number })[]>({
+    queryKey: ["/api/projects/with-counts"],
   });
 
-  // Create array of project IDs for query key to ensure refetch when projects change
-  const projectIds = useMemo(() => projects.map(p => p.id).sort().join(','), [projects]);
+  // For backward compatibility, extract projects
+  const projects = useMemo(() => 
+    projectsWithCounts.map(({ photoCount, ...project }) => project),
+    [projectsWithCounts]
+  );
 
-  const { data: allPhotos = [] } = useQuery<Photo[]>({
-    queryKey: ["/api/photos/all", projectIds],
-    queryFn: async () => {
-      // Prepare headers with skip auth if needed
-      const headers: Record<string, string> = {};
-      if (sessionStorage.getItem('skipAuth') === 'true') {
-        headers['x-skip-auth'] = 'true';
-      }
-      
-      // Fetch photos for all projects
-      const photoPromises = projects.map(p => 
-        fetch(`/api/projects/${p.id}/photos`, {
-          credentials: 'include',
-          headers,
-        }).then(r => r.json())
-      );
-      const photoArrays = await Promise.all(photoPromises);
-      return photoArrays.flat();
-    },
-    enabled: projects.length > 0,
-  });
-
-  // Group photos by project for counting
-  const photosByProject = useMemo(() => {
-    const grouped: Record<string, Photo[]> = {};
-    allPhotos.forEach(photo => {
-      if (!grouped[photo.projectId]) {
-        grouped[photo.projectId] = [];
-      }
-      grouped[photo.projectId].push(photo);
-    });
-    return grouped;
-  }, [allPhotos]);
-
-  // Get cover photo for a project
-  const getCoverPhoto = (project: Project): Photo | undefined => {
-    if (!project.coverPhotoId) return undefined;
-    return allPhotos.find(p => p.id === project.coverPhotoId);
+  // Get photo count for a project from the bulk query
+  const getPhotoCount = (projectId: string): number => {
+    const project = projectsWithCounts.find(p => p.id === projectId);
+    return project?.photoCount || 0;
   };
 
   // Get pending sync count for a project
@@ -155,7 +125,7 @@ export default function Projects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
       setDialogOpen(false);
       setName("");
       setDescription("");
@@ -178,7 +148,7 @@ export default function Projects() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
       setDeleteDialogOpen(false);
       setProjectToDelete(null);
       toast({ 
@@ -215,9 +185,9 @@ export default function Projects() {
           description: `${result.synced} item${result.synced > 1 ? 's' : ''} uploaded`,
           duration: 2000,
         });
-        // Refresh projects and photos
+        // Refresh projects and photo counts
         queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/photos/all"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
       } else if (result.failed > 0) {
         toast({
           title: 'Sync incomplete',
@@ -375,15 +345,14 @@ export default function Projects() {
         ) : (
           <div className="space-y-0.5">
             {filteredProjects.map((project) => {
-              const coverPhoto = getCoverPhoto(project);
-              const photoCount = photosByProject[project.id]?.length || 0;
+              const photoCount = getPhotoCount(project.id);
               const pendingSyncCount = getPendingSyncCount(project.id);
               
               return (
                 <SwipeableProjectCard
                   key={project.id}
                   project={project}
-                  coverPhoto={coverPhoto}
+                  coverPhoto={undefined}
                   photoCount={photoCount}
                   pendingSyncCount={pendingSyncCount}
                   onClick={() => setLocation(`/projects/${project.id}`)}
@@ -430,7 +399,7 @@ export default function Projects() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{projectToDelete?.name}"? The project and all {photosByProject[projectToDelete?.id || '']?.length || 0} of its photos will be moved to trash for 30 days before permanent deletion.
+              Are you sure you want to delete "{projectToDelete?.name}"? The project and all {getPhotoCount(projectToDelete?.id || '')} of its photos will be moved to trash for 30 days before permanent deletion.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
