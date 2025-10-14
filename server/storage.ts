@@ -7,6 +7,7 @@ import type {
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
+import { ObjectStorageService } from "./objectStorage";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -72,6 +73,8 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
+  private objectStorageService = new ObjectStorageService();
+
   // User operations (required for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
@@ -322,7 +325,17 @@ export class DbStorage implements IStorage {
   }
 
   async permanentlyDeletePhoto(id: string): Promise<boolean> {
+    // Get the photo to retrieve its URL before deleting
+    const photo = await this.getPhoto(id);
+    
+    // Delete from database
     const result = await db.delete(photos).where(eq(photos.id, id)).returning();
+    
+    // Clean up object storage if the photo was stored there
+    if (photo?.url) {
+      await this.objectStorageService.deleteObjectEntity(photo.url);
+    }
+    
     return result.length > 0;
   }
 
