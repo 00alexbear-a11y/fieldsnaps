@@ -3,6 +3,54 @@
 ## Overview
 FieldSnaps is an Apple-inspired, premium Progressive Web App (PWA) designed for construction professionals to capture and document job sites. Its core purpose is to provide an extremely simple, offline-reliable, and effortless photo documentation experience, focusing on instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app aims for complete offline functionality, touch optimization for work gloves, and reliability in challenging environments, ultimately enhancing efficiency and reducing disputes in construction projects.
 
+## Recent Changes
+
+### Bug Fixes and Pinch-to-Zoom (October 14, 2025)
+Completed 7 critical bug fixes and feature implementations:
+
+**1. Bottom Navigation Safe Area Padding** ✓
+- Added `pb-safe` class to bottom navigation inner div
+- Lifts navigation above iPhone curved screen edges
+- Prevents gesture bar overlap on iOS devices
+
+**2. Video Recording Save Functionality** ✓
+- Implemented full video recording save to IndexedDB
+- Videos saved with auto-caption format: `[ProjectName]_VIDEO_[Date]_[Time]`
+- Uses same sync infrastructure as photos (IndexedDB + background sync)
+- Videos stored as LocalPhoto objects with video/webm blob
+
+**3. Zoom Controls During Video Recording** ✓
+- Hid zoom buttons during active video recording
+- Prevents camera stream interruption when recording
+- Zoom controls remain available in photo mode and before/after recording
+
+**4. Storage Display Clarification** ✓
+- Changed "Storage" to "Offline Storage" with clarifying subtitle
+- Label now says "Local Photos" instead of "Photos"
+- Makes clear it only shows photos captured on this device
+
+**5. Project Settings Gear Icon Removal** ✓
+- Completely removed gear icon and settings dialog
+- All related code cleaned up with no orphaned references
+
+**6. Camera Permission Re-prompts Fix** ✓
+- Modified zoom switching to use `applyConstraints()` first
+- Only restarts camera stream if constraints fail (iOS physical lens switch)
+- Significantly reduces permission re-prompts on modern browsers
+
+**7. Pinch-to-Zoom Within Each Lens** ✓
+- Implemented continuous pinch-to-zoom gestures for fine control
+- Lens ranges: 0.5x (0.5-0.99x), 1x (1.0-1.99x), 2x (2.0-2.99x), 3x (3.0-3.99x)
+- Two-finger pinch gestures detected and mapped to zoom values
+- Visual feedback: zoom indicator (e.g., "1.5x") shown during pinch
+- Discrete lens buttons (0.5x, 1x, 2x, 3x) switch physical lenses
+- Smooth zoom application using `applyConstraints()` without stream restart
+
+**Technical Implementation:**
+- All changes reviewed and approved by architect
+- No LSP errors or breaking changes
+- Proper error handling throughout
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
