@@ -148,7 +148,15 @@ class IndexedDBManager {
       const request = store.add(localPhoto);
 
       request.onsuccess = () => resolve(localPhoto);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        console.error('[IndexedDB] Failed to save photo:', request.error);
+        reject(request.error);
+      };
+      
+      transaction.onerror = () => {
+        console.error('[IndexedDB] Transaction error while saving photo:', transaction.error);
+        reject(transaction.error);
+      };
     });
   }
 
@@ -176,7 +184,15 @@ class IndexedDBManager {
       const request = store.put(localPhoto);
 
       request.onsuccess = () => resolve(localPhoto);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        console.error('[IndexedDB] Failed to save photo with ID:', id, request.error);
+        reject(request.error);
+      };
+      
+      transaction.onerror = () => {
+        console.error('[IndexedDB] Transaction error while saving photo with ID:', id, transaction.error);
+        reject(transaction.error);
+      };
     });
   }
 
@@ -215,7 +231,15 @@ class IndexedDBManager {
         const request = store.put(updatedPhoto);
 
         request.onsuccess = () => resolve(updatedPhoto);
-        request.onerror = () => reject(request.error);
+        request.onerror = () => {
+          console.error('[IndexedDB] Failed to update photo:', id, request.error);
+          reject(request.error);
+        };
+        
+        transaction.onerror = () => {
+          console.error('[IndexedDB] Transaction error while updating photo:', id, transaction.error);
+          reject(transaction.error);
+        };
       });
     } catch (error) {
       console.error('[IndexedDB] updatePhoto error:', error);
