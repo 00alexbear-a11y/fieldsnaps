@@ -10,13 +10,14 @@ import { syncManager } from '@/lib/syncManager';
 import { indexedDB as indexedDBService } from '@/lib/indexeddb';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
+import { useTheme } from '@/hooks/useTheme';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated, isLoading } = useAuth();
   const { registerBiometric, authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
-  const [isDark, setIsDark] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
@@ -30,10 +31,6 @@ export default function Settings() {
   } | null>(null);
 
   useEffect(() => {
-    // Check initial theme
-    const root = document.documentElement;
-    setIsDark(root.classList.contains('dark'));
-
     // Load sync status and storage usage
     loadSyncStatus();
     calculateStorageUsage();
@@ -88,20 +85,6 @@ export default function Settings() {
       console.error('Failed to calculate storage usage:', error);
       setStorageUsage({ mb: 0, photoCount: 0 });
     }
-  };
-
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    const newIsDark = !isDark;
-    
-    if (newIsDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    
-    setIsDark(newIsDark);
-    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
   };
 
   const handleSync = async () => {

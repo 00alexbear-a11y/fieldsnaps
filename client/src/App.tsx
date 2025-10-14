@@ -18,7 +18,10 @@ import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
 import SyncBanner from "./components/SyncBanner";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
+import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { useAuth } from "./hooks/useAuth";
+import { useTheme } from "./hooks/useTheme";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function AppContent() {
   const [location, setLocation] = useLocation();
@@ -80,15 +83,12 @@ function AppContent() {
 
 export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  // Initialize theme (handles localStorage and DOM automatically)
+  useTheme();
 
-  // Initialize theme and check onboarding status
+  // Check onboarding status
   useEffect(() => {
-    const theme = localStorage.getItem('theme');
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-
-    // Check if onboarding has been completed
     const onboardingComplete = localStorage.getItem('onboarding_complete');
     if (!onboardingComplete) {
       setShowOnboarding(true);
@@ -101,11 +101,14 @@ export default function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
-      <AppContent />
-      <SyncStatusNotifier />
-      <Toaster />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
+        <AppContent />
+        <SyncStatusNotifier />
+        <ServiceWorkerUpdate />
+        <Toaster />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
