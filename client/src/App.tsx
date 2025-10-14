@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
 import SyncBanner from "./components/SyncBanner";
+import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { useAuth } from "./hooks/useAuth";
 
 function AppContent() {
@@ -103,6 +104,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
       <AppContent />
+      <SyncStatusNotifier />
       <Toaster />
     </QueryClientProvider>
   );

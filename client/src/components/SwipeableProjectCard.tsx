@@ -1,4 +1,4 @@
-import { useState, useRef, TouchEvent } from "react";
+import { useState, useRef, useEffect, TouchEvent } from "react";
 import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project, Photo } from "../../../shared/schema";
@@ -29,16 +29,28 @@ export default function SwipeableProjectCard({
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
   const [isSwiping, setIsSwiping] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const touchCurrentRef = useRef<number | null>(null);
 
   const swipeDistance = touchStart !== null && touchCurrent !== null ? touchStart - touchCurrent : 0;
   const isSwipedLeft = swipeDistance > 0;
   const showDelete = swipeDistance >= SWIPE_THRESHOLD;
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0];
     if (!touch) return;
     setTouchStart(touch.clientX);
     setTouchCurrent(touch.clientX);
+    touchCurrentRef.current = touch.clientX;
     setIsSwiping(true);
   };
 
@@ -52,19 +64,43 @@ export default function SwipeableProjectCard({
     
     // Only allow left swipe (distance > 0) and limit max swipe
     if (distance > 0 && distance <= 200) {
+      touchCurrentRef.current = currentX;
+      
+      // Cancel any pending animation frame
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      
+      // Batch visual updates using RAF for smooth 60fps performance
+      rafRef.current = requestAnimationFrame(() => {
+        if (cardRef.current && touchCurrentRef.current !== null) {
+          const newDistance = touchStart - touchCurrentRef.current;
+          cardRef.current.style.transform = `translateX(-${Math.max(0, newDistance)}px)`;
+        }
+      });
+      
+      // Update state less frequently for React-managed visibility
       setTouchCurrent(currentX);
     }
   };
 
   const handleTouchEnd = () => {
+    // Cancel any pending RAF
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    
     if (swipeDistance >= DELETE_THRESHOLD) {
       // Swipe threshold met - keep delete button visible
       setTouchStart(touchStart! - DELETE_THRESHOLD);
       setTouchCurrent(touchCurrent! - DELETE_THRESHOLD);
+      touchCurrentRef.current = touchCurrent! - DELETE_THRESHOLD;
     } else {
       // Reset swipe
       setTouchStart(null);
       setTouchCurrent(null);
+      touchCurrentRef.current = null;
     }
     setIsSwiping(false);
   };
@@ -77,6 +113,7 @@ export default function SwipeableProjectCard({
       // Reset swipe on tap when swiped
       setTouchStart(null);
       setTouchCurrent(null);
+      touchCurrentRef.current = null;
     }
   };
 

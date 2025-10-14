@@ -62,6 +62,9 @@ export default function Camera() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const pinchStartDistanceRef = useRef<number | null>(null);
   const pinchStartZoomRef = useRef<number>(1);
+  const cameraSessionIdRef = useRef<number>(0); // Track camera session to prevent race conditions
+  const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null); // Preserve user's zoom choice
+  const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce camera starts
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -112,6 +115,10 @@ export default function Camera() {
   // Cleanup camera when component unmounts
   useEffect(() => {
     return () => {
+      // Clear any pending camera start
+      if (startCameraTimeoutRef.current) {
+        clearTimeout(startCameraTimeoutRef.current);
+      }
       stopCamera();
     };
   }, []);
@@ -175,9 +182,18 @@ export default function Camera() {
       
       // Only set deviceId if we found valid cameras
       if (uniqueCameras.length > 0) {
-        const defaultCamera = uniqueCameras.find(c => c.zoomLevel === 1) || uniqueCameras[0];
-        setCurrentDeviceId(defaultCamera.deviceId);
-        setZoomLevel(defaultCamera.zoomLevel);
+        // Preserve user-selected zoom if available, otherwise use default
+        const targetZoom = userSelectedZoomRef.current || 1;
+        const preferredCamera = uniqueCameras.find(c => c.zoomLevel === targetZoom) 
+          || uniqueCameras.find(c => c.zoomLevel === 1) 
+          || uniqueCameras[0];
+        
+        setCurrentDeviceId(preferredCamera.deviceId);
+        
+        // Only update zoom level if user hasn't manually selected one
+        if (!userSelectedZoomRef.current) {
+          setZoomLevel(preferredCamera.zoomLevel);
+        }
       }
     } catch (error) {
       console.error('Error detecting cameras:', error);
@@ -187,7 +203,27 @@ export default function Camera() {
     }
   };
 
-  const startCamera = async () => {
+  // Debounced camera start to prevent rapid successive calls
+  const startCamera = (): Promise<void> => {
+    // Clear any pending start attempt
+    if (startCameraTimeoutRef.current) {
+      clearTimeout(startCameraTimeoutRef.current);
+    }
+    
+    // Return a Promise that resolves when the debounced call completes
+    return new Promise<void>((resolve) => {
+      startCameraTimeoutRef.current = setTimeout(async () => {
+        await startCameraImmediate();
+        resolve();
+      }, 150);
+    });
+  };
+  
+  const startCameraImmediate = async () => {
+    // Generate new session ID to track this camera start attempt
+    const sessionId = ++cameraSessionIdRef.current;
+    console.log(`[Camera] Starting camera session ${sessionId}`);
+    
     try {
       // Check if permission is already granted to avoid repeated prompts
       try {
@@ -206,6 +242,12 @@ export default function Camera() {
       } catch (permError) {
         // Permission API not supported, continue with getUserMedia
         console.log('Permission API not supported, continuing with getUserMedia');
+      }
+      
+      // Check if this session is still current
+      if (sessionId !== cameraSessionIdRef.current) {
+        console.log(`[Camera] Session ${sessionId} aborted - newer session started`);
+        return;
       }
 
       // Use deviceId only if it's a valid non-empty string, otherwise use facingMode
@@ -226,6 +268,12 @@ export default function Camera() {
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (deviceError) {
+        // Check session still valid before fallback
+        if (sessionId !== cameraSessionIdRef.current) {
+          console.log(`[Camera] Session ${sessionId} aborted during fallback`);
+          return;
+        }
+        
         // If deviceId constraint fails, fall back to facingMode
         console.warn('Camera deviceId failed, falling back to facingMode:', deviceError);
         const fallbackConstraints: MediaStreamConstraints = {
@@ -238,6 +286,13 @@ export default function Camera() {
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
         // Clear deviceId since it didn't work
         setCurrentDeviceId(null);
+      }
+      
+      // Final session check before applying changes
+      if (sessionId !== cameraSessionIdRef.current) {
+        console.log(`[Camera] Session ${sessionId} aborted - stopping stream`);
+        stream.getTracks().forEach(track => track.stop());
+        return;
       }
 
       if (videoRef.current) {
@@ -325,8 +380,13 @@ export default function Camera() {
   const switchCamera = async () => {
     // Reset zoom to 1x when switching cameras
     setZoomLevel(1);
+    setContinuousZoom(1);
     setAvailableCameras([]);
     setCurrentDeviceId(null);
+    
+    // Clear user-selected zoom when switching cameras (different lenses available)
+    userSelectedZoomRef.current = null;
+    
     // Just toggle facing mode - the useEffect will handle restarting the camera
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
   };
@@ -352,6 +412,9 @@ export default function Camera() {
   const switchZoomLevel = async (level: 0.5 | 1 | 2 | 3) => {
     // Don't switch if already at this level
     if (zoomLevel === level) return;
+    
+    // Store user's selected zoom level to preserve across camera restarts
+    userSelectedZoomRef.current = level;
     
     // Update zoom level state and reset continuous zoom to lens base
     setZoomLevel(level);

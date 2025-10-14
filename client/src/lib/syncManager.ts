@@ -21,14 +21,53 @@ interface SyncResult {
   errors: string[];
 }
 
+export type SyncEventType = 'sync-complete' | 'sync-error' | 'item-error';
+
+export interface SyncEvent {
+  type: SyncEventType;
+  result?: SyncResult;
+  error?: string;
+  itemType?: string;
+}
+
+type SyncEventListener = (event: SyncEvent) => void;
+
 class SyncManager {
   private isSyncing = false;
   private syncInProgress = false;
+  private listeners: Set<SyncEventListener> = new Set();
 
   constructor() {
     // Setup network listeners on initialization
     this.setupNetworkListeners();
     this.setupServiceWorkerListener();
+  }
+
+  /**
+   * Add event listener for sync events
+   */
+  addEventListener(listener: SyncEventListener): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove event listener
+   */
+  removeEventListener(listener: SyncEventListener): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Emit sync event to all listeners
+   */
+  private emitEvent(event: SyncEvent): void {
+    this.listeners.forEach(listener => {
+      try {
+        listener(event);
+      } catch (error) {
+        console.error('[Sync] Event listener error:', error);
+      }
+    });
   }
 
   /**
@@ -130,10 +169,31 @@ class SyncManager {
 
       console.log(`[Sync] Complete: ${result.synced} synced, ${result.failed} failed`);
       
+      // Emit sync completion event with result
+      if (result.failed > 0) {
+        this.emitEvent({
+          type: 'sync-error',
+          result,
+          error: `${result.failed} item${result.failed > 1 ? 's' : ''} failed to sync`,
+        });
+      } else if (result.synced > 0) {
+        this.emitEvent({
+          type: 'sync-complete',
+          result,
+        });
+      }
+      
     } catch (error) {
       console.error('[Sync] Sync failed:', error);
       result.success = false;
       result.errors.push(error instanceof Error ? error.message : 'Unknown error');
+      
+      // Emit sync error event
+      this.emitEvent({
+        type: 'sync-error',
+        result,
+        error: error instanceof Error ? error.message : 'Unknown sync error',
+      });
     } finally {
       this.syncInProgress = false;
     }
