@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
+import { handleError, errors } from "./errorHandler";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -109,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const project = await storage.getProject(req.params.id);
       if (!project) {
-        return res.status(404).json({ error: "Project not found" });
+        throw errors.notFound('Project');
       }
       
       // Update project's last activity timestamp when viewed
@@ -117,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(project);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      handleError(res, error);
     }
   });
 
@@ -219,18 +220,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const photo = await storage.getPhoto(req.params.id);
       if (!photo) {
-        return res.status(404).json({ error: "Photo not found" });
+        throw errors.notFound('Photo');
       }
       res.json(photo);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      handleError(res, error);
     }
   });
 
   app.post("/api/projects/:projectId/photos", isAuthenticated, upload.single('photo'), async (req: any, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: "No photo file provided" });
+        throw errors.badRequest("No photo file provided");
       }
 
       // Create uploads directory if it doesn't exist
@@ -279,7 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('Photo upload error:', error);
-      res.status(400).json({ error: error.message });
+      handleError(res, error);
     }
   });
 

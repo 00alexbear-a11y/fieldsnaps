@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -44,6 +45,7 @@ type SortOption = 'lastActivity' | 'name' | 'created';
 
 export default function Projects() {
   const [, setLocation] = useLocation();
+  const { isDark, toggleTheme } = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
@@ -111,12 +113,6 @@ export default function Projects() {
     
     return sorted;
   }, [projects, searchQuery, sortBy]);
-
-  // Toggle theme
-  const toggleTheme = () => {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  };
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string }) => {
@@ -307,8 +303,11 @@ export default function Projects() {
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={toggleTheme} data-testid="menu-toggle-theme">
-                  <Moon className="w-4 h-4 mr-2 dark:hidden" />
-                  <Sun className="w-4 h-4 mr-2 hidden dark:inline" />
+                  {isDark ? (
+                    <Sun className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Moon className="w-4 h-4 mr-2" />
+                  )}
                   Toggle Theme
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setLocation('/settings')} data-testid="menu-settings">
