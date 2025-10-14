@@ -52,8 +52,10 @@ export const projects = pgTable("projects", {
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
 }, (table) => [
-  index("idx_projects_user_id").on(table.userId),
-  index("idx_projects_deleted_at").on(table.deletedAt),
+  // Partial index for active projects: filter deletedAt IS NULL, sort by createdAt
+  index("idx_projects_active").on(table.createdAt).where(sql`${table.deletedAt} IS NULL`),
+  // Index for trash queries: filter deletedAt IS NOT NULL, sort by deletedAt
+  index("idx_projects_trash").on(table.deletedAt.desc()).where(sql`${table.deletedAt} IS NOT NULL`),
 ]);
 
 // Photos table
@@ -67,9 +69,14 @@ export const photos = pgTable("photos", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
 }, (table) => [
+  // Index for joins (getProjectsWithPhotoCounts)
   index("idx_photos_project_id").on(table.projectId),
+  // Partial index for active photo queries: filter projectId + deletedAt IS NULL, sort by createdAt
+  index("idx_photos_project_active").on(table.projectId, table.deletedAt, table.createdAt).where(sql`${table.deletedAt} IS NULL`),
+  // Index for trash queries: filter deletedAt IS NOT NULL, sort by deletedAt
+  index("idx_photos_trash").on(table.deletedAt.desc()).where(sql`${table.deletedAt} IS NOT NULL`),
+  // Index for photographer queries
   index("idx_photos_photographer_id").on(table.photographerId),
-  index("idx_photos_deleted_at").on(table.deletedAt),
 ]);
 
 // Photo annotations table
