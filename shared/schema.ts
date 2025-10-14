@@ -111,6 +111,28 @@ export const shares = pgTable("shares", {
   index("idx_shares_token").on(table.token),
 ]);
 
+// Tags table - for photo categorization by trade/type
+export const tags = pgTable("tags", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 50 }).notNull().unique(), // e.g., "Electrician", "HVAC", "Plumber"
+  color: varchar("color", { length: 20 }).notNull(), // e.g., "red", "yellow", "blue"
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // null = global predefined tags
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_tags_project_id").on(table.projectId),
+]);
+
+// Photo Tags junction table - many-to-many relationship between photos and tags
+export const photoTags = pgTable("photo_tags", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  photoId: varchar("photo_id").notNull().references(() => photos.id, { onDelete: "cascade" }),
+  tagId: varchar("tag_id").notNull().references(() => tags.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_photo_tags_photo_id").on(table.photoId),
+  index("idx_photo_tags_tag_id").on(table.tagId),
+]);
+
 // Zod schemas for validation
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
@@ -118,6 +140,8 @@ export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
+export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
+export const insertPhotoTagSchema = createInsertSchema(photoTags).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type User = typeof users.$inferSelect;
@@ -129,12 +153,16 @@ export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Share = typeof shares.$inferSelect;
+export type Tag = typeof tags.$inferSelect;
+export type PhotoTag = typeof photoTags.$inferSelect;
 
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
 export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
+export type InsertTag = z.infer<typeof insertTagSchema>;
+export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
 
 // Annotation types for frontend
 export interface Annotation {

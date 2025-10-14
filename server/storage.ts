@@ -1,10 +1,10 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments, users, credentials, shares } from "../shared/schema";
+import { projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags } from "../shared/schema";
 import type {
   User, UpsertUser,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare
+  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
 
@@ -58,6 +58,17 @@ export interface IStorage {
   getShareByToken(token: string): Promise<Share | undefined>;
   getPhotosByIds(photoIds: string[]): Promise<Photo[]>;
   deleteShare(id: string): Promise<boolean>;
+  
+  // Tags
+  getTags(projectId?: string): Promise<Tag[]>;
+  getTag(id: string): Promise<Tag | undefined>;
+  createTag(data: InsertTag): Promise<Tag>;
+  deleteTag(id: string): Promise<boolean>;
+  
+  // Photo Tags
+  getPhotoTags(photoId: string): Promise<(PhotoTag & { tag: Tag })[]>;
+  addPhotoTag(data: InsertPhotoTag): Promise<PhotoTag>;
+  removePhotoTag(photoId: string, tagId: string): Promise<boolean>;
 }
 
 export class DbStorage implements IStorage {
@@ -320,6 +331,65 @@ export class DbStorage implements IStorage {
         isNotNull(photos.deletedAt),
         lt(photos.deletedAt, thirtyDaysAgo)
       ));
+  }
+
+  // Tags
+  async getTags(projectId?: string): Promise<Tag[]> {
+    if (projectId) {
+      // Get both global tags (projectId = null) and project-specific tags
+      return await db.select().from(tags)
+        .where(
+          sql`${tags.projectId} IS NULL OR ${tags.projectId} = ${projectId}`
+        )
+        .orderBy(tags.name);
+    }
+    // Get only global tags
+    return await db.select().from(tags)
+      .where(isNull(tags.projectId))
+      .orderBy(tags.name);
+  }
+
+  async getTag(id: string): Promise<Tag | undefined> {
+    const result = await db.select().from(tags).where(eq(tags.id, id));
+    return result[0];
+  }
+
+  async createTag(data: InsertTag): Promise<Tag> {
+    const result = await db.insert(tags).values(data).returning();
+    return result[0];
+  }
+
+  async deleteTag(id: string): Promise<boolean> {
+    const result = await db.delete(tags).where(eq(tags.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // Photo Tags
+  async getPhotoTags(photoId: string): Promise<(PhotoTag & { tag: Tag })[]> {
+    const result = await db
+      .select({
+        id: photoTags.id,
+        photoId: photoTags.photoId,
+        tagId: photoTags.tagId,
+        createdAt: photoTags.createdAt,
+        tag: tags,
+      })
+      .from(photoTags)
+      .innerJoin(tags, eq(photoTags.tagId, tags.id))
+      .where(eq(photoTags.photoId, photoId));
+    return result;
+  }
+
+  async addPhotoTag(data: InsertPhotoTag): Promise<PhotoTag> {
+    const result = await db.insert(photoTags).values(data).returning();
+    return result[0];
+  }
+
+  async removePhotoTag(photoId: string, tagId: string): Promise<boolean> {
+    const result = await db.delete(photoTags)
+      .where(and(eq(photoTags.photoId, photoId), eq(photoTags.tagId, tagId)))
+      .returning();
+    return result.length > 0;
   }
 }
 
