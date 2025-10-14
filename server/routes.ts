@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
@@ -535,6 +535,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const deleted = await storage.deleteShare(req.params.id);
       if (!deleted) {
         return res.status(404).json({ error: "Share not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Tags - Photo categorization by trade/type
+  app.get("/api/tags", isAuthenticated, async (req, res) => {
+    try {
+      const projectId = req.query.projectId as string | undefined;
+      const tags = await storage.getTags(projectId);
+      res.json(tags);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/tags", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertTagSchema.parse(req.body);
+      const tag = await storage.createTag(validated);
+      res.status(201).json(tag);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/tags/:id", isAuthenticated, async (req, res) => {
+    try {
+      const deleted = await storage.deleteTag(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Tag not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Photo Tags - Associate tags with photos
+  app.get("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
+    try {
+      const photoTags = await storage.getPhotoTags(req.params.photoId);
+      res.json(photoTags);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertPhotoTagSchema.parse({
+        photoId: req.params.photoId,
+        tagId: req.body.tagId,
+      });
+      const photoTag = await storage.addPhotoTag(validated);
+      res.status(201).json(photoTag);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, async (req, res) => {
+    try {
+      const deleted = await storage.removePhotoTag(req.params.photoId, req.params.tagId);
+      if (!deleted) {
+        return res.status(404).json({ error: "Photo tag association not found" });
       }
       res.status(204).send();
     } catch (error: any) {
