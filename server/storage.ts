@@ -6,7 +6,7 @@ import type {
   Project, Photo, PhotoAnnotation, Comment, Share,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare
 } from "../shared/schema";
-import { eq, inArray, isNull, isNotNull, and, lt } from "drizzle-orm";
+import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -21,6 +21,7 @@ export interface IStorage {
   
   // Projects
   getProjects(): Promise<Project[]>;
+  getProjectsWithPhotoCounts(): Promise<(Project & { photoCount: number })[]>;
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
@@ -105,6 +106,31 @@ export class DbStorage implements IStorage {
     return await db.select().from(projects)
       .where(isNull(projects.deletedAt))
       .orderBy(projects.createdAt);
+  }
+
+  async getProjectsWithPhotoCounts(): Promise<(Project & { photoCount: number })[]> {
+    const result = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        description: projects.description,
+        address: projects.address,
+        latitude: projects.latitude,
+        longitude: projects.longitude,
+        coverPhotoId: projects.coverPhotoId,
+        userId: projects.userId,
+        createdAt: projects.createdAt,
+        lastActivityAt: projects.lastActivityAt,
+        deletedAt: projects.deletedAt,
+        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN 1 END) AS INTEGER)`,
+      })
+      .from(projects)
+      .leftJoin(photos, eq(photos.projectId, projects.id))
+      .where(isNull(projects.deletedAt))
+      .groupBy(projects.id)
+      .orderBy(projects.createdAt);
+    
+    return result;
   }
 
   async getProject(id: string): Promise<Project | undefined> {

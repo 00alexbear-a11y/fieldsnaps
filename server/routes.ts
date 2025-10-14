@@ -95,6 +95,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk endpoint to get all projects with photo counts in one query (eliminates N+1)
+  app.get("/api/projects/with-counts", isAuthenticated, async (req, res) => {
+    try {
+      const projectsWithCounts = await storage.getProjectsWithPhotoCounts();
+      res.json(projectsWithCounts);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const project = await storage.getProject(req.params.id);
