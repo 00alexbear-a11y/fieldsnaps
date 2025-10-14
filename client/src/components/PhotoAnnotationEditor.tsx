@@ -161,6 +161,14 @@ export function PhotoAnnotationEditor({
   const [tempAnnotation, setTempAnnotation] = useState<Annotation | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [zoomCirclePos, setZoomCirclePos] = useState<{ x: number; y: number } | null>(null);
+  
+  // Multi-touch gesture state
+  const [isMultiTouch, setIsMultiTouch] = useState(false);
+  const [initialTouchDistance, setInitialTouchDistance] = useState<number | null>(null);
+  const [initialTouchAngle, setInitialTouchAngle] = useState<number | null>(null);
+  const [initialGestureScale, setInitialGestureScale] = useState<number | null>(null);
+  const [initialGestureRotation, setInitialGestureRotation] = useState<number | null>(null);
+  
   const { toast } = useToast();
 
   const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } => {
@@ -1131,6 +1139,37 @@ export function PhotoAnnotationEditor({
     e.preventDefault();
     if (!canvasRef.current || !e.touches[0]) return;
 
+    // Detect multi-touch gestures (2 fingers)
+    if (e.touches.length === 2 && selectedAnnotation) {
+      const anno = annotations.find(a => a.id === selectedAnnotation);
+      // Only enable multi-touch for text annotations
+      if (anno && anno.type === "text") {
+        setIsMultiTouch(true);
+        
+        // Calculate initial distance between fingers
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+          Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+        setInitialTouchDistance(distance);
+        
+        // Calculate initial angle between fingers
+        const angle = Math.atan2(
+          touch2.clientY - touch1.clientY,
+          touch2.clientX - touch1.clientX
+        );
+        setInitialTouchAngle(angle);
+        
+        // Store initial scale and rotation
+        setInitialGestureScale(anno.scale || 1);
+        setInitialGestureRotation(anno.rotation || 0);
+        
+        return;
+      }
+    }
+
     const { x, y } = getTouchCanvasCoordinates(e);
 
     if (selectedAnnotation) {
@@ -1157,6 +1196,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
+    // Deselect annotation when tapping empty space
     setSelectedAnnotation(null);
 
     if (!tool || tool === "select") return;
@@ -1184,6 +1224,50 @@ export function PhotoAnnotationEditor({
   const handleCanvasTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (!e.touches[0]) return;
+
+    // Handle 2-finger pinch-to-scale and twist-to-rotate gestures
+    if (isMultiTouch && e.touches.length === 2 && selectedAnnotation && initialTouchDistance !== null && initialTouchAngle !== null) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      
+      // Calculate current distance (for pinch-to-scale)
+      const currentDistance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      
+      // Calculate current angle (for twist-to-rotate)
+      const currentAngle = Math.atan2(
+        touch2.clientY - touch1.clientY,
+        touch2.clientX - touch1.clientX
+      );
+      
+      // Calculate scale factor (pinch)
+      const scaleFactor = currentDistance / initialTouchDistance;
+      const newScale = Math.max(0.6, Math.min(4, (initialGestureScale || 1) * scaleFactor));
+      
+      // Calculate rotation delta (twist) in degrees
+      const angleDelta = (currentAngle - initialTouchAngle) * (180 / Math.PI);
+      let newRotation = (initialGestureRotation || 0) + angleDelta;
+      
+      // Normalize rotation to -180 to 180
+      while (newRotation > 180) newRotation -= 360;
+      while (newRotation < -180) newRotation += 360;
+      
+      // Apply transformations
+      const updatedAnnotations = annotations.map(a => {
+        if (a.id !== selectedAnnotation || a.type !== "text") return a;
+        
+        return {
+          ...a,
+          scale: newScale,
+          rotation: newRotation,
+        };
+      });
+      
+      setAnnotations(updatedAnnotations);
+      return;
+    }
 
     const { x, y } = getTouchCanvasCoordinates(e);
 
@@ -1394,6 +1478,17 @@ export function PhotoAnnotationEditor({
   };
 
   const handleCanvasTouchEnd = () => {
+    // Handle multi-touch gesture end
+    if (isMultiTouch && selectedAnnotation) {
+      addToHistory([...annotations]);
+      setIsMultiTouch(false);
+      setInitialTouchDistance(null);
+      setInitialTouchAngle(null);
+      setInitialGestureScale(null);
+      setInitialGestureRotation(null);
+      return;
+    }
+
     if (isResizing && selectedAnnotation) {
       addToHistory([...annotations]);
       setIsResizing(false);
@@ -1778,6 +1873,20 @@ export function PhotoAnnotationEditor({
           ))}
         </div>
       </div>
+
+      {/* Floating Done Button - appears when text annotation is selected */}
+      {selectedAnnotation && annotations.find(a => a.id === selectedAnnotation)?.type === "text" && (
+        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 pb-2">
+          <Button
+            onClick={() => setSelectedAnnotation(null)}
+            data-testid="button-done-editing-text"
+            className="rounded-full hover-elevate px-8 py-3 bg-primary text-primary-foreground shadow-xl text-lg font-semibold"
+            aria-label="Done editing text"
+          >
+            Done
+          </Button>
+        </div>
+      )}
 
       {/* Bottom Toolbar - Non-scrollable Tools */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2">
