@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
@@ -44,6 +45,7 @@ export default function ProjectPhotos() {
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [targetProjectId, setTargetProjectId] = useState<string>("");
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -59,12 +61,25 @@ export default function ProjectPhotos() {
     queryKey: ["/api/projects", projectId, "photos"],
   });
 
-  // Group photos by date (newest first)
+  // Fetch available tags for filtering
+  const { data: availableTags = [] } = useQuery<Tag[]>({
+    queryKey: ["/api/tags"],
+  });
+
+  // Filter photos by selected tags (for use in viewer and display)
+  const filteredPhotos = useMemo(() => {
+    if (selectedTagIds.size === 0) return photos;
+    return photos.filter(photo => 
+      photo.tags?.some(tag => selectedTagIds.has(tag.id))
+    );
+  }, [photos, selectedTagIds]);
+
+  // Group photos by date (newest first) using filtered photos
   const photosByDate = useMemo(() => {
-    if (!photos.length) return [];
+    if (!filteredPhotos.length) return [];
 
     // Sort photos by createdAt (newest first)
-    const sortedPhotos = [...photos].sort((a, b) => 
+    const sortedPhotos = [...filteredPhotos].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
@@ -83,7 +98,7 @@ export default function ProjectPhotos() {
       date,
       photos,
     }));
-  }, [photos]);
+  }, [filteredPhotos]);
 
   const { data: annotations = [] } = useQuery<any[]>({
     queryKey: ["/api/photos", selectedPhoto?.id, "annotations"],
@@ -488,7 +503,76 @@ export default function ProjectPhotos() {
             </label>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-4">
+            {/* Tag Filter */}
+            {availableTags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 pb-2 border-b" data-testid="tag-filter-bar">
+                <span className="text-sm text-muted-foreground font-medium">Filter:</span>
+                {availableTags.map((tag) => {
+                  const isSelected = selectedTagIds.has(tag.id);
+                  return (
+                    <Badge
+                      key={tag.id}
+                      onClick={() => {
+                        const newSelected = new Set(selectedTagIds);
+                        if (isSelected) {
+                          newSelected.delete(tag.id);
+                        } else {
+                          newSelected.add(tag.id);
+                        }
+                        setSelectedTagIds(newSelected);
+                      }}
+                      className={`cursor-pointer gap-1.5 ${
+                        isSelected 
+                          ? 'ring-2 ring-primary' 
+                          : ''
+                      }`}
+                      style={{
+                        backgroundColor: isSelected ? tag.color : undefined,
+                        color: isSelected ? 'white' : undefined,
+                      }}
+                      data-testid={`tag-filter-${tag.id}`}
+                    >
+                      <div 
+                        className="w-2 h-2 rounded-full" 
+                        style={{ backgroundColor: isSelected ? 'white' : tag.color }}
+                      />
+                      {tag.name}
+                    </Badge>
+                  );
+                })}
+                {selectedTagIds.size > 0 && (
+                  <Button
+                    onClick={() => setSelectedTagIds(new Set())}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs"
+                    data-testid="button-clear-filters"
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            )}
+            
+            {/* Empty state when filter yields no results */}
+            {selectedTagIds.size > 0 && photosByDate.length === 0 && (
+              <div className="text-center py-12">
+                <TagIcon className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-xl font-semibold mb-2">No photos match this filter</h2>
+                <p className="text-muted-foreground mb-4">Try selecting different tags or clear the filter</p>
+                <Button
+                  onClick={() => setSelectedTagIds(new Set())}
+                  variant="outline"
+                  size="sm"
+                  data-testid="button-clear-empty-filter"
+                >
+                  Clear Filter
+                </Button>
+              </div>
+            )}
+            
+            <div className="space-y-8">
             {photosByDate.map(({ date, photos: datePhotos }) => (
               <div key={date} data-testid={`date-group-${date}`}>
                 {/* Date Header with Checkbox */}
@@ -509,7 +593,7 @@ export default function ProjectPhotos() {
                 {/* Photos Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {datePhotos.map((photo) => {
-                    const photoIndex = photos.findIndex(p => p.id === photo.id);
+                    const photoIndex = filteredPhotos.findIndex(p => p.id === photo.id);
                     const isSelected = selectedPhotoIds.has(photo.id);
                     return (
                       <div
@@ -585,6 +669,7 @@ export default function ProjectPhotos() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
         )}
       </main>
@@ -631,12 +716,12 @@ export default function ProjectPhotos() {
       {/* Gesture-enabled Photo Viewer */}
       {viewerPhotoIndex !== null && (
         <PhotoGestureViewer
-          photos={photos}
+          photos={filteredPhotos}
           initialIndex={viewerPhotoIndex}
           onClose={() => setViewerPhotoIndex(null)}
           onDelete={(photoId) => deleteMutation.mutate(photoId)}
           onAnnotate={(photo) => {
-            const fullPhoto = photos.find(p => p.id === photo.id);
+            const fullPhoto = filteredPhotos.find(p => p.id === photo.id);
             if (fullPhoto) {
               setViewerPhotoIndex(null);
               setSelectedPhoto(fullPhoto);
