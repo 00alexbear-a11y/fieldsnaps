@@ -40,6 +40,23 @@ export default function Map() {
       return;
     }
 
+    // Check if script already exists in document to prevent duplication
+    const existingScript = document.querySelector(
+      'script[src^="https://maps.googleapis.com/maps/api/js"]'
+    );
+    
+    if (existingScript) {
+      // Script is already loading or loaded, wait for it
+      const checkLoaded = setInterval(() => {
+        if (window.google?.maps) {
+          setIsMapLoaded(true);
+          clearInterval(checkLoaded);
+        }
+      }, 100);
+      
+      return () => clearInterval(checkLoaded);
+    }
+
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker`;
     script.async = true;
@@ -56,9 +73,8 @@ export default function Map() {
     document.head.appendChild(script);
 
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      // Don't remove the script on unmount - it can be reused
+      // This prevents re-downloading the Maps SDK on navigation
       if ('initMap' in window) {
         delete (window as any).initMap;
       }
