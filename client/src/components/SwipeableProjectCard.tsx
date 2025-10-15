@@ -33,6 +33,8 @@ export default function SwipeableProjectCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const touchCurrentRef = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const isHorizontalSwipe = useRef<boolean | null>(null);
 
   const swipeDistance = touchStart !== null && touchCurrent !== null ? touchStart - touchCurrent : 0;
   const isSwipedLeft = swipeDistance > 0;
@@ -53,19 +55,38 @@ export default function SwipeableProjectCard({
     setTouchStart(touch.clientX);
     setTouchCurrent(touch.clientX);
     touchCurrentRef.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+    isHorizontalSwipe.current = null; // Reset swipe direction detection
     setIsSwiping(true);
   };
 
   const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
-    if (touchStart === null) return;
+    if (touchStart === null || touchStartY.current === null) return;
     const touch = e.touches[0];
     if (!touch) return;
     
     const currentX = touch.clientX;
+    const currentY = touch.clientY;
+    const distanceX = Math.abs(touchStart - currentX);
+    const distanceY = Math.abs(touchStartY.current - currentY);
+    
+    // Determine swipe direction on first significant movement
+    if (isHorizontalSwipe.current === null && (distanceX > 5 || distanceY > 5)) {
+      isHorizontalSwipe.current = distanceX > distanceY;
+    }
+    
+    // Only handle horizontal swipes, allow vertical scrolling
+    if (isHorizontalSwipe.current === false) {
+      return; // Let vertical scroll happen naturally
+    }
+    
     const distance = touchStart - currentX;
     
     // Only allow left swipe (distance > 0) and limit max swipe
     if (distance > 0 && distance <= 200) {
+      // Prevent default scroll when swiping horizontally
+      e.preventDefault();
+      
       touchCurrentRef.current = currentX;
       
       // Cancel any pending animation frame
@@ -105,6 +126,10 @@ export default function SwipeableProjectCard({
       touchCurrentRef.current = null;
     }
     setIsSwiping(false);
+    
+    // Reset swipe direction detection for next gesture
+    touchStartY.current = null;
+    isHorizontalSwipe.current = null;
   };
 
   const handleCardClick = () => {
