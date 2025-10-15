@@ -4,6 +4,15 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant photo capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization for challenging environments, aspiring to become a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Critical Bug Fixes - Session Restoration & UI Positioning**:
+  - **Camera Session Null Guards**: Fixed crashes during photo restoration from localStorage by adding `if (photo && photo.id)` checks before calling createPhotoUrl()
+  - **Camera Horizontal Scroll Fix**: Added `overflow-x-hidden` to thumbnail strip container to prevent unwanted horizontal scrolling
+  - **ProjectPhotos Fixed Button Positioning**: Resolved buttons scrolling with content
+    - Removed `overflow-auto` from App.tsx main element (each page owns its scrolling)
+    - Changed ProjectPhotos to `h-screen overflow-auto` container for internal scrolling
+    - Used React Portal (`createPortal` from "react-dom") to render fixed buttons to `document.body`
+    - Buttons (Back, Camera FAB, Select) now correctly stay fixed at `bottom-4` viewport positions
+    - Added `mediaType` field initialization in upload payloads for backend compatibility
 - **Video Recording Pipeline Complete**: Full video support with persistence and playback
   - Added `mediaType` field to distinguish photos from videos throughout the system
   - LocalPhoto interface includes `mediaType: 'photo' | 'video'` with proper defaults
