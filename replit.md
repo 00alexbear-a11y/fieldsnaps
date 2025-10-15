@@ -12,8 +12,11 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
     - App.tsx main element: Changed to `flex-1 overflow-hidden` to contain page routes
     - ProjectPhotos container: Changed to `h-screen overflow-auto` for internal scrolling
     - Used React Portal (`createPortal` from "react-dom") to render all fixed buttons to `document.body`
-    - Three fixed buttons: Back (left), Camera FAB (center), Select (right) - all stay fixed at `bottom-4` viewport positions
-    - Added missing Camera FAB button to ProjectPhotos for quick photo capture
+    - Three fixed buttons positioned at `bottom-20` (80px from bottom) to sit above bottom navigation:
+      - Back button (left): Ghost variant, 56×56px, navigates to Projects list
+      - Camera FAB (center): Primary color, 64×64px, opens camera for current project
+      - Select button (right): Ghost variant, auto×56px, toggles selection mode
+    - All buttons stay fixed at viewport positions when scrolling
     - Fixed TypeScript mediaType type assertion for proper 'photo' | 'video' literal types
 - **Video Recording Pipeline Complete**: Full video support with persistence and playback
   - Added `mediaType` field to distinguish photos from videos throughout the system
