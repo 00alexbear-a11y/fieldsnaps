@@ -67,6 +67,7 @@ export const photos = pgTable("photos", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
+  mediaType: varchar("media_type", { length: 10 }).default('photo').notNull(), // 'photo' or 'video'
   caption: text("caption"),
   photographerId: varchar("photographer_id").references(() => users.id), // Who took the photo
   photographerName: varchar("photographer_name"), // Cached name for offline display

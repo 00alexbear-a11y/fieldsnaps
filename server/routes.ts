@@ -430,6 +430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertPhotoSchema.parse({
         projectId: req.params.projectId,
         url: objectPath,
+        mediaType: req.body.mediaType || 'photo', // Default to 'photo' if not provided
         caption: req.body.caption || req.file.originalname,
         photographerId,
         photographerName,
