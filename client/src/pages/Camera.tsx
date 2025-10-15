@@ -1161,7 +1161,7 @@ export default function Camera() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${!isActive ? 'opacity-0' : 'opacity-100'}`}
         style={{ 
           zIndex: 5,
         }}
