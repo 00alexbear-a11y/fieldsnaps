@@ -167,6 +167,36 @@ export default function PhotoEdit() {
     setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
   };
 
+  const handleDelete = async () => {
+    if (!photoId || !projectId) return;
+
+    try {
+      // Delete photo from IndexedDB
+      await idb.deletePhoto(photoId);
+      
+      if (photoUrlRef.current) {
+        URL.revokeObjectURL(photoUrlRef.current);
+        photoUrlRef.current = null;
+      }
+
+      toast({
+        title: 'Photo deleted',
+        description: 'Photo removed from session',
+        duration: 1500,
+      });
+
+      // Return to camera with project selected
+      setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
+    } catch (error) {
+      console.error('[PhotoEdit] Error deleting photo:', error);
+      toast({
+        title: 'Delete failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (!photoUrl) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -184,6 +214,7 @@ export default function PhotoEdit() {
       existingAnnotations={[]}
       onSave={handleSave}
       onCancel={handleCancel}
+      onDelete={handleDelete}
     />
   );
 }

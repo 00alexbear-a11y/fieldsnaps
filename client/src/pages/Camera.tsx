@@ -131,14 +131,21 @@ export default function Camera() {
     }
   }, [tags]);
 
-  // Clear session photos when project changes or component unmounts
+  // Clear session photos only on project change, not on mount
+  const previousProjectRef = useRef<string>('');
   useEffect(() => {
-    sessionPhotosRef.current = [];
-    setSessionPhotos([]);
+    // Only clear if project actually changed (not on initial mount or returning from edit)
+    if (previousProjectRef.current && previousProjectRef.current !== selectedProject) {
+      sessionPhotosRef.current = [];
+      setSessionPhotos([]);
+    }
+    previousProjectRef.current = selectedProject;
     
     return () => {
-      // Cleanup on unmount
-      sessionPhotosRef.current = [];
+      // Cleanup on unmount only
+      if (!window.location.pathname.includes('/photo/')) {
+        sessionPhotosRef.current = [];
+      }
     };
   }, [selectedProject]);
 
@@ -799,7 +806,7 @@ export default function Camera() {
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
-      // Save to IndexedDB (blob only - URL created on-demand when loading)
+      // Save to IndexedDB with tags (blob only - URL created on-demand when loading)
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -808,6 +815,7 @@ export default function Camera() {
         timestamp: Date.now(),
         syncStatus: 'pending',
         retryCount: 0,
+        pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
       // Revoke temporary URL from worker (not stored in IndexedDB)
@@ -830,13 +838,6 @@ export default function Camera() {
           duration: 3000,
         });
       });
-
-      // Save pre-selected tags to photo if any
-      if (selectedTags.length > 0) {
-        await idb.updatePhoto(savedPhoto.id, { 
-          pendingTagIds: selectedTags 
-        });
-      }
 
       // Keep selected tags for next capture (persist selection)
 
@@ -910,7 +911,7 @@ export default function Camera() {
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
-      // Save to IndexedDB
+      // Save to IndexedDB with tags
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -919,6 +920,7 @@ export default function Camera() {
         timestamp: Date.now(),
         syncStatus: 'pending',
         retryCount: 0,
+        pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
       // Revoke temporary URL from worker
@@ -935,18 +937,9 @@ export default function Camera() {
         });
       });
 
-      // Save pre-selected tags to photo if any
-      if (selectedTags.length > 0) {
-        await idb.updatePhoto(savedPhoto.id, { 
-          pendingTagIds: selectedTags 
-        });
-      }
-
       // Keep selected tags for next capture (persist selection)
 
-      // Stop camera before navigating
-      stopCamera();
-
+      // DON'T stop camera - keep it running for session continuity
       // Navigate to photo edit page
       setLocation(`/photo/${savedPhoto.id}/edit`);
 
