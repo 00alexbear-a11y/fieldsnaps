@@ -219,21 +219,6 @@ export default function SwipeableProjectCard({
               </button>
             )}
             
-            {/* Share Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-11 h-11"
-              onClick={(e) => {
-                e.stopPropagation();
-                onShare();
-              }}
-              data-testid={`button-share-${project.id}`}
-              aria-label={`Share ${project.name}`}
-            >
-              <Share2 className="w-5 h-5" />
-            </Button>
-            
             {/* Camera Button - Always visible */}
             <Button
               variant="ghost"
