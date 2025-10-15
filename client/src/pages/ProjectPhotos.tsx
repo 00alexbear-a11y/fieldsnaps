@@ -745,8 +745,9 @@ export default function ProjectPhotos() {
         <Button
           onClick={toggleSelectMode}
           data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
-          variant={isSelectMode ? "outline" : "default"}
-          className="fixed bottom-4 right-4 z-40 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
+          variant="ghost"
+          size="sm"
+          className="fixed bottom-4 right-4 z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
         >
           {isSelectMode ? 'Cancel' : 'Select'}
         </Button>
