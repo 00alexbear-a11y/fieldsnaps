@@ -140,6 +140,10 @@ class SyncManager {
     };
 
     try {
+      // First, try to apply any pending tags from previous failures
+      // This runs even if sync queue is empty
+      await this.retryPendingTags();
+      
       // Get pending sync items
       const queueItems = await idb.getPendingSyncItems();
       
@@ -510,6 +514,52 @@ class SyncManager {
         // Update local photo with server ID and sync status
         await idb.updatePhotoSyncStatus(item.localId, 'synced', data.id);
 
+        // Apply pending tags if any
+        if (photo.pendingTagIds && photo.pendingTagIds.length > 0 && data.id) {
+          console.log('[Sync] Applying pending tags:', photo.pendingTagIds);
+          
+          const failedTagIds: string[] = [];
+          
+          try {
+            for (const tagId of photo.pendingTagIds) {
+              try {
+                const tagResponse = await fetch(`/api/photos/${data.id}/tags`, {
+                  method: 'POST',
+                  headers: {
+                    ...this.getSyncHeaders(),
+                    'Content-Type': 'application/json',
+                  },
+                  credentials: 'include',
+                  body: JSON.stringify({ tagId }),
+                });
+                
+                if (!tagResponse.ok) {
+                  const errorText = await tagResponse.text();
+                  console.error(`[Sync] Failed to apply tag ${tagId}:`, errorText);
+                  failedTagIds.push(tagId);
+                }
+              } catch (tagFetchError) {
+                console.error(`[Sync] Error applying tag ${tagId}:`, tagFetchError);
+                failedTagIds.push(tagId);
+              }
+            }
+            
+            // Only clear successfully applied tags
+            if (failedTagIds.length === 0) {
+              // All tags applied successfully
+              await idb.updatePhoto(item.localId, { pendingTagIds: [] });
+              console.log('[Sync] All pending tags applied successfully');
+            } else {
+              // Keep failed tags for retry
+              await idb.updatePhoto(item.localId, { pendingTagIds: failedTagIds });
+              console.log(`[Sync] ${failedTagIds.length} tags failed to apply, will retry on next sync`);
+            }
+          } catch (tagError) {
+            console.error('[Sync] Error applying pending tags:', tagError);
+            // Keep all pending tags for retry if there was an unexpected error
+          }
+        }
+
         console.log(`[Sync] Photo uploaded: ${data.id}`);
         return true;
       }
@@ -583,6 +633,85 @@ class SyncManager {
       );
       
       return false;
+    }
+  }
+
+  /**
+   * Retry pending tags for all synced photos that have them
+   * This is called after main sync completes to ensure tags are eventually applied
+   */
+  private async retryPendingTags(): Promise<void> {
+    console.log('[Sync] Checking for photos with pending tags...');
+    
+    try {
+      // Get all photos - we need to scan all projects
+      const allProjects = await idb.getAllProjects();
+      
+      for (const project of allProjects) {
+        // Get photos for this project
+        const photos = await idb.getProjectPhotos(project.id);
+        
+        // Filter to synced photos with pending tags
+        const photosWithPendingTags = photos.filter(
+          photo => photo.syncStatus === 'synced' && 
+                   photo.serverId && 
+                   photo.pendingTagIds && 
+                   photo.pendingTagIds.length > 0
+        );
+        
+        if (photosWithPendingTags.length === 0) continue;
+        
+        console.log(`[Sync] Found ${photosWithPendingTags.length} photos with pending tags in project ${project.name}`);
+        
+        // Try to apply pending tags for each photo
+        for (const photo of photosWithPendingTags) {
+          if (!photo.serverId || !photo.pendingTagIds) continue;
+          
+          console.log(`[Sync] Retrying tags for photo ${photo.serverId}:`, photo.pendingTagIds);
+          
+          const failedTagIds: string[] = [];
+          
+          try {
+            for (const tagId of photo.pendingTagIds) {
+              try {
+                const tagResponse = await fetch(`/api/photos/${photo.serverId}/tags`, {
+                  method: 'POST',
+                  headers: {
+                    ...this.getSyncHeaders(),
+                    'Content-Type': 'application/json',
+                  },
+                  credentials: 'include',
+                  body: JSON.stringify({ tagId }),
+                });
+                
+                if (!tagResponse.ok) {
+                  const errorText = await tagResponse.text();
+                  console.error(`[Sync] Failed to retry tag ${tagId}:`, errorText);
+                  failedTagIds.push(tagId);
+                }
+              } catch (tagFetchError) {
+                console.error(`[Sync] Error retrying tag ${tagId}:`, tagFetchError);
+                failedTagIds.push(tagId);
+              }
+            }
+            
+            // Update pending tags - clear if all succeeded, keep failed ones
+            if (failedTagIds.length === 0) {
+              await idb.updatePhoto(photo.id, { pendingTagIds: [] });
+              console.log(`[Sync] All pending tags applied for photo ${photo.serverId}`);
+            } else {
+              await idb.updatePhoto(photo.id, { pendingTagIds: failedTagIds });
+              console.log(`[Sync] ${failedTagIds.length} tags still pending for photo ${photo.serverId}`);
+            }
+          } catch (error) {
+            console.error(`[Sync] Error processing pending tags for photo ${photo.serverId}:`, error);
+            // Keep all pending tags if there was an unexpected error
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[Sync] Error in retryPendingTags:', error);
+      // Don't throw - this is a best-effort operation
     }
   }
 

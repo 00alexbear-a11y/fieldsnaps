@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
-import { indexedDB as idb } from '@/lib/indexeddb';
+import { indexedDB as idb, type LocalPhoto, createPhotoUrl } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import {
@@ -16,6 +16,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
+import { type Tag } from '@shared/schema';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { Badge } from '@/components/ui/badge';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
   { value: 'quick', label: 'Quick', description: '200KB - Fast upload' },
@@ -56,6 +59,15 @@ export default function Camera() {
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   
+  // Tag selection state
+  const [showTagSelector, setShowTagSelector] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [justCapturedPhotoId, setJustCapturedPhotoId] = useState<string | null>(null);
+  
+  // Thumbnail strip state
+  const [projectPhotos, setProjectPhotos] = useState<LocalPhoto[]>([]);
+  const thumbnailUrlsRef = useRef<Map<string, string>>(new Map());
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -72,6 +84,53 @@ export default function Camera() {
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
+
+  // Load tags for selected project
+  const { data: tags = [] } = useQuery<Tag[]>({
+    queryKey: ['/api/tags', selectedProject],
+    enabled: !!selectedProject,
+  });
+
+  // Load project photos for thumbnail strip
+  useEffect(() => {
+    if (!selectedProject) {
+      setProjectPhotos([]);
+      return;
+    }
+
+    const loadPhotos = async () => {
+      try {
+        const photos = await idb.getProjectPhotos(selectedProject);
+        // Take last 10 photos, sorted by timestamp (most recent first)
+        const recentPhotos = photos.slice(0, 10);
+        setProjectPhotos(recentPhotos);
+      } catch (error) {
+        console.error('[Camera] Failed to load project photos:', error);
+      }
+    };
+
+    loadPhotos();
+  }, [selectedProject]);
+
+  // Create blob URLs for thumbnails and cleanup on unmount
+  useEffect(() => {
+    // Revoke old URLs
+    thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    thumbnailUrlsRef.current.clear();
+
+    // Create new URLs
+    projectPhotos.forEach(photo => {
+      const url = createPhotoUrl(photo);
+      thumbnailUrlsRef.current.set(photo.id, url);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+      thumbnailUrlsRef.current.clear();
+    };
+  }, [projectPhotos]);
+
 
   useEffect(() => {
     // Check for projectId query parameter
@@ -742,6 +801,17 @@ export default function Camera() {
         });
       });
 
+      // Reload photos for thumbnail strip
+      const updatedPhotos = await idb.getProjectPhotos(selectedProject);
+      setProjectPhotos(updatedPhotos.slice(0, 10));
+
+      // Show tag selector if tags are available
+      if (tags.length > 0) {
+        setJustCapturedPhotoId(savedPhoto.id);
+        setSelectedTags([]);
+        setShowTagSelector(true);
+      }
+
       // Visual feedback - pulse quick capture button
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
       if (quickButton) {
@@ -847,6 +917,86 @@ export default function Camera() {
         variant: 'destructive',
       });
       setIsCapturing(false);
+    }
+  };
+
+  // Tag selection handlers
+  const toggleTag = (tagId: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const handleTagSkip = () => {
+    setShowTagSelector(false);
+    setSelectedTags([]);
+    setJustCapturedPhotoId(null);
+  };
+
+  const handleTagDone = async () => {
+    if (!justCapturedPhotoId) {
+      setShowTagSelector(false);
+      setSelectedTags([]);
+      setJustCapturedPhotoId(null);
+      return;
+    }
+
+    if (selectedTags.length === 0) {
+      setShowTagSelector(false);
+      setSelectedTags([]);
+      setJustCapturedPhotoId(null);
+      return;
+    }
+
+    try {
+      // Save pending tags to IndexedDB - they'll be applied after photo uploads
+      await idb.updatePhoto(justCapturedPhotoId, { 
+        pendingTagIds: selectedTags 
+      });
+      
+      toast({
+        title: 'Tags saved',
+        description: 'Tags will be applied after photo uploads',
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('[Camera] Failed to save pending tags:', error);
+      toast({
+        title: 'Tag save failed',
+        description: 'Please try again',
+        variant: 'destructive',
+      });
+    }
+
+    setShowTagSelector(false);
+    setSelectedTags([]);
+    setJustCapturedPhotoId(null);
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      await idb.deletePhoto(photoId);
+      
+      // Reload photos
+      if (selectedProject) {
+        const updatedPhotos = await idb.getProjectPhotos(selectedProject);
+        setProjectPhotos(updatedPhotos.slice(0, 10));
+      }
+
+      toast({
+        title: 'Photo deleted',
+        description: 'Photo removed from local storage',
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('[Camera] Failed to delete photo:', error);
+      toast({
+        title: 'Delete failed',
+        description: 'Failed to delete photo',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -1210,6 +1360,99 @@ export default function Camera() {
           <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 animate-pulse">
             <div className="w-2 h-2 bg-white rounded-full" />
             Recording
+          </div>
+        </div>
+      )}
+
+      {/* Photo Thumbnail Strip - Above capture buttons */}
+      {projectPhotos.length > 0 && !isRecording && (
+        <div className="absolute bottom-28 left-0 right-0 z-15 pb-2">
+          <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide">
+            {projectPhotos.map((photo) => {
+              const url = thumbnailUrlsRef.current.get(photo.id);
+              if (!url) return null;
+              
+              return (
+                <div
+                  key={photo.id}
+                  className="relative flex-shrink-0 group"
+                  data-testid={`thumbnail-${photo.id}`}
+                >
+                  <button
+                    onClick={() => setLocation(`/photo/${photo.id}/edit`)}
+                    className="block w-16 h-16 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
+                  >
+                    <img
+                      src={url}
+                      alt="Thumbnail"
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeletePhoto(photo.id);
+                    }}
+                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    data-testid={`button-delete-thumbnail-${photo.id}`}
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Tag Selector Overlay - Shows after quickCapture */}
+      {showTagSelector && tags.length > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 z-30 pb-safe">
+          <div className="mx-4 mb-28 p-4 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/20">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-white font-medium text-sm">Add Tags</h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleTagSkip}
+                  className="text-white/80 hover:text-white hover:bg-white/10 h-8 px-3"
+                  data-testid="button-tag-skip"
+                >
+                  Skip
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleTagDone}
+                  className="text-white bg-primary hover:bg-primary/90 h-8 px-3"
+                  data-testid="button-tag-done"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+              {tags.map((tag) => {
+                const isSelected = selectedTags.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => toggleTag(tag.id)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-white text-black'
+                        : 'bg-white/20 text-white border border-white/30'
+                    }`}
+                    style={isSelected ? {} : { borderColor: tag.color }}
+                    data-testid={`button-tag-${tag.id}`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
