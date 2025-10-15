@@ -4,17 +4,29 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, focused on effortless, offline-reliable photo documentation. It aims to enhance efficiency and reduce disputes in construction projects through instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app targets full offline functionality and touch optimization for challenging environments, aspiring to be a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Edit Mode Trash Button Fix**: Corrected trash button behavior in photo annotation editor
+  - Trash button now deletes entire photo and returns to camera (previous behavior: deleted annotations)
+  - Provides quick discard workflow for unwanted photos during editing
+  - Consistent with user expectation for "delete photo" action
+- **Session Photo Persistence**: Fixed photo display when returning from edit mode
+  - Session photos now persist when canceling from edit mode back to camera
+  - Photos only clear when fully exiting camera or switching projects
+  - Improved continuity during multi-photo editing sessions
+- **Tag Indicators on Camera Thumbnails**: Enhanced instant visual feedback for tagged photos
+  - Tags now visible immediately on camera preview thumbnails via pendingTagIds
+  - Colored vertical bars on left side of thumbnails (matching project view)
+  - Shows up to 2 tag colors with +N badge if more tags exist
+  - Consistent design across camera and project photo views
+- **Color Picker Position Refinement**: Final positioning adjustment in edit mode
+  - Color picker moved to bottom-20 right-4 (aligned with S/M/L stroke size tabs)
+  - Positioned above trash icon for clear visual hierarchy
+  - Improved right-side alignment for better thumb reach on mobile
 - **Camera Capture Menu Redesign**: New 4-button horizontal layout for improved workflow
   - Back button (ArrowLeft icon) - exits camera, disabled during recording
   - Video mode button (Video icon) - instant recording start/stop toggle
   - Normal camera button (Camera icon) - quick photo capture, larger size for primary action
   - Edit mode button (PenLine icon) - capture and immediately edit
   - All capture buttons disabled during video recording to prevent interruptions
-- **Tag Indicators on Camera Thumbnails**: Tags now visible on camera preview thumbnails
-  - Colored vertical bars displayed on left side of thumbnails (matching project view)
-  - Shows up to 2 tag colors, with +N badge if more than 2 tags
-  - Uses pendingTagIds from LocalPhoto for instant visual feedback
-  - Consistent design across camera and project photo views
 - **Color Picker Alignment Enhancement**: Improved positioning and scroll area
   - Scroll area now spans from left edge of color swatches to right screen edge
   - Full-width container (left-0 right-0) with pl-20 left padding for proper scroll coverage
