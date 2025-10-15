@@ -59,7 +59,7 @@ export interface IStorage {
   // Shares
   createShare(data: InsertShare): Promise<Share>;
   getShareByToken(token: string): Promise<Share | undefined>;
-  getPhotosByIds(photoIds: string[]): Promise<Photo[]>;
+  getShareByProjectId(projectId: string): Promise<Share | undefined>;
   deleteShare(id: string): Promise<boolean>;
   
   // Tags
@@ -291,10 +291,9 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async getPhotosByIds(photoIds: string[]): Promise<Photo[]> {
-    if (photoIds.length === 0) return [];
-    return await db.select().from(photos)
-      .where(and(inArray(photos.id, photoIds), isNull(photos.deletedAt)));
+  async getShareByProjectId(projectId: string): Promise<Share | undefined> {
+    const result = await db.select().from(shares).where(eq(shares.projectId, projectId));
+    return result[0];
   }
 
   async deleteShare(id: string): Promise<boolean> {

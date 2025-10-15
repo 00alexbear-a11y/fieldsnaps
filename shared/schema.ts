@@ -109,14 +109,13 @@ export const comments = pgTable("comments", {
   index("idx_comments_photo_id").on(table.photoId),
 ]);
 
-// Shares table - for generating shareable photo links
+// Shares table - for generating shareable project links (shows all active photos)
 export const shares = pgTable("shares", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   token: varchar("token", { length: 32 }).notNull().unique(), // Unique share link token
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  photoIds: text("photo_ids").array().$type<string[]>().notNull(), // Array of photo IDs to share
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  expiresAt: timestamp("expires_at").notNull(), // 30 days default
+  expiresAt: timestamp("expires_at"), // Optional expiration (null = never expires)
 }, (table) => [
   index("idx_shares_project_id").on(table.projectId),
   index("idx_shares_token").on(table.token),

@@ -40,6 +40,7 @@ import {
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
+import { Copy, Check } from "lucide-react";
 
 type SortOption = 'lastActivity' | 'name' | 'created';
 
@@ -55,6 +56,9 @@ export default function Projects() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
   const { toast } = useToast();
 
   // Efficient bulk query - gets all projects with photo counts in one request
@@ -154,6 +158,24 @@ export default function Projects() {
     },
   });
 
+  const shareMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const res = await apiRequest("POST", `/api/projects/${projectId}/share`);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      setShareToken(data.token);
+      setShareDialogOpen(true);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error generating share link",
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -168,6 +190,30 @@ export default function Projects() {
   const confirmDelete = () => {
     if (projectToDelete) {
       deleteMutation.mutate(projectToDelete.id);
+    }
+  };
+
+  const handleShareProject = (projectId: string) => {
+    shareMutation.mutate(projectId);
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!shareToken) return;
+    
+    const shareUrl = `${window.location.origin}/shared/${shareToken}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+      toast({
+        title: "Link copied",
+        description: "Share link has been copied to clipboard"
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to copy link",
+        variant: "destructive"
+      });
     }
   };
 
@@ -367,6 +413,7 @@ export default function Projects() {
                   onClick={() => setLocation(`/projects/${project.id}`)}
                   onDelete={() => handleDeleteProject(project)}
                   onCameraClick={() => setLocation(`/camera?projectId=${project.id}`)}
+                  onShare={() => handleShareProject(project.id)}
                 />
               );
             })}
@@ -424,6 +471,46 @@ export default function Projects() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share Project Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent data-testid="dialog-share-project">
+          <DialogHeader>
+            <DialogTitle>Share Project</DialogTitle>
+            <DialogDescription>
+              Anyone with this link can view all active photos in this project
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-3 bg-muted rounded-lg border flex items-center gap-2">
+              <code className="flex-1 text-sm truncate" data-testid="text-share-link">
+                {shareToken ? `${window.location.origin}/shared/${shareToken}` : ''}
+              </code>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleCopyShareLink}
+                data-testid="button-copy-link"
+                aria-label="Copy share link"
+              >
+                {copiedLink ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            <DialogFooter>
+              <Button 
+                onClick={() => setShareDialogOpen(false)}
+                data-testid="button-close-share"
+              >
+                Done
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

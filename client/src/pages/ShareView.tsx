@@ -8,9 +8,18 @@ import type { Photo, Project, Share } from "../../../shared/schema";
 import { format } from "date-fns";
 
 interface ShareData {
-  share: Share;
-  photos: Photo[];
-  project: Project;
+  project: {
+    name: string;
+    description?: string;
+    address?: string;
+  };
+  photos: Array<{
+    id: string;
+    url: string;
+    caption?: string;
+    createdAt: Date;
+    photographerName?: string;
+  }>;
 }
 
 export default function ShareView() {
@@ -18,12 +27,14 @@ export default function ShareView() {
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
 
   const { data, isLoading, error } = useQuery<ShareData>({
-    queryKey: [`/api/shares/${token}`],
+    queryKey: [`/api/shared/${token}`],
   });
 
   // Group photos by date (newest first)
   const photosByDate = useMemo(() => {
     if (!data?.photos || data.photos.length === 0) return [];
+
+    type SharedPhoto = ShareData['photos'][0];
 
     // Sort photos by createdAt (newest first)
     const sortedPhotos = [...data.photos].sort((a, b) => 
@@ -31,7 +42,7 @@ export default function ShareView() {
     );
 
     // Group by date
-    const groups = new Map<string, Photo[]>();
+    const groups = new Map<string, SharedPhoto[]>();
     sortedPhotos.forEach(photo => {
       const date = format(new Date(photo.createdAt), 'MMMM d, yyyy');
       if (!groups.has(date)) {
@@ -47,7 +58,7 @@ export default function ShareView() {
     }));
   }, [data?.photos]);
 
-  const handleDownload = async (photo: Photo) => {
+  const handleDownload = async (photo: ShareData['photos'][0]) => {
     try {
       const response = await fetch(photo.url);
       const blob = await response.blob();
