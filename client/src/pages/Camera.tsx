@@ -1382,17 +1382,15 @@ export default function Camera() {
       />
 
       {/* Annotation Canvas - Visible during recording for drawing */}
-      {isRecording && (
-        <canvas
-          ref={annotationCanvasRef}
-          className="absolute inset-0 w-full h-full object-cover touch-none"
-          style={{ zIndex: 15 }}
-          onTouchStart={handleAnnotationTouchStart}
-          onTouchMove={handleAnnotationTouchMove}
-          onTouchEnd={handleAnnotationTouchEnd}
-          data-testid="annotation-canvas"
-        />
-      )}
+      <canvas
+        ref={annotationCanvasRef}
+        className={`absolute inset-0 w-full h-full object-cover ${isRecording ? 'touch-none' : 'pointer-events-none opacity-0'}`}
+        style={{ zIndex: 15 }}
+        onTouchStart={handleAnnotationTouchStart}
+        onTouchMove={handleAnnotationTouchMove}
+        onTouchEnd={handleAnnotationTouchEnd}
+        data-testid="annotation-canvas"
+      />
 
       {/* Composite Canvas - Hidden, used for recording video + annotations */}
       <canvas
