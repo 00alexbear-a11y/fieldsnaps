@@ -22,6 +22,7 @@ export interface LocalPhoto {
   serverId?: string; // ID from server after successful upload
   retryCount: number;
   annotations?: string | null; // JSON string of annotations
+  pendingTagIds?: string[]; // Tags selected but not yet synced to server
   createdAt: number;
   updatedAt: number;
 }
