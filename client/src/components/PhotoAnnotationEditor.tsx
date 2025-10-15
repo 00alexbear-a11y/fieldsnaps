@@ -128,6 +128,7 @@ interface PhotoAnnotationEditorProps {
   existingAnnotations?: Annotation[];
   onSave: (annotations: Annotation[], annotatedBlob: Blob) => void;
   onCancel?: () => void;
+  onDelete?: () => void;
 }
 
 type ResizeHandle = "start" | "end" | "radius" | "corner" | "rotate";
@@ -138,6 +139,7 @@ export function PhotoAnnotationEditor({
   existingAnnotations = [],
   onSave,
   onCancel,
+  onDelete,
 }: PhotoAnnotationEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -1879,12 +1881,12 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Color Picker - Aligned with S/M/L tabs */}
-      <div className="fixed bottom-20 right-0 z-[60] pb-2">
-        {/* Expanded Color Palette - Right-anchored full-width with left padding for scroll area */}
+      {/* Color Picker - Right side, aligned with S/M/L tabs height */}
+      <div className="fixed bottom-20 right-4 z-[60] pb-2">
+        {/* Expanded Color Palette - Floating above toggle button */}
         {colorPickerExpanded && (
           <div 
-            className="absolute bottom-14 right-0 left-0 pl-20 flex flex-col items-end gap-2 py-4 pr-4 max-h-[300px] overflow-y-auto pointer-events-auto"
+            className="absolute bottom-14 right-0 flex flex-col gap-2 py-4 max-h-[300px] overflow-y-auto pointer-events-auto"
             style={{ 
               scrollbarWidth: 'none', 
               msOverflowStyle: 'none',
@@ -1917,7 +1919,7 @@ export function PhotoAnnotationEditor({
             console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
             setColorPickerExpanded(!colorPickerExpanded);
           }}
-          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg pointer-events-auto mr-4"
+          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg pointer-events-auto"
           style={{ backgroundColor: selectedColor }}
           data-testid="button-toggle-color-picker"
           aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}
@@ -2063,11 +2065,10 @@ export function PhotoAnnotationEditor({
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleDeleteSelected}
-            disabled={!selectedAnnotation}
+            onClick={onDelete}
             data-testid="button-delete"
             className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Delete selected"
+            aria-label="Delete photo"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
