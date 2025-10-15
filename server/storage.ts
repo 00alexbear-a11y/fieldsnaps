@@ -1,10 +1,12 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags } from "../shared/schema";
+import { projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, subscriptions, subscriptionEvents } from "../shared/schema";
 import type {
   User, UpsertUser,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag
+  Subscription, SubscriptionEvent,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag,
+  InsertSubscription, InsertSubscriptionEvent
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
 import { ObjectStorageService } from "./objectStorage";
@@ -70,6 +72,16 @@ export interface IStorage {
   getPhotoTags(photoId: string): Promise<(PhotoTag & { tag: Tag })[]>;
   addPhotoTag(data: InsertPhotoTag): Promise<PhotoTag>;
   removePhotoTag(photoId: string, tagId: string): Promise<boolean>;
+  
+  // Billing & Subscriptions
+  updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
+  updateUserSubscriptionStatus(userId: string, status: string, trialEndDate?: Date): Promise<User | undefined>;
+  createSubscription(data: InsertSubscription): Promise<Subscription>;
+  updateSubscription(id: string, data: Partial<InsertSubscription>): Promise<Subscription | undefined>;
+  getSubscriptionByUserId(userId: string): Promise<Subscription | undefined>;
+  getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined>;
+  createSubscriptionEvent(data: InsertSubscriptionEvent): Promise<SubscriptionEvent>;
+  getSubscriptionEvents(subscriptionId: string): Promise<SubscriptionEvent[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -460,6 +472,62 @@ export class DbStorage implements IStorage {
       .where(and(eq(photoTags.photoId, photoId), eq(photoTags.tagId, tagId)))
       .returning();
     return result.length > 0;
+  }
+
+  // Billing & Subscriptions
+  async updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserSubscriptionStatus(userId: string, status: string, trialEndDate?: Date): Promise<User | undefined> {
+    const updates: any = { subscriptionStatus: status };
+    if (trialEndDate) {
+      updates.trialEndDate = trialEndDate;
+    }
+    
+    const result = await db.update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async createSubscription(data: InsertSubscription): Promise<Subscription> {
+    const result = await db.insert(subscriptions).values(data).returning();
+    return result[0];
+  }
+
+  async updateSubscription(id: string, data: Partial<InsertSubscription>): Promise<Subscription | undefined> {
+    const result = await db.update(subscriptions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getSubscriptionByUserId(userId: string): Promise<Subscription | undefined> {
+    const result = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId));
+    return result[0];
+  }
+
+  async getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined> {
+    const result = await db.select().from(subscriptions).where(eq(subscriptions.stripeSubscriptionId, stripeSubscriptionId));
+    return result[0];
+  }
+
+  async createSubscriptionEvent(data: InsertSubscriptionEvent): Promise<SubscriptionEvent> {
+    const result = await db.insert(subscriptionEvents).values(data).returning();
+    return result[0];
+  }
+
+  async getSubscriptionEvents(subscriptionId: string): Promise<SubscriptionEvent[]> {
+    return await db.select().from(subscriptionEvents)
+      .where(eq(subscriptionEvents.subscriptionId, subscriptionId))
+      .orderBy(subscriptionEvents.createdAt);
   }
 
   // Seed predefined trade tags
