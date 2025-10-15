@@ -77,6 +77,15 @@ export default function Camera() {
   const cameraSessionIdRef = useRef<number>(0); // Track camera session to prevent race conditions
   const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null); // Preserve user's zoom choice
   const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce camera starts
+  
+  // Video annotation refs
+  const annotationCanvasRef = useRef<HTMLCanvasElement>(null);
+  const compositeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const drawingPathRef = useRef<{x: number, y: number}[]>([]);
+  const isRecordingRef = useRef<boolean>(false);
+  const clearTimeoutRef = useRef<number | null>(null);
+  
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
 
@@ -706,12 +715,141 @@ export default function Camera() {
     pinchStartDistanceRef.current = null;
   };
 
+  // Video annotation drawing handlers
+  const handleAnnotationTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isRecording) return;
+    
+    e.preventDefault();
+    const canvas = annotationCanvasRef.current;
+    if (!canvas) return;
+    
+    // Cancel any pending clear
+    if (clearTimeoutRef.current !== null) {
+      clearTimeout(clearTimeoutRef.current);
+      clearTimeoutRef.current = null;
+    }
+    
+    // Clear previous stroke before starting new one
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    
+    // Scale coordinates from CSS pixels to canvas resolution
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    setIsDrawing(true);
+    drawingPathRef.current = [{x, y}];
+    
+    // Draw initial point
+    if (ctx) {
+      ctx.strokeStyle = '#169DF5';
+      ctx.lineWidth = 8 * Math.min(scaleX, scaleY); // Scale line width too
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+  };
+
+  const handleAnnotationTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isRecording || !isDrawing) return;
+    
+    e.preventDefault();
+    const canvas = annotationCanvasRef.current;
+    if (!canvas) return;
+    
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    
+    // Scale coordinates from CSS pixels to canvas resolution
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    drawingPathRef.current.push({x, y});
+    
+    // Draw line
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+  };
+
+  const handleAnnotationTouchEnd = () => {
+    if (!isRecording) return;
+    
+    setIsDrawing(false);
+    drawingPathRef.current = [];
+    
+    // Clear canvas after brief delay to ensure composite loop captures stroke
+    // 50ms gives ~1-2 frames at 30fps, feels temporary to user
+    const canvas = annotationCanvasRef.current;
+    if (canvas) {
+      clearTimeoutRef.current = window.setTimeout(() => {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        clearTimeoutRef.current = null;
+      }, 50);
+    }
+  };
+
   const startRecording = async () => {
     if (!streamRef.current || isRecording) return;
     
     try {
+      const video = videoRef.current;
+      const annotationCanvas = annotationCanvasRef.current;
+      const compositeCanvas = compositeCanvasRef.current;
+      
+      if (!video || !annotationCanvas || !compositeCanvas) {
+        throw new Error('Canvas elements not ready');
+      }
+
+      // Set canvas dimensions to match video
+      const width = video.videoWidth || 1280;
+      const height = video.videoHeight || 720;
+      
+      annotationCanvas.width = width;
+      annotationCanvas.height = height;
+      compositeCanvas.width = width;
+      compositeCanvas.height = height;
+
+      const compositeCtx = compositeCanvas.getContext('2d');
+      if (!compositeCtx) throw new Error('Failed to get composite canvas context');
+
+      // Composite video + annotations continuously
+      let animationFrameId: number;
+      const composite = () => {
+        // Draw video frame
+        compositeCtx.drawImage(video, 0, 0, width, height);
+        
+        // Draw annotations on top (if any)
+        if (annotationCanvas.width > 0 && annotationCanvas.height > 0) {
+          compositeCtx.drawImage(annotationCanvas, 0, 0);
+        }
+        
+        if (isRecordingRef.current) {
+          animationFrameId = requestAnimationFrame(composite);
+        }
+      };
+      composite();
+
+      // Capture composite canvas stream
+      const compositeStream = compositeCanvas.captureStream(30); // 30 fps
+      
       recordedChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(streamRef.current, {
+      const mediaRecorder = new MediaRecorder(compositeStream, {
         mimeType: 'video/webm',
       });
 
@@ -722,6 +860,9 @@ export default function Camera() {
       };
 
       mediaRecorder.onstop = async () => {
+        // Stop compositing
+        cancelAnimationFrame(animationFrameId);
+        
         const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
         
         if (!selectedProject) {
@@ -773,11 +914,12 @@ export default function Camera() {
 
       mediaRecorder.start();
       mediaRecorderRef.current = mediaRecorder;
+      isRecordingRef.current = true;
       setIsRecording(true);
       
       toast({
         title: 'Recording Started',
-        description: 'Tap again to stop recording',
+        description: 'Draw on screen to highlight - lift finger to clear',
       });
     } catch (error) {
       console.error('Recording error:', error);
@@ -793,7 +935,23 @@ export default function Camera() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current = null;
+      isRecordingRef.current = false;
       setIsRecording(false);
+      
+      // Cancel any pending clear
+      if (clearTimeoutRef.current !== null) {
+        cancelAnimationFrame(clearTimeoutRef.current);
+        clearTimeoutRef.current = null;
+      }
+      
+      // Clear annotation canvas when stopping
+      const canvas = annotationCanvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
     }
   };
 
@@ -1221,6 +1379,26 @@ export default function Camera() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         data-testid="video-camera-stream"
+      />
+
+      {/* Annotation Canvas - Visible during recording for drawing */}
+      {isRecording && (
+        <canvas
+          ref={annotationCanvasRef}
+          className="absolute inset-0 w-full h-full object-cover touch-none"
+          style={{ zIndex: 15 }}
+          onTouchStart={handleAnnotationTouchStart}
+          onTouchMove={handleAnnotationTouchMove}
+          onTouchEnd={handleAnnotationTouchEnd}
+          data-testid="annotation-canvas"
+        />
+      )}
+
+      {/* Composite Canvas - Hidden, used for recording video + annotations */}
+      <canvas
+        ref={compositeCanvasRef}
+        className="absolute"
+        style={{ top: '-9999px', left: '-9999px' }}
       />
 
       {/* Zoom Indicator - Shows when pinching */}
