@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation } from 'wouter';
+import { useParams } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
@@ -24,7 +24,6 @@ interface Annotation {
 
 export default function PhotoEdit() {
   const { id: photoId } = useParams();
-  const [, setLocation] = useLocation();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,7 +58,7 @@ export default function PhotoEdit() {
           description: 'The photo could not be loaded',
           variant: 'destructive',
         });
-        setLocation('/camera');
+        window.history.back();
       }
     };
 
@@ -144,8 +143,8 @@ export default function PhotoEdit() {
         photoUrlRef.current = null;
       }
 
-      // Return to camera with project selected
-      setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
+      // Return to camera preserving its state
+      window.history.back();
     } catch (error) {
       console.error('[PhotoEdit] Error saving annotations:', error);
       toast({
@@ -163,8 +162,8 @@ export default function PhotoEdit() {
       URL.revokeObjectURL(photoUrlRef.current);
       photoUrlRef.current = null;
     }
-    // Return to camera with project selected
-    setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
+    // Return to camera preserving its state
+    window.history.back();
   };
 
   const handleDelete = async () => {
@@ -185,8 +184,8 @@ export default function PhotoEdit() {
         duration: 1500,
       });
 
-      // Return to camera with project selected
-      setLocation(projectId ? `/camera?projectId=${projectId}` : '/camera');
+      // Return to camera preserving its state
+      window.history.back();
     } catch (error) {
       console.error('[PhotoEdit] Error deleting photo:', error);
       toast({
