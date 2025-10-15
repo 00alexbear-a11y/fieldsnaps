@@ -59,10 +59,8 @@ export default function Camera() {
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   
-  // Tag selection state
-  const [showTagSelector, setShowTagSelector] = useState(false);
+  // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [justCapturedPhotoId, setJustCapturedPhotoId] = useState<string | null>(null);
   
   // Thumbnail strip state
   const [projectPhotos, setProjectPhotos] = useState<LocalPhoto[]>([]);
@@ -90,6 +88,25 @@ export default function Camera() {
     queryKey: ['/api/tags', selectedProject],
     enabled: !!selectedProject,
   });
+
+  // Clear selected tags when project changes
+  useEffect(() => {
+    setSelectedTags([]);
+  }, [selectedProject]);
+
+  // Filter out invalid tag IDs when tags list changes (but keep valid selections)
+  useEffect(() => {
+    if (selectedTags.length > 0) {
+      if (tags.length === 0) {
+        // If all tags are deleted, clear selections
+        setSelectedTags([]);
+      } else {
+        // Filter to keep only valid tag IDs
+        const validTagIds = new Set(tags.map(t => t.id));
+        setSelectedTags(prev => prev.filter(tagId => validTagIds.has(tagId)));
+      }
+    }
+  }, [tags]);
 
   // Load project photos for thumbnail strip
   useEffect(() => {
@@ -801,16 +818,19 @@ export default function Camera() {
         });
       });
 
+      // Save pre-selected tags to photo if any
+      if (selectedTags.length > 0) {
+        await idb.updatePhoto(savedPhoto.id, { 
+          pendingTagIds: selectedTags 
+        });
+      }
+
+      // Clear selected tags after capture
+      setSelectedTags([]);
+
       // Reload photos for thumbnail strip
       const updatedPhotos = await idb.getProjectPhotos(selectedProject);
       setProjectPhotos(updatedPhotos.slice(0, 10));
-
-      // Show tag selector if tags are available
-      if (tags.length > 0) {
-        setJustCapturedPhotoId(savedPhoto.id);
-        setSelectedTags([]);
-        setShowTagSelector(true);
-      }
 
       // Visual feedback - pulse quick capture button
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
@@ -903,6 +923,16 @@ export default function Camera() {
         });
       });
 
+      // Save pre-selected tags to photo if any
+      if (selectedTags.length > 0) {
+        await idb.updatePhoto(savedPhoto.id, { 
+          pendingTagIds: selectedTags 
+        });
+      }
+
+      // Clear selected tags after capture
+      setSelectedTags([]);
+
       // Stop camera before navigating
       stopCamera();
 
@@ -920,60 +950,6 @@ export default function Camera() {
     }
   };
 
-  // Tag selection handlers
-  const toggleTag = (tagId: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tagId) 
-        ? prev.filter(id => id !== tagId)
-        : [...prev, tagId]
-    );
-  };
-
-  const handleTagSkip = () => {
-    setShowTagSelector(false);
-    setSelectedTags([]);
-    setJustCapturedPhotoId(null);
-  };
-
-  const handleTagDone = async () => {
-    if (!justCapturedPhotoId) {
-      setShowTagSelector(false);
-      setSelectedTags([]);
-      setJustCapturedPhotoId(null);
-      return;
-    }
-
-    if (selectedTags.length === 0) {
-      setShowTagSelector(false);
-      setSelectedTags([]);
-      setJustCapturedPhotoId(null);
-      return;
-    }
-
-    try {
-      // Save pending tags to IndexedDB - they'll be applied after photo uploads
-      await idb.updatePhoto(justCapturedPhotoId, { 
-        pendingTagIds: selectedTags 
-      });
-      
-      toast({
-        title: 'Tags saved',
-        description: 'Tags will be applied after photo uploads',
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error('[Camera] Failed to save pending tags:', error);
-      toast({
-        title: 'Tag save failed',
-        description: 'Please try again',
-        variant: 'destructive',
-      });
-    }
-
-    setShowTagSelector(false);
-    setSelectedTags([]);
-    setJustCapturedPhotoId(null);
-  };
 
   const handleDeletePhoto = async (photoId: string) => {
     try {
@@ -1292,6 +1268,40 @@ export default function Camera() {
         </div>
       )}
 
+      {/* Tag Selector - Lower left side, horizontal scrollable */}
+      {tags.length > 0 && !isRecording && (
+        <div className="absolute bottom-28 left-4 z-15 max-w-[70%]">
+          <div className="bg-black/60 backdrop-blur-md rounded-xl p-2 border border-white/20">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 pt-1">
+              {tags.map((tag) => {
+                const isSelected = selectedTags.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => {
+                      setSelectedTags(prev =>
+                        prev.includes(tag.id)
+                          ? prev.filter(id => id !== tag.id)
+                          : [...prev, tag.id]
+                      );
+                    }}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      isSelected
+                        ? 'bg-white text-black'
+                        : 'bg-white/20 text-white border border-white/30'
+                    }`}
+                    style={isSelected ? {} : { borderColor: tag.color }}
+                    data-testid={`button-tag-select-${tag.id}`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Capture Controls - Minimal, no background box */}
       <div className="absolute bottom-6 left-0 right-0 pb-safe z-20">
         {cameraMode === 'photo' ? (
@@ -1405,57 +1415,6 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Tag Selector Overlay - Shows after quickCapture */}
-      {showTagSelector && tags.length > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 z-30 pb-safe">
-          <div className="mx-4 mb-28 p-4 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/20">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-white font-medium text-sm">Add Tags</h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleTagSkip}
-                  className="text-white/80 hover:text-white hover:bg-white/10 h-8 px-3"
-                  data-testid="button-tag-skip"
-                >
-                  Skip
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleTagDone}
-                  className="text-white bg-primary hover:bg-primary/90 h-8 px-3"
-                  data-testid="button-tag-done"
-                >
-                  Done
-                </Button>
-              </div>
-            </div>
-            
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-              {tags.map((tag) => {
-                const isSelected = selectedTags.includes(tag.id);
-                return (
-                  <button
-                    key={tag.id}
-                    onClick={() => toggleTag(tag.id)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                      isSelected
-                        ? 'bg-white text-black'
-                        : 'bg-white/20 text-white border border-white/30'
-                    }`}
-                    style={isSelected ? {} : { borderColor: tag.color }}
-                    data-testid={`button-tag-${tag.id}`}
-                  >
-                    {tag.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
