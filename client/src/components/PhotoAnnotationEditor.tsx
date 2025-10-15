@@ -542,47 +542,49 @@ export function PhotoAnnotationEditor({
     const thickerLineWidth = lineWidth * scaleFactor;
     
     const arrowLength = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
-    
-    // Arrowhead size scales proportionally with stroke width (S=11.25, M=19.5, L=27)
-    const headLength = Math.min(arrowLength * 0.35, thickerLineWidth * 1.5);
     const angle = Math.atan2(toY - fromY, toX - fromX);
-
-    // Calculate the base of the arrowhead triangle
-    const baseX = toX - headLength * Math.cos(angle);
-    const baseY = toY - headLength * Math.sin(angle);
+    
+    // Arrowhead proportions - larger and more prominent
+    const headLength = Math.max(thickerLineWidth * 2.5, 30); // Minimum 30px for visibility
+    const headWidth = thickerLineWidth * 1.2; // Width extends beyond shaft
+    
+    // Calculate where shaft meets arrowhead (shaft stops here)
+    const shaftEndX = toX - headLength * Math.cos(angle);
+    const shaftEndY = toY - headLength * Math.sin(angle);
+    
+    // Calculate arrowhead points that extend past the shaft
+    const perpAngle = angle + Math.PI / 2;
+    const point1X = shaftEndX + headWidth * Math.cos(perpAngle);
+    const point1Y = shaftEndY + headWidth * Math.sin(perpAngle);
+    const point2X = shaftEndX - headWidth * Math.cos(perpAngle);
+    const point2Y = shaftEndY - headWidth * Math.sin(perpAngle);
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    // Draw black outline for arrow shaft first
-    ctx.lineWidth = thickerLineWidth + 6; // Thicker for black outline
+    // Draw black outline for shaft
+    ctx.lineWidth = thickerLineWidth + 6;
     ctx.strokeStyle = '#000000';
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
-    ctx.lineTo(baseX, baseY);
+    ctx.lineTo(shaftEndX, shaftEndY);
     ctx.stroke();
 
-    // Draw colored arrow shaft on top
+    // Draw colored shaft
     ctx.lineWidth = thickerLineWidth;
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
-    ctx.lineTo(baseX, baseY);
+    ctx.lineTo(shaftEndX, shaftEndY);
     ctx.stroke();
 
-    // Draw black outline for arrowhead first
+    // Draw black outline for arrowhead (filled triangle)
     ctx.beginPath();
-    ctx.moveTo(toX, toY);
-    ctx.lineTo(
-      toX - headLength * Math.cos(angle - Math.PI / 9),
-      toY - headLength * Math.sin(angle - Math.PI / 9)
-    );
-    ctx.lineTo(
-      toX - headLength * Math.cos(angle + Math.PI / 9),
-      toY - headLength * Math.sin(angle + Math.PI / 9)
-    );
+    ctx.moveTo(toX, toY); // Tip
+    ctx.lineTo(point1X, point1Y); // One side
+    ctx.lineTo(point2X, point2Y); // Other side
     ctx.closePath();
-    ctx.lineWidth = 6; // Black outline for arrowhead
+    ctx.lineWidth = 6;
     ctx.strokeStyle = '#000000';
     ctx.stroke();
     ctx.fillStyle = '#000000';
@@ -591,14 +593,8 @@ export function PhotoAnnotationEditor({
     // Draw colored arrowhead on top
     ctx.beginPath();
     ctx.moveTo(toX, toY);
-    ctx.lineTo(
-      toX - headLength * Math.cos(angle - Math.PI / 9),
-      toY - headLength * Math.sin(angle - Math.PI / 9)
-    );
-    ctx.lineTo(
-      toX - headLength * Math.cos(angle + Math.PI / 9),
-      toY - headLength * Math.sin(angle + Math.PI / 9)
-    );
+    ctx.lineTo(point1X, point1Y);
+    ctx.lineTo(point2X, point2Y);
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
