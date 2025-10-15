@@ -286,10 +286,8 @@ class SyncManager {
   private async processSyncItem(item: SyncQueueItem): Promise<boolean> {
     // Check if max retries exceeded
     if (item.retryCount >= MAX_RETRY_COUNT) {
-      console.error(`[Sync] Max retries exceeded for ${item.type} ${item.localId}`);
-      await idb.updateSyncQueueItem(item.id, {
-        error: 'Max retries exceeded',
-      });
+      console.error(`[Sync] Max retries exceeded for ${item.type} ${item.localId} - removing from queue`);
+      await idb.removeFromSyncQueue(item.id);
       return false;
     }
 

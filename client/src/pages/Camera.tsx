@@ -61,6 +61,7 @@ export default function Camera() {
   
   // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const hasAutoSelectedGeneralRef = useRef<boolean>(false); // Track if we've auto-selected General tag
   
   // Session-only thumbnail strip state (only photos from this session)
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
@@ -111,9 +112,10 @@ export default function Camera() {
     console.log('[Camera Tags] Should show selector:', tags.length > 0 && !isRecording);
   }, [selectedProject, tags, isRecording]);
 
-  // Clear selected tags when project changes
+  // Clear selected tags when project changes and reset auto-select flag
   useEffect(() => {
     setSelectedTags([]);
+    hasAutoSelectedGeneralRef.current = false; // Reset for new project
   }, [selectedProject]);
 
   // Filter out invalid tag IDs when tags list changes (but keep valid selections)
@@ -129,6 +131,17 @@ export default function Camera() {
       }
     }
   }, [tags]);
+
+  // Auto-select "General" tag when camera opens with tags loaded (only once per project)
+  useEffect(() => {
+    if (tags.length > 0 && selectedTags.length === 0 && !hasAutoSelectedGeneralRef.current) {
+      const generalTag = tags.find(tag => tag.name.toLowerCase() === 'general');
+      if (generalTag) {
+        setSelectedTags([generalTag.id]);
+        hasAutoSelectedGeneralRef.current = true; // Mark that we've auto-selected
+      }
+    }
+  }, [tags, selectedTags.length]);
 
   // Clear session photos when project changes or component unmounts
   useEffect(() => {
@@ -837,8 +850,7 @@ export default function Camera() {
         });
       }
 
-      // Clear selected tags after capture
-      setSelectedTags([]);
+      // Keep selected tags for next capture (persist selection)
 
       // Add photo to session thumbnails (most recent first)
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
@@ -942,8 +954,7 @@ export default function Camera() {
         });
       }
 
-      // Clear selected tags after capture
-      setSelectedTags([]);
+      // Keep selected tags for next capture (persist selection)
 
       // Stop camera before navigating
       stopCamera();
@@ -1278,10 +1289,10 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Tag Selector - Vertical on right side */}
+      {/* Tag Selector - Vertical on right side (max 5 visible, scrollable) */}
       {tags.length > 0 && !isRecording && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30 max-h-[60vh]">
-          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30">
+          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1 max-h-[220px]">
             {tags.map((tag) => {
               const isSelected = selectedTags.includes(tag.id);
               return (

@@ -548,7 +548,11 @@ export default function Settings() {
                 <SelectTrigger id="tag-color" data-testid="select-tag-color">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent 
+                  position="popper"
+                  sideOffset={5}
+                  className="z-50"
+                >
                   {TAG_COLORS.map((color) => (
                     <SelectItem key={color.value} value={color.value}>
                       <div className="flex items-center gap-2">
