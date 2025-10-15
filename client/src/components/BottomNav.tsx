@@ -55,26 +55,41 @@ export default function BottomNav() {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);
+          const isCamera = tab.id === 'camera';
 
           return (
             <Link key={tab.id} href={tab.path}>
-              <button
-                className="flex flex-col items-center justify-center min-w-[88px] h-full space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                data-testid={`button-tab-${tab.id}`}
-              >
-                <Icon
-                  className={`w-6 h-6 transition-colors ${
-                    active ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                />
-                <span
-                  className={`text-xs font-medium transition-colors ${
-                    active ? 'text-primary' : 'text-muted-foreground'
-                  }`}
+              {isCamera ? (
+                <button
+                  className="flex flex-col items-center justify-center min-w-[88px] h-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  data-testid={`button-tab-${tab.id}`}
                 >
-                  {tab.label}
-                </span>
-              </button>
+                  <div className="flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 mb-0.5">
+                    <Icon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <span className="text-xs font-medium text-primary">
+                    {tab.label}
+                  </span>
+                </button>
+              ) : (
+                <button
+                  className="flex flex-col items-center justify-center min-w-[88px] h-full space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  data-testid={`button-tab-${tab.id}`}
+                >
+                  <Icon
+                    className={`w-6 h-6 transition-colors ${
+                      active ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                  />
+                  <span
+                    className={`text-xs font-medium transition-colors ${
+                      active ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {tab.label}
+                  </span>
+                </button>
+              )}
             </Link>
           );
         })}
