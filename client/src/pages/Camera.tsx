@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2 } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -61,6 +61,7 @@ export default function Camera() {
   
   // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   
   // Session-only thumbnail strip state (only photos from this session)
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
@@ -1276,35 +1277,71 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Tag Selector - Vertical on right side (max 5 visible, scrollable) */}
+      {/* Tag Selector - Collapsible popup (like color picker in edit mode) */}
       {tags.length > 0 && !isRecording && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30">
-          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1 max-h-[220px]">
-            {tags.map((tag) => {
-              const isSelected = selectedTags.includes(tag.id);
-              return (
-                <button
-                  key={tag.id}
-                  onClick={() => {
-                    setSelectedTags(prev =>
-                      prev.includes(tag.id)
-                        ? prev.filter(id => id !== tag.id)
-                        : [...prev, tag.id]
-                    );
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap backdrop-blur-md ${
-                    isSelected
-                      ? 'bg-white text-black'
-                      : 'bg-white/20 text-white border border-white/30'
-                  }`}
-                  style={isSelected ? {} : { borderColor: tag.color }}
-                  data-testid={`button-tag-select-${tag.id}`}
-                >
-                  {tag.name}
-                </button>
-              );
-            })}
-          </div>
+        <div className="absolute bottom-44 right-4 z-30">
+          {/* Expanded Tag List - Floating above toggle button */}
+          {tagPickerExpanded && (
+            <div 
+              className="absolute bottom-14 right-0 flex flex-col gap-2 py-4 max-h-[220px] overflow-y-auto"
+              style={{ 
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+                maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
+              }}
+            >
+              {tags.map((tag) => {
+                const isSelected = selectedTags.includes(tag.id);
+                const tagColorMap: Record<string, string> = {
+                  red: '#ef4444',
+                  orange: '#f97316',
+                  yellow: '#eab308',
+                  blue: '#3b82f6',
+                  gray: '#6b7280',
+                };
+                const bgColor = tagColorMap[tag.color] || '#6b7280';
+                
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => {
+                      setSelectedTags(prev =>
+                        prev.includes(tag.id)
+                          ? prev.filter(id => id !== tag.id)
+                          : [...prev, tag.id]
+                      );
+                    }}
+                    className={`px-3 py-1.5 rounded-full border hover-elevate transition-all flex-shrink-0 text-xs font-medium shadow-lg whitespace-nowrap ${
+                      isSelected ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
+                    }`}
+                    style={{ backgroundColor: bgColor, color: 'white' }}
+                    data-testid={`button-tag-${tag.name.toLowerCase()}`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          
+          {/* Fixed Toggle Button */}
+          <button
+            onClick={() => setTagPickerExpanded(!tagPickerExpanded)}
+            className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg bg-white/10"
+            data-testid="button-toggle-tag-picker"
+          >
+            {selectedTags.length > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
+                {selectedTags.length}
+              </div>
+            )}
+            {tagPickerExpanded ? (
+              <ChevronDown className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+            ) : (
+              <ChevronUp className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+            )}
+          </button>
         </div>
       )}
 
