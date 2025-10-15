@@ -4,14 +4,19 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, focused on effortless, offline-reliable photo documentation. It aims to enhance efficiency and reduce disputes in construction projects through instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app targets full offline functionality and touch optimization for challenging environments, aspiring to be a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Arrow Tool Redesign**: Improved arrow annotation visual quality
+  - Arrowhead now extends past shaft line instead of sitting on top
+  - Shaft stops at arrowhead base, triangle extends to tip for unified arrow shape
+  - Better proportions: headLength = max(strokeWidth * 2.5, 30px), headWidth = strokeWidth * 1.2
+  - Matches professional arrow design with black outline and colored fill
+- **Session Photo Persistence Fix**: Photos now persist correctly when returning from edit mode
+  - Updated cleanup logic to preserve session photos for both /photo/ and /photo-edit routes
+  - Session photos only clear when fully exiting camera or switching projects
+  - Fixed issue where temp preview feed reset after closing/saving in edit mode
 - **Edit Mode Trash Button Fix**: Corrected trash button behavior in photo annotation editor
   - Trash button now deletes entire photo and returns to camera (previous behavior: deleted annotations)
   - Provides quick discard workflow for unwanted photos during editing
   - Consistent with user expectation for "delete photo" action
-- **Session Photo Persistence**: Fixed photo display when returning from edit mode
-  - Session photos now persist when canceling from edit mode back to camera
-  - Photos only clear when fully exiting camera or switching projects
-  - Improved continuity during multi-photo editing sessions
 - **Tag Indicators on Camera Thumbnails**: Enhanced instant visual feedback for tagged photos
   - Tags now visible immediately on camera preview thumbnails via pendingTagIds
   - Colored vertical bars on left side of thumbnails (matching project view)
