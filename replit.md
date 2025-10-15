@@ -4,6 +4,17 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant photo capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization for challenging environments, aspiring to become a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Mobile Button Layout & Notification Fixes**:
+  - **Button Positioning**: Fixed mobile button order using inline styles for precise placement
+    - Back button (left): `position: fixed, bottom: 80px, left: 16px`
+    - Camera FAB (center): `position: fixed, bottom: 80px, left: 50%, transform: translateX(-50%)`
+    - Select button (right): `position: fixed, bottom: 80px, right: 16px`
+    - All buttons maintain z-40 for proper stacking above content
+  - **Toast Notifications**: Moved to bottom-right corner with quick dismissal
+    - Position changed from top-center to `fixed bottom-24 right-0` (bottom-right)
+    - Auto-dismiss duration reduced from 1000s to 2s for quick disappearance
+    - Positioned at bottom-24 (96px) to avoid overlap with bottom-20 (80px) action buttons
+    - Max width 320px on larger screens for better readability
 - **Critical Bug Fixes - Session Restoration & UI Positioning**:
   - **Camera Session Null Guards**: Fixed crashes during photo restoration from localStorage by adding `if (photo && photo.id)` checks before calling createPhotoUrl()
   - **Camera Horizontal Scroll Fix**: Added `overflow-x-hidden` to thumbnail strip container to prevent unwanted horizontal scrolling
