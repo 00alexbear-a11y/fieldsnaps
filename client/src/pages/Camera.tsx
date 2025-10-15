@@ -76,7 +76,18 @@ export default function Camera() {
   const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null); // Preserve user's zoom choice
   const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce camera starts
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  // Read projectId from URL query params and set selected project
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get('projectId');
+    if (projectId && projectId !== selectedProject) {
+      console.log('[Camera] Setting project from URL:', projectId);
+      setSelectedProject(projectId);
+      setShowProjectSelection(false); // Hide project selector since we have a project
+    }
+  }, [location]); // Re-run when location changes
 
   // Load projects
   const { data: projects = [] } = useQuery<Project[]>({
@@ -88,6 +99,13 @@ export default function Camera() {
     queryKey: ['/api/tags', selectedProject],
     enabled: !!selectedProject,
   });
+  
+  // Debug logging for tags
+  useEffect(() => {
+    console.log('[Camera Tags] Selected project:', selectedProject);
+    console.log('[Camera Tags] Tags loaded:', tags);
+    console.log('[Camera Tags] Should show selector:', tags.length > 0 && !isRecording);
+  }, [selectedProject, tags, isRecording]);
 
   // Clear selected tags when project changes
   useEffect(() => {

@@ -145,7 +145,8 @@ export function PhotoAnnotationEditor({
   const [history, setHistory] = useState<Annotation[][]>([existingAnnotations]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | "select" | null>(null);
-  const [selectedColor, setSelectedColor] = useState(colors[0].value);
+  const [selectedColor, setSelectedColor] = useState("#3b82f6"); // Default to blue
+  const [colorPickerExpanded, setColorPickerExpanded] = useState(false); // Collapsed by default
   const [strokeWidth, setStrokeWidth] = useState(strokeSizes[1].value);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -343,7 +344,14 @@ export function PhotoAnnotationEditor({
             ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
             ctx.fill();
             
-            // Draw text
+            // Draw text with bold black outline
+            ctx.lineWidth = Math.max(fontSize / 8, 4); // Thick black outline
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.strokeText(annotation.content, 0, 0);
+            
+            // Draw colored text fill
             ctx.fillStyle = annotation.color;
             ctx.fillText(annotation.content, 0, 0);
             
@@ -396,10 +404,21 @@ export function PhotoAnnotationEditor({
           ) {
             // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
             const lineScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledLineWidth = annotation.strokeWidth * lineScaleFactor;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledLineWidth + 6; // Thicker for black outline
+            ctx.beginPath();
+            ctx.moveTo(annotation.position.x, annotation.position.y);
+            ctx.lineTo(annotation.position.x2, annotation.position.y2);
+            ctx.stroke();
+            
+            // Draw colored line on top
             ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * lineScaleFactor;
+            ctx.lineWidth = scaledLineWidth;
             ctx.beginPath();
             ctx.moveTo(annotation.position.x, annotation.position.y);
             ctx.lineTo(annotation.position.x2, annotation.position.y2);
@@ -426,10 +445,26 @@ export function PhotoAnnotationEditor({
             
             // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
             const circleScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledCircleWidth = annotation.strokeWidth * circleScaleFactor;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledCircleWidth + 6; // Thicker for black outline
+            ctx.beginPath();
+            ctx.arc(
+              centerX,
+              centerY,
+              annotation.position.width,
+              0,
+              2 * Math.PI
+            );
+            ctx.stroke();
+            
+            // Draw colored circle on top
             ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * circleScaleFactor;
+            ctx.lineWidth = scaledCircleWidth;
             ctx.beginPath();
             ctx.arc(
               centerX,
@@ -450,12 +485,25 @@ export function PhotoAnnotationEditor({
           if (annotation.position.points && annotation.position.points.length > 0) {
             // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x (3x bigger)
             const penScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledPenWidth = annotation.strokeWidth * penScaleFactor;
+            const points = annotation.position.points;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * penScaleFactor;
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledPenWidth + 6; // Thicker for black outline
             ctx.beginPath();
-            const points = annotation.position.points;
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+            
+            // Draw colored pen stroke on top
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledPenWidth;
+            ctx.beginPath();
             ctx.moveTo(points[0].x, points[0].y);
             for (let i = 1; i < points.length; i++) {
               ctx.lineTo(points[i].x, points[i].y);
@@ -514,32 +562,54 @@ export function PhotoAnnotationEditor({
     const baseX = toX - headLength * Math.cos(angle);
     const baseY = toY - headLength * Math.sin(angle);
 
-    // Draw arrow shaft - STOP at the base of the triangle
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
+    // Draw black outline for arrow shaft first
+    ctx.lineWidth = thickerLineWidth + 6; // Thicker for black outline
+    ctx.strokeStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(baseX, baseY);
+    ctx.stroke();
+
+    // Draw colored arrow shaft on top
     ctx.lineWidth = thickerLineWidth;
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
-    ctx.lineTo(baseX, baseY); // Stop at triangle base, not at tip
+    ctx.lineTo(baseX, baseY);
     ctx.stroke();
 
-    // Draw filled arrowhead triangle - starts at exact tip
+    // Draw black outline for arrowhead first
     ctx.beginPath();
-    ctx.moveTo(toX, toY); // Arrow tip - exact point
-    
-    // Left wing - sharper angle (PI/9 = 20 degrees)
+    ctx.moveTo(toX, toY);
     ctx.lineTo(
       toX - headLength * Math.cos(angle - Math.PI / 9),
       toY - headLength * Math.sin(angle - Math.PI / 9)
     );
-    
-    // Right wing - sharper angle (PI/9 = 20 degrees)
     ctx.lineTo(
       toX - headLength * Math.cos(angle + Math.PI / 9),
       toY - headLength * Math.sin(angle + Math.PI / 9)
     );
-    
+    ctx.closePath();
+    ctx.lineWidth = 6; // Black outline for arrowhead
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+
+    // Draw colored arrowhead on top
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(
+      toX - headLength * Math.cos(angle - Math.PI / 9),
+      toY - headLength * Math.sin(angle - Math.PI / 9)
+    );
+    ctx.lineTo(
+      toX - headLength * Math.cos(angle + Math.PI / 9),
+      toY - headLength * Math.sin(angle + Math.PI / 9)
+    );
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
@@ -1635,6 +1705,14 @@ export function PhotoAnnotationEditor({
             ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
             ctx.fill();
             
+            // Draw text with bold black outline
+            ctx.lineWidth = Math.max(fontSize / 8, 4);
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.strokeText(annotation.content, 0, 0);
+            
+            // Draw colored text fill
             ctx.fillStyle = annotation.color;
             ctx.fillText(annotation.content, 0, 0);
             ctx.restore();
@@ -1666,10 +1744,21 @@ export function PhotoAnnotationEditor({
             annotation.position.y2 !== undefined
           ) {
             const lineScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledLineWidth = annotation.strokeWidth * lineScaleFactor;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledLineWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(annotation.position.x, annotation.position.y);
+            ctx.lineTo(annotation.position.x2, annotation.position.y2);
+            ctx.stroke();
+            
+            // Draw colored line on top
             ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * lineScaleFactor;
+            ctx.lineWidth = scaledLineWidth;
             ctx.beginPath();
             ctx.moveTo(annotation.position.x, annotation.position.y);
             ctx.lineTo(annotation.position.x2, annotation.position.y2);
@@ -1690,10 +1779,26 @@ export function PhotoAnnotationEditor({
               : annotation.position.y;
             
             const circleScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledCircleWidth = annotation.strokeWidth * circleScaleFactor;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledCircleWidth + 6;
+            ctx.beginPath();
+            ctx.arc(
+              centerX,
+              centerY,
+              annotation.position.width,
+              0,
+              2 * Math.PI
+            );
+            ctx.stroke();
+            
+            // Draw colored circle on top
             ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * circleScaleFactor;
+            ctx.lineWidth = scaledCircleWidth;
             ctx.beginPath();
             ctx.arc(
               centerX,
@@ -1708,12 +1813,25 @@ export function PhotoAnnotationEditor({
         case "pen":
           if (annotation.position.points && annotation.position.points.length > 0) {
             const penScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledPenWidth = annotation.strokeWidth * penScaleFactor;
+            const points = annotation.position.points;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            ctx.strokeStyle = annotation.color;
-            ctx.lineWidth = annotation.strokeWidth * penScaleFactor;
+            
+            // Draw black outline first
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledPenWidth + 6;
             ctx.beginPath();
-            const points = annotation.position.points;
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+            
+            // Draw colored pen stroke on top
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledPenWidth;
+            ctx.beginPath();
             ctx.moveTo(points[0].x, points[0].y);
             for (let i = 1; i < points.length; i++) {
               ctx.lineTo(points[i].x, points[i].y);
@@ -1779,52 +1897,44 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Left Sidebar - Scrollable Color Picker */}
+      {/* Left Sidebar - Collapsible Color Picker */}
       <div className="fixed left-2 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 pb-safe">
         <div className="bg-black/80 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
-          {/* Up arrow indicator */}
+          {/* Current Color Button - Toggle Expand/Collapse */}
           <button
-            className="w-8 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-            onClick={() => {
-              const container = document.getElementById('color-scroll-container');
-              if (container) container.scrollBy({ top: -40, behavior: 'smooth' });
-            }}
-            aria-label="Scroll up"
+            onClick={() => setColorPickerExpanded(!colorPickerExpanded)}
+            className="w-10 h-10 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative"
+            style={{ backgroundColor: selectedColor }}
+            data-testid="button-toggle-color-picker"
+            aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}
           >
-            <ChevronUp className="w-4 h-4" />
+            {colorPickerExpanded ? (
+              <ChevronUp className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+            )}
           </button>
           
-          {/* Scrollable color container - 4 visible */}
-          <div 
-            id="color-scroll-container"
-            className="flex flex-col gap-2.5 overflow-y-auto py-1"
-            style={{ maxHeight: '180px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {colors.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => setSelectedColor(color.value)}
-                className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-transparent border-2'
-                }`}
-                style={{ backgroundColor: color.value }}
-                data-testid={`button-color-${color.name.toLowerCase()}`}
-                aria-label={`Color ${color.name}`}
-              />
-            ))}
-          </div>
-
-          {/* Down arrow indicator */}
-          <button
-            className="w-8 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-            onClick={() => {
-              const container = document.getElementById('color-scroll-container');
-              if (container) container.scrollBy({ top: 40, behavior: 'smooth' });
-            }}
-            aria-label="Scroll down"
-          >
-            <ChevronDown className="w-4 h-4" />
-          </button>
+          {/* Expanded Color Palette */}
+          {colorPickerExpanded && (
+            <div className="mt-2 flex flex-col gap-2 py-1 max-h-[300px] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {colors.map((color) => (
+                <button
+                  key={color.value}
+                  onClick={() => {
+                    setSelectedColor(color.value);
+                    setColorPickerExpanded(false); // Auto-collapse after selection
+                  }}
+                  className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                    selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
+                  }`}
+                  style={{ backgroundColor: color.value }}
+                  data-testid={`button-color-${color.name.toLowerCase()}`}
+                  aria-label={`Color ${color.name}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
