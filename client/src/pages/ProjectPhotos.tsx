@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon } from "lucide-react";
@@ -440,6 +441,7 @@ export default function ProjectPhotos() {
           retryCount: 0,
           annotations: null,
           serverId: selectedPhoto.id,
+          mediaType: selectedPhoto.mediaType || 'photo',
         });
       }
 
@@ -484,8 +486,9 @@ export default function ProjectPhotos() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden pb-20">
-      <header className="border-b p-4 bg-background sticky top-0 z-10">
+    <>
+      <div className="h-screen flex flex-col overflow-auto pb-20">
+        <header className="border-b p-4 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex-1 text-center">
             <h1 className="text-lg sm:text-xl font-bold">{project?.name || "Project Photos"}</h1>
@@ -728,29 +731,36 @@ export default function ProjectPhotos() {
           </div>
         )}
       </main>
+      </div>
 
-      {/* Back Button - Fixed Bottom Left */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setLocation("/")}
-        data-testid="button-back"
-        className="fixed bottom-4 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
-      >
-        <ArrowLeft className="w-6 h-6" />
-      </Button>
+      {/* Portal fixed buttons to body to escape overflow containers */}
+      {createPortal(
+        <>
+          {/* Back Button - Fixed Bottom Left */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            data-testid="button-back"
+            className="fixed bottom-4 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
 
-      {/* Select/Cancel Button - Fixed Bottom Right */}
-      {photos.length > 0 && (
-        <Button
-          onClick={toggleSelectMode}
-          data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
-          variant="ghost"
-          size="sm"
-          className="fixed bottom-4 right-4 z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
-        >
-          {isSelectMode ? 'Cancel' : 'Select'}
-        </Button>
+          {/* Select/Cancel Button - Fixed Bottom Right */}
+          {photos.length > 0 && (
+            <Button
+              onClick={toggleSelectMode}
+              data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
+              variant="ghost"
+              size="sm"
+              className="fixed bottom-4 right-4 z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
+            >
+              {isSelectMode ? 'Cancel' : 'Select'}
+            </Button>
+          )}
+        </>,
+        document.body
       )}
 
       {/* Selection Toolbar */}
@@ -1075,15 +1085,22 @@ export default function ProjectPhotos() {
         className="hidden"
         id="photo-upload-fab"
       />
-      {/* Main FAB - Camera (always visible) */}
-      <Button
-        onClick={() => setLocation(`/camera?projectId=${projectId}`)}
-        data-testid="button-add-photo-fab"
-        size="icon"
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground shadow-xl transition-transform"
-      >
-        <Camera className="w-6 h-6" />
-      </Button>
-    </div>
+      
+      {/* Portal fixed buttons to body to escape overflow containers */}
+      {createPortal(
+        <>
+          {/* Main FAB - Camera (always visible) */}
+          <Button
+            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+            data-testid="button-add-photo-fab"
+            size="icon"
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground shadow-xl transition-transform"
+          >
+            <Camera className="w-6 h-6" />
+          </Button>
+        </>,
+        document.body
+      )}
+    </>
   );
 }
