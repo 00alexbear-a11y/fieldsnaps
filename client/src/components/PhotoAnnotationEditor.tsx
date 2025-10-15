@@ -2061,10 +2061,10 @@ export function PhotoAnnotationEditor({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onDelete}
+            onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
             data-testid="button-delete"
             className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Delete photo"
+            aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
           >
             <Trash2 className="w-5 h-5" />
           </Button>

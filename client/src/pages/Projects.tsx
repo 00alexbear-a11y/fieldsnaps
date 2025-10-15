@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +51,7 @@ export default function Projects() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
+  const [showCompleted, setShowCompleted] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
@@ -89,10 +91,15 @@ export default function Projects() {
   const filteredProjects = useMemo(() => {
     let filtered = projects;
     
+    // Apply completed filter (hide completed by default unless showCompleted is true)
+    if (!showCompleted) {
+      filtered = filtered.filter(project => !project.completed);
+    }
+    
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = projects.filter(project => 
+      filtered = filtered.filter(project => 
         project.name.toLowerCase().includes(query) ||
         (project.address?.toLowerCase()?.includes(query) ?? false) ||
         (project.description?.toLowerCase()?.includes(query) ?? false)
@@ -116,7 +123,7 @@ export default function Projects() {
     });
     
     return sorted;
-  }, [projects, searchQuery, sortBy]);
+  }, [projects, searchQuery, sortBy, showCompleted]);
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string }) => {
@@ -269,31 +276,10 @@ export default function Projects() {
           data-testid="img-fieldsnaps-logo"
         />
         <div className="flex items-center gap-2">
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={handleSyncNow}
-              disabled={isSyncing}
-              className="h-8 w-8"
-              data-testid="button-sync-now"
-            >
-              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            </Button>
-
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={() => setLocation('/settings')}
-              className="h-8 w-8"
-              data-testid="button-settings"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-            
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="default" data-testid="button-create-project">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button size="sm" data-testid="button-create-project">
+                  <Plus className="w-4 h-4 mr-1.5" />
                   New Project
                 </Button>
               </DialogTrigger>
@@ -351,8 +337,8 @@ export default function Projects() {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" data-testid="button-settings-menu">
-                  <Settings className="w-5 h-5" />
+                <Button size="icon" variant="outline" className="h-8 w-8" data-testid="button-settings-menu">
+                  <Settings className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -423,29 +409,45 @@ export default function Projects() {
 
       {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
       <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 z-40">
-        <div className="relative max-w-screen-sm mx-auto flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-projects"
-            />
+        <div className="relative max-w-screen-sm mx-auto space-y-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search-projects"
+              />
+            </div>
+            <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+              <SelectTrigger className="w-[140px]" data-testid="select-sort">
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="lastActivity">Recent Activity</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="created">Date Created</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-            <SelectTrigger className="w-[140px]" data-testid="select-sort">
-              <ArrowUpDown className="w-4 h-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="lastActivity">Recent Activity</SelectItem>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="created">Date Created</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2 pl-1">
+            <Checkbox 
+              id="show-completed" 
+              checked={showCompleted}
+              onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+              data-testid="checkbox-show-completed"
+            />
+            <label 
+              htmlFor="show-completed" 
+              className="text-sm text-muted-foreground cursor-pointer select-none"
+            >
+              Show Completed Jobs
+            </label>
+          </div>
         </div>
       </div>
 

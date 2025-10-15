@@ -1,4 +1,4 @@
-import { pgTable, varchar, text, timestamp, jsonb, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, jsonb, integer, boolean, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -52,6 +52,7 @@ export const projects = pgTable("projects", {
   longitude: text("longitude"), // GPS longitude for map view
   coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
   userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
+  completed: boolean("completed").default(false).notNull(), // Mark job as complete
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
