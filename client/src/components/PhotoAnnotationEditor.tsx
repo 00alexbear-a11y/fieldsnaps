@@ -1836,9 +1836,9 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-muted/30">
+    <div className="fixed inset-0 flex items-center justify-center bg-muted/30 pointer-events-none">
       {/* Canvas - Full screen */}
-      <div className="relative w-full h-full flex items-center justify-center">
+      <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
         <img
           ref={imageRef}
           src={photoUrl}
@@ -1863,7 +1863,7 @@ export function PhotoAnnotationEditor({
             maxHeight: "100%",
             objectFit: "contain"
           }}
-          className="touch-none"
+          className="touch-none pointer-events-auto"
           data-testid="canvas-annotation"
         />
         
@@ -1877,7 +1877,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Color Picker - Positioned above trash tool, aligned with S/M/L */}
-      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 items-end pb-2">
+      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 items-end pb-2 pointer-events-auto">
         <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
           {/* Current Color Button - Toggle Expand/Collapse */}
           <button
@@ -1918,7 +1918,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Fixed Cancel and Save Buttons - Top Corners */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 pointer-events-auto">
         <Button
           variant="ghost"
           size="icon"
@@ -1930,7 +1930,7 @@ export function PhotoAnnotationEditor({
           <X className="w-6 h-6" />
         </Button>
       </div>
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50 pointer-events-auto">
         <Button
           size="icon"
           onClick={handleSave}
@@ -1943,7 +1943,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Fixed Size Tabs Above Bottom Toolbar */}
-      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-2 px-2">
+      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-2 px-2 pointer-events-auto">
         <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
           {strokeSizes.map((size) => (
             <button
@@ -1965,7 +1965,7 @@ export function PhotoAnnotationEditor({
 
       {/* Floating Done Button - appears when text annotation is selected */}
       {selectedAnnotation && annotations.find(a => a.id === selectedAnnotation)?.type === "text" && (
-        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 pb-2">
+        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 pb-2 pointer-events-auto">
           <Button
             onClick={() => setSelectedAnnotation(null)}
             data-testid="button-done-editing-text"
@@ -1978,7 +1978,7 @@ export function PhotoAnnotationEditor({
       )}
 
       {/* Bottom Toolbar - Non-scrollable Tools */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2">
+      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2 pointer-events-auto">
         <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
           {/* Tool Buttons */}
           <Button
