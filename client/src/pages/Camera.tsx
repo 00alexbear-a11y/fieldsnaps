@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -1688,6 +1688,8 @@ export default function Camera() {
                 gray: '#6b7280',
               };
               
+              const isVideo = photo.mediaType === 'video';
+              
               return (
                 <div
                   key={photo.id}
@@ -1695,14 +1697,38 @@ export default function Camera() {
                   data-testid={`thumbnail-${photo.id}`}
                 >
                   <button
-                    onClick={() => setLocation(`/photo/${photo.id}/edit`)}
+                    onClick={() => {
+                      if (isVideo) {
+                        // TODO: Open video player
+                        setLocation(`/photo/${photo.id}/view`);
+                      } else {
+                        setLocation(`/photo/${photo.id}/edit`);
+                      }
+                    }}
                     className="block w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
                   >
-                    <img
-                      src={url}
-                      alt="Thumbnail"
-                      className="w-full h-full object-cover"
-                    />
+                    {isVideo ? (
+                      <video
+                        src={url}
+                        className="w-full h-full object-cover"
+                        muted
+                      />
+                    ) : (
+                      <img
+                        src={url}
+                        alt="Thumbnail"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    
+                    {/* Play button overlay for videos */}
+                    {isVideo && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                        <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                          <Play className="w-4 h-4 text-black fill-black ml-0.5" />
+                        </div>
+                      </div>
+                    )}
                   </button>
                   
                   {/* Tag indicators on left side (matching project view) */}
