@@ -122,19 +122,11 @@ function ZoomCircle({
   );
 }
 
-interface Tag {
-  id: string;
-  name: string;
-  color: string;
-}
-
 interface PhotoAnnotationEditorProps {
   photoUrl: string;
   photoId: string;
   existingAnnotations?: Annotation[];
-  availableTags?: Tag[];
-  selectedTagIds?: string[];
-  onSave: (annotations: Annotation[], annotatedBlob: Blob, selectedTagIds: string[]) => void;
+  onSave: (annotations: Annotation[], annotatedBlob: Blob) => void;
   onCancel?: () => void;
 }
 
@@ -144,8 +136,6 @@ export function PhotoAnnotationEditor({
   photoUrl,
   photoId,
   existingAnnotations = [],
-  availableTags = [],
-  selectedTagIds = [],
   onSave,
   onCancel,
 }: PhotoAnnotationEditorProps) {
@@ -158,14 +148,7 @@ export function PhotoAnnotationEditor({
   const [selectedColor, setSelectedColor] = useState("#3b82f6"); // Default to blue
   const [colorPickerExpanded, setColorPickerExpanded] = useState(false); // Collapsed by default
   const [strokeWidth, setStrokeWidth] = useState(strokeSizes[1].value);
-  const [selectedTags, setSelectedTags] = useState<string[]>(selectedTagIds);
-  const [tagPickerExpanded, setTagPickerExpanded] = useState(false); // Collapsed by default
   const [isDrawing, setIsDrawing] = useState(false);
-  
-  // Sync selectedTags with prop changes (for when tags load asynchronously)
-  useEffect(() => {
-    setSelectedTags(selectedTagIds);
-  }, [selectedTagIds]);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState<ResizeHandle | null>(null);
@@ -1844,7 +1827,7 @@ export function PhotoAnnotationEditor({
     // Convert canvas to blob
     canvas.toBlob((blob) => {
       if (blob) {
-        onSave(annotations, blob, selectedTags);
+        onSave(annotations, blob);
       }
     }, 'image/jpeg', 0.92);
   };
@@ -1896,122 +1879,57 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Color Picker - Positioned above trash tool, aligned with S/M/L */}
-      <div className="fixed bottom-20 right-4 z-[60] flex flex-col gap-2 items-end pb-2 pointer-events-auto">
-        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
-          {/* Current Color Button - Toggle Expand/Collapse */}
-          <button
-            onClick={() => {
-              console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
-              setColorPickerExpanded(!colorPickerExpanded);
+      {/* Color Picker - Floating colors with fade effect */}
+      <div className="fixed bottom-20 right-4 z-[60] pointer-events-auto">
+        {/* Expanded Color Palette - Floating above toggle button */}
+        {colorPickerExpanded && (
+          <div 
+            className="absolute bottom-14 right-0 flex flex-col gap-2 py-4 max-h-[300px] overflow-y-auto"
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
             }}
-            className="w-10 h-10 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative"
-            style={{ backgroundColor: selectedColor }}
-            data-testid="button-toggle-color-picker"
-            aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}
           >
-            {colorPickerExpanded ? (
-              <ChevronDown className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-            ) : (
-              <ChevronUp className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-            )}
-          </button>
-          
-          {/* Expanded Color Palette - Expands Upward */}
-          {colorPickerExpanded && (
-            <div className="absolute bottom-full mb-2 flex flex-col gap-2 py-2 px-2 bg-black/60 backdrop-blur-md rounded-full shadow-lg max-h-[300px] overflow-y-auto relative" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {/* Gradient fade at top */}
-              <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/60 to-transparent pointer-events-none rounded-t-full z-10" />
-              {colors.map((color) => (
-                <button
-                  key={color.value}
-                  onClick={() => {
-                    console.log("[PhotoEdit] Color selected:", color.name, color.value);
-                    setSelectedColor(color.value);
-                    setColorPickerExpanded(false); // Auto-collapse after selection
-                  }}
-                  className={`w-8 h-8 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                    selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
-                  }`}
-                  style={{ backgroundColor: color.value }}
-                  data-testid={`button-color-${color.name.toLowerCase()}`}
-                  aria-label={`Color ${color.name}`}
-                />
-              ))}
-              {/* Gradient fade at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-black/60 to-transparent pointer-events-none rounded-b-full z-10" />
-            </div>
+            {colors.map((color) => (
+              <button
+                key={color.value}
+                onClick={() => {
+                  console.log("[PhotoEdit] Color selected:", color.name, color.value);
+                  setSelectedColor(color.value);
+                  setColorPickerExpanded(false); // Auto-collapse after selection
+                }}
+                className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 shadow-lg ${
+                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
+                }`}
+                style={{ backgroundColor: color.value }}
+                data-testid={`button-color-${color.name.toLowerCase()}`}
+                aria-label={`Color ${color.name}`}
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Fixed Toggle Button */}
+        <button
+          onClick={() => {
+            console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
+            setColorPickerExpanded(!colorPickerExpanded);
+          }}
+          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg"
+          style={{ backgroundColor: selectedColor }}
+          data-testid="button-toggle-color-picker"
+          aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}
+        >
+          {colorPickerExpanded ? (
+            <ChevronDown className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+          ) : (
+            <ChevronUp className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
           )}
-        </div>
+        </button>
       </div>
 
-      {/* Tag Selector - Below color picker in bottom-right corner */}
-      {availableTags.length > 0 && (
-        <div className="fixed bottom-8 right-4 z-[60] flex flex-col gap-2 items-end pb-2 pointer-events-auto">
-          <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
-            {/* Tag Toggle Button */}
-            <button
-              onClick={() => setTagPickerExpanded(!tagPickerExpanded)}
-              className="w-10 h-10 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative bg-white/10"
-              data-testid="button-toggle-tag-picker"
-              aria-label={tagPickerExpanded ? "Collapse tag picker" : "Expand tag picker"}
-            >
-              {selectedTags.length > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
-                  {selectedTags.length}
-                </div>
-              )}
-              {tagPickerExpanded ? (
-                <ChevronDown className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-              ) : (
-                <ChevronUp className="w-4 h-4 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-              )}
-            </button>
-            
-            {/* Expanded Tag List - Expands Upward */}
-            {tagPickerExpanded && (
-              <div className="absolute bottom-full mb-2 flex flex-col gap-2 py-2 px-2 bg-black/60 backdrop-blur-md rounded-full shadow-lg max-h-[220px] overflow-y-auto relative" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                {/* Gradient fade at top */}
-                <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-black/60 to-transparent pointer-events-none rounded-t-full z-10" />
-                {availableTags.slice(0, 5).map((tag) => {
-                  const isSelected = selectedTags.includes(tag.id);
-                  const tagColorMap: Record<string, string> = {
-                    red: '#ef4444',
-                    orange: '#f97316',
-                    yellow: '#eab308',
-                    blue: '#3b82f6',
-                    gray: '#6b7280',
-                  };
-                  const bgColor = tagColorMap[tag.color] || '#6b7280';
-                  
-                  return (
-                    <button
-                      key={tag.id}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedTags(selectedTags.filter(id => id !== tag.id));
-                        } else {
-                          setSelectedTags([...selectedTags, tag.id]);
-                        }
-                      }}
-                      className={`px-3 py-1.5 rounded-full border hover-elevate transition-all flex-shrink-0 text-xs font-medium ${
-                        isSelected ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
-                      }`}
-                      style={{ backgroundColor: bgColor, color: 'white' }}
-                      data-testid={`button-tag-${tag.name.toLowerCase()}`}
-                      aria-label={`Tag ${tag.name}`}
-                    >
-                      {tag.name}
-                    </button>
-                  );
-                })}
-                {/* Gradient fade at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-black/60 to-transparent pointer-events-none rounded-b-full z-10" />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Fixed Cancel and Save Buttons - Top Corners */}
       <div className="fixed top-4 left-4 z-50 pointer-events-auto">
