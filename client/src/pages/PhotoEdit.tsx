@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
+import { useQuery } from '@tanstack/react-query';
 
 interface Annotation {
   id: string;
@@ -22,14 +23,27 @@ interface Annotation {
   };
 }
 
+interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export default function PhotoEdit() {
   const { id: photoId } = useParams();
   const [, setLocation] = useLocation();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
+  const [currentTags, setCurrentTags] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const photoUrlRef = useRef<string | null>(null);
+
+  // Fetch available tags
+  const { data: availableTags = [] } = useQuery<Tag[]>({
+    queryKey: ['/api/tags'],
+    enabled: true,
+  });
 
   useEffect(() => {
     if (!photoId) return;
@@ -42,6 +56,20 @@ export default function PhotoEdit() {
           photoUrlRef.current = url;
           setPhotoUrl(url);
           setProjectId(photo.projectId);
+          
+          // Load photo tags from server
+          try {
+            const tagsResponse = await fetch(`/api/photos/${photoId}/tags`, {
+              headers: { 'x-skip-auth': 'true' }
+            });
+            if (tagsResponse.ok) {
+              const photoTags = await tagsResponse.json();
+              setCurrentTags(photoTags.map((pt: any) => pt.tagId));
+            }
+          } catch (err) {
+            console.error('Error loading photo tags:', err);
+          }
+          
           return;
         }
 
@@ -52,6 +80,19 @@ export default function PhotoEdit() {
         const serverPhoto = await response.json();
         setPhotoUrl(serverPhoto.url);
         setProjectId(serverPhoto.projectId);
+        
+        // Load photo tags
+        try {
+          const tagsResponse = await fetch(`/api/photos/${photoId}/tags`, {
+            headers: { 'x-skip-auth': 'true' }
+          });
+          if (tagsResponse.ok) {
+            const photoTags = await tagsResponse.json();
+            setCurrentTags(photoTags.map((pt: any) => pt.tagId));
+          }
+        } catch (err) {
+          console.error('Error loading photo tags:', err);
+        }
       } catch (error) {
         console.error('Error loading photo:', error);
         toast({
@@ -73,7 +114,7 @@ export default function PhotoEdit() {
     };
   }, [photoId]);
 
-  const handleSave = async (annotations: Annotation[], annotatedBlob: Blob) => {
+  const handleSave = async (annotations: Annotation[], annotatedBlob: Blob, selectedTagIds: string[]) => {
     if (!photoId || !projectId) return;
 
     setIsSaving(true);
@@ -102,10 +143,13 @@ export default function PhotoEdit() {
         existingPhoto = await idb.savePhotoWithId(photoId, {
           projectId: projectId,
           blob: originalBlob,
-          thumbnailBlob: originalBlob,
           caption: serverPhoto.caption || null,
           annotations: null,
           serverId: photoId,
+          quality: 'detailed',
+          timestamp: Date.now(),
+          syncStatus: 'synced',
+          retryCount: 0,
         });
       }
 
@@ -114,6 +158,27 @@ export default function PhotoEdit() {
         blob: annotatedBlob,
         annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
       });
+      
+      // Update photo tags if they changed
+      if (JSON.stringify(selectedTagIds.sort()) !== JSON.stringify(currentTags.sort())) {
+        // Delete existing tags
+        await fetch(`/api/photos/${photoId}/tags`, {
+          method: 'DELETE',
+          headers: { 'x-skip-auth': 'true' }
+        });
+        
+        // Add new tags
+        for (const tagId of selectedTagIds) {
+          await fetch(`/api/photos/${photoId}/tags`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'x-skip-auth': 'true'
+            },
+            body: JSON.stringify({ tagId })
+          });
+        }
+      }
 
       // Add to sync queue to upload the annotated photo to server
       await idb.addToSyncQueue({
@@ -179,6 +244,8 @@ export default function PhotoEdit() {
       photoUrl={photoUrl}
       photoId={photoId!}
       existingAnnotations={[]}
+      availableTags={availableTags}
+      selectedTagIds={currentTags}
       onSave={handleSave}
       onCancel={handleCancel}
     />
