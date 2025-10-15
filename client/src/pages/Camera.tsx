@@ -886,6 +886,7 @@ export default function Camera() {
           const savedPhoto = await idb.savePhoto({
             projectId: selectedProject,
             blob: blob,
+            mediaType: 'video',
             quality: 'standard',
             caption: autoCaption,
             timestamp: Date.now(),
@@ -897,6 +898,16 @@ export default function Camera() {
           syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
             console.error('[Camera] Video sync queue error:', err);
           });
+
+          // Add video to session thumbnails (most recent first)
+          sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
+          setSessionPhotos([...sessionPhotosRef.current]);
+          
+          // Persist session to localStorage
+          if (selectedProject) {
+            const photoIds = sessionPhotosRef.current.map(p => p.id);
+            localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
+          }
 
           toast({
             title: '✓ Video Saved',
@@ -1004,6 +1015,7 @@ export default function Camera() {
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
+        mediaType: 'photo',
         quality: selectedQuality,
         caption: autoCaption,
         timestamp: Date.now(),
@@ -1115,6 +1127,7 @@ export default function Camera() {
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
+        mediaType: 'photo',
         quality: selectedQuality,
         caption: autoCaption,
         timestamp: Date.now(),
