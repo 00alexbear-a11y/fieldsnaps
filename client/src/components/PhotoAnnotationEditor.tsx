@@ -1880,7 +1880,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Color Picker - Positioned above trash tool, aligned with S/M/L */}
-      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 items-end pb-2 pointer-events-auto">
+      <div className="fixed bottom-20 right-4 z-[60] flex flex-col gap-2 items-end pb-2 pointer-events-auto">
         <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
           {/* Current Color Button - Toggle Expand/Collapse */}
           <button
