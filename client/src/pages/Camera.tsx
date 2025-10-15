@@ -845,11 +845,24 @@ export default function Camera() {
       };
       composite();
 
-      // Capture composite canvas stream
+      // Capture composite canvas stream (video only)
       const compositeStream = compositeCanvas.captureStream(30); // 30 fps
       
+      // Get audio stream from microphone
+      let finalStream = compositeStream;
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Combine video track from canvas with audio track from microphone
+        finalStream = new MediaStream([
+          ...compositeStream.getVideoTracks(),
+          ...audioStream.getAudioTracks()
+        ]);
+      } catch (audioError) {
+        console.warn('[Camera] Could not get audio, recording video only:', audioError);
+      }
+      
       recordedChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(compositeStream, {
+      const mediaRecorder = new MediaRecorder(finalStream, {
         mimeType: 'video/webm',
       });
 
@@ -1457,31 +1470,10 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Mode Selector - Right side, higher position */}
-      <div className="absolute right-4 top-24 flex flex-col gap-3 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCameraMode('photo')}
-          className={`text-white backdrop-blur-md rounded-xl ${cameraMode === 'photo' ? 'bg-white/25' : 'bg-white/10'}`}
-          data-testid="button-mode-photo"
-        >
-          <CameraIcon className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCameraMode('video')}
-          className={`text-white backdrop-blur-md rounded-xl ${cameraMode === 'video' ? 'bg-white/25' : 'bg-white/10'}`}
-          data-testid="button-mode-video"
-        >
-          <Video className="w-5 h-5" />
-        </Button>
-      </div>
 
       {/* Zoom Selector - Center, lower position - Hide during video recording */}
       {!(cameraMode === 'video' && isRecording) && (
-        <div className="absolute bottom-44 left-0 right-0 flex justify-center gap-2 z-10">
+        <div className="absolute bottom-32 left-0 right-0 flex justify-center gap-2 z-10">
           {availableCameras.length > 0 ? (
             availableCameras.map((camera) => (
               <Button
@@ -1613,9 +1605,9 @@ export default function Camera() {
             }}
             className={`w-14 h-14 rounded-full ${
               isRecording 
-                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' 
-                : 'bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40'
-            } text-white shadow-lg transition-all`}
+                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' 
+                : 'bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40 text-red-500'
+            } shadow-lg transition-all`}
             data-testid="button-video-mode"
           >
             {isRecording ? (
@@ -1667,11 +1659,11 @@ export default function Camera() {
           <div 
             className="flex flex-col gap-2 overflow-y-auto scrollbar-hide max-h-[344px]"
             style={{
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)'
             }}
           >
-            {sessionPhotos.map((photo) => {
+            {[...sessionPhotos].reverse().map((photo) => {
               const url = thumbnailUrlsRef.current.get(photo.id);
               if (!url) return null;
               

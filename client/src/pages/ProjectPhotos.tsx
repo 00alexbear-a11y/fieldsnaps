@@ -486,13 +486,41 @@ export default function ProjectPhotos() {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden pb-20">
       <header className="border-b p-4 bg-background sticky top-0 z-10">
-        <div className="flex items-center justify-center">
-          <div className="text-center">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 text-center">
             <h1 className="text-lg sm:text-xl font-bold">{project?.name || "Project Photos"}</h1>
             {project?.description && (
               <p className="text-xs sm:text-sm text-muted-foreground">{project.description}</p>
             )}
           </div>
+          {project && (
+            <Button
+              variant={project.completed ? "outline" : "default"}
+              size="sm"
+              onClick={() => {
+                apiRequest("PATCH", `/api/projects/${projectId}`, { completed: !project.completed })
+                  .then(() => {
+                    queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
+                    queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
+                    toast({
+                      title: project.completed ? "Job Reopened" : "Job Completed",
+                      description: project.completed ? "This job is now active again" : "This job is marked as complete",
+                    });
+                  })
+                  .catch((error) => {
+                    toast({
+                      title: "Error",
+                      description: "Failed to update job status",
+                      variant: "destructive",
+                    });
+                  });
+              }}
+              className="flex-shrink-0 ml-2"
+              data-testid="button-toggle-complete"
+            >
+              {project.completed ? "Reopen" : "Complete"}
+            </Button>
+          )}
         </div>
       </header>
 
@@ -1039,26 +1067,22 @@ export default function ProjectPhotos() {
       )}
 
       {/* Floating Action Buttons (FABs) - Camera & Upload */}
-      {!isSelectMode && (
-        <>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="photo-upload-fab"
-          />
-          {/* Main FAB - Camera (centered at bottom) */}
-          <Button
-            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
-            data-testid="button-add-photo-fab"
-            size="lg"
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 h-14 w-14 rounded-full shadow-xl z-20 hover:scale-110 transition-transform"
-          >
-            <Camera className="w-6 h-6" />
-          </Button>
-        </>
-      )}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+        id="photo-upload-fab"
+      />
+      {/* Main FAB - Camera (always visible) */}
+      <Button
+        onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+        data-testid="button-add-photo-fab"
+        size="icon"
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground shadow-xl transition-transform"
+      >
+        <Camera className="w-6 h-6" />
+      </Button>
     </div>
   );
 }
