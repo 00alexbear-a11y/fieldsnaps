@@ -7,16 +7,17 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 - **Critical Bug Fixes - Session Restoration & UI Positioning**:
   - **Camera Session Null Guards**: Fixed crashes during photo restoration from localStorage by adding `if (photo && photo.id)` checks before calling createPhotoUrl()
   - **Camera Horizontal Scroll Fix**: Added `overflow-x-hidden` to thumbnail strip container to prevent unwanted horizontal scrolling
-  - **ProjectPhotos Fixed Button Positioning**: Resolved buttons scrolling with content
+  - **ProjectPhotos Fixed Button Positioning**: Complete fix for buttons scrolling with content and duplicate rendering
     - App.tsx outer div: Changed to `h-screen overflow-hidden` to prevent document/window scrolling
     - App.tsx main element: Changed to `flex-1 overflow-hidden` to contain page routes
     - ProjectPhotos container: Changed to `h-screen overflow-auto` for internal scrolling
     - Used React Portal (`createPortal` from "react-dom") to render all fixed buttons to `document.body`
+    - Removed duplicate camera FAB that was rendering at bottom-4
     - Three fixed buttons positioned at `bottom-20` (80px from bottom) to sit above bottom navigation:
-      - Back button (left): Ghost variant, 56×56px, navigates to Projects list
-      - Camera FAB (center): Primary color, 64×64px, opens camera for current project
-      - Select button (right): Ghost variant, auto×56px, toggles selection mode
-    - All buttons stay fixed at viewport positions when scrolling
+      - Back button (left-4): Ghost variant, 56×56px, navigates to Projects list
+      - Camera FAB (centered): Primary blue (#169DF5), 64×64px, opens camera for current project
+      - Select button (right-4): Ghost variant, auto×56px, toggles selection mode
+    - All buttons stay fixed at viewport positions when scrolling, fully visible above bottom nav
     - Fixed TypeScript mediaType type assertion for proper 'photo' | 'video' literal types
 - **Video Recording Pipeline Complete**: Full video support with persistence and playback
   - Added `mediaType` field to distinguish photos from videos throughout the system
