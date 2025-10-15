@@ -4,6 +4,15 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, focused on effortless, offline-reliable photo documentation. It aims to enhance efficiency and reduce disputes in construction projects through instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app targets full offline functionality and touch optimization for challenging environments, aspiring to be a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Photo Edit Tag Selector Redesign**: Complete UX overhaul for tag selection in photo annotation mode
+  - Redesigned tag selector as collapsible dropdown in bottom-right corner (positioned at bottom-8, right-4)
+  - Toggle button with count badge showing number of selected tags
+  - Expands upward (max 5 visible tags, 220px height) with vertical scroll for overflow
+  - Added gradient fade effects (transparency haze) at scroll edges for smooth visual scrolling
+  - Positioned below color picker (bottom-20, right-4) for consistent UI hierarchy
+  - Fixed tag synchronization: Added useEffect to sync selectedTags with selectedTagIds prop for proper async tag loading
+  - Both color picker and tag selector feature gradient overlays using pointer-events-none for non-intrusive visual effects
+  - Z-index hierarchy: Color picker and tag selector at z-[60], ensuring proper layering above other elements
 - **Camera Launch Polish**: Eliminated visual stutter when opening camera
   - Added smooth opacity transition (0 to 100%) to video element
   - Video now fades in only after metadata loads and camera is ready
