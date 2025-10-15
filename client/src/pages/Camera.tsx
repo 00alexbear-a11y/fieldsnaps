@@ -131,19 +131,55 @@ export default function Camera() {
     }
   }, [tags]);
 
-  // Clear session photos only on project change, not on mount
+  // Persist session photos across Camera remounts using localStorage
   const previousProjectRef = useRef<string>('');
+  const currentProjectRef = useRef<string>(''); // Track current project for async guard
   useEffect(() => {
-    // Only clear if project actually changed (not on initial mount or returning from edit)
+    const sessionKey = selectedProject ? `camera-session-${selectedProject}` : null;
+    currentProjectRef.current = selectedProject; // Update current project ref
+    
+    // Restore session photos from localStorage on mount or project change
+    if (sessionKey) {
+      const saved = localStorage.getItem(sessionKey);
+      if (saved) {
+        try {
+          const photoIds = JSON.parse(saved) as string[];
+          const restoreForProject = selectedProject; // Capture project for this restore
+          
+          // Load photos from IndexedDB
+          Promise.all(photoIds.map(id => idb.getPhoto(id).catch(() => undefined)))
+            .then(photos => {
+              // Guard: Only update if we're still on the same project (check against live ref)
+              if (currentProjectRef.current === restoreForProject) {
+                const validPhotos = photos.filter(p => p !== undefined) as LocalPhoto[];
+                sessionPhotosRef.current = validPhotos;
+                setSessionPhotos(validPhotos);
+              }
+            })
+            .catch(e => {
+              console.error('[Camera] Failed to restore session:', e);
+            });
+        } catch (e) {
+          console.error('[Camera] Failed to restore session:', e);
+        }
+      }
+    }
+    
+    // Clear session if project changed
     if (previousProjectRef.current && previousProjectRef.current !== selectedProject) {
+      const oldKey = `camera-session-${previousProjectRef.current}`;
+      localStorage.removeItem(oldKey);
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
     }
     previousProjectRef.current = selectedProject;
     
     return () => {
-      // Cleanup on unmount only - preserve session if navigating to photo view or edit
+      // Clear session storage only on real exit (not to photo/edit pages)
       if (!window.location.pathname.includes('/photo/') && !window.location.pathname.includes('/photo-edit')) {
+        if (sessionKey) {
+          localStorage.removeItem(sessionKey);
+        }
         sessionPhotosRef.current = [];
       }
     };
@@ -844,6 +880,12 @@ export default function Camera() {
       // Add photo to session thumbnails (most recent first)
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
+      
+      // Persist session to localStorage
+      if (selectedProject) {
+        const photoIds = sessionPhotosRef.current.map(p => p.id);
+        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
+      }
 
       // Visual feedback - pulse quick capture button
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
@@ -938,6 +980,16 @@ export default function Camera() {
       });
 
       // Keep selected tags for next capture (persist selection)
+      
+      // Add photo to session thumbnails (most recent first)
+      sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
+      setSessionPhotos([...sessionPhotosRef.current]);
+      
+      // Persist session to localStorage
+      if (selectedProject) {
+        const photoIds = sessionPhotosRef.current.map(p => p.id);
+        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
+      }
 
       // DON'T stop camera - keep it running for session continuity
       // Navigate to photo edit page
@@ -962,6 +1014,12 @@ export default function Camera() {
       // Remove from session photos
       sessionPhotosRef.current = sessionPhotosRef.current.filter(p => p.id !== photoId);
       setSessionPhotos([...sessionPhotosRef.current]);
+      
+      // Persist session to localStorage
+      if (selectedProject) {
+        const photoIds = sessionPhotosRef.current.map(p => p.id);
+        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
+      }
 
       toast({
         title: 'Photo deleted',
@@ -1339,7 +1397,7 @@ export default function Camera() {
       )}
 
       {/* Bottom Capture Controls - 4-button horizontal layout */}
-      <div className="absolute bottom-24 left-0 right-0 pb-safe z-20">
+      <div className="absolute bottom-12 left-0 right-0 pb-safe z-20">
         <div className="flex items-center justify-center gap-4 px-8 max-w-lg mx-auto">
           {/* Back Button */}
           <Button
@@ -1414,10 +1472,16 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Photo Thumbnail Strip - Session photos only, at very bottom */}
+      {/* Photo Thumbnail Strip - Session photos only, left side vertical */}
       {sessionPhotos.length > 0 && !isRecording && (
-        <div className="absolute bottom-2 left-0 right-0 z-10 pb-2">
-          <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+          <div 
+            className="flex flex-col gap-2 overflow-y-auto scrollbar-hide max-h-[344px]"
+            style={{
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
+            }}
+          >
             {sessionPhotos.map((photo) => {
               const url = thumbnailUrlsRef.current.get(photo.id);
               if (!url) return null;
@@ -1443,7 +1507,7 @@ export default function Camera() {
                 >
                   <button
                     onClick={() => setLocation(`/photo/${photo.id}/edit`)}
-                    className="block w-16 h-16 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
+                    className="block w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
                   >
                     <img
                       src={url}
