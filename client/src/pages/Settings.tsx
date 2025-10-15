@@ -1,9 +1,12 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2 } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { syncManager } from '@/lib/syncManager';
@@ -11,13 +14,26 @@ import { indexedDB as indexedDBService } from '@/lib/indexeddb';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useTheme } from '@/hooks/useTheme';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import type { Tag } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+
+const TAG_COLORS = [
+  { value: 'red', label: 'Red' },
+  { value: 'orange', label: 'Orange' },
+  { value: 'yellow', label: 'Yellow' },
+  { value: 'blue', label: 'Blue' },
+  { value: 'gray', label: 'Gray' },
+];
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated, isLoading } = useAuth();
   const { registerBiometric, authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const { isDark, toggleTheme } = useTheme();
+  const { toast } = useToast();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
@@ -29,6 +45,12 @@ export default function Settings() {
     mb: number;
     photoCount: number;
   } | null>(null);
+  
+  // Tag management state
+  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [tagName, setTagName] = useState('');
+  const [tagColor, setTagColor] = useState('blue');
 
   useEffect(() => {
     // Load sync status and storage usage
@@ -92,6 +114,116 @@ export default function Settings() {
     await loadSyncStatus();
   };
 
+  // Load tags
+  const { data: tags = [] } = useQuery<Tag[]>({
+    queryKey: ['/api/tags'],
+  });
+
+  // Create tag mutation
+  const createTagMutation = useMutation({
+    mutationFn: async (data: { name: string; color: string }) => {
+      const res = await apiRequest('POST', '/api/tags', data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tags'] });
+      setIsTagDialogOpen(false);
+      setTagName('');
+      setTagColor('blue');
+      toast({
+        title: 'Tag created',
+        description: 'New tag has been added',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to create tag',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Update tag mutation
+  const updateTagMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: { name?: string; color?: string } }) => {
+      const res = await apiRequest('PUT', `/api/tags/${id}`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tags'] });
+      setIsTagDialogOpen(false);
+      setEditingTag(null);
+      setTagName('');
+      setTagColor('blue');
+      toast({
+        title: 'Tag updated',
+        description: 'Tag has been updated',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to update tag',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete tag mutation
+  const deleteTagMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest('DELETE', `/api/tags/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tags'] });
+      toast({
+        title: 'Tag deleted',
+        description: 'Tag has been removed',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to delete tag',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleOpenTagDialog = (tag?: Tag) => {
+    if (tag) {
+      setEditingTag(tag);
+      setTagName(tag.name);
+      setTagColor(tag.color);
+    } else {
+      setEditingTag(null);
+      setTagName('');
+      setTagColor('blue');
+    }
+    setIsTagDialogOpen(true);
+  };
+
+  const handleSaveTag = () => {
+    if (!tagName.trim()) {
+      toast({
+        title: 'Name required',
+        description: 'Please enter a tag name',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (editingTag) {
+      updateTagMutation.mutate({
+        id: editingTag.id,
+        data: { name: tagName, color: tagColor },
+      });
+    } else {
+      createTagMutation.mutate({ name: tagName, color: tagColor });
+    }
+  };
+
   return (
     <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
       <div className="flex flex-col items-center space-y-4 pb-2">
@@ -131,6 +263,65 @@ export default function Settings() {
             data-testid="switch-dark-mode"
           />
         </label>
+      </Card>
+
+      {/* Tags Management */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Photo Tags</h2>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => handleOpenTagDialog()}
+            data-testid="button-create-tag"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Tag
+          </Button>
+        </div>
+
+        {tags.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No tags yet. Create one to categorize your photos.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {tags.map((tag) => (
+              <div
+                key={tag.id}
+                className="flex items-center justify-between p-3 rounded-lg border bg-card hover-elevate transition-colors"
+                data-testid={`tag-item-${tag.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-4 h-4 rounded-full`}
+                    style={{ backgroundColor: tag.color }}
+                  />
+                  <span className="font-medium">{tag.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleOpenTagDialog(tag)}
+                    data-testid={`button-edit-tag-${tag.id}`}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteTagMutation.mutate(tag.id)}
+                    disabled={deleteTagMutation.isPending}
+                    data-testid={`button-delete-tag-${tag.id}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       {/* Account */}
@@ -329,6 +520,69 @@ export default function Settings() {
           Offline-first photo documentation for construction sites
         </p>
       </Card>
+
+      {/* Tag Edit Dialog */}
+      <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
+        <DialogContent data-testid="dialog-tag-edit">
+          <DialogHeader>
+            <DialogTitle>
+              {editingTag ? 'Edit Tag' : 'Create Tag'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="tag-name">Name</Label>
+              <Input
+                id="tag-name"
+                value={tagName}
+                onChange={(e) => setTagName(e.target.value)}
+                placeholder="e.g., Electrician, HVAC, Plumber"
+                data-testid="input-tag-name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tag-color">Color</Label>
+              <Select value={tagColor} onValueChange={setTagColor}>
+                <SelectTrigger id="tag-color" data-testid="select-tag-color">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TAG_COLORS.map((color) => (
+                    <SelectItem key={color.value} value={color.value}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: color.value }}
+                        />
+                        {color.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsTagDialogOpen(false)}
+              data-testid="button-cancel-tag"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveTag}
+              disabled={createTagMutation.isPending || updateTagMutation.isPending}
+              data-testid="button-save-tag"
+            >
+              {editingTag ? 'Update' : 'Create'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
