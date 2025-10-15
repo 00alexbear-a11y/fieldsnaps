@@ -1242,7 +1242,7 @@ export default function Camera() {
 
       {/* Zoom Selector - Center, lower position - Hide during video recording */}
       {!(cameraMode === 'video' && isRecording) && (
-        <div className="absolute bottom-36 left-0 right-0 flex justify-center gap-2 z-10">
+        <div className="absolute bottom-44 left-0 right-0 flex justify-center gap-2 z-10">
           {availableCameras.length > 0 ? (
             availableCameras.map((camera) => (
               <Button
@@ -1281,33 +1281,31 @@ export default function Camera() {
       {/* Tag Selector - Vertical on right side */}
       {tags.length > 0 && !isRecording && (
         <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30 max-h-[60vh]">
-          <div className="bg-black/60 backdrop-blur-md rounded-xl p-2 border border-white/20">
-            <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1">
-              {tags.map((tag) => {
-                const isSelected = selectedTags.includes(tag.id);
-                return (
-                  <button
-                    key={tag.id}
-                    onClick={() => {
-                      setSelectedTags(prev =>
-                        prev.includes(tag.id)
-                          ? prev.filter(id => id !== tag.id)
-                          : [...prev, tag.id]
-                      );
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
-                      isSelected
-                        ? 'bg-white text-black'
-                        : 'bg-white/20 text-white border border-white/30'
-                    }`}
-                    style={isSelected ? {} : { borderColor: tag.color }}
-                    data-testid={`button-tag-select-${tag.id}`}
-                  >
-                    {tag.name}
-                  </button>
-                );
-              })}
-            </div>
+          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1">
+            {tags.map((tag) => {
+              const isSelected = selectedTags.includes(tag.id);
+              return (
+                <button
+                  key={tag.id}
+                  onClick={() => {
+                    setSelectedTags(prev =>
+                      prev.includes(tag.id)
+                        ? prev.filter(id => id !== tag.id)
+                        : [...prev, tag.id]
+                    );
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap backdrop-blur-md ${
+                    isSelected
+                      ? 'bg-white text-black'
+                      : 'bg-white/20 text-white border border-white/30'
+                  }`}
+                  style={isSelected ? {} : { borderColor: tag.color }}
+                  data-testid={`button-tag-select-${tag.id}`}
+                >
+                  {tag.name}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
