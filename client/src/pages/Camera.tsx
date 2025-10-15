@@ -200,10 +200,12 @@ export default function Camera() {
     thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
     thumbnailUrlsRef.current.clear();
 
-    // Create new URLs for session photos
+    // Create new URLs for session photos (with null check)
     sessionPhotos.forEach(photo => {
-      const url = createPhotoUrl(photo);
-      thumbnailUrlsRef.current.set(photo.id, url);
+      if (photo && photo.id) {
+        const url = createPhotoUrl(photo);
+        thumbnailUrlsRef.current.set(photo.id, url);
+      }
     });
 
     // Cleanup on unmount
@@ -1657,7 +1659,7 @@ export default function Camera() {
       {sessionPhotos.length > 0 && !isRecording && (
         <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
           <div 
-            className="flex flex-col gap-2 overflow-y-auto scrollbar-hide max-h-[344px]"
+            className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden scrollbar-hide max-h-[344px]"
             style={{
               maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)'
