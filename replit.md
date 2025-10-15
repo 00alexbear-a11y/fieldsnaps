@@ -4,6 +4,9 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, focused on effortless, offline-reliable photo documentation. It aims to enhance efficiency and reduce disputes in construction projects through instant photo capture, smart compression, auto-timestamping, and efficient project organization. The app targets full offline functionality and touch optimization for challenging environments, aspiring to be a commercial SaaS product.
 
 ### Recent Updates (October 15, 2025)
+- **Camera UI Polish**: Final camera interface refinements
+  - Removed background box around tags - cleaner, more minimalist appearance with individual tag pills
+  - Fixed zoom magnifiers overlapping with capture buttons by moving from bottom-36 to bottom-44
 - **Camera UI Reorganization**: Complete camera interface restructure for better usability
   - Session-only thumbnails: Now shows only photos from current session (not all project photos), clears on camera close
   - Thumbnails repositioned to very bottom (bottom-2) with most recent first
