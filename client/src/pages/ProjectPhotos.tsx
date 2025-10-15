@@ -43,6 +43,7 @@ export default function ProjectPhotos() {
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [showMoveDialog, setShowMoveDialog] = useState(false);
+  const [showBatchTagDialog, setShowBatchTagDialog] = useState(false);
   const [targetProjectId, setTargetProjectId] = useState<string>("");
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
@@ -192,6 +193,32 @@ export default function ProjectPhotos() {
     onError: (error: any) => {
       toast({ 
         title: "Failed to move photos", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const batchTagMutation = useMutation({
+    mutationFn: async ({ photoIds, tagId }: { photoIds: string[]; tagId: string }) => {
+      // Apply tag to each selected photo
+      await Promise.all(
+        photoIds.map(photoId => 
+          apiRequest("POST", `/api/photos/${photoId}/tags`, { tagId })
+        )
+      );
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "photos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ 
+        title: `Tag applied to ${variables.photoIds.length} photo${variables.photoIds.length === 1 ? '' : 's'}`,
+        duration: 1500,
+      });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to apply tags", 
         description: error.message,
         variant: "destructive" 
       });
@@ -677,11 +704,20 @@ export default function ProjectPhotos() {
       {/* Selection Toolbar */}
       {isSelectMode && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
-          <div className="max-w-screen-sm mx-auto flex items-center justify-between gap-4">
-            <span className="text-sm font-medium">
+          <div className="max-w-screen-sm mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-sm font-medium flex-shrink-0">
               {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} selected
             </span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowBatchTagDialog(true)}
+                disabled={selectedPhotoIds.size === 0}
+                data-testid="button-tag-selected"
+              >
+                <TagIcon className="w-4 h-4 mr-2" />
+                Tag
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowMoveDialog(true)}
@@ -904,6 +940,67 @@ export default function ProjectPhotos() {
               data-testid="button-confirm-move"
             >
               {movePhotosMutation.isPending ? "Moving..." : "Move Photos"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Batch Tag Dialog */}
+      <Dialog open={showBatchTagDialog} onOpenChange={setShowBatchTagDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Apply Tags to Photos</DialogTitle>
+            <DialogDescription>
+              Select tags to apply to {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4 max-h-[400px] overflow-y-auto">
+            {availableTags.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No tags available
+              </p>
+            ) : (
+              availableTags.map((tag) => {
+                const tagColorMap: Record<string, string> = {
+                  red: "bg-red-500",
+                  yellow: "bg-yellow-500",
+                  blue: "bg-blue-500",
+                  orange: "bg-orange-500",
+                  gray: "bg-gray-500",
+                };
+                const colorClass = tagColorMap[tag.color] || "bg-gray-500";
+
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => {
+                      batchTagMutation.mutate({
+                        photoIds: Array.from(selectedPhotoIds),
+                        tagId: tag.id,
+                      });
+                    }}
+                    disabled={batchTagMutation.isPending}
+                    className="w-full flex items-center justify-between p-3 rounded-lg border transition-colors hover-elevate active-elevate-2 bg-card border-border"
+                    data-testid={`button-batch-tag-${tag.name.toLowerCase()}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 rounded-full ${colorClass}`} />
+                      <span className="font-medium">{tag.name}</span>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowBatchTagDialog(false);
+              }}
+              data-testid="button-close-batch-tag"
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

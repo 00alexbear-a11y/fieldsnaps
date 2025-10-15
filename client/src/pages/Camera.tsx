@@ -97,7 +97,9 @@ export default function Camera() {
   // Load tags for selected project
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
-    queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`).then(r => r.json()),
+    queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`, {
+      headers: { 'x-skip-auth': 'true' }
+    }).then(r => r.json()),
     enabled: !!selectedProject,
   });
   
@@ -1393,9 +1395,9 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Photo Thumbnail Strip - Above capture buttons */}
+      {/* Photo Thumbnail Strip - Above tag selector and capture buttons */}
       {projectPhotos.length > 0 && !isRecording && (
-        <div className="absolute bottom-28 left-0 right-0 z-15 pb-2">
+        <div className="absolute bottom-48 left-0 right-0 z-15 pb-2">
           <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide">
             {projectPhotos.map((photo) => {
               const url = thumbnailUrlsRef.current.get(photo.id);
