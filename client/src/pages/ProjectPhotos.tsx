@@ -546,6 +546,27 @@ export default function ProjectPhotos() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Photo Size Selector */}
+            <div className="flex items-center gap-2 justify-center" data-testid="photo-size-selector">
+              <span className="text-sm text-muted-foreground">Size:</span>
+              <div className="inline-flex rounded-lg border border-border p-1 bg-muted/30">
+                {(['S', 'M', 'L'] as const).map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setPhotoSize(size)}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                      photoSize === size
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover-elevate'
+                    }`}
+                    data-testid={`button-size-${size}`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
             {/* Tag Filter */}
             {availableTags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 pb-2 border-b" data-testid="tag-filter-bar">
