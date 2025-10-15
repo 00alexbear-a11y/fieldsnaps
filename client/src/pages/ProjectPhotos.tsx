@@ -484,51 +484,15 @@ export default function ProjectPhotos() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
-      <header className="border-b p-4 flex items-center justify-between bg-background sticky top-0 z-10 gap-2 min-w-0">
-        <div className="flex items-center gap-2 min-w-0 flex-shrink">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/")}
-            data-testid="button-back"
-            className="flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="min-w-0 flex-shrink">
-            <h1 className="text-lg sm:text-xl font-bold truncate">{project?.name || "Project Photos"}</h1>
+    <div className="min-h-screen flex flex-col overflow-x-hidden pb-20">
+      <header className="border-b p-4 bg-background sticky top-0 z-10">
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-lg sm:text-xl font-bold">{project?.name || "Project Photos"}</h1>
             {project?.description && (
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">{project.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{project.description}</p>
             )}
           </div>
-        </div>
-        <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
-          {!isSelectMode && (
-            <>
-              {photos.length > 0 && (
-                <Button
-                  onClick={toggleSelectMode}
-                  data-testid="button-select-mode"
-                  size="sm"
-                  className="flex-shrink-0"
-                >
-                  Select
-                </Button>
-              )}
-            </>
-          )}
-          {isSelectMode && (
-            <Button
-              onClick={toggleSelectMode}
-              variant="outline"
-              data-testid="button-cancel-select"
-              size="sm"
-              className="flex-shrink-0"
-            >
-              Cancel
-            </Button>
-          )}
         </div>
       </header>
 
@@ -737,9 +701,32 @@ export default function ProjectPhotos() {
         )}
       </main>
 
+      {/* Back Button - Fixed Bottom Left */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setLocation("/")}
+        data-testid="button-back"
+        className="fixed bottom-4 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
+      >
+        <ArrowLeft className="w-6 h-6" />
+      </Button>
+
+      {/* Select/Cancel Button - Fixed Bottom Right */}
+      {photos.length > 0 && (
+        <Button
+          onClick={toggleSelectMode}
+          data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
+          variant={isSelectMode ? "outline" : "default"}
+          className="fixed bottom-4 right-4 z-40 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
+        >
+          {isSelectMode ? 'Cancel' : 'Select'}
+        </Button>
+      )}
+
       {/* Selection Toolbar */}
       {isSelectMode && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
+        <div className="fixed bottom-20 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
           <div className="max-w-screen-sm mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <span className="text-sm font-medium flex-shrink-0">
               {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} selected
