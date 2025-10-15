@@ -62,8 +62,9 @@ export default function Camera() {
   // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  // Thumbnail strip state
-  const [projectPhotos, setProjectPhotos] = useState<LocalPhoto[]>([]);
+  // Session-only thumbnail strip state (only photos from this session)
+  const sessionPhotosRef = useRef<LocalPhoto[]>([]);
+  const [sessionPhotos, setSessionPhotos] = useState<LocalPhoto[]>([]);
   const thumbnailUrlsRef = useRef<Map<string, string>>(new Map());
   
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -129,25 +130,15 @@ export default function Camera() {
     }
   }, [tags]);
 
-  // Load project photos for thumbnail strip
+  // Clear session photos when project changes or component unmounts
   useEffect(() => {
-    if (!selectedProject) {
-      setProjectPhotos([]);
-      return;
-    }
-
-    const loadPhotos = async () => {
-      try {
-        const photos = await idb.getProjectPhotos(selectedProject);
-        // Take last 10 photos, sorted by timestamp (most recent first)
-        const recentPhotos = photos.slice(0, 10);
-        setProjectPhotos(recentPhotos);
-      } catch (error) {
-        console.error('[Camera] Failed to load project photos:', error);
-      }
+    sessionPhotosRef.current = [];
+    setSessionPhotos([]);
+    
+    return () => {
+      // Cleanup on unmount
+      sessionPhotosRef.current = [];
     };
-
-    loadPhotos();
   }, [selectedProject]);
 
   // Create blob URLs for thumbnails and cleanup on unmount
@@ -156,8 +147,8 @@ export default function Camera() {
     thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
     thumbnailUrlsRef.current.clear();
 
-    // Create new URLs
-    projectPhotos.forEach(photo => {
+    // Create new URLs for session photos
+    sessionPhotos.forEach(photo => {
       const url = createPhotoUrl(photo);
       thumbnailUrlsRef.current.set(photo.id, url);
     });
@@ -167,7 +158,7 @@ export default function Camera() {
       thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
       thumbnailUrlsRef.current.clear();
     };
-  }, [projectPhotos]);
+  }, [sessionPhotos]);
 
 
   useEffect(() => {
@@ -849,9 +840,9 @@ export default function Camera() {
       // Clear selected tags after capture
       setSelectedTags([]);
 
-      // Reload photos for thumbnail strip
-      const updatedPhotos = await idb.getProjectPhotos(selectedProject);
-      setProjectPhotos(updatedPhotos.slice(0, 10));
+      // Add photo to session thumbnails (most recent first)
+      sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
+      setSessionPhotos([...sessionPhotosRef.current]);
 
       // Visual feedback - pulse quick capture button
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
@@ -976,11 +967,9 @@ export default function Camera() {
     try {
       await idb.deletePhoto(photoId);
       
-      // Reload photos
-      if (selectedProject) {
-        const updatedPhotos = await idb.getProjectPhotos(selectedProject);
-        setProjectPhotos(updatedPhotos.slice(0, 10));
-      }
+      // Remove from session photos
+      sessionPhotosRef.current = sessionPhotosRef.current.filter(p => p.id !== photoId);
+      setSessionPhotos([...sessionPhotosRef.current]);
 
       toast({
         title: 'Photo deleted',
@@ -1229,8 +1218,8 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Mode Selector - Right side, lower position */}
-      <div className="absolute right-4 bottom-48 flex flex-col gap-3 z-10">
+      {/* Mode Selector - Right side, higher position */}
+      <div className="absolute right-4 top-24 flex flex-col gap-3 z-10">
         <Button
           variant="ghost"
           size="icon"
@@ -1289,11 +1278,11 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Tag Selector - Lower left side, horizontal scrollable */}
+      {/* Tag Selector - Vertical on right side */}
       {tags.length > 0 && !isRecording && (
-        <div className="absolute bottom-28 left-4 z-30 max-w-[70%]">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30 max-h-[60vh]">
           <div className="bg-black/60 backdrop-blur-md rounded-xl p-2 border border-white/20">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 pt-1">
+            <div className="flex flex-col gap-2 overflow-y-auto scrollbar-hide py-1">
               {tags.map((tag) => {
                 const isSelected = selectedTags.includes(tag.id);
                 return (
@@ -1306,7 +1295,7 @@ export default function Camera() {
                           : [...prev, tag.id]
                       );
                     }}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                       isSelected
                         ? 'bg-white text-black'
                         : 'bg-white/20 text-white border border-white/30'
@@ -1323,8 +1312,8 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Bottom Capture Controls - Minimal, no background box */}
-      <div className="absolute bottom-6 left-0 right-0 pb-safe z-20">
+      {/* Bottom Capture Controls - Above thumbnails */}
+      <div className="absolute bottom-24 left-0 right-0 pb-safe z-20">
         {cameraMode === 'photo' ? (
           <div className="flex items-center justify-center gap-8 px-8 max-w-md mx-auto">
             {/* Close Button */}
@@ -1395,11 +1384,11 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Photo Thumbnail Strip - Above tag selector and capture buttons */}
-      {projectPhotos.length > 0 && !isRecording && (
-        <div className="absolute bottom-48 left-0 right-0 z-40 pb-2">
+      {/* Photo Thumbnail Strip - Session photos only, at very bottom */}
+      {sessionPhotos.length > 0 && !isRecording && (
+        <div className="absolute bottom-2 left-0 right-0 z-10 pb-2">
           <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide">
-            {projectPhotos.map((photo) => {
+            {sessionPhotos.map((photo) => {
               const url = thumbnailUrlsRef.current.get(photo.id);
               if (!url) return null;
               
