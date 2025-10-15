@@ -36,7 +36,8 @@ export default function PhotoView() {
         
         const serverPhoto = await response.json();
         setMediaUrl(serverPhoto.url);
-        setMediaType('video'); // Server photos are typically already synced
+        // Use mediaType from server if available, otherwise default to 'photo'
+        setMediaType(serverPhoto.mediaType || 'photo');
         setProjectId(serverPhoto.projectId);
       } catch (error) {
         console.error('Error loading media:', error);

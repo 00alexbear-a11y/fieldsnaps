@@ -485,6 +485,8 @@ class SyncManager {
         if (photo.annotations) {
           formData.append('annotations', photo.annotations);
         }
+        // Include mediaType to distinguish photos from videos
+        formData.append('mediaType', photo.mediaType);
 
         // Get headers (without Content-Type for FormData)
         const headers = this.getSyncHeaders();
