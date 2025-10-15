@@ -742,7 +742,7 @@ export default function ProjectPhotos() {
             size="icon"
             onClick={() => setLocation("/")}
             data-testid="button-back"
-            className="fixed bottom-4 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
+            className="fixed bottom-20 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
@@ -751,7 +751,7 @@ export default function ProjectPhotos() {
           <Button
             onClick={() => setLocation(`/camera?projectId=${projectId}`)}
             data-testid="button-add-photo-fab"
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-16 h-16 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-16 h-16 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90"
           >
             <Camera className="w-7 h-7" />
           </Button>
@@ -763,7 +763,7 @@ export default function ProjectPhotos() {
               data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
               variant="ghost"
               size="sm"
-              className="fixed bottom-4 right-4 z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
+              className="fixed bottom-20 right-4 z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
             >
               {isSelectMode ? 'Cancel' : 'Select'}
             </Button>
