@@ -47,6 +47,7 @@ export default function ProjectPhotos() {
   const [targetProjectId, setTargetProjectId] = useState<string>("");
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
+  const [photoSize, setPhotoSize] = useState<'S' | 'M' | 'L'>('M');
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -398,6 +399,20 @@ export default function ProjectPhotos() {
     }
   };
 
+  // Get grid classes based on photo size
+  const getGridClasses = () => {
+    switch (photoSize) {
+      case 'S':
+        return 'grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
+      case 'M':
+        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+      case 'L':
+        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+      default:
+        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+    }
+  };
+
   const handleSaveAnnotations = async (annotations: any[], annotatedBlob: Blob) => {
     if (!selectedPhoto || !projectId) return;
 
@@ -618,7 +633,7 @@ export default function ProjectPhotos() {
                 </div>
                 
                 {/* Photos Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className={`grid ${getGridClasses()} gap-4`}>
                   {datePhotos.map((photo) => {
                     const photoIndex = filteredPhotos.findIndex(p => p.id === photo.id);
                     const isSelected = selectedPhotoIds.has(photo.id);
