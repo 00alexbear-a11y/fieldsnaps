@@ -650,7 +650,7 @@ export default function ProjectPhotos() {
                         )}
                         
                         {/* Tag indicators on left side */}
-                        {photo.tags && photo.tags.length > 0 && !isSelectMode && (
+                        {photo.tags && photo.tags.length > 0 && (
                           <div 
                             className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 z-10"
                             data-testid={`tag-indicators-${photo.id}`}
@@ -668,7 +668,7 @@ export default function ProjectPhotos() {
                         )}
                         
                         {/* +N badge if more than 2 tags */}
-                        {photo.tags && photo.tags.length > 2 && !isSelectMode && (
+                        {photo.tags && photo.tags.length > 2 && (
                           <div 
                             className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full z-10"
                             data-testid={`tag-overflow-badge-${photo.id}`}
