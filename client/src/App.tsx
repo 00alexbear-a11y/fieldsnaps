@@ -7,6 +7,7 @@ import Camera from "./pages/Camera";
 import Projects from "./pages/Projects";
 import ProjectPhotos from "./pages/ProjectPhotos";
 import PhotoEdit from "./pages/PhotoEdit";
+import PhotoView from "./pages/PhotoView";
 import Settings from "./pages/Settings";
 import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
@@ -71,6 +72,7 @@ function AppContent() {
           <Route path="/" component={Projects} />
           <Route path="/projects/:id" component={ProjectPhotos} />
           <Route path="/photo/:id/edit" component={PhotoEdit} />
+          <Route path="/photo/:id/view" component={PhotoView} />
           <Route path="/settings" component={Settings} />
           <Route path="/sync-status" component={SyncStatus} />
           <Route path="/trash" component={Trash} />
