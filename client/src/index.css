@@ -305,12 +305,12 @@
   .hover-elevate-2:not(.no-default-hover-elevate)::after,
   .active-elevate-2:not(.no-default-active-elevate)::after {
     content: "";
-    pointer-events: none;
+    pointer-events: none !important;
     position: absolute;
     inset: 0px;
     /*border-radius: inherit;   match rounded corners */
     border-radius: inherit;
-    z-index: 999;
+    z-index: 1;
     /* sits in front of content */
   }
 
