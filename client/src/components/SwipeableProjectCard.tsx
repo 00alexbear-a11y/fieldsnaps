@@ -201,7 +201,7 @@ export default function SwipeableProjectCard({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Open in Maps Button - Compact square design */}
+            {/* Maps Button - Compact square design */}
             {project.address && (
               <button
                 className="flex flex-col items-center justify-center w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 text-primary hover-elevate active-elevate-2 flex-shrink-0"
@@ -212,12 +212,9 @@ export default function SwipeableProjectCard({
                 data-testid={`button-open-map-${project.id}`}
                 aria-label="Open in Google Maps"
               >
-                <div className="flex items-center gap-0.5 text-[11px] font-medium leading-none">
-                  <span>Open</span>
-                  <MapPin className="w-3 h-3" />
-                </div>
-                <div className="text-[11px] font-medium leading-none mt-0.5">
-                  in Maps
+                <MapPin className="w-4 h-4 mb-0.5" />
+                <div className="text-[11px] font-medium leading-none">
+                  Maps
                 </div>
               </button>
             )}
