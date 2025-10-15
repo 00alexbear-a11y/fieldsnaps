@@ -11,6 +11,8 @@ import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
+import { billingService } from "./billing";
+import { emailService } from "./email";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -742,6 +744,347 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(204).send();
     } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Billing & Subscription Routes (Stripe Integration)
+  // Note: These routes are ready but dormant until production launch
+  
+  // Get or create subscription for current user
+  app.post("/api/billing/subscription", isAuthenticated, async (req: any, res) => {
+    // Check if billing is configured (dormant mode check)
+    if (!billingService.isConfigured()) {
+      console.log("[Billing] Service not configured - dormant mode");
+      return res.status(503).json({ 
+        error: "Billing service not available",
+        message: "Billing is not yet activated for this application" 
+      });
+    }
+
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Check if user already has an active subscription
+      const existingSubscription = await storage.getSubscriptionByUserId(user.id);
+      
+      if (existingSubscription && existingSubscription.stripeSubscriptionId) {
+        // Retrieve latest subscription data from Stripe
+        const stripeSubscription = await billingService.retrieveSubscription(existingSubscription.stripeSubscriptionId);
+        
+        const latestInvoice = stripeSubscription.latest_invoice;
+        let clientSecret: string | null = null;
+        
+        if (latestInvoice && typeof latestInvoice === 'object' && 'payment_intent' in latestInvoice) {
+          const pi = latestInvoice.payment_intent;
+          if (pi && typeof pi === 'object' && 'client_secret' in pi) {
+            clientSecret = (pi as any).client_secret || null;
+          }
+        }
+        
+        return res.json({
+          subscriptionId: stripeSubscription.id,
+          clientSecret,
+        });
+      }
+
+      // Create new Stripe customer if needed
+      let stripeCustomerId = user.stripeCustomerId;
+      if (!stripeCustomerId) {
+        stripeCustomerId = await billingService.getOrCreateStripeCustomer(user);
+        await storage.updateUserStripeCustomerId(user.id, stripeCustomerId);
+      }
+
+      // Get Stripe price ID from environment
+      const priceId = process.env.STRIPE_PRICE_ID;
+      if (!priceId) {
+        throw new Error("STRIPE_PRICE_ID not configured");
+      }
+
+      // Create subscription with 7-day trial
+      const { subscription, clientSecret } = await billingService.createTrialSubscription(
+        user,
+        stripeCustomerId,
+        priceId
+      );
+
+      // Calculate trial end date
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 7);
+
+      // Save subscription to database
+      await storage.createSubscription({
+        userId: user.id,
+        stripeSubscriptionId: subscription.id,
+        stripePriceId: priceId,
+        status: subscription.status,
+        currentPeriodStart: 'current_period_start' in subscription && typeof subscription.current_period_start === 'number'
+          ? new Date(subscription.current_period_start * 1000) 
+          : null,
+        currentPeriodEnd: 'current_period_end' in subscription && typeof subscription.current_period_end === 'number'
+          ? new Date(subscription.current_period_end * 1000) 
+          : null,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
+      });
+
+      // Update user subscription status
+      await storage.updateUserSubscriptionStatus(user.id, "trial", trialEnd);
+
+      // Send welcome email (dormant in development)
+      if (user.email) {
+        const userName = user.firstName || user.email.split('@')[0];
+        await emailService.sendWelcomeEmail(user.email, userName);
+      }
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret,
+      });
+    } catch (error: any) {
+      console.error("Error creating subscription:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Cancel subscription
+  app.post("/api/billing/subscription/cancel", isAuthenticated, async (req: any, res) => {
+    // Check if billing is configured (dormant mode check)
+    if (!billingService.isConfigured()) {
+      console.log("[Billing] Service not configured - dormant mode");
+      return res.status(503).json({ 
+        error: "Billing service not available",
+        message: "Billing is not yet activated for this application" 
+      });
+    }
+
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const subscription = await storage.getSubscriptionByUserId(user.id);
+      if (!subscription || !subscription.stripeSubscriptionId) {
+        return res.status(404).json({ error: "No active subscription" });
+      }
+
+      const cancelAtPeriodEnd = req.body.cancelAtPeriodEnd !== false; // default true
+      const updatedSubscription = await billingService.cancelSubscription(
+        subscription.stripeSubscriptionId,
+        cancelAtPeriodEnd
+      );
+
+      await storage.updateSubscription(subscription.id, {
+        cancelAtPeriodEnd: updatedSubscription.cancel_at_period_end ? 1 : 0,
+        status: updatedSubscription.status,
+      });
+
+      // Send cancellation email (dormant in development)
+      if (user.email && subscription.currentPeriodEnd) {
+        const userName = user.firstName || user.email.split('@')[0];
+        await emailService.sendCancellationEmail(user.email, userName, subscription.currentPeriodEnd);
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error canceling subscription:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Reactivate cancelled subscription
+  app.post("/api/billing/subscription/reactivate", isAuthenticated, async (req: any, res) => {
+    // Check if billing is configured (dormant mode check)
+    if (!billingService.isConfigured()) {
+      console.log("[Billing] Service not configured - dormant mode");
+      return res.status(503).json({ 
+        error: "Billing service not available",
+        message: "Billing is not yet activated for this application" 
+      });
+    }
+
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const subscription = await storage.getSubscriptionByUserId(user.id);
+      if (!subscription || !subscription.stripeSubscriptionId) {
+        return res.status(404).json({ error: "No subscription found" });
+      }
+
+      const updatedSubscription = await billingService.reactivateSubscription(subscription.stripeSubscriptionId);
+
+      await storage.updateSubscription(subscription.id, {
+        cancelAtPeriodEnd: 0,
+        status: updatedSubscription.status,
+      });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error reactivating subscription:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Stripe webhook handler for subscription events
+  app.post("/api/billing/webhook", express.raw({ type: "application/json" }), async (req, res) => {
+    // Check if billing is configured (dormant mode check)
+    if (!billingService.isConfigured()) {
+      console.log("[Billing] Webhook received but service not configured - dormant mode");
+      return res.status(503).json({ 
+        error: "Billing service not available",
+        message: "Billing webhooks not yet activated" 
+      });
+    }
+
+    const signature = req.headers["stripe-signature"];
+    if (!signature || typeof signature !== "string") {
+      return res.status(400).send("Missing stripe-signature header");
+    }
+
+    try {
+      const event = billingService.parseWebhookEvent(req.body, signature);
+
+      // Process different webhook events
+      switch (event.type) {
+        case "customer.subscription.created":
+        case "customer.subscription.updated": {
+          const subscription = event.data.object as any;
+          const dbSubscription = await storage.getSubscriptionByStripeId(subscription.id);
+          
+          if (dbSubscription) {
+            await storage.updateSubscription(dbSubscription.id, {
+              status: subscription.status,
+              currentPeriodStart: subscription.current_period_start 
+                ? new Date(subscription.current_period_start * 1000) 
+                : null,
+              currentPeriodEnd: subscription.current_period_end 
+                ? new Date(subscription.current_period_end * 1000) 
+                : null,
+              cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
+            });
+
+            const userStatus = billingService.mapStripeStatusToUserStatus(subscription.status);
+            await storage.updateUserSubscriptionStatus(dbSubscription.userId, userStatus);
+
+            // Log event
+            const eventData = billingService.createSubscriptionEventData(dbSubscription.id, event);
+            await storage.createSubscriptionEvent(eventData);
+          }
+          break;
+        }
+
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object as any;
+          const dbSubscription = await storage.getSubscriptionByStripeId(subscription.id);
+          
+          if (dbSubscription) {
+            await storage.updateSubscription(dbSubscription.id, {
+              status: "canceled",
+            });
+            await storage.updateUserSubscriptionStatus(dbSubscription.userId, "canceled");
+
+            // Log event
+            const eventData = billingService.createSubscriptionEventData(dbSubscription.id, event);
+            await storage.createSubscriptionEvent(eventData);
+          }
+          break;
+        }
+
+        case "invoice.payment_succeeded": {
+          const invoice = event.data.object as any;
+          const subscriptionId = invoice.subscription;
+          
+          if (subscriptionId) {
+            const dbSubscription = await storage.getSubscriptionByStripeId(subscriptionId);
+            if (dbSubscription) {
+              // Log payment event
+              const eventData = billingService.createSubscriptionEventData(dbSubscription.id, event);
+              await storage.createSubscriptionEvent(eventData);
+
+              // Send payment success email (dormant in development)
+              const user = await storage.getUser(dbSubscription.userId);
+              if (user?.email && dbSubscription.currentPeriodEnd) {
+                const userName = user.firstName || user.email.split('@')[0];
+                await emailService.sendPaymentSuccessEmail(
+                  user.email,
+                  userName,
+                  invoice.amount_paid,
+                  dbSubscription.currentPeriodEnd
+                );
+              }
+            }
+          }
+          break;
+        }
+
+        case "invoice.payment_failed": {
+          const invoice = event.data.object as any;
+          const subscriptionId = invoice.subscription;
+          
+          if (subscriptionId) {
+            const dbSubscription = await storage.getSubscriptionByStripeId(subscriptionId);
+            if (dbSubscription) {
+              // Update status to past_due
+              await storage.updateSubscription(dbSubscription.id, {
+                status: "past_due",
+              });
+              await storage.updateUserSubscriptionStatus(dbSubscription.userId, "past_due");
+
+              // Log payment failure event
+              const eventData = billingService.createSubscriptionEventData(dbSubscription.id, event);
+              await storage.createSubscriptionEvent(eventData);
+
+              // Send payment failed email (dormant in development)
+              const user = await storage.getUser(dbSubscription.userId);
+              if (user?.email) {
+                const userName = user.firstName || user.email.split('@')[0];
+                await emailService.sendPaymentFailedEmail(
+                  user.email,
+                  userName,
+                  invoice.amount_due
+                );
+              }
+            }
+          }
+          break;
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error("Webhook error:", error);
+      res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+  });
+
+  // Get current user's subscription status
+  app.get("/api/billing/subscription/status", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Even in dormant mode, we can return basic user status
+      // Just won't have active Stripe subscription data
+      const subscription = billingService.isConfigured() 
+        ? await storage.getSubscriptionByUserId(user.id)
+        : null;
+      
+      res.json({
+        subscriptionStatus: user.subscriptionStatus || "trial",
+        trialEndDate: user.trialEndDate,
+        subscription: subscription || null,
+        billingConfigured: billingService.isConfigured(),
+      });
+    } catch (error: any) {
+      console.error("Error fetching subscription status:", error);
       res.status(500).json({ error: error.message });
     }
   });

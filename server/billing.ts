@@ -1,24 +1,45 @@
 import Stripe from "stripe";
 import type { User, Subscription, InsertSubscription, InsertSubscriptionEvent } from "../shared/schema";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
-
 export class BillingService {
   private readonly TRIAL_DAYS = 7;
   private readonly MONTHLY_PRICE = 1999; // $19.99 in cents
+  private _stripe: Stripe | null = null;
+
+  /**
+   * Lazy-load Stripe client to prevent server crash when keys are missing
+   * This allows the server to boot without Stripe configured (billing dormant mode)
+   */
+  private get stripe(): Stripe {
+    if (!this._stripe) {
+      if (!process.env.STRIPE_SECRET_KEY) {
+        throw new Error("Billing service not configured: Missing STRIPE_SECRET_KEY");
+      }
+      this._stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2025-09-30.clover",
+      });
+    }
+    return this._stripe;
+  }
+
+  /**
+   * Check if billing service is properly configured
+   * Requires all Stripe credentials to be production-ready
+   */
+  isConfigured(): boolean {
+    return !!(
+      process.env.STRIPE_SECRET_KEY && 
+      process.env.STRIPE_PRICE_ID && 
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  }
 
   async getOrCreateStripeCustomer(user: User): Promise<string> {
     if (user.stripeCustomerId) {
       return user.stripeCustomerId;
     }
 
-    const customer = await stripe.customers.create({
+    const customer = await this.stripe.customers.create({
       email: user.email || undefined,
       name: user.firstName && user.lastName 
         ? `${user.firstName} ${user.lastName}` 
@@ -36,7 +57,7 @@ export class BillingService {
     customerId: string,
     priceId: string
   ): Promise<{ subscription: Stripe.Subscription; clientSecret: string | null }> {
-    const subscription = await stripe.subscriptions.create({
+    const subscription = await this.stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       trial_period_days: this.TRIAL_DAYS,
@@ -62,16 +83,16 @@ export class BillingService {
 
   async cancelSubscription(subscriptionId: string, cancelAtPeriodEnd: boolean = true): Promise<Stripe.Subscription> {
     if (cancelAtPeriodEnd) {
-      return await stripe.subscriptions.update(subscriptionId, {
+      return await this.stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       });
     } else {
-      return await stripe.subscriptions.cancel(subscriptionId);
+      return await this.stripe.subscriptions.cancel(subscriptionId);
     }
   }
 
   async reactivateSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
-    return await stripe.subscriptions.update(subscriptionId, {
+    return await this.stripe.subscriptions.update(subscriptionId, {
       cancel_at_period_end: false,
     });
   }
@@ -80,11 +101,11 @@ export class BillingService {
     customerId: string,
     paymentMethodId: string
   ): Promise<Stripe.Customer> {
-    await stripe.paymentMethods.attach(paymentMethodId, {
+    await this.stripe.paymentMethods.attach(paymentMethodId, {
       customer: customerId,
     });
 
-    return await stripe.customers.update(customerId, {
+    return await this.stripe.customers.update(customerId, {
       invoice_settings: {
         default_payment_method: paymentMethodId,
       },
@@ -92,7 +113,7 @@ export class BillingService {
   }
 
   async retrieveSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
-    return await stripe.subscriptions.retrieve(subscriptionId, {
+    return await this.stripe.subscriptions.retrieve(subscriptionId, {
       expand: ["latest_invoice.payment_intent"],
     });
   }
@@ -101,10 +122,10 @@ export class BillingService {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     
     if (!webhookSecret) {
-      throw new Error("Missing STRIPE_WEBHOOK_SECRET");
+      throw new Error("Billing webhook not configured: Missing STRIPE_WEBHOOK_SECRET");
     }
 
-    return stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    return this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
   }
 
   createSubscriptionEventData(
