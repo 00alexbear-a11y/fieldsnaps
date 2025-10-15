@@ -1879,12 +1879,12 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Color Picker - Floating colors with fade effect */}
-      <div className="fixed bottom-20 right-0 z-[60] pointer-events-none">
-        {/* Expanded Color Palette - Wider invisible scroll area extending to screen edge */}
+      {/* Color Picker - Aligned with S/M/L tabs */}
+      <div className="fixed bottom-20 right-0 z-[60] pb-2">
+        {/* Expanded Color Palette - Right-anchored full-width with left padding for scroll area */}
         {colorPickerExpanded && (
           <div 
-            className="absolute bottom-14 right-0 w-screen flex flex-col items-end gap-2 py-4 pr-4 max-h-[300px] overflow-y-auto pointer-events-auto"
+            className="absolute bottom-14 right-0 left-0 pl-20 flex flex-col items-end gap-2 py-4 pr-4 max-h-[300px] overflow-y-auto pointer-events-auto"
             style={{ 
               scrollbarWidth: 'none', 
               msOverflowStyle: 'none',
@@ -1911,13 +1911,13 @@ export function PhotoAnnotationEditor({
           </div>
         )}
         
-        {/* Fixed Toggle Button */}
+        {/* Fixed Toggle Button - Same height as S/M/L tabs */}
         <button
           onClick={() => {
             console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
             setColorPickerExpanded(!colorPickerExpanded);
           }}
-          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg mr-4 pointer-events-auto"
+          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg pointer-events-auto mr-4"
           style={{ backgroundColor: selectedColor }}
           data-testid="button-toggle-color-picker"
           aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}

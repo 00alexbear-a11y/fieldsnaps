@@ -1345,66 +1345,70 @@ export default function Camera() {
         </div>
       )}
 
-      {/* Bottom Capture Controls - Above thumbnails */}
+      {/* Bottom Capture Controls - 4-button horizontal layout */}
       <div className="absolute bottom-24 left-0 right-0 pb-safe z-20">
-        {cameraMode === 'photo' ? (
-          <div className="flex items-center justify-center gap-8 px-8 max-w-md mx-auto">
-            {/* Close Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation('/')}
-              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white shadow-lg"
-              data-testid="button-close-camera-bottom"
-            >
-              <X className="w-7 h-7" />
-            </Button>
+        <div className="flex items-center justify-center gap-4 px-8 max-w-lg mx-auto">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation('/')}
+            disabled={isRecording}
+            className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50 shadow-lg"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-7 h-7" />
+          </Button>
 
-            {/* Quick Capture Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={quickCapture}
-              disabled={isCapturing}
-              className="w-14 h-14 rounded-full bg-white/90 hover:bg-white active:bg-white/80 text-black disabled:opacity-50 transition-transform shadow-lg"
-              data-testid="button-quick-capture"
-            >
-              <CameraIcon className="w-7 h-7" />
-            </Button>
+          {/* Video Mode Button - Instant Recording */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={async () => {
+              if (isRecording) {
+                stopRecording();
+              } else {
+                startRecording();
+              }
+            }}
+            className={`w-14 h-14 rounded-full ${
+              isRecording 
+                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' 
+                : 'bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40'
+            } text-white shadow-lg transition-all`}
+            data-testid="button-video-mode"
+          >
+            {isRecording ? (
+              <div className="w-5 h-5 bg-white rounded-sm" />
+            ) : (
+              <Video className="w-7 h-7" />
+            )}
+          </Button>
 
-            {/* Capture & Edit Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={captureAndEdit}
-              disabled={isCapturing}
-              className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50 shadow-lg"
-              data-testid="button-capture-edit"
-            >
-              <div className="relative">
-                <CameraIcon className="w-8 h-8" />
-                <PenLine className="w-4 h-4 absolute -bottom-1 -right-1" />
-              </div>
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center px-8 max-w-md mx-auto">
-            {/* Video Record/Stop Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`w-20 h-20 rounded-full ${isRecording ? 'bg-red-600' : 'bg-white/90'} hover:scale-105 active:scale-95 transition-all shadow-lg`}
-              data-testid="button-record-video"
-            >
-              {isRecording ? (
-                <div className="w-6 h-6 bg-white rounded-sm" />
-              ) : (
-                <div className="w-5 h-5 bg-red-600 rounded-full" />
-              )}
-            </Button>
-          </div>
-        )}
+          {/* Normal Camera Button - Quick Capture */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={quickCapture}
+            disabled={isCapturing || isRecording}
+            className="w-16 h-16 rounded-full bg-white/90 hover:bg-white active:bg-white/80 text-black disabled:opacity-50 transition-transform shadow-lg"
+            data-testid="button-quick-capture"
+          >
+            <CameraIcon className="w-8 h-8" />
+          </Button>
+
+          {/* Edit Mode Button - Capture & Edit */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={captureAndEdit}
+            disabled={isCapturing || isRecording}
+            className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50 shadow-lg"
+            data-testid="button-capture-edit"
+          >
+            <PenLine className="w-7 h-7" />
+          </Button>
+        </div>
       </div>
 
       {/* Recording indicator */}
@@ -1425,6 +1429,19 @@ export default function Camera() {
               const url = thumbnailUrlsRef.current.get(photo.id);
               if (!url) return null;
               
+              // Get photo tags from pendingTagIds
+              const photoTags = photo.pendingTagIds
+                ?.map(tagId => tags.find(t => t.id === tagId))
+                .filter(Boolean) as Tag[] | undefined;
+              
+              const tagColorMap: Record<string, string> = {
+                red: '#ef4444',
+                orange: '#f97316',
+                yellow: '#eab308',
+                blue: '#3b82f6',
+                gray: '#6b7280',
+              };
+              
               return (
                 <div
                   key={photo.id}
@@ -1441,6 +1458,33 @@ export default function Camera() {
                       className="w-full h-full object-cover"
                     />
                   </button>
+                  
+                  {/* Tag indicators on left side (matching project view) */}
+                  {photoTags && photoTags.length > 0 && (
+                    <div 
+                      className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 pointer-events-none"
+                      data-testid={`tag-indicators-${photo.id}`}
+                    >
+                      {photoTags.slice(0, 2).map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="w-1 flex-1 rounded-full"
+                          style={{ backgroundColor: tagColorMap[tag.color] || '#6b7280' }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* +N badge if more than 2 tags */}
+                  {photoTags && photoTags.length > 2 && (
+                    <div 
+                      className="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1 py-0.5 rounded-full pointer-events-none"
+                      data-testid={`tag-overflow-badge-${photo.id}`}
+                    >
+                      +{photoTags.length - 2}
+                    </div>
+                  )}
+                  
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
