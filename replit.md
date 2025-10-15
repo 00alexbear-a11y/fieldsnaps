@@ -3,6 +3,31 @@
 ## Overview
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant photo capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization for challenging environments, aspiring to become a commercial SaaS product.
 
+### Recent Updates (October 15, 2025)
+- **Real-Time Video Annotation**: Draw temporary highlights during video recording
+  - Touch-based drawing overlay appears during video recording
+  - Annotations follow finger precisely with coordinate scaling (CSS pixels → canvas resolution)
+  - Temporary highlights clear 50ms after finger lift (captured in ~1-2 frames)
+  - Highlights baked into saved video via canvas compositing at 30fps
+  - Brand blue (#169DF5) stroke with scaled line width for consistent visibility
+  - Composite canvas system: annotation overlay + video stream → MediaRecorder
+- **Session Photo Persistence with Race Condition Guard**: localStorage-based session restoration with async safety
+  - Session photos now persist across Camera remounts when returning from PhotoEdit
+  - Implemented currentProjectRef guard to prevent cross-project photo leakage during async restore
+  - Photos only restore if project hasn't changed mid-async operation
+  - Session clears properly on project switch and on non-photo navigation exit
+  - captureAndEdit workflow now adds photos to session before navigating to edit mode
+- **Thumbnail Layout Refinement**: Vertical strip repositioned to left side with exact sizing
+  - Moved from bottom-2 to left-4 with vertical centering (top-1/2 -translate-y-1/2)
+  - max-h-[344px] for exactly 4 photos (4×80px thumbnails + 3×8px gaps)
+  - CSS mask fade effect at top/bottom (0% → 15% → 85% → 100%)
+  - Capture buttons repositioned to bottom-12 for better layout balance
+- **Arrow Tool Redesign**: Improved arrow annotation visual quality
+  - Arrowhead now extends past shaft line instead of sitting on top
+  - Shaft stops at arrowhead base, triangle extends to tip for unified arrow shape
+  - Better proportions: headLength = max(strokeWidth * 2.5, 30px), headWidth = strokeWidth * 1.2
+  - Matches professional arrow design with black outline and colored fill
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
