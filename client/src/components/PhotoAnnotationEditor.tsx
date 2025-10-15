@@ -1627,6 +1627,7 @@ export function PhotoAnnotationEditor({
   };
 
   const handleDeleteSelected = () => {
+    console.log("[PhotoEdit] Delete button clicked, selectedAnnotation:", selectedAnnotation);
     if (selectedAnnotation) {
       const newAnnotations = annotations.filter(a => a.id !== selectedAnnotation);
       setAnnotations(newAnnotations);
@@ -1636,6 +1637,8 @@ export function PhotoAnnotationEditor({
         title: "Annotation deleted",
         description: "The selected annotation has been removed",
       });
+    } else {
+      console.log("[PhotoEdit] Delete clicked but no annotation selected");
     }
   };
 
@@ -1881,7 +1884,10 @@ export function PhotoAnnotationEditor({
         <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
           {/* Current Color Button - Toggle Expand/Collapse */}
           <button
-            onClick={() => setColorPickerExpanded(!colorPickerExpanded)}
+            onClick={() => {
+              console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
+              setColorPickerExpanded(!colorPickerExpanded);
+            }}
             className="w-10 h-10 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative"
             style={{ backgroundColor: selectedColor }}
             data-testid="button-toggle-color-picker"
@@ -1901,6 +1907,7 @@ export function PhotoAnnotationEditor({
                 <button
                   key={color.value}
                   onClick={() => {
+                    console.log("[PhotoEdit] Color selected:", color.name, color.value);
                     setSelectedColor(color.value);
                     setColorPickerExpanded(false); // Auto-collapse after selection
                   }}
