@@ -545,7 +545,6 @@ export class DbStorage implements IStorage {
       { name: 'HVAC', color: 'yellow' },
       { name: 'Plumber', color: 'blue' },
       { name: 'Framer', color: 'orange' },
-      { name: 'General', color: 'gray' },
     ];
 
     for (const tag of predefinedTags) {
