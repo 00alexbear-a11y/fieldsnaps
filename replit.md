@@ -8,11 +8,13 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
   - **Camera Session Null Guards**: Fixed crashes during photo restoration from localStorage by adding `if (photo && photo.id)` checks before calling createPhotoUrl()
   - **Camera Horizontal Scroll Fix**: Added `overflow-x-hidden` to thumbnail strip container to prevent unwanted horizontal scrolling
   - **ProjectPhotos Fixed Button Positioning**: Resolved buttons scrolling with content
-    - Removed `overflow-auto` from App.tsx main element (each page owns its scrolling)
-    - Changed ProjectPhotos to `h-screen overflow-auto` container for internal scrolling
-    - Used React Portal (`createPortal` from "react-dom") to render fixed buttons to `document.body`
-    - Buttons (Back, Camera FAB, Select) now correctly stay fixed at `bottom-4` viewport positions
-    - Added `mediaType` field initialization in upload payloads for backend compatibility
+    - App.tsx outer div: Changed to `h-screen overflow-hidden` to prevent document/window scrolling
+    - App.tsx main element: Changed to `flex-1 overflow-hidden` to contain page routes
+    - ProjectPhotos container: Changed to `h-screen overflow-auto` for internal scrolling
+    - Used React Portal (`createPortal` from "react-dom") to render all fixed buttons to `document.body`
+    - Three fixed buttons: Back (left), Camera FAB (center), Select (right) - all stay fixed at `bottom-4` viewport positions
+    - Added missing Camera FAB button to ProjectPhotos for quick photo capture
+    - Fixed TypeScript mediaType type assertion for proper 'photo' | 'video' literal types
 - **Video Recording Pipeline Complete**: Full video support with persistence and playback
   - Added `mediaType` field to distinguish photos from videos throughout the system
   - LocalPhoto interface includes `mediaType: 'photo' | 'video'` with proper defaults

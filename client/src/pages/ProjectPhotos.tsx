@@ -441,7 +441,7 @@ export default function ProjectPhotos() {
           retryCount: 0,
           annotations: null,
           serverId: selectedPhoto.id,
-          mediaType: selectedPhoto.mediaType || 'photo',
+          mediaType: (selectedPhoto.mediaType === 'video' ? 'video' : 'photo') as 'photo' | 'video',
         });
       }
 
@@ -745,6 +745,15 @@ export default function ProjectPhotos() {
             className="fixed bottom-4 left-4 z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
           >
             <ArrowLeft className="w-6 h-6" />
+          </Button>
+
+          {/* Camera FAB - Fixed Bottom Center */}
+          <Button
+            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
+            data-testid="button-add-photo-fab"
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-16 h-16 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90"
+          >
+            <Camera className="w-7 h-7" />
           </Button>
 
           {/* Select/Cancel Button - Fixed Bottom Right */}
