@@ -142,8 +142,8 @@ export default function Camera() {
     previousProjectRef.current = selectedProject;
     
     return () => {
-      // Cleanup on unmount only
-      if (!window.location.pathname.includes('/photo/')) {
+      // Cleanup on unmount only - preserve session if navigating to photo view or edit
+      if (!window.location.pathname.includes('/photo/') && !window.location.pathname.includes('/photo-edit')) {
         sessionPhotosRef.current = [];
       }
     };
