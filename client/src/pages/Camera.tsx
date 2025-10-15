@@ -61,7 +61,6 @@ export default function Camera() {
   
   // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const hasAutoSelectedGeneralRef = useRef<boolean>(false); // Track if we've auto-selected General tag
   
   // Session-only thumbnail strip state (only photos from this session)
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
@@ -112,10 +111,9 @@ export default function Camera() {
     console.log('[Camera Tags] Should show selector:', tags.length > 0 && !isRecording);
   }, [selectedProject, tags, isRecording]);
 
-  // Clear selected tags when project changes and reset auto-select flag
+  // Clear selected tags when project changes
   useEffect(() => {
     setSelectedTags([]);
-    hasAutoSelectedGeneralRef.current = false; // Reset for new project
   }, [selectedProject]);
 
   // Filter out invalid tag IDs when tags list changes (but keep valid selections)
@@ -131,17 +129,6 @@ export default function Camera() {
       }
     }
   }, [tags]);
-
-  // Auto-select "General" tag when camera opens with tags loaded (only once per project)
-  useEffect(() => {
-    if (tags.length > 0 && selectedTags.length === 0 && !hasAutoSelectedGeneralRef.current) {
-      const generalTag = tags.find(tag => tag.name.toLowerCase() === 'general');
-      if (generalTag) {
-        setSelectedTags([generalTag.id]);
-        hasAutoSelectedGeneralRef.current = true; // Mark that we've auto-selected
-      }
-    }
-  }, [tags, selectedTags.length]);
 
   // Clear session photos when project changes or component unmounts
   useEffect(() => {
