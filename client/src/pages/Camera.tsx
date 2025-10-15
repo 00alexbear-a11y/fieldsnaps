@@ -1150,7 +1150,7 @@ export default function Camera() {
   }
 
   return (
-    <div className="fixed inset-0 w-full bg-black overflow-hidden" style={{ height: '100dvh', minHeight: '100vh' }}>
+    <div className="fixed inset-0 w-full bg-black" style={{ height: '100dvh', minHeight: '100vh' }}>
       {/* Loading state while camera starts */}
       {!isActive && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 z-30 bg-black">
