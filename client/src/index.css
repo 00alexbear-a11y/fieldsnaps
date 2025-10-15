@@ -410,4 +410,9 @@
     transform: scale(0.98);
     transition: transform 100ms ease-out;
   }
+
+  /* Fix for Select inside Dialog - ensure Select portal renders above Dialog */
+  [data-radix-popper-content-wrapper] {
+    z-index: 100 !important;
+  }
 }

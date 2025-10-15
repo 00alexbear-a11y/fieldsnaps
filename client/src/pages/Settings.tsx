@@ -551,7 +551,7 @@ export default function Settings() {
                 <SelectContent 
                   position="popper"
                   sideOffset={5}
-                  className="z-50"
+                  className="z-[100]"
                 >
                   {TAG_COLORS.map((color) => (
                     <SelectItem key={color.value} value={color.value}>
