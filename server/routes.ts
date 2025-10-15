@@ -722,6 +722,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/tags/:id", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertTagSchema.partial().parse(req.body);
+      const tag = await storage.updateTag(req.params.id, validated);
+      if (!tag) {
+        return res.status(404).json({ error: "Tag not found" });
+      }
+      res.json(tag);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/tags/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteTag(req.params.id);

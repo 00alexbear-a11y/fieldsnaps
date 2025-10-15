@@ -66,6 +66,7 @@ export interface IStorage {
   getTags(projectId?: string): Promise<Tag[]>;
   getTag(id: string): Promise<Tag | undefined>;
   createTag(data: InsertTag): Promise<Tag>;
+  updateTag(id: string, data: Partial<InsertTag>): Promise<Tag | undefined>;
   deleteTag(id: string): Promise<boolean>;
   
   // Photo Tags
@@ -437,6 +438,14 @@ export class DbStorage implements IStorage {
 
   async createTag(data: InsertTag): Promise<Tag> {
     const result = await db.insert(tags).values(data).returning();
+    return result[0];
+  }
+
+  async updateTag(id: string, data: Partial<InsertTag>): Promise<Tag | undefined> {
+    const result = await db.update(tags)
+      .set(data)
+      .where(eq(tags.id, id))
+      .returning();
     return result[0];
   }
 
