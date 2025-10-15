@@ -330,21 +330,8 @@ export function PhotoAnnotationEditor({
             const textMetrics = ctx.measureText(annotation.content);
             const textWidth = textMetrics.width;
             const textHeight = fontSize;
-            const padding = 8;
-            const borderRadius = 6;
             
-            const boxX = -padding;
-            const boxY = -textHeight - padding;
-            const boxWidth = textWidth + padding * 2;
-            const boxHeight = textHeight + padding * 2;
-            
-            // Draw background box
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.beginPath();
-            ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
-            ctx.fill();
-            
-            // Draw text with bold black outline
+            // Draw text with bold black outline (no background box)
             ctx.lineWidth = Math.max(fontSize / 8, 4); // Thick black outline
             ctx.strokeStyle = '#000000';
             ctx.lineJoin = 'round';
@@ -554,8 +541,8 @@ export function PhotoAnnotationEditor({
     
     const arrowLength = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
     
-    // Arrowhead size scales with the scaled line width
-    const headLength = Math.min(arrowLength * 0.35, thickerLineWidth * 3);
+    // Arrowhead size scales proportionally with stroke width (S=11.25, M=19.5, L=27)
+    const headLength = Math.min(arrowLength * 0.35, thickerLineWidth * 1.5);
     const angle = Math.atan2(toY - fromY, toX - fromX);
 
     // Calculate the base of the arrowhead triangle
@@ -764,7 +751,7 @@ export function PhotoAnnotationEditor({
               // Apply stroke width scaling: XS/S use 1.5x, M/L use 4.5x
               const scaleFactor = anno.strokeWidth >= 8 ? 4.5 : 1.5;
               const thickerLineWidth = anno.strokeWidth * scaleFactor;
-              const arrowheadSize = thickerLineWidth * 3;
+              const arrowheadSize = thickerLineWidth * 1.5;
               
               const arrowTipX = anno.position.x2;
               const arrowTipY = anno.position.y2;
@@ -926,7 +913,11 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    setSelectedAnnotation(null);
+    // Keep text annotations selected until "Done" is pressed
+    const selectedAnno = annotations.find(a => a.id === selectedAnnotation);
+    if (selectedAnno?.type !== "text") {
+      setSelectedAnnotation(null);
+    }
 
     // Don't create new annotations if no tool is selected
     if (!tool) return;
@@ -1266,8 +1257,11 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    // Deselect annotation when tapping empty space
-    setSelectedAnnotation(null);
+    // Keep text annotations selected until "Done" is pressed
+    const selectedAnno = annotations.find(a => a.id === selectedAnnotation);
+    if (selectedAnno?.type !== "text") {
+      setSelectedAnnotation(null);
+    }
 
     if (!tool || tool === "select") return;
 
@@ -1689,23 +1683,8 @@ export function PhotoAnnotationEditor({
             ctx.scale(scale, scale);
             
             ctx.font = `${fontSize}px Arial`;
-            const textMetrics = ctx.measureText(annotation.content);
-            const textWidth = textMetrics.width;
-            const textHeight = fontSize;
-            const padding = 8;
-            const borderRadius = 6;
             
-            const boxX = -padding;
-            const boxY = -textHeight - padding;
-            const boxWidth = textWidth + padding * 2;
-            const boxHeight = textHeight + padding * 2;
-            
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.beginPath();
-            ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
-            ctx.fill();
-            
-            // Draw text with bold black outline
+            // Draw text with bold black outline (no background box)
             ctx.lineWidth = Math.max(fontSize / 8, 4);
             ctx.strokeStyle = '#000000';
             ctx.lineJoin = 'round';
@@ -1897,9 +1876,9 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Left Sidebar - Collapsible Color Picker */}
-      <div className="fixed left-2 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 pb-safe">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
+      {/* Color Picker - Positioned above trash tool, aligned with S/M/L */}
+      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 items-end pb-2">
+        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-2 shadow-lg flex flex-col items-center relative">
           {/* Current Color Button - Toggle Expand/Collapse */}
           <button
             onClick={() => setColorPickerExpanded(!colorPickerExpanded)}
@@ -1915,9 +1894,9 @@ export function PhotoAnnotationEditor({
             )}
           </button>
           
-          {/* Expanded Color Palette */}
+          {/* Expanded Color Palette - Expands Upward */}
           {colorPickerExpanded && (
-            <div className="mt-2 flex flex-col gap-2 py-1 max-h-[300px] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="absolute bottom-full mb-2 flex flex-col gap-2 py-2 px-2 bg-black/60 backdrop-blur-md rounded-full shadow-lg max-h-[300px] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {colors.map((color) => (
                 <button
                   key={color.value}

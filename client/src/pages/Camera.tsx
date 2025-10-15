@@ -97,6 +97,7 @@ export default function Camera() {
   // Load tags for selected project
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
+    queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`).then(r => r.json()),
     enabled: !!selectedProject,
   });
   
