@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, TouchEvent } from "react";
-import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink } from "lucide-react";
+import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project, Photo } from "../../../shared/schema";
 
@@ -11,6 +11,7 @@ interface SwipeableProjectCardProps {
   onClick: () => void;
   onDelete: () => void;
   onCameraClick: () => void;
+  onShare: () => void;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -24,6 +25,7 @@ export default function SwipeableProjectCard({
   onClick,
   onDelete,
   onCameraClick,
+  onShare,
 }: SwipeableProjectCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
@@ -219,6 +221,21 @@ export default function SwipeableProjectCard({
                 </div>
               </button>
             )}
+            
+            {/* Share Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-11 h-11"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare();
+              }}
+              data-testid={`button-share-${project.id}`}
+              aria-label={`Share ${project.name}`}
+            >
+              <Share2 className="w-5 h-5" />
+            </Button>
             
             {/* Camera Button - Always visible */}
             <Button

@@ -36,7 +36,7 @@ function AppContent() {
   const skipAuth = sessionStorage.getItem('skipAuth') === 'true';
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/share/'];
+  const publicRoutes = ['/share/', '/shared/'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route));
 
   // Redirect to login if not authenticated (except for public routes or skip mode)
@@ -77,7 +77,7 @@ function AppContent() {
           <Route path="/map" component={Map} />
           <Route path="/inbox" component={Inbox} />
           <Route path="/login" component={Login} />
-          <Route path="/share/:token" component={ShareView} />
+          <Route path="/shared/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
       </main>

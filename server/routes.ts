@@ -289,6 +289,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Project sharing - generate or get share token
+  app.post("/api/projects/:id/share", isAuthenticated, async (req, res) => {
+    try {
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      // Check if share already exists
+      const existingShare = await storage.getShareByProjectId(req.params.id);
+      if (existingShare) {
+        return res.json({ token: existingShare.token });
+      }
+
+      // Generate random 32-character token
+      const token = Array.from(
+        { length: 32 },
+        () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]
+      ).join('');
+
+      const share = await storage.createShare({
+        token,
+        projectId: req.params.id,
+        expiresAt: null, // Never expires
+      });
+
+      res.json({ token: share.token });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Public endpoint to view shared project (no authentication required)
+  app.get("/api/shared/:token", async (req, res) => {
+    try {
+      const share = await storage.getShareByToken(req.params.token);
+      if (!share) {
+        return res.status(404).json({ error: "Share not found or expired" });
+      }
+
+      // Check if expired
+      if (share.expiresAt && new Date(share.expiresAt) < new Date()) {
+        return res.status(404).json({ error: "Share has expired" });
+      }
+
+      // Get project and active photos (excluding trash)
+      const project = await storage.getProject(share.projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      const photos = await storage.getProjectPhotos(share.projectId);
+
+      res.json({
+        project: {
+          name: project.name,
+          description: project.description,
+          address: project.address,
+        },
+        photos: photos.map(photo => ({
+          id: photo.id,
+          url: photo.url,
+          caption: photo.caption,
+          createdAt: photo.createdAt,
+          photographerName: photo.photographerName,
+        })),
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Photos
   app.get("/api/projects/:projectId/photos", isAuthenticated, async (req, res) => {
     try {
@@ -616,58 +688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Shares - Photo sharing via link
-  app.post("/api/shares", isAuthenticated, async (req, res) => {
-    try {
-      // Generate a unique token
-      const token = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
-      
-      // Set expiration to 30 days from now
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 30);
-      
-      const validated = insertShareSchema.parse({
-        ...req.body,
-        token,
-        expiresAt,
-      });
-      
-      const share = await storage.createShare(validated);
-      res.status(201).json(share);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
-    }
-  });
-
-  // Public route - no auth required
-  app.get("/api/shares/:token", async (req, res) => {
-    try {
-      const share = await storage.getShareByToken(req.params.token);
-      if (!share) {
-        return res.status(404).json({ error: "Share not found" });
-      }
-      
-      // Check if expired
-      if (new Date() > new Date(share.expiresAt)) {
-        return res.status(410).json({ error: "Share link has expired" });
-      }
-      
-      // Get the photos for this share
-      const photos = await storage.getPhotosByIds(share.photoIds);
-      
-      // Get project info
-      const project = await storage.getProject(share.projectId);
-      
-      res.json({
-        share,
-        photos,
-        project,
-      });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
+  // Delete share - revoke share link
   app.delete("/api/shares/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteShare(req.params.id);
