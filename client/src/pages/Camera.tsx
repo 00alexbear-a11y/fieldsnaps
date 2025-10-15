@@ -1291,7 +1291,7 @@ export default function Camera() {
 
       {/* Tag Selector - Lower left side, horizontal scrollable */}
       {tags.length > 0 && !isRecording && (
-        <div className="absolute bottom-28 left-4 z-15 max-w-[70%]">
+        <div className="absolute bottom-28 left-4 z-30 max-w-[70%]">
           <div className="bg-black/60 backdrop-blur-md rounded-xl p-2 border border-white/20">
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 pt-1">
               {tags.map((tag) => {
@@ -1397,7 +1397,7 @@ export default function Camera() {
 
       {/* Photo Thumbnail Strip - Above tag selector and capture buttons */}
       {projectPhotos.length > 0 && !isRecording && (
-        <div className="absolute bottom-48 left-0 right-0 z-15 pb-2">
+        <div className="absolute bottom-48 left-0 right-0 z-40 pb-2">
           <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide">
             {projectPhotos.map((photo) => {
               const url = thumbnailUrlsRef.current.get(photo.id);
