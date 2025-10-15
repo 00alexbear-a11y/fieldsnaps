@@ -1085,31 +1085,6 @@ export default function ProjectPhotos() {
           onClose={() => setTagPickerPhotoId(null)}
         />
       )}
-
-      {/* Floating Action Buttons (FABs) - Camera & Upload */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileUpload}
-        className="hidden"
-        id="photo-upload-fab"
-      />
-      
-      {/* Portal fixed buttons to body to escape overflow containers */}
-      {createPortal(
-        <>
-          {/* Main FAB - Camera (always visible) */}
-          <Button
-            onClick={() => setLocation(`/camera?projectId=${projectId}`)}
-            data-testid="button-add-photo-fab"
-            size="icon"
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground shadow-xl transition-transform"
-          >
-            <Camera className="w-6 h-6" />
-          </Button>
-        </>,
-        document.body
-      )}
     </>
   );
 }
