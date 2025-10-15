@@ -419,13 +419,4 @@
   [data-radix-select-viewport] {
     z-index: 100 !important;
   }
-  
-  /* Ensure dialog overlay doesn't block select content */
-  [data-radix-dialog-overlay] {
-    pointer-events: none;
-  }
-  
-  [data-radix-dialog-content] {
-    pointer-events: auto;
-  }
 }
