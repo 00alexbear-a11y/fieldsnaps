@@ -1437,46 +1437,52 @@ export default function Camera() {
           </div>
           
           {/* Auto-tag Dropdown */}
-          {tags.length > 0 && !isRecording && (
-            <Select
-              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
-              onValueChange={(v) => {
-                if (v && v !== 'none') {
-                  setSelectedTags([v]);
-                } else {
-                  setSelectedTags([]);
-                }
-              }}
-            >
-              <SelectTrigger
-                className="w-24 bg-white/10 border-white/20 text-white h-8 text-xs"
-                data-testid="select-auto-tag"
+          {tags.length > 0 && !isRecording && (() => {
+            const tagColorMap: Record<string, string> = {
+              red: '#ef4444',
+              orange: '#f97316',
+              yellow: '#eab308',
+              blue: '#3b82f6',
+              gray: '#6b7280',
+            };
+            const selectedTag = selectedTags.length > 0 ? tags.find(t => t.id === selectedTags[0]) : null;
+            const borderColor = selectedTag ? tagColorMap[selectedTag.color] || '#6b7280' : 'rgba(255, 255, 255, 0.2)';
+            
+            return (
+              <Select
+                value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
+                onValueChange={(v) => {
+                  if (v && v !== 'none') {
+                    setSelectedTags([v]);
+                  } else {
+                    setSelectedTags([]);
+                  }
+                }}
               >
-                <SelectValue placeholder="No tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No tag</SelectItem>
-                {tags.map((tag) => {
-                  const tagColorMap: Record<string, string> = {
-                    red: '#ef4444',
-                    orange: '#f97316',
-                    yellow: '#eab308',
-                    blue: '#3b82f6',
-                    gray: '#6b7280',
-                  };
-                  return (
-                    <SelectItem 
-                      key={tag.id} 
-                      value={tag.id}
-                      style={{ color: tagColorMap[tag.color] || '#6b7280' }}
-                    >
-                      {tag.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          )}
+                <SelectTrigger
+                  className="w-24 bg-white/10 text-white h-8 text-xs"
+                  style={{ borderColor, borderWidth: '2px' }}
+                  data-testid="select-auto-tag"
+                >
+                  <SelectValue placeholder="No tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No tag</SelectItem>
+                  {tags.map((tag) => {
+                    return (
+                      <SelectItem 
+                        key={tag.id} 
+                        value={tag.id}
+                        style={{ color: tagColorMap[tag.color] || '#6b7280' }}
+                      >
+                        {tag.name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            );
+          })()}
         </div>
       </div>
 
