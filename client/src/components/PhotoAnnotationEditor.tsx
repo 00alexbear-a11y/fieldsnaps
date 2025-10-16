@@ -2206,7 +2206,7 @@ export function PhotoAnnotationEditor({
           src={imageUrl}
           alt="Photo to annotate"
           className="hidden"
-          crossOrigin="use-credentials"
+          {...(imageUrl && !imageUrl.startsWith('blob:') ? { crossOrigin: 'use-credentials' } : {})}
         />
         <canvas
           ref={canvasRef}
