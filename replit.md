@@ -3,6 +3,16 @@
 ## Overview
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant photo capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization for challenging environments, aspiring to become a commercial SaaS product.
 
+### Recent Updates (October 16, 2025)
+- **Project Completion Tracking**:
+  - Added ability to mark projects as complete/incomplete via dropdown menu on project cards
+  - Completed projects display green "Done" badge with checkmark icon
+  - "Show Completed Jobs" checkbox now works correctly to filter completed projects
+  - Default behavior: hides completed projects (checkbox unchecked)
+  - Backend: PATCH /api/projects/:id/toggle-complete endpoint toggles completion status
+  - Database: projects.completed field (boolean, default: false)
+  - UI: Dropdown menu (three dots) provides "Mark as Complete/Incomplete" and "Share Project" options
+
 ### Recent Updates (October 15, 2025)
 - **Mobile Button Layout & Notification Fixes**:
   - **Button Positioning**: Fixed mobile button order using inline styles for precise placement
