@@ -42,25 +42,20 @@ export default function PhotoEdit() {
 
     const loadPhoto = async () => {
       try {
-        console.log('[PhotoEdit] Loading photo:', photoId);
         const photo = await idb.getPhoto(photoId);
-        console.log('[PhotoEdit] Photo from IndexedDB:', photo ? 'found' : 'not found', photo?.blob ? `blob size: ${photo.blob.size}` : 'no blob');
         if (photo && photo.blob) {
           const url = URL.createObjectURL(photo.blob);
-          console.log('[PhotoEdit] Created blob URL:', url);
           photoUrlRef.current = url;
           setPhotoUrl(url);
           setProjectId(photo.projectId);
           return;
         }
 
-        console.log('[PhotoEdit] Photo not in IndexedDB, fetching from server');
         const response = await fetch(`/api/photos/${photoId}`);
         if (!response.ok) {
           throw new Error('Photo not found');
         }
         const serverPhoto = await response.json();
-        console.log('[PhotoEdit] Loaded from server:', serverPhoto.url);
         setPhotoUrl(serverPhoto.url);
         setProjectId(serverPhoto.projectId);
       } catch (error) {
@@ -70,7 +65,7 @@ export default function PhotoEdit() {
           description: 'The photo could not be loaded',
           variant: 'destructive',
         });
-        window.history.back();
+        setLocation('/projects');
       }
     };
 

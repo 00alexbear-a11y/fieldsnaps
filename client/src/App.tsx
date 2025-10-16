@@ -71,7 +71,11 @@ function AppContent() {
   // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
   // This prevents data queries from firing without auth credentials
   if (!isAuthenticated && !isPublicRoute && !skipAuth) {
-    return null; // Will redirect via useEffect above
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   // Public routes get different layout (no bottom nav)
