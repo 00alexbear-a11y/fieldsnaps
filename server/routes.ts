@@ -434,6 +434,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const userId = req.user?.claims?.sub;
+      
+      // Ensure dev user exists in database (for dev bypass mode)
+      if (userId === 'dev-user') {
+        const existingUser = await storage.getUser(userId);
+        if (!existingUser) {
+          await storage.upsertUser({
+            id: 'dev-user',
+            email: 'dev@test.com',
+            firstName: 'Dev',
+            lastName: 'User',
+            subscriptionStatus: 'active',
+          });
+        }
+      }
+      
       const objectStorageService = new ObjectStorageService();
 
       // Get presigned upload URL for object storage
