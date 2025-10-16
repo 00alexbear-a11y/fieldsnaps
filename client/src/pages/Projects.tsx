@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import {
   AlertDialog,
@@ -497,19 +498,19 @@ export default function Projects() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center gap-2 pl-1">
-            <Checkbox 
-              id="show-completed" 
-              checked={showCompleted}
-              onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
-              data-testid="checkbox-show-completed"
-            />
+          <div className="flex items-center justify-between gap-2 pl-1">
             <label 
               htmlFor="show-completed" 
               className="text-sm text-muted-foreground cursor-pointer select-none"
             >
               Show Completed Jobs
             </label>
+            <Switch 
+              id="show-completed" 
+              checked={showCompleted}
+              onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+              data-testid="switch-show-completed"
+            />
           </div>
         </div>
       </div>

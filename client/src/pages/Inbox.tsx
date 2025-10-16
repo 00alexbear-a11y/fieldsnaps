@@ -6,7 +6,7 @@ export default function Inbox() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
         <div className="flex items-center justify-between p-4 max-w-screen-sm mx-auto">
-          <h1 className="text-2xl font-bold">Inbox</h1>
+          <h1 className="text-2xl font-bold">Notifications</h1>
         </div>
       </div>
 

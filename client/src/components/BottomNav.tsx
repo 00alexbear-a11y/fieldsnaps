@@ -19,7 +19,7 @@ export default function BottomNav() {
     },
     {
       id: 'inbox',
-      label: 'Inbox',
+      label: 'Notifications',
       icon: Bell,
       path: '/inbox',
     },

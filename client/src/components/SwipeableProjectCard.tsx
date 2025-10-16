@@ -215,20 +215,36 @@ export default function SwipeableProjectCard({
               {project.name}
             </h3>
 
-            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5" />
-                <span data-testid={`text-photo-count-${project.id}`}>
-                  {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
-                </span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span data-testid={`text-photo-count-${project.id}`}>
+                    {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
+                  </span>
+                </div>
+                
+                {pendingSyncCount > 0 && (
+                  <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>{pendingSyncCount} pending</span>
+                  </div>
+                )}
               </div>
               
-              {pendingSyncCount > 0 && (
-                <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{pendingSyncCount} pending</span>
-                </div>
-              )}
+              {/* Last updated */}
+              <div className="text-xs text-muted-foreground/70" data-testid={`text-last-updated-${project.id}`}>
+                {(() => {
+                  const lastActivity = new Date(project.lastActivityAt || project.createdAt);
+                  const now = new Date();
+                  const diffMs = now.getTime() - lastActivity.getTime();
+                  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                  
+                  if (diffDays === 0) return 'Last updated: today';
+                  if (diffDays === 1) return 'Last updated: 1 day ago';
+                  return `Last updated: ${diffDays} days ago`;
+                })()}
+              </div>
             </div>
           </div>
 
@@ -240,24 +256,6 @@ export default function SwipeableProjectCard({
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span className="text-xs font-medium">Done</span>
               </div>
-            )}
-            
-            {/* Maps Button - Compact square design */}
-            {project.address && (
-              <button
-                className="flex flex-col items-center justify-center w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 text-primary hover-elevate active-elevate-2 flex-shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
-                }}
-                data-testid={`button-open-map-${project.id}`}
-                aria-label="Open in Google Maps"
-              >
-                <MapPin className="w-4 h-4 mb-0.5" />
-                <div className="text-[11px] font-medium leading-none">
-                  Maps
-                </div>
-              </button>
             )}
             
             {/* Camera Button - Always visible */}
@@ -290,6 +288,18 @@ export default function SwipeableProjectCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {project.address && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                    }}
+                    data-testid={`menu-open-map-${project.id}`}
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Go to Map
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
