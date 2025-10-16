@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -744,61 +744,55 @@ export default function ProjectPhotos() {
       </main>
       </div>
 
-      {/* Portal fixed buttons to body to escape overflow containers */}
+      {/* Portal fixed buttons to body - evenly spaced bottom bar */}
       {createPortal(
-        <>
-          {/* Back Button - Fixed Bottom Left */}
+        <div 
+          className="z-40 flex items-center justify-between px-4 max-w-screen-sm mx-auto"
+          style={{ position: 'fixed', bottom: '80px', left: '0', right: '0' }}
+        >
+          {/* Back Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setLocation("/")}
             data-testid="button-back"
-            className="z-40 w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
-            style={{ position: 'fixed', bottom: '80px', left: '16px' }}
+            className="w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
 
-          {/* Camera FAB - Fixed Bottom Center */}
+          {/* Camera Button */}
           <Button
             onClick={() => setLocation(`/camera?projectId=${projectId}`)}
             data-testid="button-add-photo-fab"
-            className="z-40 w-16 h-16 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90"
-            style={{ position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)' }}
+            className="w-16 h-16 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90"
           >
             <Camera className="w-7 h-7" />
           </Button>
 
-          {/* Right side buttons container */}
-          <div 
-            className="z-40 flex items-center gap-2"
-            style={{ position: 'fixed', bottom: '80px', right: '16px' }}
+          {/* Upload Button */}
+          <button
+            onClick={() => document.getElementById('photo-upload-input')?.click()}
+            disabled={uploadMutation.isPending}
+            className="flex items-center justify-center w-14 h-14 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-upload-photo"
+            aria-label="Upload from library"
           >
-            {/* Upload Button */}
-            <button
-              onClick={() => document.getElementById('photo-upload-input')?.click()}
-              disabled={uploadMutation.isPending}
-              className="flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="button-upload-photo"
-              aria-label="Upload from library"
-            >
-              <Images className="w-6 h-6 text-primary-foreground" />
-            </button>
-            
-            {/* Select/Cancel Button - Only show when photos exist */}
-            {photos.length > 0 && (
-              <Button
-                onClick={toggleSelectMode}
-                data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
-                variant="ghost"
-                size="sm"
-                className="h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
-              >
-                {isSelectMode ? 'Cancel' : 'Select'}
-              </Button>
-            )}
-          </div>
-        </>,
+            <Images className="w-6 h-6 text-primary-foreground" />
+          </button>
+          
+          {/* Select/Cancel Button */}
+          <Button
+            onClick={toggleSelectMode}
+            disabled={photos.length === 0}
+            data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
+            variant="ghost"
+            size="icon"
+            className="w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background disabled:opacity-50"
+          >
+            {isSelectMode ? <X className="w-6 h-6" /> : <CheckSquare className="w-6 h-6" />}
+          </Button>
+        </div>,
         document.body
       )}
 
