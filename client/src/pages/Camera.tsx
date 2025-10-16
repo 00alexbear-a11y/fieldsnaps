@@ -1358,12 +1358,11 @@ export default function Camera() {
               {continuousZoom.toFixed(1)}x
             </div>
           )}
-        </div>
-        
-        {/* Horizontal Photo Preview Strip */}
-        {sessionPhotos.length > 0 && !isRecording && (
-          <div className="flex-shrink-0 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 pb-2">
+          
+          {/* Horizontal Photo Preview Strip - Overlaid at bottom */}
+          {sessionPhotos.length > 0 && !isRecording && (
+            <div className="absolute bottom-0 left-0 right-0 z-20 overflow-x-auto scrollbar-hide bg-black/30 backdrop-blur-sm">
+              <div className="flex gap-2 p-2">
               {sessionPhotos.slice(0, 5).map((photo) => {
                 const url = thumbnailUrlsRef.current.get(photo.id);
                 if (!url) return null;
@@ -1458,9 +1457,10 @@ export default function Camera() {
                   </div>
                 );
               })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+      </div>
 
       {/* Bottom Action Rail - 4 Buttons */}
       <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
