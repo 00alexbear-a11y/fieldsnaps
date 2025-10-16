@@ -361,10 +361,6 @@ class SyncManager {
     if (contentType) {
       headers['Content-Type'] = contentType;
     }
-    // Add skip auth header if needed (development only)
-    if (sessionStorage.getItem('skipAuth') === 'true') {
-      headers['x-skip-auth'] = 'true';
-    }
     return headers;
   }
 

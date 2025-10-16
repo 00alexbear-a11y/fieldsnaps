@@ -115,15 +115,8 @@ export default function ProjectPhotos() {
       formData.append('photo', file);
       formData.append('caption', file.name);
       
-      // Prepare headers with skip auth if needed
-      const headers: Record<string, string> = {};
-      if (sessionStorage.getItem('skipAuth') === 'true') {
-        headers['x-skip-auth'] = 'true';
-      }
-      
       const res = await fetch(`/api/projects/${projectId}/photos`, {
         method: 'POST',
-        headers,
         credentials: 'include',
         body: formData,
       });
@@ -318,17 +311,11 @@ export default function ProjectPhotos() {
     }
     
     try {
-      // Get auth headers (skip-auth for testing)
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      const skipAuth = sessionStorage.getItem('skipAuth');
-      if (skipAuth) {
-        headers['x-skip-auth'] = 'true';
-      }
-
       // Create share via API
       const response = await fetch('/api/shares', {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           projectId,
           photoIds: Array.from(selectedPhotoIds),

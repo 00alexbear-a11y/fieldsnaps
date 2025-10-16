@@ -113,7 +113,7 @@ export default function Camera() {
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
     queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`, {
-      headers: { 'x-skip-auth': 'true' }
+      credentials: 'include'
     }).then(r => r.json()),
     enabled: !!selectedProject,
   });
