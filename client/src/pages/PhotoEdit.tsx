@@ -8,11 +8,13 @@ import { indexedDB as idb } from '@/lib/indexeddb';
 
 interface Annotation {
   id: string;
-  type: "text" | "arrow" | "line" | "circle" | "pen";
+  type: "text" | "arrow" | "line" | "circle" | "pen" | "measurement";
   content?: string;
   color: string;
   strokeWidth: number;
   fontSize?: number;
+  feet?: number;
+  inches?: number;
   position: {
     x: number;
     y: number;
