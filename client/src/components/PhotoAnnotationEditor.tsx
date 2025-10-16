@@ -2214,8 +2214,8 @@ export function PhotoAnnotationEditor({
           style={{ 
             cursor: cursorStyle, 
             transition: "cursor 0.1s ease",
-            maxWidth: "100%",
-            maxHeight: "100%",
+            width: "100%",
+            height: "100%",
             objectFit: "contain"
           }}
           className="touch-none pointer-events-auto"

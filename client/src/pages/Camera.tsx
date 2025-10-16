@@ -1494,7 +1494,15 @@ export default function Camera() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => window.history.back()}
+          onClick={() => {
+            const params = new URLSearchParams(window.location.search);
+            const projectId = params.get('projectId');
+            if (projectId) {
+              setLocation(`/projects/${projectId}`);
+            } else {
+              setLocation('/projects');
+            }
+          }}
           className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
           data-testid="button-back"
         >
