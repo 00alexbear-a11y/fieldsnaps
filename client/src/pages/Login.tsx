@@ -22,12 +22,6 @@ export default function Login() {
     }
   };
 
-  const handleSkip = () => {
-    // Store skip flag in sessionStorage
-    sessionStorage.setItem('skipAuth', 'true');
-    setLocation('/');
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
@@ -82,19 +76,6 @@ export default function Login() {
               : 'Sign in with your Replit account to get started'}
           </p>
         </Card>
-
-        {/* Skip Button for Testing */}
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSkip}
-            className="text-muted-foreground hover:text-foreground"
-            data-testid="button-skip-auth"
-          >
-            Skip for now (Testing)
-          </Button>
-        </div>
 
         {/* Features List */}
         <div className="space-y-3 text-sm text-muted-foreground">

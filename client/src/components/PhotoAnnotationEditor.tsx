@@ -143,10 +143,7 @@ export function PhotoAnnotationEditor({
   onCancel,
   onDelete,
 }: PhotoAnnotationEditorProps) {
-  // Add skipAuth query param in dev mode for images (but not for blob URLs)
-  const imageUrl = photoUrl && sessionStorage.getItem('skipAuth') === 'true' && !photoUrl.startsWith('blob:')
-    ? `${photoUrl}?skipAuth=true`
-    : photoUrl;
+  const imageUrl = photoUrl; // Use photoUrl directly
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>(existingAnnotations);

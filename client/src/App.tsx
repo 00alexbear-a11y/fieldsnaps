@@ -38,9 +38,6 @@ function AppContent() {
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
 
-  // Check for skip auth flag (testing mode)
-  const skipAuth = sessionStorage.getItem('skipAuth') === 'true';
-
   // Public routes that don't require authentication
   const publicRoutes = ['/share/', '/shared/', '/impact', '/login'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
@@ -54,13 +51,13 @@ function AppContent() {
 
   // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !isPublicRoute && !skipAuth) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute) {
       setLocation('/');
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, skipAuth, setLocation]);
+  }, [isAuthenticated, isLoading, isPublicRoute, setLocation]);
 
-  // Show loading state while checking authentication (skip if in skip mode)
-  if (isLoading && !skipAuth) {
+  // Show loading state while checking authentication
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -70,7 +67,7 @@ function AppContent() {
 
   // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
   // This prevents data queries from firing without auth credentials
-  if (!isAuthenticated && !isPublicRoute && !skipAuth) {
+  if (!isAuthenticated && !isPublicRoute) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

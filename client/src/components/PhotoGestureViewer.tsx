@@ -76,11 +76,7 @@ export function PhotoGestureViewer({
   const controlsTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentPhoto = photos[currentIndex];
-  
-  // Add skipAuth query param in dev mode for images
-  const photoUrl = currentPhoto?.url && sessionStorage.getItem('skipAuth') === 'true'
-    ? `${currentPhoto.url}?skipAuth=true`
-    : currentPhoto?.url;
+  const photoUrl = currentPhoto?.url;
 
   // Fetch comments for current photo
   const { data: comments = [], isLoading: commentsLoading } = useQuery<Comment[]>({

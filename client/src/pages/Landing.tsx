@@ -7,30 +7,8 @@ import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 export default function Landing() {
   const [, setLocation] = useLocation();
 
-  const handleDevBypass = () => {
-    sessionStorage.setItem('skipAuth', 'true');
-    setLocation('/projects');
-  };
-
-  const isDev = import.meta.env.DEV;
-
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      {/* Dev Only: Skip Auth Button */}
-      {isDev && (
-        <div className="fixed top-4 left-4 z-50">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDevBypass}
-            className="bg-yellow-500 hover:bg-yellow-600 text-black border-yellow-600"
-            data-testid="button-dev-bypass"
-          >
-            🚀 Dev Bypass
-          </Button>
-        </div>
-      )}
-      
       {/* Header */}
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

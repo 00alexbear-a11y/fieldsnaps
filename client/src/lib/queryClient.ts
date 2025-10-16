@@ -14,11 +14,6 @@ export async function apiRequest(
 ): Promise<Response> {
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   
-  // Add skip auth header if flag is set (development only)
-  if (sessionStorage.getItem('skipAuth') === 'true') {
-    headers['x-skip-auth'] = 'true';
-  }
-  
   const res = await fetch(url, {
     method,
     headers,
@@ -36,16 +31,8 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const headers: Record<string, string> = {};
-    
-    // Add skip auth header if flag is set (development only)
-    if (sessionStorage.getItem('skipAuth') === 'true') {
-      headers['x-skip-auth'] = 'true';
-    }
-    
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
-      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
