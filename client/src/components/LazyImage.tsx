@@ -44,6 +44,7 @@ export default function LazyImage({ src, alt, className = '' }: LazyImageProps) 
         ref={imgRef}
         src={isInView ? src : undefined}
         alt={alt}
+        crossOrigin="use-credentials"
         className={`${className} ${!isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
         onLoad={() => setIsLoaded(true)}
       />
