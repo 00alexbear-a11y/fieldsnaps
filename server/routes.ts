@@ -67,10 +67,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to load icon' });
     }
   });
-  
-  // Serve uploaded photos
-  const uploadsPath = path.join(process.cwd(), 'uploads');
-  app.use('/uploads', express.static(uploadsPath));
 
   // Setup authentication
   await setupAuth(app);
