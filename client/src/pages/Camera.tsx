@@ -28,15 +28,6 @@ const QUALITY_PRESETS: { value: QualityPreset; label: string; description: strin
   { value: 'detailed', label: 'L', description: '1MB - High quality' },
 ];
 
-type AspectRatio = '4:3' | '16:9' | '1:1' | 'original';
-
-const ASPECT_RATIOS: { value: AspectRatio; label: string; ratio: number | null }[] = [
-  { value: '4:3', label: '4:3', ratio: 4/3 },
-  { value: '16:9', label: '16:9', ratio: 16/9 },
-  { value: '1:1', label: '1:1', ratio: 1 },
-  { value: 'original', label: 'Orig', ratio: null },
-];
-
 interface Project {
   id: string;
   name: string;
@@ -60,10 +51,6 @@ export default function Camera() {
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<QualityPreset>('standard');
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(() => {
-    const saved = localStorage.getItem('camera-aspect-ratio');
-    return (saved as AspectRatio) || '4:3';
-  });
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -151,10 +138,6 @@ export default function Camera() {
       }
     }
   }, [tags]);
-
-  useEffect(() => {
-    localStorage.setItem('camera-aspect-ratio', selectedAspectRatio);
-  }, [selectedAspectRatio]);
 
   const previousProjectRef = useRef<string>('');
   const currentProjectRef = useRef<string>('');
