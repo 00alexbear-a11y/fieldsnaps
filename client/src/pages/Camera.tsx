@@ -152,6 +152,10 @@ export default function Camera() {
     }
   }, [tags]);
 
+  useEffect(() => {
+    localStorage.setItem('camera-aspect-ratio', selectedAspectRatio);
+  }, [selectedAspectRatio]);
+
   const previousProjectRef = useRef<string>('');
   const currentProjectRef = useRef<string>('');
   useEffect(() => {
@@ -1528,10 +1532,7 @@ export default function Camera() {
                 key={ar.value}
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  setSelectedAspectRatio(ar.value);
-                  localStorage.setItem('camera-aspect-ratio', ar.value);
-                }}
+                onClick={() => setSelectedAspectRatio(ar.value)}
                 className={`h-8 px-2 text-xs ${
                   selectedAspectRatio === ar.value
                     ? 'bg-white text-black'
