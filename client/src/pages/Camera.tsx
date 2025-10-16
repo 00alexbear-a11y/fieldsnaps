@@ -838,46 +838,6 @@ export default function Camera() {
     }
   };
 
-  const applyCrop = (sourceCanvas: HTMLCanvasElement): HTMLCanvasElement => {
-    const selectedRatio = ASPECT_RATIOS.find(ar => ar.value === selectedAspectRatio);
-    
-    if (!selectedRatio || !selectedRatio.ratio) {
-      return sourceCanvas;
-    }
-
-    const srcWidth = sourceCanvas.width;
-    const srcHeight = sourceCanvas.height;
-    const srcRatio = srcWidth / srcHeight;
-    const targetRatio = selectedRatio.ratio;
-
-    let cropWidth = srcWidth;
-    let cropHeight = srcHeight;
-    let cropX = 0;
-    let cropY = 0;
-
-    if (srcRatio > targetRatio) {
-      cropWidth = srcHeight * targetRatio;
-      cropX = (srcWidth - cropWidth) / 2;
-    } else {
-      cropHeight = srcWidth / targetRatio;
-      cropY = (srcHeight - cropHeight) / 2;
-    }
-
-    const croppedCanvas = document.createElement('canvas');
-    croppedCanvas.width = cropWidth;
-    croppedCanvas.height = cropHeight;
-    const ctx = croppedCanvas.getContext('2d');
-    if (!ctx) return sourceCanvas;
-
-    ctx.drawImage(
-      sourceCanvas,
-      cropX, cropY, cropWidth, cropHeight,
-      0, 0, cropWidth, cropHeight
-    );
-
-    return croppedCanvas;
-  };
-
   const quickCapture = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
@@ -897,19 +857,17 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = video.videoWidth;
-      tempCanvas.height = video.videoHeight;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) throw new Error('Failed to get canvas context');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Failed to get canvas context');
 
-      tempCtx.drawImage(video, 0, 0);
-
-      const croppedCanvas = applyCrop(tempCanvas);
+      ctx.drawImage(video, 0, 0);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
-        croppedCanvas.toBlob(
+        canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
           'image/jpeg',
           0.95
@@ -1001,19 +959,17 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = video.videoWidth;
-      tempCanvas.height = video.videoHeight;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) throw new Error('Failed to get canvas context');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Failed to get canvas context');
 
-      tempCtx.drawImage(video, 0, 0);
-
-      const croppedCanvas = applyCrop(tempCanvas);
+      ctx.drawImage(video, 0, 0);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
-        croppedCanvas.toBlob(
+        canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
           'image/jpeg',
           0.95
