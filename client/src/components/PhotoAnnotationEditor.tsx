@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown, Ruler } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,13 +21,15 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface Annotation {
   id: string;
-  type: "text" | "arrow" | "line" | "circle" | "pen";
+  type: "text" | "arrow" | "line" | "circle" | "pen" | "measurement";
   content?: string;
   color: string;
   strokeWidth: number;
   fontSize?: number;
   rotation?: number; // in degrees
   scale?: number; // scale multiplier
+  feet?: number;
+  inches?: number;
   position: {
     x: number;
     y: number;
@@ -146,7 +148,7 @@ export function PhotoAnnotationEditor({
   const [annotations, setAnnotations] = useState<Annotation[]>(existingAnnotations);
   const [history, setHistory] = useState<Annotation[][]>([existingAnnotations]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | "select" | null>(null);
+  const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | "measurement" | "select" | null>(null);
   const [selectedColor, setSelectedColor] = useState("#3b82f6"); // Default to blue
   const [colorPickerExpanded, setColorPickerExpanded] = useState(false); // Collapsed by default
   const [strokeWidth, setStrokeWidth] = useState(strokeSizes[1].value);
@@ -157,6 +159,9 @@ export function PhotoAnnotationEditor({
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
   const [textInput, setTextInput] = useState("");
   const [textDialogOpen, setTextDialogOpen] = useState(false);
+  const [measurementFeet, setMeasurementFeet] = useState("");
+  const [measurementInches, setMeasurementInches] = useState("");
+  const [measurementDialogOpen, setMeasurementDialogOpen] = useState(false);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
   const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
   const [initialAnnoState, setInitialAnnoState] = useState<Annotation | null>(null);
@@ -1624,6 +1629,48 @@ export function PhotoAnnotationEditor({
     setTextInput("");
   };
 
+  const handleAddMeasurementFromDialog = () => {
+    if (!canvasRef.current) return;
+    
+    const feet = parseInt(measurementFeet) || 0;
+    const inches = parseInt(measurementInches) || 0;
+    
+    if (feet === 0 && inches === 0) return;
+
+    // Place measurement in the center of the canvas
+    const centerX = canvasRef.current.width / 2;
+    const centerY = canvasRef.current.height / 2;
+
+    const newAnnotation: Annotation = {
+      id: `anno-${Date.now()}`,
+      type: "measurement",
+      feet,
+      inches,
+      color: selectedColor,
+      strokeWidth,
+      fontSize: Math.max(32, 40 + strokeWidth * 2),
+      rotation: 0,
+      scale: 1,
+      position: {
+        x: centerX,
+        y: centerY,
+      },
+    };
+    
+    const newAnnotations = [...annotations, newAnnotation];
+    setAnnotations(newAnnotations);
+    addToHistory(newAnnotations);
+    
+    // Auto-select the new measurement so user can immediately reposition it
+    setSelectedAnnotation(newAnnotation.id);
+    setTool("select");
+    
+    // Close dialog and clear inputs
+    setMeasurementDialogOpen(false);
+    setMeasurementFeet("");
+    setMeasurementInches("");
+  };
+
   const handleDeleteSelected = () => {
     console.log("[PhotoEdit] Delete button clicked, selectedAnnotation:", selectedAnnotation);
     if (selectedAnnotation) {
@@ -2043,6 +2090,16 @@ export function PhotoAnnotationEditor({
           >
             <Pen className="w-5 h-5" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMeasurementDialogOpen(true)}
+            data-testid="button-tool-measurement"
+            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+            aria-label="Tape measure"
+          >
+            <Ruler className="w-5 h-5" />
+          </Button>
 
           <div className="h-6 w-px bg-white/20 mx-0.5" />
 
@@ -2113,6 +2170,83 @@ export function PhotoAnnotationEditor({
               data-testid="button-submit-text"
             >
               Add Text
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Measurement Input Dialog */}
+      <Dialog open={measurementDialogOpen} onOpenChange={setMeasurementDialogOpen}>
+        <DialogContent className="bg-background/95 backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle>Add Measurement</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="text-sm text-muted-foreground mb-1 block">Feet</label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={measurementFeet}
+                  onChange={(e) => setMeasurementFeet(e.target.value)}
+                  placeholder="0"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (measurementFeet || measurementInches)) {
+                      handleAddMeasurementFromDialog();
+                    } else if (e.key === "Escape") {
+                      setMeasurementDialogOpen(false);
+                      setMeasurementFeet("");
+                      setMeasurementInches("");
+                    }
+                  }}
+                  autoFocus
+                  data-testid="input-measurement-feet"
+                  className="text-base"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-sm text-muted-foreground mb-1 block">Inches</label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="11"
+                  value={measurementInches}
+                  onChange={(e) => setMeasurementInches(e.target.value)}
+                  placeholder="0"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (measurementFeet || measurementInches)) {
+                      handleAddMeasurementFromDialog();
+                    } else if (e.key === "Escape") {
+                      setMeasurementDialogOpen(false);
+                      setMeasurementFeet("");
+                      setMeasurementInches("");
+                    }
+                  }}
+                  data-testid="input-measurement-inches"
+                  className="text-base"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setMeasurementDialogOpen(false);
+                setMeasurementFeet("");
+                setMeasurementInches("");
+              }}
+              data-testid="button-cancel-measurement"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddMeasurementFromDialog}
+              disabled={!measurementFeet && !measurementInches}
+              data-testid="button-submit-measurement"
+            >
+              Add Measurement
             </Button>
           </DialogFooter>
         </DialogContent>
