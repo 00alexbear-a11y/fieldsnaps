@@ -2191,7 +2191,7 @@ export function PhotoAnnotationEditor({
   return (
     <div className="fixed inset-0 bg-muted/30 pointer-events-none">
       {/* Canvas - Fill available space above bottom UI */}
-      <div className="absolute inset-x-0 top-16 bottom-32 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-x-0 top-0 bottom-24 flex items-center justify-center pointer-events-none">
         <img
           ref={imageRef}
           alt="Photo to annotate"
