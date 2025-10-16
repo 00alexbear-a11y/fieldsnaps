@@ -29,6 +29,7 @@ export interface IStorage {
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: string): Promise<boolean>; // Soft delete
+  toggleProjectCompletion(id: string): Promise<Project | undefined>;
   
   // Photos
   getProjectPhotos(projectId: string): Promise<Photo[]>;
@@ -186,6 +187,19 @@ export class DbStorage implements IStorage {
       .where(eq(projects.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  async toggleProjectCompletion(id: string): Promise<Project | undefined> {
+    // Get current completion status
+    const project = await this.getProject(id);
+    if (!project) return undefined;
+    
+    // Toggle completion status
+    const result = await db.update(projects)
+      .set({ completed: !project.completed })
+      .where(eq(projects.id, id))
+      .returning();
+    return result[0];
   }
 
   // Photos
