@@ -168,29 +168,53 @@ export async function setupAuth(app: Express) {
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
+  const isDevelopment = process.env.NODE_ENV !== 'production';
 
-  if (!req.isAuthenticated() || !user.expires_at) {
-    return res.status(401).json({ message: "Unauthorized" });
+  // Try real authentication first
+  if (req.isAuthenticated() && user?.expires_at) {
+    const now = Math.floor(Date.now() / 1000);
+    if (now <= user.expires_at) {
+      return next();
+    }
+
+    const refreshToken = user.refresh_token;
+    if (!refreshToken) {
+      if (isDevelopment) {
+        // Fall through to dev fallback below
+      } else {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+    } else {
+      try {
+        const config = await getOidcConfig();
+        const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
+        updateUserSession(user, tokenResponse);
+        return next();
+      } catch (error) {
+        if (isDevelopment) {
+          // Fall through to dev fallback below
+        } else {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+      }
+    }
   }
 
-  const now = Math.floor(Date.now() / 1000);
-  if (now <= user.expires_at) {
+  // Development fallback - mock session for dev user
+  if (isDevelopment) {
+    // Mock user session for development
+    (req as any).user = {
+      claims: {
+        sub: 'dev-user-local',
+        email: 'dev@fieldsnaps.local',
+        first_name: 'Dev',
+        last_name: 'User',
+      },
+      expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+    };
     return next();
   }
 
-  const refreshToken = user.refresh_token;
-  if (!refreshToken) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
-
-  try {
-    const config = await getOidcConfig();
-    const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
-    updateUserSession(user, tokenResponse);
-    return next();
-  } catch (error) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
+  // Production or no valid session
+  return res.status(401).json({ message: "Unauthorized" });
 };
