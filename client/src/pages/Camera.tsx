@@ -1205,7 +1205,7 @@ export default function Camera() {
 
   return (
     <div className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
-      {/* Compact Header - All secondary controls */}
+      {/* Compact Header - Project selector and flip camera only */}
       <div className="flex-shrink-0 z-30 bg-black/50 backdrop-blur-md border-b border-white/10 px-2 py-2">
         <div className="flex items-center gap-2">
           {/* Project Dropdown */}
@@ -1225,46 +1225,6 @@ export default function Camera() {
             </SelectContent>
           </Select>
           
-          {/* Quality toggles S/M/L */}
-          <div className="flex gap-1">
-            {QUALITY_PRESETS.map((preset) => (
-              <Button
-                key={preset.value}
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedQuality(preset.value)}
-                className={`h-8 w-8 p-0 text-xs ${
-                  selectedQuality === preset.value
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white'
-                }`}
-                data-testid={`button-quality-${preset.value}`}
-              >
-                {preset.label}
-              </Button>
-            ))}
-          </div>
-          
-          {/* Zoom controls */}
-          <div className="flex gap-1">
-            {availableCameras.map((camera) => (
-              <Button
-                key={camera.deviceId}
-                variant="ghost"
-                size="sm"
-                onClick={() => switchZoomLevel(camera.zoomLevel)}
-                className={`h-8 px-2 text-xs ${
-                  zoomLevel === camera.zoomLevel
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white'
-                }`}
-                data-testid={`button-zoom-${camera.zoomLevel}x`}
-              >
-                {camera.zoomLevel}x
-              </Button>
-            ))}
-          </div>
-          
           {/* Flip Camera */}
           <Button
             variant="ghost"
@@ -1275,35 +1235,6 @@ export default function Camera() {
           >
             <SwitchCamera className="w-4 h-4" />
           </Button>
-          
-          {/* Auto-tag Dropdown */}
-          {tags.length > 0 && !isRecording && (
-            <Select
-              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
-              onValueChange={(v) => {
-                if (v && v !== 'none') {
-                  setSelectedTags([v]);
-                } else {
-                  setSelectedTags([]);
-                }
-              }}
-            >
-              <SelectTrigger
-                className="w-24 bg-white/10 border-white/20 text-white h-8 text-xs"
-                data-testid="select-auto-tag"
-              >
-                <SelectValue placeholder="No tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No tag</SelectItem>
-                {tags.map((tag) => (
-                  <SelectItem key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
         </div>
       </div>
 
@@ -1395,7 +1326,7 @@ export default function Camera() {
                           setLocation(`/photo/${photo.id}/edit`);
                         }
                       }}
-                      className="block w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
+                      className="block w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
                     >
                       {isVideo ? (
                         <video
@@ -1462,32 +1393,92 @@ export default function Camera() {
           )}
       </div>
 
-      {/* Bottom Action Rail - 4 Buttons */}
+      {/* Controls Row - Quality, Zoom, Tags */}
+      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10">
+        <div className="flex items-center justify-center gap-4">
+          {/* Quality toggles S/M/L */}
+          <div className="flex gap-1">
+            {QUALITY_PRESETS.map((preset) => (
+              <Button
+                key={preset.value}
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedQuality(preset.value)}
+                className={`h-8 w-8 p-0 text-xs ${
+                  selectedQuality === preset.value
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white'
+                }`}
+                data-testid={`button-quality-${preset.value}`}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+          
+          {/* Zoom controls */}
+          <div className="flex gap-1">
+            {availableCameras.map((camera) => (
+              <Button
+                key={camera.deviceId}
+                variant="ghost"
+                size="sm"
+                onClick={() => switchZoomLevel(camera.zoomLevel)}
+                className={`h-8 px-2 text-xs ${
+                  zoomLevel === camera.zoomLevel
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white'
+                }`}
+                data-testid={`button-zoom-${camera.zoomLevel}x`}
+              >
+                {camera.zoomLevel}x
+              </Button>
+            ))}
+          </div>
+          
+          {/* Auto-tag Dropdown */}
+          {tags.length > 0 && !isRecording && (
+            <Select
+              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
+              onValueChange={(v) => {
+                if (v && v !== 'none') {
+                  setSelectedTags([v]);
+                } else {
+                  setSelectedTags([]);
+                }
+              }}
+            >
+              <SelectTrigger
+                className="w-24 bg-white/10 border-white/20 text-white h-8 text-xs"
+                data-testid="select-auto-tag"
+              >
+                <SelectValue placeholder="No tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No tag</SelectItem>
+                {tags.map((tag) => (
+                  <SelectItem key={tag.id} value={tag.id}>
+                    {tag.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
       <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
-        {/* Quick Capture */}
+        {/* Back */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={quickCapture}
-          disabled={isCapturing || isRecording || !selectedProject}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-quick-capture"
+          onClick={() => window.history.back()}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+          data-testid="button-back"
         >
-          <CameraIcon className="w-6 h-6" />
-          <span className="text-[10px]">Quick</span>
-        </Button>
-        
-        {/* Capture & Edit */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={captureAndEdit}
-          disabled={isCapturing || isRecording || !selectedProject}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-capture-edit"
-        >
-          <PenLine className="w-6 h-6" />
-          <span className="text-[10px]">Edit</span>
+          <ArrowLeft className="w-6 h-6" />
+          <span className="text-[10px]">Back</span>
         </Button>
         
         {/* Video Record/Stop */}
@@ -1516,17 +1507,30 @@ export default function Camera() {
           )}
         </Button>
         
-        {/* Session Photos */}
+        {/* Camera - Quick Capture */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => selectedProject && setLocation(`/projects/${selectedProject}/photos`)}
-          disabled={!selectedProject}
+          onClick={quickCapture}
+          disabled={isCapturing || isRecording || !selectedProject}
           className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-session-photos"
+          data-testid="button-quick-capture"
         >
-          <FolderOpen className="w-6 h-6" />
-          <span className="text-[10px]">Photos</span>
+          <CameraIcon className="w-6 h-6" />
+          <span className="text-[10px]">Camera</span>
+        </Button>
+        
+        {/* Edit Mode - Capture & Edit */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={captureAndEdit}
+          disabled={isCapturing || isRecording || !selectedProject}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+          data-testid="button-capture-edit"
+        >
+          <PenLine className="w-6 h-6" />
+          <span className="text-[10px]">Edit</span>
         </Button>
       </div>
 
