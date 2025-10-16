@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -389,6 +389,142 @@ export default function Settings() {
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out
           </Button>
+        </div>
+      </Card>
+
+      {/* Subscription Status */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-primary" />
+          </div>
+          <h2 className="text-lg font-semibold">Subscription</h2>
+        </div>
+        
+        <div className="space-y-3">
+          {/* Trial Status */}
+          {user?.subscriptionStatus === 'trial' && user?.trialStartDate && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="font-medium text-sm">Free Trial</span>
+              </div>
+              {user?.trialEndDate && (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Trial ends</span>
+                    <span className="font-medium text-sm">
+                      {new Date(user.trialEndDate).toLocaleDateString('en-US', { 
+                        month: 'long', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}
+                      {' '}
+                      ({Math.max(0, Math.ceil((new Date(user.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining)
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="w-full"
+                    onClick={() => setLocation('/billing/upgrade')}
+                    data-testid="button-upgrade-trial"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Upgrade to Pro
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Trial Not Started */}
+          {user?.subscriptionStatus === 'trial' && !user?.trialStartDate && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="font-medium text-sm">Trial Ready</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Your 7-day free trial starts when you create your first project
+              </p>
+            </div>
+          )}
+
+          {/* Active Subscription */}
+          {user?.subscriptionStatus === 'active' && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="font-medium text-sm text-green-600 dark:text-green-500">
+                  FieldSnaps Pro - Active
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Billing</span>
+                <span className="font-medium text-sm">$19.99/month</span>
+              </div>
+              <Button
+                variant="outline"
+                size="default"
+                className="w-full"
+                onClick={() => window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank')}
+                data-testid="button-manage-subscription"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Manage Subscription
+              </Button>
+            </div>
+          )}
+
+          {/* Past Due */}
+          {user?.subscriptionStatus === 'past_due' && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="font-medium text-sm text-amber-600 dark:text-amber-500">
+                  Payment Issue
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Please update your payment method to continue using FieldSnaps
+              </p>
+              <Button
+                variant="default"
+                size="default"
+                className="w-full"
+                onClick={() => window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank')}
+                data-testid="button-update-payment"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Update Payment Method
+              </Button>
+            </div>
+          )}
+
+          {/* Trial Ended */}
+          {(!user?.subscriptionStatus || user?.subscriptionStatus === 'canceled' || 
+            (user?.subscriptionStatus === 'trial' && user?.trialEndDate && new Date(user.trialEndDate) < new Date())) && (
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className="font-medium text-sm">Trial Ended</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Upgrade to FieldSnaps Pro to continue using all features
+              </p>
+              <Button
+                variant="default"
+                size="default"
+                className="w-full"
+                onClick={() => setLocation('/billing/upgrade')}
+                data-testid="button-upgrade-expired"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Upgrade to Pro
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
 
