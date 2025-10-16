@@ -143,6 +143,10 @@ export function PhotoAnnotationEditor({
   onCancel,
   onDelete,
 }: PhotoAnnotationEditorProps) {
+  // Add skipAuth query param in dev mode for images
+  const imageUrl = photoUrl && sessionStorage.getItem('skipAuth') === 'true'
+    ? `${photoUrl}?skipAuth=true`
+    : photoUrl;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>(existingAnnotations);
@@ -264,7 +268,7 @@ export function PhotoAnnotationEditor({
       img.onload = null;
       img.onerror = null;
     };
-  }, [photoUrl]);
+  }, [imageUrl]);
 
   useEffect(() => {
     redrawCanvas();
@@ -2199,10 +2203,10 @@ export function PhotoAnnotationEditor({
       <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
         <img
           ref={imageRef}
-          src={photoUrl}
+          src={imageUrl}
           alt="Photo to annotate"
           className="hidden"
-          crossOrigin="anonymous"
+          crossOrigin="use-credentials"
         />
         <canvas
           ref={canvasRef}
