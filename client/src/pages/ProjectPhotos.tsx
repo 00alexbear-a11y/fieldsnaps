@@ -769,19 +769,35 @@ export default function ProjectPhotos() {
             <Camera className="w-7 h-7" />
           </Button>
 
-          {/* Select/Cancel Button - Fixed Bottom Right */}
-          {photos.length > 0 && (
-            <Button
-              onClick={toggleSelectMode}
-              data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
-              variant="ghost"
-              size="sm"
-              className="z-40 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
-              style={{ position: 'fixed', bottom: '80px', right: '16px' }}
+          {/* Right side buttons container */}
+          <div 
+            className="z-40 flex items-center gap-2"
+            style={{ position: 'fixed', bottom: '80px', right: '16px' }}
+          >
+            {/* Upload Button */}
+            <button
+              onClick={() => document.getElementById('photo-upload-input')?.click()}
+              disabled={uploadMutation.isPending}
+              className="flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="button-upload-photo"
+              aria-label="Upload from library"
             >
-              {isSelectMode ? 'Cancel' : 'Select'}
-            </Button>
-          )}
+              <Images className="w-6 h-6 text-primary-foreground" />
+            </button>
+            
+            {/* Select/Cancel Button - Only show when photos exist */}
+            {photos.length > 0 && (
+              <Button
+                onClick={toggleSelectMode}
+                data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
+                variant="ghost"
+                size="sm"
+                className="h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background px-6"
+              >
+                {isSelectMode ? 'Cancel' : 'Select'}
+              </Button>
+            )}
+          </div>
         </>,
         document.body
       )}
@@ -1109,21 +1125,6 @@ export default function ProjectPhotos() {
         className="hidden"
         data-testid="input-photo-upload"
       />
-
-      {/* Portal Upload FAB to body - show when no photos */}
-      {photos.length === 0 && createPortal(
-        <button
-          onClick={() => document.getElementById('photo-upload-input')?.click()}
-          disabled={uploadMutation.isPending}
-          className="z-40 flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ position: 'fixed', bottom: '80px', right: '16px' }}
-          data-testid="button-upload-photo"
-          aria-label="Upload from library"
-        >
-          <Images className="w-6 h-6 text-primary-foreground" />
-        </button>,
-        document.body
-      )}
     </>
   );
 }
