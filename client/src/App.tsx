@@ -15,6 +15,8 @@ import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
 import Inbox from "./pages/Inbox";
 import Login from "./pages/Login";
+import Landing from "./pages/Landing";
+import Impact from "./pages/Impact";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -37,13 +39,20 @@ function AppContent() {
   const skipAuth = sessionStorage.getItem('skipAuth') === 'true';
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/share/', '/shared/'];
-  const isPublicRoute = publicRoutes.some(route => location.startsWith(route));
+  const publicRoutes = ['/share/', '/shared/', '/impact', '/login'];
+  const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
 
-  // Redirect to login if not authenticated (except for public routes or skip mode)
+  // Redirect authenticated users from landing to dashboard
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && location === '/') {
+      setLocation('/projects');
+    }
+  }, [isAuthenticated, isLoading, location, setLocation]);
+
+  // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !isPublicRoute && !skipAuth) {
-      setLocation('/login');
+      setLocation('/');
     }
   }, [isAuthenticated, isLoading, isPublicRoute, skipAuth, setLocation]);
 
@@ -56,9 +65,25 @@ function AppContent() {
     );
   }
 
-  // Show login page if not authenticated and not on a public route (skip if in skip mode)
+  // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
+  // This prevents data queries from firing without auth credentials
   if (!isAuthenticated && !isPublicRoute && !skipAuth) {
-    return <Login />;
+    return null; // Will redirect via useEffect above
+  }
+
+  // Public routes get different layout (no bottom nav)
+  if (!isAuthenticated && isPublicRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          <Route path="/" component={Landing} />
+          <Route path="/impact" component={Impact} />
+          <Route path="/login" component={Login} />
+          <Route path="/shared/:token" component={ShareView} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    );
   }
 
   return (
@@ -69,7 +94,7 @@ function AppContent() {
       <main className="flex-1 bg-white dark:bg-black overflow-hidden">
         <Switch>
           <Route path="/camera" component={Camera} />
-          <Route path="/" component={Projects} />
+          <Route path="/projects" component={Projects} />
           <Route path="/projects/:id" component={ProjectPhotos} />
           <Route path="/photo/:id/edit" component={PhotoEdit} />
           <Route path="/photo/:id/view" component={PhotoView} />
@@ -78,7 +103,6 @@ function AppContent() {
           <Route path="/trash" component={Trash} />
           <Route path="/map" component={Map} />
           <Route path="/inbox" component={Inbox} />
-          <Route path="/login" component={Login} />
           <Route path="/shared/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>

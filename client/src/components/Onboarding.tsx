@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, Image, Settings, ChevronRight, X } from 'lucide-react';
+import { Camera, Heart, FolderOpen, X } from 'lucide-react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 interface OnboardingProps {
@@ -14,22 +14,22 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const steps = [
     {
       title: 'Welcome to FieldSnaps',
-      description: 'Document your job sites with ease. Capture, compress, and organize photos - even offline.',
+      description: 'Professional photo documentation for contractors and field service teams. Capture, annotate, and share - even offline.',
       icon: Camera,
       color: 'text-primary',
       showLogo: true,
     },
     {
-      title: 'Smart Photo Quality',
-      description: 'Choose from 3 compression levels: Quick (200KB), Standard (500KB), or Detailed (1MB).',
-      icon: Image,
-      color: 'text-green-500',
+      title: 'Organize by Project',
+      description: 'Keep all your job site photos organized. Create projects, add photos, and share with clients.',
+      icon: FolderOpen,
+      color: 'text-primary',
     },
     {
-      title: 'Offline-First Design',
-      description: 'Photos are saved locally first. Sync to cloud when you have connectivity. Works everywhere.',
-      icon: Settings,
-      color: 'text-amber-500',
+      title: 'Business with Purpose',
+      description: '20% of your subscription supports missionaries overseas. Your work makes a global impact.',
+      icon: Heart,
+      color: 'text-primary',
     },
   ];
 
@@ -78,7 +78,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             {currentStep.title}
           </h2>
 
-          <p className="text-muted-foreground" data-testid={`text-onboarding-description-${step}`}>
+          <p className="text-muted-foreground text-lg" data-testid={`text-onboarding-description-${step}`}>
             {currentStep.description}
           </p>
         </div>
@@ -97,29 +97,27 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           ))}
         </div>
 
-        <div className="flex space-x-3">
-          {!isLastStep && (
-            <Button
-              variant="outline"
-              size="default"
-              onClick={handleSkip}
-              className="flex-1"
-              data-testid="button-skip"
-            >
-              Skip
-            </Button>
-          )}
+        <Button
+          variant="default"
+          size="lg"
+          onClick={handleNext}
+          className="w-full"
+          data-testid={isLastStep ? "button-get-started" : "button-next"}
+        >
+          {isLastStep ? 'Get Started' : 'Next'}
+        </Button>
+
+        {!isLastStep && (
           <Button
-            variant="default"
-            size="default"
-            onClick={handleNext}
-            className="flex-1"
-            data-testid={isLastStep ? "button-get-started" : "button-next"}
+            variant="ghost"
+            size="sm"
+            onClick={handleSkip}
+            className="w-full text-muted-foreground"
+            data-testid="button-skip"
           >
-            {isLastStep ? 'Get Started' : 'Next'}
-            {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" />}
+            Skip tour
           </Button>
-        </div>
+        )}
       </Card>
     </div>
   );

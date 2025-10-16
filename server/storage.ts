@@ -78,6 +78,7 @@ export interface IStorage {
   // Billing & Subscriptions
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
   updateUserSubscriptionStatus(userId: string, status: string, trialEndDate?: Date): Promise<User | undefined>;
+  startUserTrial(userId: string): Promise<User | undefined>;
   createSubscription(data: InsertSubscription): Promise<Subscription>;
   updateSubscription(id: string, data: Partial<InsertSubscription>): Promise<Subscription | undefined>;
   getSubscriptionByUserId(userId: string): Promise<Subscription | undefined>;
@@ -514,6 +515,22 @@ export class DbStorage implements IStorage {
     
     const result = await db.update(users)
       .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async startUserTrial(userId: string): Promise<User | undefined> {
+    const trialStartDate = new Date();
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 7); // 7 days from now
+    
+    const result = await db.update(users)
+      .set({
+        trialStartDate,
+        trialEndDate,
+        subscriptionStatus: 'trial',
+      })
       .where(eq(users.id, userId))
       .returning();
     return result[0];

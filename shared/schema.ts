@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   // Subscription fields (for future Stripe integration)
   subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled, none
   stripeCustomerId: varchar("stripe_customer_id"),
+  trialStartDate: timestamp("trial_start_date"), // When trial started (on first project creation)
   trialEndDate: timestamp("trial_end_date"),
 });
 

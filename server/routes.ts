@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", isAuthenticated, async (req, res) => {
+  app.post("/api/projects", isAuthenticated, async (req: any, res) => {
     try {
       const validated = insertProjectSchema.parse(req.body);
       
@@ -230,6 +230,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Geocoding error:', geocodeError);
           // Continue without geocoding if it fails
         }
+      }
+      
+      // Check if this is the user's first project and start trial if needed
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      // Start trial if user has no trial start date yet (first project)
+      if (user && !user.trialStartDate && user.subscriptionStatus === 'trial') {
+        console.log(`[Trial] Starting 7-day trial for user ${userId} on first project creation`);
+        await storage.startUserTrial(userId);
       }
       
       const project = await storage.createProject(validated);

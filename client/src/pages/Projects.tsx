@@ -395,11 +395,29 @@ export default function Projects() {
           </div>
         ) : projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 m-3 mt-6">
-            <div className="bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center max-w-md">
-              <FolderOpen className="w-16 h-16 mb-4 text-muted-foreground mx-auto" />
-              <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
-              <p className="text-muted-foreground mb-6">Create your first project to get started</p>
-            </div>
+            <Card className="p-8 text-center max-w-md space-y-6">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <FolderOpen className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-semibold">Create Your First Project</h2>
+                <p className="text-muted-foreground text-lg">
+                  Your 7-day free trial starts when you create your first project
+                </p>
+              </div>
+              <Button 
+                size="lg" 
+                className="w-full"
+                onClick={() => setDialogOpen(true)}
+                data-testid="button-create-first-project"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Project
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                No credit card required • Full access to all features
+              </p>
+            </Card>
           </div>
         ) : filteredProjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 m-3 mt-6">

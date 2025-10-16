@@ -15,7 +15,7 @@ export default function BottomNav() {
       id: 'projects',
       label: 'Projects',
       icon: FolderOpen,
-      path: '/',
+      path: '/projects',
     },
     {
       id: 'inbox',
@@ -32,8 +32,8 @@ export default function BottomNav() {
   ];
 
   const isActive = (path: string) => {
-    if (path === '/' && location === '/') return true;
-    if (path !== '/' && location.startsWith(path)) return true;
+    if (path === '/projects' && location === '/projects') return true;
+    if (path !== '/projects' && location.startsWith(path)) return true;
     return false;
   };
 
