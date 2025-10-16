@@ -28,6 +28,15 @@ const QUALITY_PRESETS: { value: QualityPreset; label: string; description: strin
   { value: 'detailed', label: 'L', description: '1MB - High quality' },
 ];
 
+type AspectRatio = '4:3' | '16:9' | '1:1' | 'original';
+
+const ASPECT_RATIOS: { value: AspectRatio; label: string; ratio: number | null }[] = [
+  { value: '4:3', label: '4:3', ratio: 4/3 },
+  { value: '16:9', label: '16:9', ratio: 16/9 },
+  { value: '1:1', label: '1:1', ratio: 1 },
+  { value: 'original', label: 'Orig', ratio: null },
+];
+
 interface Project {
   id: string;
   name: string;
@@ -51,6 +60,10 @@ export default function Camera() {
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<QualityPreset>('standard');
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(() => {
+    const saved = localStorage.getItem('camera-aspect-ratio');
+    return (saved as AspectRatio) || '4:3';
+  });
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -838,6 +851,46 @@ export default function Camera() {
     }
   };
 
+  const applyCrop = (sourceCanvas: HTMLCanvasElement): HTMLCanvasElement => {
+    const selectedRatio = ASPECT_RATIOS.find(ar => ar.value === selectedAspectRatio);
+    
+    if (!selectedRatio || !selectedRatio.ratio) {
+      return sourceCanvas;
+    }
+
+    const srcWidth = sourceCanvas.width;
+    const srcHeight = sourceCanvas.height;
+    const srcRatio = srcWidth / srcHeight;
+    const targetRatio = selectedRatio.ratio;
+
+    let cropWidth = srcWidth;
+    let cropHeight = srcHeight;
+    let cropX = 0;
+    let cropY = 0;
+
+    if (srcRatio > targetRatio) {
+      cropWidth = srcHeight * targetRatio;
+      cropX = (srcWidth - cropWidth) / 2;
+    } else {
+      cropHeight = srcWidth / targetRatio;
+      cropY = (srcHeight - cropHeight) / 2;
+    }
+
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = cropWidth;
+    croppedCanvas.height = cropHeight;
+    const ctx = croppedCanvas.getContext('2d');
+    if (!ctx) return sourceCanvas;
+
+    ctx.drawImage(
+      sourceCanvas,
+      cropX, cropY, cropWidth, cropHeight,
+      0, 0, cropWidth, cropHeight
+    );
+
+    return croppedCanvas;
+  };
+
   const quickCapture = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
@@ -857,17 +910,19 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = video.videoWidth;
+      tempCanvas.height = video.videoHeight;
 
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) throw new Error('Failed to get canvas context');
 
-      ctx.drawImage(video, 0, 0);
+      tempCtx.drawImage(video, 0, 0);
+
+      const croppedCanvas = applyCrop(tempCanvas);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob(
+        croppedCanvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
           'image/jpeg',
           0.95
@@ -959,17 +1014,19 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = video.videoWidth;
+      tempCanvas.height = video.videoHeight;
 
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) throw new Error('Failed to get canvas context');
 
-      ctx.drawImage(video, 0, 0);
+      tempCtx.drawImage(video, 0, 0);
+
+      const croppedCanvas = applyCrop(tempCanvas);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob(
+        croppedCanvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
           'image/jpeg',
           0.95
@@ -1395,7 +1452,7 @@ export default function Camera() {
           )}
       </div>
 
-      {/* Controls Row - Quality, Zoom, Tags */}
+      {/* Controls Row - Quality, Aspect Ratio, Zoom, Tags */}
       <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10">
         <div className="flex items-center justify-center gap-4">
           {/* Quality toggles S/M/L */}
@@ -1414,6 +1471,29 @@ export default function Camera() {
                 data-testid={`button-quality-${preset.value}`}
               >
                 {preset.label}
+              </Button>
+            ))}
+          </div>
+          
+          {/* Aspect Ratio toggles */}
+          <div className="flex gap-1">
+            {ASPECT_RATIOS.map((ar) => (
+              <Button
+                key={ar.value}
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedAspectRatio(ar.value);
+                  localStorage.setItem('camera-aspect-ratio', ar.value);
+                }}
+                className={`h-8 px-2 text-xs ${
+                  selectedAspectRatio === ar.value
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white'
+                }`}
+                data-testid={`button-aspect-${ar.value}`}
+              >
+                {ar.label}
               </Button>
             ))}
           </div>
