@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, TouchEvent } from "react";
-import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle } from "lucide-react";
+import { Trash2, Home, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -203,7 +203,7 @@ export default function SwipeableProjectCard({
             />
           ) : (
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-muted/50 backdrop-blur-sm flex items-center justify-center border border-border/30">
-              <FolderOpen className="w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground/70" />
+              <Home className="w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground/70" />
             </div>
           )}
         </div>

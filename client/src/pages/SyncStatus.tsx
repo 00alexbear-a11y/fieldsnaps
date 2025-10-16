@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, FolderOpen, Trash2, CheckSquare, Square } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, Home, Trash2, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -423,7 +423,7 @@ export default function SyncStatus() {
         {!loading && projectItems.length > 0 && (
           <div className="space-y-3">
             <h3 className="text-md font-semibold flex items-center gap-2">
-              <FolderOpen className="w-4 h-4" />
+              <Home className="w-4 h-4" />
               Projects ({projectItems.length})
             </h3>
             {projectItems.map((item) => (

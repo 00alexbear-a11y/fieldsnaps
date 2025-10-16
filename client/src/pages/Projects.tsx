@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
+import { Plus, Home, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -410,7 +410,7 @@ export default function Projects() {
           <div className="flex flex-col items-center justify-center py-12 px-4 m-3 mt-6">
             <Card className="p-8 text-center max-w-md space-y-6">
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <FolderOpen className="w-10 h-10 text-primary" />
+                <Home className="w-10 h-10 text-primary" />
               </div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold">Create Your First Project</h2>
@@ -503,12 +503,13 @@ export default function Projects() {
               htmlFor="show-completed" 
               className="text-sm text-muted-foreground cursor-pointer select-none"
             >
-              Show Completed Jobs
+              Show completed
             </label>
             <Switch 
               id="show-completed" 
               checked={showCompleted}
               onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+              className="scale-75"
               data-testid="switch-show-completed"
             />
           </div>
@@ -540,7 +541,7 @@ export default function Projects() {
 
       {/* Share Project Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent data-testid="dialog-share-project">
+        <DialogContent className="max-w-md w-[90vw]" data-testid="dialog-share-project">
           <DialogHeader>
             <DialogTitle>Share Project</DialogTitle>
             <DialogDescription>
@@ -548,14 +549,15 @@ export default function Projects() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="p-3 bg-muted rounded-lg border flex items-center gap-2">
-              <code className="flex-1 text-sm truncate" data-testid="text-share-link">
+            <div className="p-3 bg-muted rounded-lg border flex items-center gap-2 min-w-0">
+              <code className="flex-1 text-xs sm:text-sm min-w-0 break-all whitespace-pre-wrap" data-testid="text-share-link">
                 {shareToken ? `${window.location.origin}/shared/${shareToken}` : ''}
               </code>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={handleCopyShareLink}
+                className="flex-shrink-0"
                 data-testid="button-copy-link"
                 aria-label="Copy share link"
               >
@@ -569,6 +571,7 @@ export default function Projects() {
             <DialogFooter>
               <Button 
                 onClick={() => setShareDialogOpen(false)}
+                className="w-full"
                 data-testid="button-close-share"
               >
                 Done

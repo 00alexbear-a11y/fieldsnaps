@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'wouter';
-import { Camera, FolderOpen, Bell, MapPin } from 'lucide-react';
+import { Camera, Home, Bell, MapPin } from 'lucide-react';
 
 export default function BottomNav() {
   const [location] = useLocation();
@@ -14,7 +14,7 @@ export default function BottomNav() {
     {
       id: 'projects',
       label: 'Projects',
-      icon: FolderOpen,
+      icon: Home,
       path: '/projects',
     },
     {

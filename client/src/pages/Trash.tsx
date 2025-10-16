@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Trash2, RotateCcw, AlertTriangle, FolderOpen, Image, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Trash2, RotateCcw, AlertTriangle, Home, Image, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -316,7 +316,7 @@ export default function Trash() {
             {deletedProjects.length > 0 && (
               <div>
                 <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <FolderOpen className="w-5 h-5" />
+                  <Home className="w-5 h-5" />
                   Deleted Projects ({deletedProjects.length})
                 </h2>
                 <div className="space-y-2">

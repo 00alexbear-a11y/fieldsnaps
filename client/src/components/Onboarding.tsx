@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, FolderOpen, Share2, Cloud, X } from 'lucide-react';
+import { Camera, Home, Share2, Cloud, X } from 'lucide-react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 interface OnboardingProps {
@@ -21,7 +21,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     {
       title: 'Organize by project',
       description: '',
-      icon: FolderOpen,
+      icon: Home,
       color: 'text-primary',
     },
     {
