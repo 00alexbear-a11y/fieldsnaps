@@ -795,6 +795,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email Test Endpoint (for verifying Resend integration)
+  app.post("/api/test-email", isAuthenticated, async (req: any, res) => {
+    try {
+      const { email, name } = req.body;
+      
+      if (!email || !name) {
+        return res.status(400).json({ error: "Email and name are required" });
+      }
+
+      // Send test welcome email
+      await emailService.sendWelcomeEmail(email, name);
+      
+      res.json({ 
+        success: true, 
+        message: `Test email sent to ${email}`,
+        from: "FieldSnaps <hello@fieldsnaps.com>"
+      });
+    } catch (error: any) {
+      console.error('[Test Email] Error:', error);
+      res.status(500).json({ 
+        error: error.message || "Failed to send test email",
+        details: error.toString()
+      });
+    }
+  });
+
   // Billing & Subscription Routes (Stripe Integration)
   // Note: These routes are ready but dormant until production launch
   
