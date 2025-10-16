@@ -1088,6 +1088,16 @@ export default function ProjectPhotos() {
           onClose={() => setTagPickerPhotoId(null)}
         />
       )}
+
+      {/* Hidden file input for photo upload from camera roll */}
+      <input
+        type="file"
+        id="photo-upload-fab"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+        data-testid="input-photo-upload"
+      />
     </>
   );
 }
