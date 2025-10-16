@@ -2,8 +2,129 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { billingService } from "./billing";
 
 const app = express();
+
+// Stripe webhook endpoint - MUST be before express.json() to preserve raw body
+app.post('/api/webhooks/stripe', 
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    
+    if (!sig || typeof sig !== 'string') {
+      console.error('[Webhook] Missing Stripe signature');
+      return res.status(400).json({ error: 'Missing signature' });
+    }
+
+    try {
+      // Verify webhook signature and parse event
+      const event = billingService.parseWebhookEvent(req.body, sig);
+      console.log(`[Webhook] Received event: ${event.type}`);
+
+      // Handle different event types
+      switch (event.type) {
+        case 'checkout.session.completed': {
+          const session = event.data.object as any;
+          const userId = session.metadata?.userId;
+          const customerId = session.customer;
+          
+          if (!userId) {
+            console.error('[Webhook] No userId in session metadata');
+            break;
+          }
+
+          // Update user with Stripe customer ID
+          await storage.updateUser(userId, {
+            stripeCustomerId: customerId as string,
+          });
+          
+          console.log(`[Webhook] Checkout completed for user ${userId}`);
+          break;
+        }
+
+        case 'invoice.payment_succeeded': {
+          const invoice = event.data.object as any;
+          const customerId = invoice.customer;
+          
+          // Find user by Stripe customer ID
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          if (!user) {
+            console.error(`[Webhook] No user found for customer ${customerId}`);
+            break;
+          }
+
+          // Get subscription to determine status
+          const subscriptionId = invoice.subscription;
+          if (subscriptionId) {
+            const subscription = await billingService.retrieveSubscription(subscriptionId);
+            const newStatus = billingService.mapStripeStatusToUserStatus(subscription.status);
+            
+            // Clear pastDueSince on successful payment
+            await storage.updateUser(user.id, {
+              subscriptionStatus: newStatus,
+              pastDueSince: null,
+            });
+            
+            console.log(`[Webhook] Payment succeeded for user ${user.id}, status: ${newStatus}`);
+          }
+          break;
+        }
+
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object as any;
+          const customerId = invoice.customer;
+          
+          // Find user by Stripe customer ID
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          if (!user) {
+            console.error(`[Webhook] No user found for customer ${customerId}`);
+            break;
+          }
+
+          // Set pastDueSince to track when grace period starts
+          await storage.updateUser(user.id, {
+            subscriptionStatus: 'past_due',
+            pastDueSince: new Date(),
+          });
+          
+          console.log(`[Webhook] Payment failed for user ${user.id}, set to past_due`);
+          break;
+        }
+
+        case 'customer.subscription.deleted': {
+          const subscription = event.data.object as any;
+          const customerId = subscription.customer;
+          
+          // Find user by Stripe customer ID
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          if (!user) {
+            console.error(`[Webhook] No user found for customer ${customerId}`);
+            break;
+          }
+
+          // Set status to canceled and clear pastDueSince
+          await storage.updateUser(user.id, {
+            subscriptionStatus: 'canceled',
+            pastDueSince: null,
+          });
+          
+          console.log(`[Webhook] Subscription canceled for user ${user.id}`);
+          break;
+        }
+
+        default:
+          console.log(`[Webhook] Unhandled event type: ${event.type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('[Webhook] Error processing webhook:', error);
+      return res.status(400).json({ error: error.message });
+    }
+  }
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
