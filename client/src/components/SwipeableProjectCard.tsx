@@ -319,6 +319,17 @@ export default function SwipeableProjectCard({
                   <Share2 className="w-4 h-4 mr-2" />
                   Share Project
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="text-destructive focus:text-destructive"
+                  data-testid={`menu-delete-${project.id}`}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Project
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
