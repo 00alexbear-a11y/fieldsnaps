@@ -539,26 +539,6 @@ export default function ProjectPhotos() {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Photo Size Selector */}
-            <div className="flex items-center gap-2 justify-center" data-testid="photo-size-selector">
-              <span className="text-sm text-muted-foreground">Size:</span>
-              <div className="inline-flex rounded-lg border border-border p-1 bg-muted/30">
-                {(['S', 'M', 'L'] as const).map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setPhotoSize(size)}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                      photoSize === size
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'text-muted-foreground hover-elevate'
-                    }`}
-                    data-testid={`button-size-${size}`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
             
             {/* Tag Filter */}
             {availableTags.length > 0 && (
@@ -730,6 +710,33 @@ export default function ProjectPhotos() {
         )}
       </main>
       </div>
+
+      {/* Portal photo size selector to body - positioned at same height as camera buttons */}
+      {createPortal(
+        <div 
+          className="z-40 flex items-center justify-center pointer-events-none"
+          style={{ position: 'fixed', bottom: '80px', left: '0', right: '0' }}
+          data-testid="photo-size-selector"
+        >
+          <div className="inline-flex rounded-lg border border-border p-1 bg-background/80 backdrop-blur-md shadow-lg pointer-events-auto">
+            {(['S', 'M', 'L'] as const).map((size) => (
+              <button
+                key={size}
+                onClick={() => setPhotoSize(size)}
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                  photoSize === size
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover-elevate'
+                }`}
+                data-testid={`button-size-${size}`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Portal fixed buttons to body - evenly spaced bottom bar */}
       {createPortal(
