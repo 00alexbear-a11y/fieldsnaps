@@ -47,9 +47,9 @@ export default function Landing() {
       <section className="pt-20 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto space-y-8">
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
-              Photo Documentation<br />
-              Built by a Contractor<br />
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
+              Photo Documentation /<br />
+              Built by a Contractor /<br />
               For Contractors
             </h1>
             <div className="text-lg sm:text-xl text-muted-foreground space-y-4 max-w-3xl mx-auto">

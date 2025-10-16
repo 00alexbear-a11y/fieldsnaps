@@ -13,27 +13,26 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   const steps = [
     {
-      title: "Welcome to FieldSnaps! Let's show you around.",
-      description: 'Take & annotate photos',
+      title: 'Take & annotate photos',
+      description: '',
       icon: Camera,
       color: 'text-primary',
-      showLogo: true,
     },
     {
       title: 'Organize by project',
-      description: 'Keep all your job site photos organized by project.',
+      description: '',
       icon: FolderOpen,
       color: 'text-primary',
     },
     {
       title: 'Share instantly',
-      description: 'Generate secure share links for clients - no login required.',
+      description: '',
       icon: Share2,
       color: 'text-primary',
     },
     {
       title: 'Cloud backup',
-      description: 'Never lose a photo. Automatic backup to secure cloud storage.',
+      description: '',
       icon: Cloud,
       color: 'text-primary',
     },
@@ -67,18 +66,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </button>
 
         <div className="flex flex-col items-center text-center space-y-4 pt-4">
-          {currentStep.showLogo ? (
-            <img 
-              src={logoPath} 
-              alt="FieldSnaps" 
-              className="h-16 w-auto object-contain"
-              data-testid="img-fieldsnaps-logo"
-            />
-          ) : (
-            <div className={`w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ${currentStep.color}`}>
-              <Icon className="w-10 h-10" />
-            </div>
-          )}
+          <div className={`w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ${currentStep.color}`}>
+            <Icon className="w-10 h-10" />
+          </div>
 
           <h2 className="text-2xl font-semibold" data-testid={`text-onboarding-title-${step}`}>
             {currentStep.title}
