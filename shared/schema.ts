@@ -28,6 +28,7 @@ export const users = pgTable("users", {
   stripeCustomerId: varchar("stripe_customer_id"),
   trialStartDate: timestamp("trial_start_date"), // When trial started (on first project creation)
   trialEndDate: timestamp("trial_end_date"),
+  pastDueSince: timestamp("past_due_since"), // When payment failed (for 14-day grace period)
 });
 
 // WebAuthn credentials table (for biometric authentication)

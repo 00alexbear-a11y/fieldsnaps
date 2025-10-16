@@ -3,11 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Plus, FolderOpen, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { UpgradeModal } from "@/components/UpgradeModal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +50,7 @@ type SortOption = 'lastActivity' | 'name' | 'created';
 export default function Projects() {
   const [, setLocation] = useLocation();
   const { isDark, toggleTheme } = useTheme();
+  const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
@@ -61,6 +64,7 @@ export default function Projects() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const { toast } = useToast();
 
   // Efficient bulk query - gets all projects with photo counts in one request
@@ -303,12 +307,20 @@ export default function Projects() {
         />
         <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" data-testid="button-create-project">
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  New Project
-                </Button>
-              </DialogTrigger>
+              <Button 
+                size="sm" 
+                data-testid="button-create-project"
+                onClick={() => {
+                  if (!canWrite) {
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setDialogOpen(true);
+                  }
+                }}
+              >
+                <Plus className="w-4 h-4 mr-1.5" />
+                New Project
+              </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Project</DialogTitle>
@@ -408,7 +420,13 @@ export default function Projects() {
               <Button 
                 size="lg" 
                 className="w-full"
-                onClick={() => setDialogOpen(true)}
+                onClick={() => {
+                  if (!canWrite) {
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setDialogOpen(true);
+                  }
+                }}
                 data-testid="button-create-first-project"
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -558,6 +576,13 @@ export default function Projects() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        open={upgradeModalOpen} 
+        onClose={() => setUpgradeModalOpen(false)}
+        reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
+      />
     </div>
   );
 }
