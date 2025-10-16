@@ -1,89 +1,7 @@
 # FieldSnaps - Construction Photo PWA
 
 ## Overview
-FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant photo capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization for challenging environments, aspiring to become a commercial SaaS product.
-
-### Recent Updates (October 16, 2025)
-- **Project Completion Tracking**:
-  - Added ability to mark projects as complete/incomplete via dropdown menu on project cards
-  - Completed projects display green "Done" badge with checkmark icon
-  - "Show Completed Jobs" checkbox now works correctly to filter completed projects
-  - Default behavior: hides completed projects (checkbox unchecked)
-  - Backend: PATCH /api/projects/:id/toggle-complete endpoint toggles completion status
-  - Database: projects.completed field (boolean, default: false)
-  - UI: Dropdown menu (three dots) provides "Mark as Complete/Incomplete" and "Share Project" options
-
-### Recent Updates (October 15, 2025)
-- **Mobile Button Layout & Notification Fixes**:
-  - **Button Positioning**: Fixed mobile button order using inline styles for precise placement
-    - Back button (left): `position: fixed, bottom: 80px, left: 16px`
-    - Camera FAB (center): `position: fixed, bottom: 80px, left: 50%, transform: translateX(-50%)`
-    - Select button (right): `position: fixed, bottom: 80px, right: 16px`
-    - All buttons maintain z-40 for proper stacking above content
-  - **Toast Notifications**: Moved to bottom-right corner with quick dismissal
-    - Position changed from top-center to `fixed bottom-24 right-0` (bottom-right)
-    - Auto-dismiss duration reduced from 1000s to 2s for quick disappearance
-    - Positioned at bottom-24 (96px) to avoid overlap with bottom-20 (80px) action buttons
-    - Max width 320px on larger screens for better readability
-- **Critical Bug Fixes - Session Restoration & UI Positioning**:
-  - **Camera Session Null Guards**: Fixed crashes during photo restoration from localStorage by adding `if (photo && photo.id)` checks before calling createPhotoUrl()
-  - **Camera Horizontal Scroll Fix**: Added `overflow-x-hidden` to thumbnail strip container to prevent unwanted horizontal scrolling
-  - **ProjectPhotos Fixed Button Positioning**: Complete fix for buttons scrolling with content and duplicate rendering
-    - App.tsx outer div: Changed to `h-screen overflow-hidden` to prevent document/window scrolling
-    - App.tsx main element: Changed to `flex-1 overflow-hidden` to contain page routes
-    - ProjectPhotos container: Changed to `h-screen overflow-auto` for internal scrolling
-    - Used React Portal (`createPortal` from "react-dom") to render all fixed buttons to `document.body`
-    - Removed duplicate camera FAB that was rendering at bottom-4
-    - Three fixed buttons positioned at `bottom-20` (80px from bottom) to sit above bottom navigation:
-      - Back button (left-4): Ghost variant, 56×56px, navigates to Projects list
-      - Camera FAB (centered): Primary blue (#169DF5), 64×64px, opens camera for current project
-      - Select button (right-4): Ghost variant, auto×56px, toggles selection mode
-    - All buttons stay fixed at viewport positions when scrolling, fully visible above bottom nav
-    - Fixed TypeScript mediaType type assertion for proper 'photo' | 'video' literal types
-- **Video Recording Pipeline Complete**: Full video support with persistence and playback
-  - Added `mediaType` field to distinguish photos from videos throughout the system
-  - LocalPhoto interface includes `mediaType: 'photo' | 'video'` with proper defaults
-  - Database schema updated with `media_type` VARCHAR column (default: 'photo')
-  - Server multer configuration accepts both image/* and video/* mimetypes (50MB limit)
-  - Sync manager transmits mediaType in upload FormData
-  - Videos saved to IndexedDB with mediaType: 'video', photos with mediaType: 'photo'
-  - Video thumbnails display in camera preview strip with play button overlay
-  - PhotoView component handles video playback with native HTML5 controls
-  - Server routes accept and persist mediaType from client uploads
-  - Graceful fallback to 'photo' for legacy records without mediaType
-- **PhotoEdit Navigation Fix**: Corrected return-to-camera behavior after editing
-  - Changed from `window.history.back()` to explicit `setLocation(/camera?projectId=X)` navigation
-  - Fixes issue where cancel/save in PhotoEdit would return to project selection instead of camera
-  - Camera component now properly receives projectId parameter and maintains viewfinder state
-  - Applied to handleSave, handleCancel, and handleDelete functions in PhotoEdit
-  - Graceful fallback to `/camera` if projectId unavailable
-- **Video Recording Canvas Fix**: Eliminated "canvas not ready" errors during video recording
-  - Annotation canvas now always rendered in DOM (hidden when not recording) to ensure refs exist
-  - Prevents recording failures caused by missing canvas element references
-  - Maintains same visual behavior with conditional visibility instead of conditional rendering
-- **Real-Time Video Annotation**: Draw temporary highlights during video recording
-  - Touch-based drawing overlay appears during video recording
-  - Annotations follow finger precisely with coordinate scaling (CSS pixels → canvas resolution)
-  - Temporary highlights clear 50ms after finger lift (captured in ~1-2 frames)
-  - Highlights baked into saved video via canvas compositing at 30fps
-  - Brand blue (#169DF5) stroke with scaled line width for consistent visibility
-  - Composite canvas system: annotation overlay + video stream → MediaRecorder
-- **Session Photo Persistence with Race Condition Guard**: localStorage-based session restoration with async safety
-  - Session photos now persist across Camera remounts when returning from PhotoEdit
-  - Implemented currentProjectRef guard to prevent cross-project photo leakage during async restore
-  - Photos only restore if project hasn't changed mid-async operation
-  - Session clears properly on project switch and on non-photo navigation exit
-  - captureAndEdit workflow now adds photos to session before navigating to edit mode
-- **Thumbnail Layout**: Vertical strip on left side with exact sizing (confirmed working as designed)
-  - Positioned at left-4 with vertical centering (top-1/2 -translate-y-1/2)
-  - max-h-[344px] for exactly 4 photos (4×80px thumbnails + 3×8px gaps)
-  - CSS mask fade effect at top/bottom (0% → 15% → 85% → 100%)
-  - Vertical scrolling with flex-col and overflow-y-auto
-- **Arrow Tool Redesign**: Improved arrow annotation visual quality
-  - Arrowhead now extends past shaft line instead of sitting on top
-  - Shaft stops at arrowhead base, triangle extends to tip for unified arrow shape
-  - Better proportions: headLength = max(strokeWidth * 2.5, 30px), headWidth = strokeWidth * 1.2
-  - Matches professional arrow design with black outline and colored fill
+FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo and video documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant media capture, smart compression, auto-timestamping, efficient project organization, and a mission-driven SaaS model that donates 20% of proceeds to missionaries. The project aims for full offline functionality and touch optimization, aspiring to become a commercial SaaS product.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -103,10 +21,10 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 The design adheres to an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, subtle depth, and typography excellence, all based on an 8px grid. The color palette includes iOS Blue, Warm Gray, Success Green, Warning Orange, Pure White, and Light Gray. Interaction design incorporates fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar utilizing SF Symbols-inspired icons. The branding prominently features the FieldSnaps logo. The bottom navigation includes "Map," "Projects," "Inbox," and "Camera" tabs, with Settings accessible from the Projects page header.
 
 ### Technical Implementations
-FieldSnaps is an offline-first PWA leveraging Service Workers for caching and IndexedDB for local photo and video storage. The Background Sync API manages queued uploads. Performance is optimized through lazy loading, Web Workers for image compression, and strict URL lifecycle management. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and aspect ratio preservation. Photos and videos are stored in Replit Object Storage, using presigned URLs for upload and server-side ACL policies. IndexedDB maintains local blob caches for offline access, with a sync manager coordinating uploads. The storage system uses a `mediaType` field to distinguish between photos and videos throughout the data pipeline. Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, full-screen viewfinders, and video recording with real-time annotation. Video recordings are saved with native HTML5 playback support and appear in thumbnail previews with play button overlays. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication uses Replit Auth with OpenID Connect and supports biometric login. An interactive 3-step onboarding and contextual PWA installation prompts guide new users. The application is built with robust error resilience.
+FieldSnaps is an offline-first PWA leveraging Service Workers for caching and IndexedDB for local photo and video storage. The Background Sync API manages queued uploads. Performance is optimized through lazy loading, Web Workers for image compression, and strict URL lifecycle management. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and aspect ratio preservation. Photos and videos are stored in Replit Object Storage, using presigned URLs for upload and server-side ACL policies, with a `mediaType` field to distinguish between photos and videos. Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, full-screen viewfinders, video recording with real-time annotation, and native HTML5 playback. A Stripe-integrated subscription system includes a 7-day free trial, soft block enforcement, and a mission-focused billing success page. Project completion tracking allows marking projects as complete/incomplete. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication uses Replit Auth with OpenID Connect and supports biometric login.
 
 ### Feature Specifications
-The application features a bottom navigation with "Map," "Projects," "Inbox," and "Camera" tabs. The camera interface includes project selection, a full-screen viewfinder, a floating capture button, quality selector, zoom levels, and a camera flip button. Project organization is card-based with photo counts, search, and address buttons. Photo management offers grid and timeline views, swipe actions, batch selection, and controls for editing, sharing, commenting, deleting, and renaming. The Photo Annotation Editor has a redesigned layout with fixed cancel/save buttons, a scrollable color picker, size selection (S/M/L) as fixed tabs, and a non-scrollable bottom toolbar for annotation tools (text, arrow, line, circle, pen), undo, and delete. Text annotations support scaling and rotation. Photo auto-naming follows the format `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view for geocoded projects, a 30-day trash bin for soft-deleted items, and bulk photo move functionality.
+The application features a bottom navigation with "Map," "Projects," "Inbox," and "Camera" tabs. The camera interface includes project selection, a full-screen viewfinder, a floating capture button, quality selector, zoom levels, and a camera flip button. Project organization is card-based with photo counts, search, and address buttons, and the ability to filter and mark projects as complete. Photo management offers grid and timeline views, swipe actions, batch selection, and controls for editing, sharing, commenting, deleting, and renaming. The Photo Annotation Editor has a redesigned layout with fixed cancel/save buttons, a scrollable color picker, size selection (S/M/L) as fixed tabs, and a non-scrollable bottom toolbar for annotation tools (text, arrow, line, circle, pen), undo, and delete. Text annotations support scaling and rotation. Photo auto-naming follows the format `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view for geocoded projects, a 30-day trash bin for soft-deleted items, and bulk photo move functionality.
 
 ### System Design Choices
 The build philosophy emphasizes simplicity and invisible interface design. The PWA infrastructure relies on a Service Worker for hourly updates and offline caching. The storage strategy uses IndexedDB for Blob storage, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query optimization, sync queue optimization (batch processing, smart prioritization, exponential backoff), and database indexing.
@@ -140,3 +58,4 @@ The build philosophy emphasizes simplicity and invisible interface design. The P
 
 ### Third-Party APIs
 - **Google Geocoding API**: For converting addresses to latitude/longitude coordinates.
+- **Stripe**: For subscription management and payment processing.
