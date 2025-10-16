@@ -510,6 +510,117 @@ export function PhotoAnnotationEditor({
             }
           }
           break;
+        case "measurement":
+          if (annotation.feet !== undefined && annotation.inches !== undefined && annotation.position.x !== undefined) {
+            const fontSize = annotation.fontSize || 20;
+            const rotation = annotation.rotation || 0;
+            const scale = annotation.scale || 1;
+            
+            // Create measurement text (always show both feet and inches)
+            const feet = annotation.feet || 0;
+            const inches = annotation.inches || 0;
+            const measurementText = `${feet}'${inches}"`;
+            
+            ctx.save();
+            
+            // Apply transformations
+            ctx.translate(annotation.position.x, annotation.position.y);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale(scale, scale);
+            
+            // Measure text to determine line length
+            ctx.font = `bold ${fontSize}px Arial`;
+            const textMetrics = ctx.measureText(measurementText);
+            const textWidth = textMetrics.width;
+            const lineLength = Math.max(textWidth + 80, 200); // Line extends beyond text
+            const capHeight = 20; // Height of end caps
+            
+            const measureScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledMeasureWidth = annotation.strokeWidth * measureScaleFactor;
+            
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            
+            // Draw black outline for horizontal line
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, 0);
+            ctx.lineTo(lineLength / 2, 0);
+            ctx.stroke();
+            
+            // Draw colored horizontal line
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, 0);
+            ctx.lineTo(lineLength / 2, 0);
+            ctx.stroke();
+            
+            // Draw black outline for left end cap
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, -capHeight / 2);
+            ctx.lineTo(-lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw colored left end cap
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, -capHeight / 2);
+            ctx.lineTo(-lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw black outline for right end cap
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(lineLength / 2, -capHeight / 2);
+            ctx.lineTo(lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw colored right end cap
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(lineLength / 2, -capHeight / 2);
+            ctx.lineTo(lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw measurement text with black outline
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.lineWidth = Math.max(fontSize / 8, 4);
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.strokeText(measurementText, 0, -capHeight - fontSize / 2);
+            
+            // Draw colored text
+            ctx.fillStyle = annotation.color;
+            ctx.fillText(measurementText, 0, -capHeight - fontSize / 2);
+            
+            ctx.restore();
+            
+            // Draw handles if selected (outside transformation)
+            if (isSelected) {
+              ctx.save();
+              ctx.translate(annotation.position.x, annotation.position.y);
+              ctx.rotate((rotation * Math.PI) / 180);
+              ctx.scale(scale, scale);
+              
+              // Scale handle (right side)
+              drawHandle(ctx, lineLength / 2, 0, "#3b82f6");
+              // Rotation handle (top center)
+              drawHandle(ctx, 0, -capHeight - fontSize / 2 - 30, "#22c55e");
+              
+              ctx.restore();
+            }
+          }
+          break;
       }
       
       if (isTemp) {
@@ -652,6 +763,62 @@ export function PhotoAnnotationEditor({
           }
         }
         break;
+      case "measurement":
+        if (anno.feet !== undefined && anno.inches !== undefined) {
+          const canvas = canvasRef.current;
+          const ctx = canvas?.getContext("2d");
+          if (ctx) {
+            const fontSize = anno.fontSize || 20;
+            const rotation = anno.rotation || 0;
+            const scale = anno.scale || 1;
+            
+            // Create measurement text
+            let measurementText = "";
+            if (anno.feet > 0) {
+              measurementText = `${anno.feet}'`;
+            }
+            if (anno.inches > 0) {
+              measurementText += `${anno.inches}"`;
+            }
+            if (!measurementText) {
+              measurementText = "0\"";
+            }
+            
+            ctx.font = `bold ${fontSize}px Arial`;
+            const textMetrics = ctx.measureText(measurementText);
+            const textWidth = textMetrics.width;
+            const lineLength = Math.max(textWidth + 80, 200);
+            const capHeight = 20;
+            
+            // Transform point to measurement's local coordinate system
+            const dx = x - anno.position.x;
+            const dy = y - anno.position.y;
+            const rad = (-rotation * Math.PI) / 180;
+            const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
+            const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
+            
+            // Check rotation handle (top center, above text)
+            const rotateHandleX = 0;
+            const rotateHandleY = -capHeight - fontSize / 2 - 30;
+            const distanceToRotate = Math.sqrt(
+              Math.pow(localX - rotateHandleX, 2) + Math.pow(localY - rotateHandleY, 2)
+            );
+            if (distanceToRotate <= handleSize / 2) {
+              return "rotate";
+            }
+            
+            // Check scale handle (right side of line)
+            const scaleHandleX = lineLength / 2;
+            const scaleHandleY = 0;
+            const distanceToScale = Math.sqrt(
+              Math.pow(localX - scaleHandleX, 2) + Math.pow(localY - scaleHandleY, 2)
+            );
+            if (distanceToScale <= handleSize / 2) {
+              return "corner";
+            }
+          }
+        }
+        break;
       case "arrow":
       case "line":
         if (anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
@@ -723,6 +890,53 @@ export function PhotoAnnotationEditor({
                 localX <= textWidth + padding &&
                 localY >= -textHeight - padding &&
                 localY <= padding
+              ) {
+                return anno;
+              }
+            }
+          }
+          break;
+        case "measurement":
+          if (anno.feet !== undefined && anno.inches !== undefined) {
+            const canvas = canvasRef.current;
+            const ctx = canvas?.getContext("2d");
+            if (ctx) {
+              const fontSize = anno.fontSize || 20;
+              const rotation = anno.rotation || 0;
+              const scale = anno.scale || 1;
+              
+              // Create measurement text
+              let measurementText = "";
+              if (anno.feet > 0) {
+                measurementText = `${anno.feet}'`;
+              }
+              if (anno.inches > 0) {
+                measurementText += `${anno.inches}"`;
+              }
+              if (!measurementText) {
+                measurementText = "0\"";
+              }
+              
+              ctx.font = `bold ${fontSize}px Arial`;
+              const textMetrics = ctx.measureText(measurementText);
+              const textWidth = textMetrics.width;
+              const lineLength = Math.max(textWidth + 80, 200);
+              const capHeight = 20;
+              
+              // Transform click point to measurement's local coordinate system
+              const dx = x - anno.position.x;
+              const dy = y - anno.position.y;
+              const rad = (-rotation * Math.PI) / 180;
+              const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
+              const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
+              
+              // Check if click is within measurement bounds (line + text area)
+              const padding = 15;
+              if (
+                localX >= -lineLength / 2 - padding &&
+                localX <= lineLength / 2 + padding &&
+                localY >= -capHeight - fontSize - padding &&
+                localY <= capHeight + padding
               ) {
                 return anno;
               }
@@ -928,8 +1142,8 @@ export function PhotoAnnotationEditor({
     setIsCreating(true);
     setStartPos({ x, y });
 
-    // Text tool now uses dialog, not inline positioning
-    if (tool === "text") {
+    // Text and measurement tools now use dialog, not inline positioning
+    if (tool === "text" || tool === "measurement") {
       setIsCreating(false);
       return;
     } else if (tool === "pen") {
@@ -1082,6 +1296,7 @@ export function PhotoAnnotationEditor({
         
         switch (a.type) {
           case "text":
+          case "measurement":
             updated.position = {
               ...a.position,
               x: initialAnnoState.position.x + dx,
@@ -1134,7 +1349,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    if (isCreating && startPos && tool && tool !== "text" && tool !== "pen" && tool !== "select") {
+    if (isCreating && startPos && tool && tool !== "text" && tool !== "measurement" && tool !== "pen" && tool !== "select") {
       const newAnnotation: Annotation = {
         id: `temp-${Date.now()}`,
         type: tool,
@@ -1178,7 +1393,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    if (isCreating && tempAnnotation && tool && tool !== "text") {
+    if (isCreating && tempAnnotation && tool && tool !== "text" && tool !== "measurement") {
       if (tool === "pen") {
         const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
         const newAnnotations = [...annotations, finalAnnotation];
@@ -1466,6 +1681,7 @@ export function PhotoAnnotationEditor({
         
         switch (a.type) {
           case "text":
+          case "measurement":
             updated.position = {
               ...a.position,
               x: initialAnnoState.position.x + dx,
@@ -1518,7 +1734,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    if (isCreating && startPos && tool && tool !== "text" && tool !== "pen" && tool !== "select") {
+    if (isCreating && startPos && tool && tool !== "text" && tool !== "measurement" && tool !== "pen" && tool !== "select") {
       const newAnnotation: Annotation = {
         id: `temp-${Date.now()}`,
         type: tool,
@@ -1573,7 +1789,7 @@ export function PhotoAnnotationEditor({
       return;
     }
 
-    if (isCreating && tempAnnotation && tool && tool !== "text") {
+    if (isCreating && tempAnnotation && tool && tool !== "text" && tool !== "measurement") {
       if (tool === "pen") {
         const finalAnnotation = { ...tempAnnotation, id: `anno-${Date.now()}` };
         const newAnnotations = [...annotations, finalAnnotation];
@@ -1864,6 +2080,100 @@ export function PhotoAnnotationEditor({
               ctx.lineTo(points[i].x, points[i].y);
             }
             ctx.stroke();
+          }
+          break;
+        case "measurement":
+          if (annotation.feet !== undefined && annotation.inches !== undefined && annotation.position.x !== undefined) {
+            const fontSize = annotation.fontSize || 40;
+            const rotation = annotation.rotation || 0;
+            const scale = annotation.scale || 1;
+            
+            // Create measurement text (always show both feet and inches)
+            const feet = annotation.feet || 0;
+            const inches = annotation.inches || 0;
+            const measurementText = `${feet}'${inches}"`;
+            
+            ctx.save();
+            ctx.translate(annotation.position.x, annotation.position.y);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale(scale, scale);
+            
+            // Measure text to determine line length
+            ctx.font = `bold ${fontSize}px Arial`;
+            const textMetrics = ctx.measureText(measurementText);
+            const textWidth = textMetrics.width;
+            const lineLength = Math.max(textWidth + 80, 200);
+            const capHeight = 20;
+            
+            const measureScaleFactor = annotation.strokeWidth >= 8 ? 4.5 : 1.5;
+            const scaledMeasureWidth = annotation.strokeWidth * measureScaleFactor;
+            
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            
+            // Draw black outline for horizontal line
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, 0);
+            ctx.lineTo(lineLength / 2, 0);
+            ctx.stroke();
+            
+            // Draw colored horizontal line
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, 0);
+            ctx.lineTo(lineLength / 2, 0);
+            ctx.stroke();
+            
+            // Draw black outline for left end cap
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, -capHeight / 2);
+            ctx.lineTo(-lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw colored left end cap
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(-lineLength / 2, -capHeight / 2);
+            ctx.lineTo(-lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw black outline for right end cap
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = scaledMeasureWidth + 6;
+            ctx.beginPath();
+            ctx.moveTo(lineLength / 2, -capHeight / 2);
+            ctx.lineTo(lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw colored right end cap
+            ctx.strokeStyle = annotation.color;
+            ctx.lineWidth = scaledMeasureWidth;
+            ctx.beginPath();
+            ctx.moveTo(lineLength / 2, -capHeight / 2);
+            ctx.lineTo(lineLength / 2, capHeight / 2);
+            ctx.stroke();
+            
+            // Draw measurement text with black outline
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.lineWidth = Math.max(fontSize / 8, 4);
+            ctx.strokeStyle = '#000000';
+            ctx.lineJoin = 'round';
+            ctx.miterLimit = 2;
+            ctx.strokeText(measurementText, 0, -capHeight - fontSize / 2);
+            
+            // Draw colored text
+            ctx.fillStyle = annotation.color;
+            ctx.fillText(measurementText, 0, -capHeight - fontSize / 2);
+            
+            ctx.restore();
           }
           break;
       }
