@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface UpgradeModalProps {
   open: boolean;
@@ -16,9 +19,27 @@ interface UpgradeModalProps {
 }
 
 export function UpgradeModal({ open, onClose, reason = 'trial_expired' }: UpgradeModalProps) {
+  const { toast } = useToast();
+
+  const checkoutMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/billing/create-checkout-session');
+      return await res.json();
+    },
+    onSuccess: (data: { url: string }) => {
+      window.location.href = data.url;
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Checkout failed',
+        description: error.message || 'Unable to start checkout process',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleUpgrade = () => {
-    // TODO: Implement Stripe Checkout flow
-    window.location.href = '/settings?tab=subscription';
+    checkoutMutation.mutate();
   };
 
   const messages = {
@@ -54,9 +75,10 @@ export function UpgradeModal({ open, onClose, reason = 'trial_expired' }: Upgrad
           <Button 
             onClick={handleUpgrade} 
             className="w-full"
+            disabled={checkoutMutation.isPending}
             data-testid="button-upgrade"
           >
-            View Subscription Options
+            {checkoutMutation.isPending ? 'Loading...' : 'View Subscription Options'}
           </Button>
           <Button 
             onClick={onClose} 

@@ -52,6 +52,30 @@ export class BillingService {
     return customer.id;
   }
 
+  async createCheckoutSession(userId: string, successUrl: string, cancelUrl: string): Promise<Stripe.Checkout.Session> {
+    const priceId = process.env.STRIPE_PRICE_ID;
+    if (!priceId) {
+      throw new Error("Billing not configured: Missing STRIPE_PRICE_ID");
+    }
+
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'subscription',
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        userId,
+      },
+    });
+
+    return session;
+  }
+
   async createTrialSubscription(
     user: User,
     customerId: string,
