@@ -1456,11 +1456,24 @@ export default function Camera() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No tag</SelectItem>
-                {tags.map((tag) => (
-                  <SelectItem key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </SelectItem>
-                ))}
+                {tags.map((tag) => {
+                  const tagColorMap: Record<string, string> = {
+                    red: '#ef4444',
+                    orange: '#f97316',
+                    yellow: '#eab308',
+                    blue: '#3b82f6',
+                    gray: '#6b7280',
+                  };
+                  return (
+                    <SelectItem 
+                      key={tag.id} 
+                      value={tag.id}
+                      style={{ color: tagColorMap[tag.color] || '#6b7280' }}
+                    >
+                      {tag.name}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           )}
