@@ -996,7 +996,7 @@ export default function Camera() {
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
-      URL.revokeObjectURL(compressionResult.url);
+      console.log('[Camera] Photo saved for edit:', savedPhoto.id);
 
       syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
         console.error('[Camera] Sync queue error:', err);
@@ -1015,6 +1015,8 @@ export default function Camera() {
         const photoIds = sessionPhotosRef.current.map(p => p.id);
         localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
       }
+
+      URL.revokeObjectURL(compressionResult.url);
 
       setLocation(`/photo/${savedPhoto.id}/edit`);
 
