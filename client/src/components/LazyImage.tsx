@@ -10,6 +10,11 @@ export default function LazyImage({ src, alt, className = '' }: LazyImageProps) 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  
+  // Add skipAuth query param in dev mode for images
+  const imageSrc = src && sessionStorage.getItem('skipAuth') === 'true' 
+    ? `${src}?skipAuth=true`
+    : src;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -42,7 +47,7 @@ export default function LazyImage({ src, alt, className = '' }: LazyImageProps) 
       )}
       <img
         ref={imgRef}
-        src={isInView ? src : undefined}
+        src={isInView ? imageSrc : undefined}
         alt={alt}
         crossOrigin="use-credentials"
         className={`${className} ${!isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
