@@ -1,0 +1,338 @@
+Hey! Thanks for the detailed breakdown. I've made the key decisions - let's build this out!
+
+✅ My Decisions:
+Pricing & Trial:
+
+Pro Plan Price: $19.99/month
+Trial Length: 7 days
+Credit Card: Not required for trial signup
+Trial Start: Begins when user creates their first project (not at signup)
+Trial Enforcement: Soft block when expired
+Users can VIEW existing projects and photos (read-only)
+Can't upload new photos or create new projects
+Gentle upgrade prompt (not pushy)
+Access to existing data preserved
+Brand & Messaging:
+
+Landing Page Style: Apple-inspired minimalist design
+Tone: No-nonsense, straightforward - "It's $19.99, you get this service, done."
+Mission: We're a mission-driven company - 20% of profits support overseas missionaries
+User Experience Philosophy: No pressure tactics, no countdown timers in dashboard, make users feel supported not forced
+User Flow After Signup:
+
+User signs up (trial hasn't started yet)
+Onboarding tour (show key features)
+"Create Your First Project" prompt
+When they create first project → 7-day trial starts → trialStartDate set in database
+After 7 days → soft block → gentle upgrade prompt (no urgency/pressure)
+Failed Payment Handling:
+
+Payment fails → User gets notification bar in app
+After 2 weeks of failed payment → Show "Update Payment Method to Continue" modal
+Soft block activates after 2 week grace period
+Send email reminders (not aggressive, helpful tone)
+Trial Display:
+
+NO countdown timer in dashboard (don't want to pressure users)
+Show in Settings menu only: "Trial: X days remaining" or "Subscription: Active"
+Keep it low-key and informative, not anxiety-inducing
+Launch Timeline: Next couple of weeks, but let's build as much as possible NOW
+
+🚀 Let's Build - Phase 1 (Do This Now):
+1. Professional Landing Page (Priority #1)
+Build a marketing homepage at / (before login) with:
+
+Hero Section:
+
+Headline: "Document Every Detail. Win Every Dispute."
+Subheadline: "Professional photo documentation for contractors, inspectors, and field service teams. $19.99/month. No gimmicks."
+CTA Button: "Start Free 7-Day Trial"
+Hero image: Screenshot of the app showing photo annotation
+Navigation: Logo, Features, Pricing, Impact, Sign In
+Features Section:
+
+Photo Annotations (arrows, text, shapes, pen)
+Project Organization
+Easy Sharing with clients
+Cloud Storage with CDN
+Mobile-Friendly
+(Use icons + brief descriptions)
+Pricing Section:
+
+Simple, Honest Pricing
+
+Free Trial
+7 Days • Full Access • No Credit Card
+Trial starts when you create your first project
+
+FieldSnaps Pro - $19.99/month
+✓ Unlimited Projects
+✓ Unlimited Photos & Videos  
+✓ Advanced Annotations
+✓ Secure Cloud Storage
+✓ Client Sharing Links
+✓ Priority Support
+
+[Start Free Trial] button
+Mission Section:
+
+Business as a Force for Good
+
+20% of FieldSnaps profits support missionaries serving overseas.
+When you choose FieldSnaps, you're not just getting great software - 
+you're making a global impact.
+
+[See the Impact] → Link to /impact page
+Footer:
+
+Links: Features, Pricing, Impact, Terms, Privacy, Contact
+Copyright
+Design Notes:
+
+Apple-style minimalist (clean, lots of white space)
+No-nonsense tone throughout
+Mobile responsive
+Fast loading
+2. Impact Page (Priority #1b)
+Create /impact page:
+
+Purpose: Share stories of missionaries and work supported by FieldSnaps
+
+Structure:
+
+Hero: "Your Subscription Makes a Global Impact"
+Intro: Explanation of 20% giving commitment
+Stories Section: Individual missionary stories (can start with placeholders)
+Photo
+Name & location
+Brief story of their work
+How FieldSnaps support helps them
+Impact Stats (as you get them):
+"Supporting X missionaries"
+"In X countries"
+"$X given this year"
+Updates section (blog-style posts about impact)
+Note: We can build this page structure now with placeholder content, and you can add real stories as you fund missionaries.
+
+3. Onboarding Flow (Priority #2)
+After user signs up (but before trial starts):
+
+Step 1: Welcome Tour (modal or overlay)
+
+"Welcome to FieldSnaps! Let's show you around"
+Highlight 3-4 key features (30 seconds max)
+Skip button available
+Friendly, helpful tone (not salesy)
+Step 2: Create First Project Prompt
+
+Big CTA: "Create Your First Project"
+Subtitle: "Your 7-day free trial starts when you create your first project"
+Form: Project name, description, address
+No countdown, no urgency - just helpful guidance
+Step 3: Trial Begins
+
+When project created → Set trialStartDate = now()
+Calculate trialEndDate = now() + 7 days
+Show success message: "Project created! Your 7-day trial has started."
+No mention of trial ending - keep it positive
+4. Settings Menu - Subscription Status (Priority #3)
+In Settings/Account page:
+
+Show subscription info in a dedicated section:
+
+Subscription Status
+
+[If in trial:]
+Status: Free Trial
+Trial ends: October 23, 2025 (4 days remaining)
+[Upgrade to Pro] button (not prominent, just available)
+
+[If active:]
+Status: FieldSnaps Pro - Active
+Billing: $19.99/month
+Next billing date: November 16, 2025
+[Manage Subscription] button
+
+[If expired:]
+Status: Trial Ended
+[Upgrade to Pro] button
+Keep it informational, not pushy. Users can check here if they want to know trial status.
+
+5. Stripe Setup & Webhooks (Priority #4)
+Webhook Implementation: YES, do it properly with signature verification
+
+Why webhooks are important:
+
+Handles payment success/failure asynchronously
+Updates subscription status reliably
+Catches edge cases (payment method expired, etc.)
+Security: Verify webhook signatures to prevent fake requests
+Webhook Endpoint: https://fieldsnaps.com/api/webhooks/stripe
+
+Events to handle:
+
+checkout.session.completed - User subscribed successfully
+invoice.payment_succeeded - Recurring payment succeeded
+invoice.payment_failed - Payment failed
+customer.subscription.deleted - User canceled subscription
+Webhook flow for failed payments:
+
+Day 0: Payment fails
+  → Stripe retries automatically
+  → Send email: "Payment failed, we'll retry"
+  → Show notification bar in app: "Payment issue - update payment method"
+
+Day 7: Still failed after retries
+  → Send email: "Please update payment method"
+  → Notification bar persists
+
+Day 14: 2 weeks past due
+  → Set subscriptionStatus = 'past_due'
+  → Soft block activates (read-only mode)
+  → Modal: "Update Payment Method to Continue Using FieldSnaps"
+  → [Update Payment] button → Stripe Customer Portal
+  → Helpful tone: "We couldn't process your payment. Update your card to continue."
+Stripe setup I'll need to do:
+
+Create Stripe account
+Create Product: "FieldSnaps Pro" - $19.99/month
+Get STRIPE_SECRET_KEY (from API keys page)
+Get STRIPE_PRICE_ID (from product page)
+Set up webhook endpoint, get STRIPE_WEBHOOK_SECRET
+Add all 3 to Replit Secrets
+Question: Can you provide step-by-step Stripe setup instructions so I do it correctly?
+
+6. Trial Enforcement - Gentle Approach (Priority #5)
+Check trial status on protected actions:
+
+Copyif (user.trialEndDate < now() && user.subscriptionStatus !== 'active') {
+  // Show gentle upgrade modal (not blocking the whole UI)
+}
+Upgrade Modal Design:
+
+Headline: "Your Trial Has Ended"
+Message: "Thanks for trying FieldSnaps! Upgrade to Pro ($19.99/month) to continue creating projects and uploading photos."
+Benefits reminder:
+Unlimited projects & photos
+Secure cloud storage
+Client sharing
+Plus: 20% of your subscription supports overseas missions
+[Upgrade to Pro] button (primary)
+[Not Now] button (secondary) → stays in read-only mode
+No countdown, no urgency language
+Where upgrade prompts appear:
+
+When trying to upload photo → Modal
+When trying to create project → Modal
+Small persistent banner at top (dismissible): "Trial ended - Upgrade to Pro"
+Read-only mode features:
+
+✅ View all projects
+✅ View all photos
+✅ Download photos
+✅ View annotations
+❌ Upload new photos
+❌ Create new projects
+❌ Edit/delete (up to you)
+7. Stripe Checkout Flow (Priority #6)
+User clicks "Upgrade to Pro":
+
+Create Stripe Checkout Session:
+Copy{
+  price: STRIPE_PRICE_ID, // $19.99/month
+  customer_email: user.email,
+  success_url: 'https://fieldsnaps.com/billing/success',
+  cancel_url: 'https://fieldsnaps.com/dashboard',
+  metadata: { userId: user.id }
+}
+Redirect to Stripe (they handle payment UI)
+Success page (/billing/success):
+
+"Welcome to FieldSnaps Pro! 🎉"
+"Your subscription is now active"
+"Thanks for supporting our mission - 20% of your subscription supports overseas missionaries"
+[Go to Dashboard] button
+Webhook handling (checkout.session.completed):
+
+Verify webhook signature (security)
+Extract customer & subscription IDs
+Update database:
+Copy{
+  subscriptionStatus: 'active',
+  stripeCustomerId: session.customer,
+  stripeSubscriptionId: session.subscription,
+  trialEndDate: null // Clear trial
+}
+Send "Payment Success" email
+Log event in subscriptionEvents table
+🔒 Webhook Security (Important!)
+Always verify webhook signatures:
+
+Copyconst sig = request.headers['stripe-signature'];
+const event = stripe.webhooks.constructEvent(
+  request.body,
+  sig,
+  STRIPE_WEBHOOK_SECRET
+);
+This prevents attackers from faking webhook requests. Please implement this properly!
+
+⏸️ Phase 2 (After First Users):
+Nice-to-have, not critical for launch:
+
+Trial reminder emails (3-day, 1-day warnings) - can manually email first users
+Full subscription management page (for now, Stripe Customer Portal works)
+Cancel subscription flow (Stripe Customer Portal handles this)
+Billing history page
+Spanish/Russian translations
+🎯 Questions for You:
+Impact page content: Can you provide placeholder content for now? Or should I write generic missionary stories?
+
+Failed payment emails: What tone? Suggested: "Hi [name], we couldn't process your payment. No worries - update your card in Settings to continue using FieldSnaps."
+
+Customer Portal: Should I enable Stripe's Customer Portal so users can manage subscriptions themselves? (Easy self-service for canceling, updating cards, viewing invoices)
+
+Grace period: Confirm 2 weeks (14 days) past due before blocking? Or different timeframe?
+
+✅ Build Order:
+Please build in this sequence:
+
+Landing page with mission messaging
+Impact page (with placeholder structure)
+Onboarding flow - "Create first project" trigger for trial
+Settings subscription section - Show trial status (no pressure)
+Trial tracking logic - Start trial on project creation
+Soft block enforcement - Gentle upgrade prompts
+Webhook implementation with signature verification
+Stripe checkout integration
+Failed payment handling - 2-week grace period + notification bar
+Most important: Webhook security and failed payment grace period. This protects both us and users.
+
+Let's start with #1 (landing page + impact page) - these make the biggest impression! 🚀
+
+Copy and send that to Replit!
+
+📋 For the Impact Page - My Suggestions:
+Since you'll be adding real stories later, here's a structure we can use now:
+
+Placeholder content for /impact page:
+
+Hero Section:
+
+"Your Subscription Makes a Global Impact"
+
+20% of every FieldSnaps subscription directly supports missionaries serving in some of the hardest-to-reach places on earth. When you use FieldSnaps, you're not just running your business better - you're changing lives around the world.
+
+Coming Soon Section:
+
+"Stories of Impact - Coming Soon
+
+As we support missionaries through FieldSnaps, we'll share their stories here. Check back soon to see the difference your subscription is making."
+
+The Commitment:
+
+"Why We Give
+
+We believe business should be about more than profit. Every subscription to FieldSnaps contributes 20% toward supporting missionaries who are bringing hope, education, and practical help to communities around the world. This isn't a marketing gimmick - it's our mission."
+
+Then you can add real stories as they come!
+
