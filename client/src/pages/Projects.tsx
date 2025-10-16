@@ -183,6 +183,28 @@ export default function Projects() {
     },
   });
 
+  const toggleCompleteMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const res = await apiRequest("PATCH", `/api/projects/${projectId}/toggle-complete`);
+      return await res.json();
+    },
+    onSuccess: (data: Project) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
+      toast({
+        title: data.completed ? "Project marked as complete" : "Project marked as incomplete",
+        duration: 2000,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error updating project",
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -202,6 +224,10 @@ export default function Projects() {
 
   const handleShareProject = (projectId: string) => {
     shareMutation.mutate(projectId);
+  };
+
+  const handleToggleComplete = (projectId: string) => {
+    toggleCompleteMutation.mutate(projectId);
   };
 
   const handleCopyShareLink = async () => {
@@ -400,6 +426,7 @@ export default function Projects() {
                   onDelete={() => handleDeleteProject(project)}
                   onCameraClick={() => setLocation(`/camera?projectId=${project.id}`)}
                   onShare={() => handleShareProject(project.id)}
+                  onToggleComplete={() => handleToggleComplete(project.id)}
                 />
               );
             })}
