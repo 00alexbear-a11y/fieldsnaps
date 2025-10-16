@@ -1,0 +1,82 @@
+Hey! Now that we're close to having the domain live, I want to understand the current state of FieldSnaps and plan out the landing page + monetization strategy.
+
+🔍 What's Currently Built?
+Current User Experience:
+
+What does a visitor see at https://fieldsnaps.com when NOT logged in?
+
+Is there a marketing/landing page?
+Or does it go straight to login/signup?
+Can you describe or show me the current homepage?
+What's the signup flow right now?
+
+Sign up → immediate access?
+Sign up → free trial → paid?
+Sign up → just free forever?
+Stripe Integration Status: 3. Is Stripe already integrated?
+
+I see Stripe customer IDs and subscription tables in the database
+Are Stripe API keys already in Secrets?
+What's implemented vs what's prepared for future use?
+What payment flows currently work?
+Can users subscribe to paid plans?
+Is there a checkout process?
+Are webhooks handling subscription events?
+Can users manage subscriptions?
+Trial & Subscription Logic: 5. How does the trial system work?
+
+Email templates mention 7-day trials
+Is this enforced in code?
+What happens when trial expires?
+What subscription features are ready?
+Trial reminders (3-day, 1-day before expiration)
+Payment success/failure handling
+Subscription cancellation flow
+Billing management
+🎯 What We Want to Build
+Our soft launch plan:
+
+Target User Journey:
+
+Visitor → Landing Page → "Start Free Trial" → 
+Sign Up (no credit card) → 7 Days Free Access → 
+Trial Ending Reminders → Stripe Checkout → Paid Subscription
+Landing Page Needs:
+
+Professional marketing homepage
+Clear value proposition for field services
+Feature highlights with screenshots
+Pricing section (Free Trial + Pro Plan pricing)
+"Start Free Trial" CTA button
+Social proof section (when we have testimonials)
+Footer with links
+Monetization Strategy:
+
+Free Trial: 7 days, full access, no credit card required
+Pro Plan: $XX/month (we need to decide pricing)
+Trial-to-Paid Conversion: Email reminders → Stripe checkout
+Payment Required: After trial expires to continue using
+❓ Questions for You:
+What's already built that we can use? Landing page? Stripe integration? Trial logic?
+
+What needs to be added? Should I create a new landing page route? Set up Stripe from scratch?
+
+Do you recommend using:
+
+Stripe Checkout (hosted by Stripe - easiest)
+Stripe Elements (custom payment form)
+Stripe Customer Portal (for subscription management)
+Current authentication: How does Replit Auth work with trials and subscriptions? Does it track trial status?
+
+What's the fastest path to launch? What's the minimum we need to:
+
+Have a professional landing page
+Collect payments after trial
+Handle the trial → paid conversion
+🚀 Our Timeline:
+Domain verification: Should complete in next few hours
+Soft launch goal: Get first 10-50 users on free trials
+Revenue goal: Convert 20-30% of trial users to paid
+What's the best approach to build this out efficiently? Should we focus on landing page first, or get Stripe working first, or both in parallel?
+
+Thanks for the guidance! 🙏
