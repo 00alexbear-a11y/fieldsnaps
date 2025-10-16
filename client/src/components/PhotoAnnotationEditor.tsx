@@ -143,8 +143,8 @@ export function PhotoAnnotationEditor({
   onCancel,
   onDelete,
 }: PhotoAnnotationEditorProps) {
-  // Add skipAuth query param in dev mode for images
-  const imageUrl = photoUrl && sessionStorage.getItem('skipAuth') === 'true'
+  // Add skipAuth query param in dev mode for images (but not for blob URLs)
+  const imageUrl = photoUrl && sessionStorage.getItem('skipAuth') === 'true' && !photoUrl.startsWith('blob:')
     ? `${photoUrl}?skipAuth=true`
     : photoUrl;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -214,7 +214,7 @@ export function PhotoAnnotationEditor({
   };
 
   useEffect(() => {
-    if (!canvasRef.current || !imageRef.current) return;
+    if (!canvasRef.current || !imageRef.current || !imageUrl) return;
 
     const canvas = canvasRef.current;
     const img = imageRef.current;
@@ -222,25 +222,17 @@ export function PhotoAnnotationEditor({
     if (!ctx) return;
 
     const handleImageLoad = () => {
-      let width = img.naturalWidth || img.width || 800;
-      let height = img.naturalHeight || img.height || 600;
-      
-      const MAX_CANVAS_WIDTH = 1200;
-      if (width > MAX_CANVAS_WIDTH) {
-        const scale = MAX_CANVAS_WIDTH / width;
-        width = MAX_CANVAS_WIDTH;
-        height = Math.round(height * scale);
-      }
+      // Use original image dimensions for canvas - let CSS handle display sizing
+      const width = img.naturalWidth || img.width || 800;
+      const height = img.naturalHeight || img.height || 600;
       
       canvas.width = width;
       canvas.height = height;
       redrawCanvas();
     };
 
-    if (img.complete && img.naturalWidth > 0) {
-      handleImageLoad();
-    } else if (img.complete && img.naturalWidth === 0) {
-      console.warn("Image failed to load, using default canvas dimensions:", photoUrl);
+    const handleImageError = () => {
+      console.error("Failed to load photo for annotation:", photoUrl);
       canvas.width = 800;
       canvas.height = 600;
       ctx.fillStyle = "#374151";
@@ -249,19 +241,21 @@ export function PhotoAnnotationEditor({
       ctx.font = "16px Arial";
       ctx.textAlign = "center";
       ctx.fillText("Image failed to load", 400, 300);
-    } else {
-      img.onload = handleImageLoad;
-      img.onerror = (e) => {
-        console.error("Failed to load photo for annotation:", photoUrl);
-        canvas.width = 800;
-        canvas.height = 600;
-        ctx.fillStyle = "#374151";
-        ctx.fillRect(0, 0, 800, 600);
-        ctx.fillStyle = "#9ca3af";
-        ctx.font = "16px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("Image failed to load", 400, 300);
-      };
+    };
+
+    // Always set handlers first
+    img.onload = handleImageLoad;
+    img.onerror = handleImageError;
+
+    // Then set/update the src - this ensures handlers are in place before loading starts
+    if (img.src !== imageUrl) {
+      img.src = imageUrl;
+    } else if (img.complete && img.naturalWidth > 0) {
+      // Image already loaded (e.g., cached)
+      handleImageLoad();
+    } else if (img.complete && img.naturalWidth === 0) {
+      // Image complete but failed to load
+      handleImageError();
     }
 
     return () => {
@@ -2198,12 +2192,11 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-muted/30 pointer-events-none">
-      {/* Canvas - Full screen */}
-      <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
+    <div className="fixed inset-0 bg-muted/30 pointer-events-none">
+      {/* Canvas - Fill available space above bottom UI */}
+      <div className="absolute inset-x-0 top-16 bottom-32 flex items-center justify-center pointer-events-none">
         <img
           ref={imageRef}
-          src={imageUrl}
           alt="Photo to annotate"
           className="hidden"
           {...(imageUrl && !imageUrl.startsWith('blob:') ? { crossOrigin: 'use-credentials' } : {})}
