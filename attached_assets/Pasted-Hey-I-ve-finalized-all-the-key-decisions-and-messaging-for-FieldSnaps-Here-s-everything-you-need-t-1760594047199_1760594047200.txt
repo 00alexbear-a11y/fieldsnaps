@@ -1,0 +1,571 @@
+Hey! I've finalized all the key decisions and messaging for FieldSnaps. Here's everything you need to build the landing page, onboarding, trial system, and Stripe integration.
+
+✅ FINAL DECISIONS CONFIRMED:
+Pricing & Business Model:
+Price: $19.99/month flat rate
+Users: Unlimited (1 user or 100 users, same price)
+Trial: 7 days, no credit card required
+Trial Start: Begins when user creates their first project (NOT at signup)
+Trial Expiration: Soft block (read-only mode, can view existing data, can't upload new)
+Failed Payments: 2-week grace period with notification bar, then soft block
+Brand & Positioning:
+Tone: No-nonsense, straightforward, authentic
+Design: Apple-inspired minimalism
+Target Market: Solo contractors and small crews (but open to all sizes)
+Key Differentiator: Flat pricing vs per-user pricing, built by a contractor
+Mission: 20% of profits support missionaries overseas
+Messaging:
+Mention CompanyCam once as context ("the tool I wish existed")
+Focus 95% on FieldSnaps value, features, and story
+No detailed comparison charts on main site
+Confident presentation of features
+🎯 LANDING PAGE - COMPLETE COPY:
+HERO SECTION (Above the fold)
+Headline:
+
+Photo Documentation
+Built by a Contractor
+For Contractors
+Story/Subheadline:
+
+When I started my business, I looked at CompanyCam and other tools. 
+They had great features, but the pricing didn't make sense for a solo 
+operator. The cheap alternatives were frustrating to use.
+
+I wanted professional features without paying for enterprise bloat 
+or forced user minimums.
+
+So I built FieldSnaps - the tool I wish existed when I started.
+Key Value Props:
+
+$19.99/month
+Unlimited users
+No nonsense
+CTA:
+
+[Start Free 7-Day Trial]
+
+No credit card required • Trial starts when you create your first project
+Visual: Screenshot of app showing photo annotation in action
+
+FEATURES SECTION
+Section Headline:
+
+PROFESSIONAL FEATURES THAT MATTER
+
+Every feature in FieldSnaps exists because it solves a real problem 
+I faced on job sites. No bloat. Just what works.
+Feature Grid (6 features with icons):
+
+1. 📸 Smart Organization
+
+Group photos by project, job site, or client. 
+Find any photo in seconds.
+
+• Unlimited projects
+• Unlimited photos
+• Easy search
+2. ✏️ Powerful Annotations
+
+Mark issues with arrows, circles, text, and pen. 
+Show clients exactly what needs attention.
+
+• Arrows
+• Text labels
+• Shapes
+• Freehand pen
+3. 🔗 Instant Sharing
+
+Generate shareable links in one click. 
+Clients view photos without downloading apps or logging in.
+
+• Secure links
+• No login required
+• Works on any device
+4. 🕐 Time & GPS Stamps
+
+Automatic timestamps and location data. 
+Proof of when and where photos were taken.
+
+• Timestamped
+• GPS tagged
+• Dispute protection
+5. ☁️ Secure Cloud Storage
+
+Never lose a photo. Automatic backup with fast CDN delivery. 
+Access from anywhere.
+
+• Automatic backup
+• CDN delivery
+• Unlimited storage
+6. 📱 Works Everywhere
+
+iOS, Android, and web. Take photos on site, organize them in 
+the office, share from home.
+
+• Mobile apps
+• Web dashboard
+• Sync across devices
+PRICING SECTION
+Headline:
+
+SIMPLE, HONEST PRICING
+Subheadline:
+
+No per-user fees. No forced minimums. 
+No complicated tiers. Just one price.
+Free Trial Box:
+
+FREE 7-DAY TRIAL
+Full Access • No Credit Card
+
+Your trial starts when you create your first project - not at signup. 
+We only count days you're actually using it.
+Pro Plan Box:
+
+THEN UPGRADE TO FIELDSNAPS PRO
+
+$19.99/month
+
+✓ Unlimited Projects
+✓ Unlimited Photos & Videos
+✓ Unlimited Users (1 or 100, same price)
+✓ Advanced Annotations
+✓ Secure Cloud Storage
+✓ Client Sharing Links
+✓ Time & GPS Stamps
+✓ Priority Support
+✓ 20% Supports Missionaries Worldwide
+
+[Start Free 7-Day Trial]
+
+Your team grows. Your bill doesn't.
+MISSION SECTION
+BUSINESS AS A FORCE FOR GOOD
+
+20% of FieldSnaps profits support missionaries serving overseas. 
+When you choose FieldSnaps, you're not just getting great software - 
+you're making a global impact.
+
+[See the Impact] → link to /impact page
+FINAL CTA SECTION
+READY TO DOCUMENT LIKE A PRO?
+
+Start your free 7-day trial. No credit card required. 
+Your trial begins when you create your first project.
+
+[Start Free Trial]
+
+Questions? Email hello@fieldsnaps.com
+FOOTER
+FIELDSNAPS
+Professional photo documentation for contractors. Built by contractors.
+
+Links: Features • Pricing • Impact • Contact • Terms • Privacy
+
+© 2025 FieldSnaps • Made with purpose
+
+Social: Instagram @getfieldsnaps
+🎨 DESIGN SPECIFICATIONS:
+Style:
+
+Apple-inspired minimalism
+Clean, professional
+Lots of white space
+Subtle shadows and depth
+Mobile-responsive
+Colors:
+
+I'll provide professional photography/videography later
+Use placeholder screenshots for now
+Clean blue/gray palette (or suggest based on brand)
+Typography:
+
+Sans-serif (SF Pro, Inter, Helvetica, or similar)
+Clear hierarchy
+Large, readable text
+Layout:
+
+Single-page scroll design
+Sections with clear separation
+CTAs appear multiple times (hero, pricing, bottom)
+📱 NAVIGATION BAR:
+[FIELDSNAPS LOGO]    Features    Pricing    Impact    Sign In
+Behavior:
+
+Features/Pricing = anchor links to sections on same page
+Impact = link to /impact page
+Sign In = link to login page
+Sticky nav on scroll (optional)
+📄 IMPACT PAGE (/impact):
+Hero:
+
+Your Subscription Makes a Global Impact
+Intro:
+
+20% of every FieldSnaps subscription directly supports missionaries 
+serving in some of the hardest-to-reach places on earth. When you use 
+FieldSnaps, you're not just running your business better - you're 
+changing lives around the world.
+Placeholder Section:
+
+Stories of Impact - Coming Soon
+
+As we support missionaries through FieldSnaps, we'll share their 
+stories here. Check back soon to see the difference your subscription 
+is making.
+The Commitment:
+
+Why We Give
+
+We believe business should be about more than profit. Every subscription 
+to FieldSnaps contributes 20% toward supporting missionaries who are 
+bringing hope, education, and practical help to communities around the 
+world. This isn't a marketing gimmick - it's our mission.
+🚀 ONBOARDING FLOW (After Signup):
+Step 1: Welcome Tour (Modal/Overlay)
+Welcome to FieldSnaps! Let's show you around.
+
+[Quick 3-4 slide tour highlighting key features - 30 seconds max]
+
+• Take & annotate photos
+• Organize by project
+• Share instantly
+• Cloud backup
+
+[Skip] [Next] [Get Started]
+Design: Clean modal with skip option always visible
+
+Step 2: Create First Project Prompt
+After tour (or if skipped), show:
+
+Create Your First Project
+
+Your 7-day free trial starts when you create your first project.
+
+[Form Fields:]
+Project Name: ___________
+Description: ___________
+Address: ___________ (optional)
+
+[Create Project]
+Important: Trial does NOT start until they click "Create Project"
+
+Step 3: Trial Begins
+When project is created:
+
+Backend:
+
+Set trialStartDate = now()
+Calculate trialEndDate = now() + 7 days
+Set subscriptionStatus = 'trial'
+Frontend:
+
+Show success message: "Project created! Your 7-day trial has started."
+Redirect to project dashboard
+Show project with "Upload your first photo" prompt
+⚙️ TRIAL LOGIC & ENFORCEMENT:
+Trial Tracking:
+On user signup:
+
+Create user account
+trialStartDate = null (trial hasn't started yet)
+trialEndDate = null
+subscriptionStatus = 'pre-trial'
+When first project created:
+
+trialStartDate = now()
+trialEndDate = now() + 7 days
+subscriptionStatus = 'trial'
+Trial expiration check (run on every protected action):
+
+Copyif (now() > user.trialEndDate && user.subscriptionStatus !== 'active') {
+  // Trial expired
+  user.subscriptionStatus = 'trial_expired'
+  // Show upgrade modal
+}
+Soft Block Enforcement:
+When trial expires, user CAN:
+
+✅ View all existing projects
+✅ View all existing photos
+✅ Download their photos
+✅ View existing annotations
+✅ Access settings
+✅ View subscription status
+When trial expires, user CANNOT:
+
+❌ Upload new photos
+❌ Create new projects
+❌ Edit/add annotations (you decide)
+❌ Share new links (optional - existing links can stay active)
+UI when blocked:
+
+Gentle modal (not aggressive): "Your 7-day trial has ended"
+Banner across top (dismissible): "Trial ended - Upgrade to Pro"
+When attempting blocked action → Show upgrade modal
+Upgrade Modal:
+┌─────────────────────────────────────────────────┐
+│              Your Trial Has Ended                │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│ Thanks for trying FieldSnaps!                    │
+│                                                  │
+│ Upgrade to FieldSnaps Pro to continue creating   │
+│ projects and uploading photos.                   │
+│                                                  │
+│ FIELDSNAPS PRO - $19.99/month                    │
+│                                                  │
+│ ✓ Unlimited projects & photos                    │
+│ ✓ Secure cloud storage                           │
+│ ✓ Client sharing                                 │
+│ ✓ 20% supports missionaries                      │
+│                                                  │
+│ [Upgrade to Pro]  [Not Now]                      │
+│                                                  │
+└─────────────────────────────────────────────────┘
+Design: Clean, not aggressive, easy to dismiss
+
+Settings Menu - Subscription Display:
+In Settings/Account page, show subscription section:
+
+If in trial:
+
+Subscription Status
+
+Status: Free Trial
+Trial ends: October 23, 2025 (4 days remaining)
+
+[Upgrade to Pro]
+If active:
+
+Subscription Status
+
+Status: FieldSnaps Pro - Active
+Billing: $19.99/month
+Next billing date: November 16, 2025
+
+[Manage Subscription]
+If expired:
+
+Subscription Status
+
+Status: Trial Ended
+
+[Upgrade to Pro]
+Design: Clean, informational, not pushy. No countdown timers in main dashboard.
+
+💳 STRIPE INTEGRATION:
+Setup Needed:
+I'll provide these secrets after creating Stripe account:
+
+STRIPE_SECRET_KEY
+STRIPE_PRICE_ID (for $19.99/month product)
+STRIPE_WEBHOOK_SECRET
+In Stripe Dashboard, I'll create:
+
+Product: "FieldSnaps Pro"
+Price: $19.99/month recurring
+Description: "Professional photo documentation - No games, just great service"
+Checkout Flow:
+When user clicks "Upgrade to Pro":
+
+Create Stripe Checkout Session:
+Copyconst session = await stripe.checkout.sessions.create({
+  mode: 'subscription',
+  line_items: [{
+    price: STRIPE_PRICE_ID,
+    quantity: 1,
+  }],
+  customer_email: user.email,
+  success_url: 'https://fieldsnaps.com/billing/success',
+  cancel_url: 'https://fieldsnaps.com/dashboard',
+  metadata: {
+    userId: user.id
+  }
+});
+Redirect to Stripe (they handle payment UI)
+
+After successful payment:
+
+User redirected to /billing/success
+Webhook receives checkout.session.completed
+Success Page (/billing/success):
+┌─────────────────────────────────────────────────┐
+│                                                  │
+│           Welcome to FieldSnaps Pro! 🎉          │
+│                                                  │
+│ Your subscription is now active.                 │
+│                                                  │
+│ Thanks for supporting our mission - 20% of your  │
+│ subscription supports missionaries worldwide.    │
+│                                                  │
+│ [Go to Dashboard]                                │
+│                                                  │
+└─────────────────────────────────────────────────┘
+Webhook Implementation:
+Endpoint: https://fieldsnaps.com/api/webhooks/stripe
+
+CRITICAL: Verify webhook signatures for security:
+
+Copyconst sig = request.headers['stripe-signature'];
+const event = stripe.webhooks.constructEvent(
+  request.body,
+  sig,
+  STRIPE_WEBHOOK_SECRET
+);
+Events to handle:
+
+1. checkout.session.completed (User subscribed)
+
+Copy// Update database:
+user.subscriptionStatus = 'active'
+user.stripeCustomerId = session.customer
+user.stripeSubscriptionId = session.subscription
+user.trialEndDate = null
+
+// Log event in subscriptionEvents table
+// Send "Payment Success" email
+2. invoice.payment_succeeded (Recurring payment successful)
+
+Copy// Ensure subscriptionStatus = 'active'
+// Log successful payment
+// Continue service
+3. invoice.payment_failed (Payment failed)
+
+Copy// Day 0: Show notification bar in app
+// Send email: "Payment failed, we'll retry"
+// Notification: "Payment issue - update payment method"
+
+// Day 7: Send reminder email
+
+// Day 14: Set subscriptionStatus = 'past_due'
+// Soft block activates (read-only mode)
+// Show modal: "Update Payment Method to Continue"
+// [Update Payment] button → Stripe Customer Portal
+4. customer.subscription.deleted (User canceled)
+
+Copy// Set subscriptionStatus = 'canceled'
+// Send cancellation confirmation email
+// Soft block activates (read-only mode)
+Failed Payment Handling:
+Grace Period: 2 weeks (14 days)
+
+Timeline:
+
+Day 0: Payment fails → Notification bar + email
+Day 7: Reminder email
+Day 14: Soft block + "Update Payment" modal
+Notification Bar (Days 0-14):
+
+⚠️ Payment Issue: We couldn't process your payment. 
+[Update Payment Method] to continue using FieldSnaps.
+Modal (After Day 14):
+
+Update Payment Method to Continue
+
+We haven't been able to process your payment for 2 weeks. 
+Update your payment method to continue using FieldSnaps.
+
+[Update Payment Method]
+(Opens Stripe Customer Portal)
+
+No worries - your data is safe and you can update anytime.
+Email Tone (Helpful, not threatening):
+
+Subject: Payment Issue - Update Your Card
+
+Hi [Name],
+
+We couldn't process your payment for FieldSnaps. No worries - 
+this happens sometimes when cards expire or have insufficient funds.
+
+You can update your payment method in Settings → Subscription.
+
+Your data is safe and we'll keep trying for 2 weeks. After that, 
+your account will be in read-only mode until payment is updated.
+
+Questions? Reply to this email anytime.
+
+Thanks,
+FieldSnaps Team
+Stripe Customer Portal:
+Enable Stripe Customer Portal so users can:
+
+Update payment methods
+View invoices
+Cancel subscriptions
+Download receipts
+Configuration:
+
+Allow customers to update payment methods: YES
+Allow customers to cancel subscriptions: YES
+Allow customers to switch plans: NO (only one plan)
+🎯 PRIORITY BUILD ORDER:
+Phase 1: Landing Page (Priority 1)
+
+Hero with messaging
+Features section
+Pricing section
+Mission section
+Final CTA
+Footer
+Impact page structure
+Phase 2: Onboarding (Priority 2)
+
+Welcome tour modal
+"Create first project" prompt
+Trial start logic (on project creation)
+Success message
+Phase 3: Trial Enforcement (Priority 3)
+
+Trial tracking in database
+Soft block logic
+Upgrade modal
+Settings subscription section
+Phase 4: Stripe (Priority 4)
+
+Provide setup instructions for me
+Integrate checkout flow
+Webhook handling with signature verification
+Success/cancel pages
+Failed payment handling (2-week grace period)
+❓ QUESTIONS FOR YOU:
+Stripe Customer Portal: I recommend enabling it so users can self-serve billing management. Should I activate this?
+
+Professional photos/videos: I'll provide these later. For now, use placeholder screenshots or simple mockups. OK?
+
+Email notification settings: Should we let users opt out of trial reminder emails? Or keep them mandatory (recommended)?
+
+Settings page: Should subscription info be in a dedicated "Billing" page or just a section in Settings? (I suggest Settings section to keep it simple)
+
+Mobile apps: Are iOS/Android apps ready, or should we focus on web-first for launch?
+
+✅ WHAT THIS ACHIEVES:
+✅ Professional landing page with authentic messaging
+✅ Clear value proposition (flat pricing, unlimited users)
+✅ Mission-driven brand (20% to missionaries)
+✅ Smart onboarding (trial starts on first project)
+✅ Gentle trial enforcement (soft block, not aggressive)
+✅ Proper Stripe integration with webhooks
+✅ 2-week grace period for failed payments
+✅ User-friendly subscription management
+🚀 TIMELINE ESTIMATE:
+Based on your earlier estimate of 4-6 hours total:
+
+Landing page: 1-2 hours
+Onboarding flow: 1 hour
+Trial logic: 1-2 hours
+Stripe integration: 1-2 hours
+Total: ~4-6 hours of focused work
+
+Once you complete each phase, let me know and I can test/provide feedback!
+
+📸 NEXT STEPS FOR ME:
+I'll provide professional photography/videography when ready
+I'll create Stripe account and provide API keys
+I'll test everything once built
+I'll provide feedback on design/UX
+Let's build this! Start with the landing page - that's the foundation everything else builds on. 🚀
+
+Questions or need clarification on anything?
