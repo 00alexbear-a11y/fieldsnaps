@@ -46,15 +46,34 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="pt-20 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto space-y-8">
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight">
-              Document Every Detail.<br />Win Every Dispute.
+          <div className="text-center max-w-4xl mx-auto space-y-8">
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
+              Photo Documentation<br />
+              Built by a Contractor<br />
+              For Contractors
             </h1>
-            <p className="text-xl text-muted-foreground">
-              Professional photo documentation for contractors, inspectors, and field service teams. 
-              $19.99/month. No gimmicks.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="text-lg sm:text-xl text-muted-foreground space-y-4 max-w-3xl mx-auto">
+              <p>
+                When I started my business, I looked at CompanyCam and other tools. 
+                They had great features, but the pricing didn't make sense for a solo 
+                operator. The cheap alternatives were frustrating to use.
+              </p>
+              <p>
+                I wanted professional features without paying for enterprise bloat 
+                or forced user minimums.
+              </p>
+              <p className="font-medium">
+                So I built FieldSnaps - the tool I wish existed when I started.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-lg font-medium">
+              <div>$19.99/month</div>
+              <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+              <div>Unlimited users</div>
+              <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+              <div>No nonsense</div>
+            </div>
+            <div className="flex flex-col items-center gap-3 pt-4">
               <Button 
                 size="lg" 
                 className="text-lg px-8"
@@ -65,7 +84,7 @@ export default function Landing() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <p className="text-sm text-muted-foreground">
-                Trial starts when you create your first project
+                No credit card required • Trial starts when you create your first project
               </p>
             </div>
           </div>
@@ -75,72 +94,103 @@ export default function Landing() {
       {/* Features Section */}
       <section id="features" className="py-24 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Everything You Need</h2>
-            <p className="text-muted-foreground text-lg">
-              Built for professionals who need reliable documentation
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl font-bold">PROFESSIONAL FEATURES THAT MATTER</h2>
+            <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+              Every feature in FieldSnaps exists because it solves a real problem I faced on job sites. No bloat. Just what works.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="p-6 space-y-4">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Edit3 className="w-6 h-6 text-primary" />
+                <Camera className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Photo Annotations</h3>
-              <p className="text-muted-foreground">
-                Add arrows, text, shapes, and pen marks to highlight issues and details
+              <h3 className="text-xl font-semibold">Smart Organization</h3>
+              <p className="text-muted-foreground mb-3">
+                Group photos by project, job site, or client. Find any photo in seconds.
               </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Unlimited projects</li>
+                <li>• Unlimited photos</li>
+                <li>• Easy search</li>
+              </ul>
             </Card>
 
             <Card className="p-6 space-y-4">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Camera className="w-6 h-6 text-primary" />
+                <Edit3 className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Project Organization</h3>
-              <p className="text-muted-foreground">
-                Keep photos organized by project with automatic timestamping and tagging
+              <h3 className="text-xl font-semibold">Powerful Annotations</h3>
+              <p className="text-muted-foreground mb-3">
+                Mark issues with arrows, circles, text, and pen. Show clients exactly what needs attention.
               </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Arrows</li>
+                <li>• Text labels</li>
+                <li>• Shapes</li>
+                <li>• Freehand pen</li>
+              </ul>
             </Card>
 
             <Card className="p-6 space-y-4">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Share2 className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Easy Sharing</h3>
-              <p className="text-muted-foreground">
-                Generate secure share links for clients - no account required for viewing
+              <h3 className="text-xl font-semibold">Instant Sharing</h3>
+              <p className="text-muted-foreground mb-3">
+                Generate shareable links in one click. Clients view photos without downloading apps or logging in.
               </p>
-            </Card>
-
-            <Card className="p-6 space-y-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Cloud className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Cloud Storage with CDN</h3>
-              <p className="text-muted-foreground">
-                Secure, unlimited storage with fast global delivery for instant access
-              </p>
-            </Card>
-
-            <Card className="p-6 space-y-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Smartphone className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Mobile-Friendly</h3>
-              <p className="text-muted-foreground">
-                Works perfectly on any device - phone, tablet, or desktop
-              </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Secure links</li>
+                <li>• No login required</li>
+                <li>• Works on any device</li>
+              </ul>
             </Card>
 
             <Card className="p-6 space-y-4">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MapPin className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Map View</h3>
-              <p className="text-muted-foreground">
-                See all your projects on an interactive map with automatic geocoding
+              <h3 className="text-xl font-semibold">Time & GPS Stamps</h3>
+              <p className="text-muted-foreground mb-3">
+                Automatic timestamps and location data. Proof of when and where photos were taken.
               </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Timestamped</li>
+                <li>• GPS tagged</li>
+                <li>• Dispute protection</li>
+              </ul>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Cloud className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold">Secure Cloud Storage</h3>
+              <p className="text-muted-foreground mb-3">
+                Never lose a photo. Automatic backup with fast CDN delivery. Access from anywhere.
+              </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Automatic backup</li>
+                <li>• CDN delivery</li>
+                <li>• Unlimited storage</li>
+              </ul>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Smartphone className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold">Works Everywhere</h3>
+              <p className="text-muted-foreground mb-3">
+                iOS, Android, and web. Take photos on site, organize them in the office, share from home.
+              </p>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• Mobile apps</li>
+                <li>• Web dashboard</li>
+                <li>• Sync across devices</li>
+              </ul>
             </Card>
           </div>
         </div>
@@ -149,40 +199,30 @@ export default function Landing() {
       {/* Pricing Section */}
       <section id="pricing" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Simple, Honest Pricing</h2>
+          <div className="text-center mb-16 space-y-3">
+            <h2 className="text-3xl font-bold">SIMPLE, HONEST PRICING</h2>
+            <p className="text-lg text-muted-foreground">
+              No per-user fees. No forced minimums. No complicated tiers. Just one price.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Trial */}
             <Card className="p-8 space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold">Free Trial</h3>
-                <div className="text-muted-foreground space-y-1">
-                  <p>7 Days • Full Access • No Credit Card</p>
-                  <p className="text-sm">Trial starts when you create your first project</p>
-                </div>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold">FREE 7-DAY TRIAL</h3>
+                <p className="text-muted-foreground">Full Access • No Credit Card</p>
               </div>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span>All Pro features included</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span>No payment required</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span>Cancel anytime</span>
-                </li>
-              </ul>
+              <p className="text-muted-foreground">
+                Your trial starts when you create your first project - not at signup. 
+                We only count days you're actually using it.
+              </p>
             </Card>
 
             {/* Pro Plan */}
             <Card className="p-8 space-y-6 border-primary">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold">FieldSnaps Pro</h3>
+              <div className="space-y-3">
+                <h3 className="text-xl font-semibold text-muted-foreground">THEN UPGRADE TO FIELDSNAPS PRO</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-bold">$19.99</span>
                   <span className="text-muted-foreground">/month</span>
@@ -190,28 +230,40 @@ export default function Landing() {
               </div>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
                   <span>Unlimited Projects</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
                   <span>Unlimited Photos & Videos</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
+                  <span>Unlimited Users (1 or 100, same price)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>✓</span>
                   <span>Advanced Annotations</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
                   <span>Secure Cloud Storage</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
                   <span>Client Sharing Links</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span>✓</span>
+                  <span>Time & GPS Stamps</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>✓</span>
                   <span>Priority Support</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>✓</span>
+                  <span>20% Supports Missionaries Worldwide</span>
                 </li>
               </ul>
               <Button 
@@ -220,8 +272,11 @@ export default function Landing() {
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-start-trial-pricing"
               >
-                Start Free Trial
+                Start Free 7-Day Trial
               </Button>
+              <p className="text-center text-sm text-muted-foreground pt-2">
+                Your team grows. Your bill doesn't.
+              </p>
             </Card>
           </div>
         </div>
@@ -233,7 +288,7 @@ export default function Landing() {
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
             <Heart className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold">Business as a Force for Good</h2>
+          <h2 className="text-3xl font-bold">BUSINESS AS A FORCE FOR GOOD</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
             20% of FieldSnaps profits support missionaries serving overseas. 
             When you choose FieldSnaps, you're not just getting great software - 
@@ -251,46 +306,68 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Final CTA Section */}
+      <section className="py-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          <h2 className="text-4xl font-bold">READY TO DOCUMENT LIKE A PRO?</h2>
+          <p className="text-lg text-muted-foreground">
+            Start your free 7-day trial. No credit card required. 
+            Your trial begins when you create your first project.
+          </p>
+          <Button 
+            size="lg" 
+            className="text-lg px-8"
+            onClick={() => window.location.href = '/api/login'}
+            data-testid="button-start-trial-final"
+          >
+            Start Free Trial
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            Questions? Email hello@fieldsnaps.com
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
+          <div className="space-y-8">
+            <div className="text-center space-y-3">
+              <div className="flex items-center gap-3 justify-center">
                 <img 
                   src={logoPath} 
                   alt="FieldSnaps" 
-                  className="h-6 w-auto object-contain"
+                  className="h-8 w-auto object-contain"
                 />
-                <span className="font-semibold">FieldSnaps</span>
+                <span className="text-xl font-semibold">FIELDSNAPS</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Professional photo documentation for field services
+              <p className="text-muted-foreground">
+                Professional photo documentation for contractors. Built by contractors.
               </p>
             </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-              </ul>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+              <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+              <span>•</span>
+              <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
+              <span>•</span>
+              <a href="/impact" className="hover:text-foreground transition-colors">Impact</a>
+              <span>•</span>
+              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+              <span>•</span>
+              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+              <span>•</span>
+              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/impact" className="hover:text-foreground transition-colors">Impact</a></li>
-              </ul>
+
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                © 2025 FieldSnaps • Made with purpose
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Social: <a href="https://instagram.com/getfieldsnaps" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Instagram @getfieldsnaps</a>
+              </p>
             </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2025 FieldSnaps. All rights reserved.
           </div>
         </div>
       </footer>

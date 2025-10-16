@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, Heart, FolderOpen, X } from 'lucide-react';
+import { Camera, FolderOpen, Share2, Cloud, X } from 'lucide-react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 interface OnboardingProps {
@@ -13,22 +13,28 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   const steps = [
     {
-      title: 'Welcome to FieldSnaps',
-      description: 'Professional photo documentation for contractors and field service teams. Capture, annotate, and share - even offline.',
+      title: "Welcome to FieldSnaps! Let's show you around.",
+      description: 'Take & annotate photos',
       icon: Camera,
       color: 'text-primary',
       showLogo: true,
     },
     {
-      title: 'Organize by Project',
-      description: 'Keep all your job site photos organized. Create projects, add photos, and share with clients.',
+      title: 'Organize by project',
+      description: 'Keep all your job site photos organized by project.',
       icon: FolderOpen,
       color: 'text-primary',
     },
     {
-      title: 'Business with Purpose',
-      description: '20% of your subscription supports missionaries overseas. Your work makes a global impact.',
-      icon: Heart,
+      title: 'Share instantly',
+      description: 'Generate secure share links for clients - no login required.',
+      icon: Share2,
+      color: 'text-primary',
+    },
+    {
+      title: 'Cloud backup',
+      description: 'Never lose a photo. Automatic backup to secure cloud storage.',
+      icon: Cloud,
       color: 'text-primary',
     },
   ];
