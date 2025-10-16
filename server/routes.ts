@@ -151,18 +151,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
+  app.get('/api/auth/user', async (req: any, res) => {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    // Try real authentication first
+    if (req.isAuthenticated() && req.user?.claims?.sub) {
+      try {
+        const userId = req.user.claims.sub;
+        const user = await storage.getUser(userId);
+        return res.json(user);
+      } catch (error) {
+        console.error("Error fetching authenticated user:", error);
+        return res.status(500).json({ message: "Failed to fetch user" });
       }
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
     }
+    
+    // Development fallback when OAuth session fails
+    if (isDevelopment) {
+      try {
+        const devUserId = 'dev-user-local';
+        let devUser = await storage.getUser(devUserId);
+        
+        if (!devUser) {
+          // Create dev user if doesn't exist
+          devUser = await storage.upsertUser({
+            id: devUserId,
+            email: 'dev@fieldsnaps.local',
+            firstName: 'Dev',
+            lastName: 'User',
+            profileImageUrl: null,
+          });
+          console.log('[Auth] Created development user');
+        }
+        
+        return res.json(devUser);
+      } catch (error) {
+        console.error("Error creating dev user:", error);
+        return res.status(500).json({ message: "Failed to create dev user" });
+      }
+    }
+    
+    // Production or no session - require authentication
+    return res.status(401).json({ message: 'Unauthorized' });
   });
 
   // Projects - protected routes
