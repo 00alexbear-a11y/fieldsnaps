@@ -100,7 +100,7 @@ function AppContent() {
       {/* Show sync banner only on Projects list and Settings pages */}
       {showSyncBanner && <SyncBanner />}
       
-      <main className="flex-1 bg-white dark:bg-black overflow-hidden">
+      <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
         <Switch>
           <Route path="/camera" component={Camera} />
           <Route path="/projects" component={Projects} />
