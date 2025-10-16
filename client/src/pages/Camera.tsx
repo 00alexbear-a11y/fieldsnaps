@@ -3,6 +3,8 @@ import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, 
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
+import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb, type LocalPhoto, createPhotoUrl } from '@/lib/indexeddb';
@@ -43,6 +45,7 @@ type CameraMode = 'photo' | 'video';
 type CameraFacing = 'environment' | 'user';
 
 export default function Camera() {
+  const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [hasPermission, setHasPermission] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -58,6 +61,7 @@ export default function Camera() {
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   
   // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -808,6 +812,12 @@ export default function Camera() {
 
   const startRecording = async () => {
     if (!streamRef.current || isRecording) return;
+
+    // Check subscription access
+    if (!canWrite) {
+      setUpgradeModalOpen(true);
+      return;
+    }
     
     try {
       const video = videoRef.current;
@@ -985,6 +995,12 @@ export default function Camera() {
   const quickCapture = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
+    // Check subscription access
+    if (!canWrite) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setIsCapturing(true);
 
     try {
@@ -1096,6 +1112,12 @@ export default function Camera() {
   // Capture and edit mode: Capture photo then open annotation editor
   const captureAndEdit = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
+
+    // Check subscription access
+    if (!canWrite) {
+      setUpgradeModalOpen(true);
+      return;
+    }
 
     setIsCapturing(true);
 
@@ -1767,6 +1789,13 @@ export default function Camera() {
           </div>
         </div>
       )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        open={upgradeModalOpen} 
+        onClose={() => setUpgradeModalOpen(false)}
+        reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
+      />
 
     </div>
   );

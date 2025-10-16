@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
 
@@ -25,9 +27,11 @@ interface Annotation {
 export default function PhotoEdit() {
   const { id: photoId } = useParams();
   const [, setLocation] = useLocation();
+  const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const { toast } = useToast();
   const photoUrlRef = useRef<string | null>(null);
 
@@ -76,6 +80,12 @@ export default function PhotoEdit() {
   const handleSave = async (annotations: Annotation[], annotatedBlob: Blob) => {
     if (!photoId || !projectId) return;
 
+    // Check subscription access
+    if (!canWrite) {
+      setUpgradeModalOpen(true);
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -102,6 +112,7 @@ export default function PhotoEdit() {
         existingPhoto = await idb.savePhotoWithId(photoId, {
           projectId: projectId,
           blob: originalBlob,
+          mediaType: 'photo',
           caption: serverPhoto.caption || null,
           annotations: null,
           serverId: photoId,
@@ -220,13 +231,22 @@ export default function PhotoEdit() {
   }
 
   return (
-    <PhotoAnnotationEditor
-      photoUrl={photoUrl}
-      photoId={photoId!}
-      existingAnnotations={[]}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onDelete={handleDelete}
-    />
+    <>
+      <PhotoAnnotationEditor
+        photoUrl={photoUrl}
+        photoId={photoId!}
+        existingAnnotations={[]}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDelete={handleDelete}
+      />
+      
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        open={upgradeModalOpen} 
+        onClose={() => setUpgradeModalOpen(false)}
+        reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
+      />
+    </>
   );
 }
