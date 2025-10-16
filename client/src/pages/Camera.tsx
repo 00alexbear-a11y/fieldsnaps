@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +33,7 @@ interface Project {
   name: string;
   description?: string;
   address?: string;
+  completed?: boolean;
 }
 
 interface CameraDevice {
@@ -105,9 +106,15 @@ export default function Camera() {
   }, [location]); // Re-run when location changes
 
   // Load projects
-  const { data: projects = [] } = useQuery<Project[]>({
+  const { data: allProjects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
+
+  // Filter out completed projects (consistent with Projects page)
+  const projects = useMemo(() => 
+    allProjects.filter(project => !project.completed),
+    [allProjects]
+  );
 
   // Load tags for selected project
   const { data: tags = [] } = useQuery<Tag[]>({
