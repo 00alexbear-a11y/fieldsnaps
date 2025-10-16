@@ -1114,8 +1114,8 @@ export default function ProjectPhotos() {
       <button
         onClick={() => document.getElementById('photo-upload-input')?.click()}
         disabled={uploadMutation.isPending}
-        className="fixed right-6 z-40 flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        style={{ bottom: '88px' }}
+        className="fixed z-40 flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{ bottom: '16px', right: '24px' }}
         data-testid="button-upload-photo"
         aria-label="Upload from library"
       >
