@@ -1,22 +1,17 @@
 /**
- * Email Service - Future Integration with Resend
+ * Email Service - Resend Integration
  * 
- * Status: Dormant - Will be activated during production launch
+ * Status: Active ✅
  * Integration: Resend (connector:ccfg_resend_01K69QKYK789WN202XSE3QS17V)
  * 
- * This service will handle transactional emails for:
+ * This service handles transactional emails for:
  * - Welcome emails (new user registration)
  * - Trial reminders (3 days before expiration, 1 day before)
  * - Payment notifications (successful payments, failed payments)
  * - Subscription updates (cancellation confirmations, reactivation)
- * 
- * Setup Instructions (when ready for production):
- * 1. Use search_integrations to find Resend connector
- * 2. Propose setup with use_integration tool
- * 3. User connects Resend account through OAuth/API key
- * 4. Update environment with RESEND_API_KEY
- * 5. Activate email templates below
  */
+
+import { Resend } from 'resend';
 
 export interface EmailTemplate {
   subject: string;
@@ -26,15 +21,24 @@ export interface EmailTemplate {
 
 export class EmailService {
   private readonly FROM_EMAIL = "FieldSnaps <hello@fieldsnaps.com>";
+  private resend: Resend | null = null;
+
+  private getResendClient(): Resend {
+    if (!this.resend) {
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error("RESEND_API_KEY not configured");
+      }
+      this.resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return this.resend;
+  }
   
   /**
    * Send welcome email to new users
    */
   async sendWelcomeEmail(to: string, userName: string): Promise<void> {
-    // Template will be activated in production
     const template = this.getWelcomeTemplate(userName);
-    console.log(`[EMAIL - DORMANT] Would send welcome email to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
@@ -42,8 +46,7 @@ export class EmailService {
    */
   async sendTrialReminder3Days(to: string, userName: string, trialEndDate: Date): Promise<void> {
     const template = this.getTrialReminder3DaysTemplate(userName, trialEndDate);
-    console.log(`[EMAIL - DORMANT] Would send 3-day trial reminder to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
@@ -51,8 +54,7 @@ export class EmailService {
    */
   async sendTrialReminder1Day(to: string, userName: string, trialEndDate: Date): Promise<void> {
     const template = this.getTrialReminder1DayTemplate(userName, trialEndDate);
-    console.log(`[EMAIL - DORMANT] Would send 1-day trial reminder to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
@@ -60,8 +62,7 @@ export class EmailService {
    */
   async sendPaymentSuccessEmail(to: string, userName: string, amount: number, nextBillingDate: Date): Promise<void> {
     const template = this.getPaymentSuccessTemplate(userName, amount, nextBillingDate);
-    console.log(`[EMAIL - DORMANT] Would send payment success to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
@@ -69,8 +70,7 @@ export class EmailService {
    */
   async sendPaymentFailedEmail(to: string, userName: string, amount: number): Promise<void> {
     const template = this.getPaymentFailedTemplate(userName, amount);
-    console.log(`[EMAIL - DORMANT] Would send payment failed to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
@@ -78,26 +78,33 @@ export class EmailService {
    */
   async sendCancellationEmail(to: string, userName: string, endDate: Date): Promise<void> {
     const template = this.getCancellationTemplate(userName, endDate);
-    console.log(`[EMAIL - DORMANT] Would send cancellation confirmation to ${to}`);
-    // await this.send(to, template);
+    await this.send(to, template);
   }
 
   /**
-   * Send email via Resend (activate in production)
+   * Send email via Resend
    */
   private async send(to: string, template: EmailTemplate): Promise<void> {
-    // Production implementation:
-    // const { Resend } = require('resend');
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({
-    //   from: this.FROM_EMAIL,
-    //   to,
-    //   subject: template.subject,
-    //   html: template.html,
-    //   text: template.text,
-    // });
-    
-    throw new Error("Email service not activated - production only");
+    try {
+      const resend = this.getResendClient();
+      const { data, error } = await resend.emails.send({
+        from: this.FROM_EMAIL,
+        to,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      });
+
+      if (error) {
+        console.error('[EMAIL] Failed to send email:', error);
+        throw new Error(`Email send failed: ${error.message}`);
+      }
+
+      console.log('[EMAIL] ✅ Email sent successfully:', { id: data?.id, to, subject: template.subject });
+    } catch (error: any) {
+      console.error('[EMAIL] Error sending email:', error);
+      throw error;
+    }
   }
 
   // Email Templates
