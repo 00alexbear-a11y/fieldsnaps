@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
 import SyncBanner from "./components/SyncBanner";
+import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { useAuth } from "./hooks/useAuth";
@@ -89,6 +90,9 @@ function AppContent() {
 
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
+      {/* Show payment notification for past_due users */}
+      <PaymentNotification />
+      
       {/* Show sync banner only on Projects list and Settings pages */}
       {showSyncBanner && <SyncBanner />}
       

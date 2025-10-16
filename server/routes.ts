@@ -1206,6 +1206,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create Stripe Customer Portal session
+  app.post("/api/billing/create-portal-session", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!user.stripeCustomerId) {
+        return res.status(400).json({ error: "No Stripe customer found" });
+      }
+
+      // Check if billing is configured
+      if (!billingService.isConfigured()) {
+        console.log("[Billing] Service not configured - dormant mode");
+        return res.status(503).json({ 
+          error: "Billing service not available",
+          message: "Billing is not yet activated for this application" 
+        });
+      }
+
+      // Build return URL
+      const baseUrl = process.env.REPLIT_DEPLOYMENT ? 
+        `https://${process.env.REPLIT_DEPLOYMENT}` : 
+        `http://localhost:5000`;
+      const returnUrl = `${baseUrl}/settings`;
+
+      // Create portal session
+      const session = await billingService.createPortalSession(user.stripeCustomerId, returnUrl);
+
+      res.json({ url: session.url });
+    } catch (error: any) {
+      console.error("[Billing] Error creating portal session:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
