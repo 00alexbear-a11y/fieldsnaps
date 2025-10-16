@@ -1,0 +1,45 @@
+Hey! Thanks for clarifying the database setup. I now understand I'm already using Replit's PostgreSQL (Neon-backed) with Drizzle ORM, so I don't need Supabase. I've already canceled the Supabase Pro subscription.
+
+What I've Completed So Far for Soft Launch:
+
+✅ Domain DNS Configuration (fieldsnaps.com)
+
+Configured all DNS records at Cloudflare
+A record pointing to 13.248.243.5 (Proxied)
+CNAME records for www, subdomains
+MX records for Google Workspace email
+NS records: ns19/ns20.domaincontrol.com
+SPF and DMARC records configured
+✅ Postmark Email Service Setup
+
+Account created and configured
+Added DKIM record: 20251016002242pm._domainkey (TXT)
+Added Return-Path record: pm-bounces CNAME → pm.mtasv.net (DNS only, not proxied)
+Currently waiting 2-48 hours for DNS propagation and verification
+Ready for transactional emails once verified
+❌ Supabase Pro - Canceled (realized we're already using Replit PostgreSQL)
+
+Next Steps - Services Still Needed:
+
+⏳ Cloudinary Advanced - For photo/video storage, optimization, and CDN delivery
+
+Need this for field inspection photos/videos
+Upgrading from free/basic tier
+⏳ Sentry Business - For error tracking and performance monitoring
+
+Production error monitoring
+Performance insights
+Questions for You:
+
+Cloudinary Integration: Do I already have Cloudinary configured in the FieldSnaps app? If so, what tier am I currently on, and what environment variables do I need to update when I upgrade to Advanced?
+
+Sentry Integration: Is Sentry already integrated in the codebase? If so, what configuration changes do I need when upgrading to Business tier?
+
+Postmark Integration: Once DNS verification completes (2-48 hours), what environment variables or configuration do I need to update to connect Postmark for transactional emails?
+
+Domain Connection: Do I need to update any environment variables in Replit to connect fieldsnaps.com to the app? Or is that handled separately?
+
+Soft Launch Readiness: Besides these service upgrades, what else needs to be configured or tested before we're ready for soft launch?
+
+I want to make sure we coordinate properly so nothing breaks when I upgrade these services. Let me know what's already configured and what I need to update!
+
