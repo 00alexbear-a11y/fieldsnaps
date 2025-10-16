@@ -7,6 +7,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { emailService } from "./email";
 
 // REPLIT_DOMAINS may not be set in local development
 const isProduction = process.env.NODE_ENV === 'production';
@@ -62,13 +63,30 @@ function updateUserSession(
 async function upsertUser(
   claims: any,
 ) {
-  await storage.upsertUser({
+  // Check if this is a new user (for welcome email)
+  const existingUser = await storage.getUser(claims["sub"]);
+  const isNewUser = !existingUser;
+
+  // Create or update user
+  const user = await storage.upsertUser({
     id: claims["sub"],
     email: claims["email"],
     firstName: claims["first_name"],
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
   });
+
+  // Send welcome email to new users
+  if (isNewUser && user.email) {
+    const userName = user.firstName || user.email.split('@')[0];
+    try {
+      await emailService.sendWelcomeEmail(user.email, userName);
+      console.log(`[Auth] Welcome email sent to ${user.email}`);
+    } catch (error) {
+      // Don't fail auth if email fails - just log it
+      console.error('[Auth] Failed to send welcome email:', error);
+    }
+  }
 }
 
 export async function setupAuth(app: Express) {
