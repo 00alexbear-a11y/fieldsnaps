@@ -277,6 +277,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/projects/:id/toggle-complete", isAuthenticated, async (req, res) => {
+    try {
+      const updated = await storage.toggleProjectCompletion(req.params.id);
+      if (!updated) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const deleted = await storage.deleteProject(req.params.id);
