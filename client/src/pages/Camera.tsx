@@ -1240,8 +1240,8 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Dominant Viewfinder (≥75% height) */}
-      <div className="relative flex-1 min-h-0">
+      {/* Dominant Viewfinder (16:9 aspect ratio, maximized) */}
+      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto" style={{ aspectRatio: '16/9' }}>
           {/* Loading state */}
           {!isActive && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
