@@ -1277,52 +1277,6 @@ export default function Camera() {
             data-testid="annotation-canvas"
           />
           
-          {/* Crop Guides Overlay - show when non-original ratio selected */}
-          {selectedAspectRatio !== 'original' && isActive && (
-            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 3 }}>
-              <div className="relative w-full h-full flex items-center justify-center">
-                {(() => {
-                  const selectedRatio = ASPECT_RATIOS.find(ar => ar.value === selectedAspectRatio);
-                  if (!selectedRatio || !selectedRatio.ratio) return null;
-                  
-                  const targetRatio = selectedRatio.ratio;
-                  const viewportRatio = window.innerWidth / window.innerHeight;
-                  
-                  let cropAreaStyle: React.CSSProperties = {};
-                  
-                  if (viewportRatio > targetRatio) {
-                    const cropWidth = window.innerHeight * targetRatio;
-                    const cropWidthPercent = (cropWidth / window.innerWidth) * 100;
-                    cropAreaStyle = {
-                      width: `${cropWidthPercent}%`,
-                      height: '100%',
-                    };
-                  } else {
-                    const cropHeight = window.innerWidth / targetRatio;
-                    const cropHeightPercent = (cropHeight / window.innerHeight) * 100;
-                    cropAreaStyle = {
-                      width: '100%',
-                      height: `${cropHeightPercent}%`,
-                    };
-                  }
-                  
-                  return (
-                    <>
-                      {/* Darken outer areas */}
-                      <div className="absolute inset-0 bg-black/40" />
-                      {/* Clear crop area */}
-                      <div 
-                        className="relative bg-transparent border-2 border-white/50"
-                        style={cropAreaStyle}
-                        data-testid="crop-guide-overlay"
-                      />
-                    </>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-          
           {/* Recording Indicator */}
           {isRecording && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 animate-pulse">
