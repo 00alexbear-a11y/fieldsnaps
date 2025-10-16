@@ -1502,7 +1502,7 @@ export default function Camera() {
           )}
       </div>
 
-      {/* Controls Row - Quality, Aspect Ratio, Zoom, Tags */}
+      {/* Controls Row - Quality, Zoom, Tags */}
       <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10">
         <div className="flex items-center justify-center gap-4">
           {/* Quality toggles S/M/L */}
@@ -1521,26 +1521,6 @@ export default function Camera() {
                 data-testid={`button-quality-${preset.value}`}
               >
                 {preset.label}
-              </Button>
-            ))}
-          </div>
-          
-          {/* Aspect Ratio toggles */}
-          <div className="flex gap-1">
-            {ASPECT_RATIOS.map((ar) => (
-              <Button
-                key={ar.value}
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedAspectRatio(ar.value)}
-                className={`h-8 px-2 text-xs ${
-                  selectedAspectRatio === ar.value
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white'
-                }`}
-                data-testid={`button-aspect-${ar.value}`}
-              >
-                {ar.label}
               </Button>
             ))}
           </div>
