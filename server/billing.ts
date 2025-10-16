@@ -76,6 +76,15 @@ export class BillingService {
     return session;
   }
 
+  async createPortalSession(customerId: string, returnUrl: string): Promise<Stripe.BillingPortal.Session> {
+    const session = await this.stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+
+    return session;
+  }
+
   async createTrialSubscription(
     user: User,
     customerId: string,
