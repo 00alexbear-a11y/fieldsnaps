@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, FolderOpen, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, Grid3X3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -23,9 +23,9 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Badge } from '@/components/ui/badge';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
-  { value: 'quick', label: 'Quick', description: '200KB - Fast upload' },
-  { value: 'standard', label: 'Standard', description: '500KB - Balanced' },
-  { value: 'detailed', label: 'Detailed', description: '1MB - High quality' },
+  { value: 'quick', label: 'S', description: '200KB - Fast upload' },
+  { value: 'standard', label: 'M', description: '500KB - Balanced' },
+  { value: 'detailed', label: 'L', description: '1MB - High quality' },
 ];
 
 interface Project {
@@ -58,17 +58,15 @@ export default function Camera() {
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
-  const [continuousZoom, setContinuousZoom] = useState<number>(1); // Actual zoom value within lens range
+  const [continuousZoom, setContinuousZoom] = useState<number>(1);
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   
-  // Tag selection state (pre-capture)
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   
-  // Session-only thumbnail strip state (only photos from this session)
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
   const [sessionPhotos, setSessionPhotos] = useState<LocalPhoto[]>([]);
   const thumbnailUrlsRef = useRef<Map<string, string>>(new Map());
@@ -79,11 +77,10 @@ export default function Camera() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const pinchStartDistanceRef = useRef<number | null>(null);
   const pinchStartZoomRef = useRef<number>(1);
-  const cameraSessionIdRef = useRef<number>(0); // Track camera session to prevent race conditions
-  const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null); // Preserve user's zoom choice
-  const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce camera starts
+  const cameraSessionIdRef = useRef<number>(0);
+  const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null);
+  const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Video annotation refs
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -94,29 +91,25 @@ export default function Camera() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
 
-  // Read projectId from URL query params and set selected project
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('projectId');
     if (projectId && projectId !== selectedProject) {
       console.log('[Camera] Setting project from URL:', projectId);
       setSelectedProject(projectId);
-      setShowProjectSelection(false); // Hide project selector since we have a project
+      setShowProjectSelection(false);
     }
-  }, [location]); // Re-run when location changes
+  }, [location]);
 
-  // Load projects
   const { data: allProjects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
 
-  // Filter out completed projects (consistent with Projects page)
   const projects = useMemo(() => 
     allProjects.filter(project => !project.completed),
     [allProjects]
   );
 
-  // Load tags for selected project
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
     queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`, {
@@ -125,51 +118,42 @@ export default function Camera() {
     enabled: !!selectedProject,
   });
   
-  // Debug logging for tags
   useEffect(() => {
     console.log('[Camera Tags] Selected project:', selectedProject);
     console.log('[Camera Tags] Tags loaded:', tags);
     console.log('[Camera Tags] Should show selector:', tags.length > 0 && !isRecording);
   }, [selectedProject, tags, isRecording]);
 
-  // Clear selected tags when project changes
   useEffect(() => {
     setSelectedTags([]);
   }, [selectedProject]);
 
-  // Filter out invalid tag IDs when tags list changes (but keep valid selections)
   useEffect(() => {
     if (selectedTags.length > 0) {
       if (tags.length === 0) {
-        // If all tags are deleted, clear selections
         setSelectedTags([]);
       } else {
-        // Filter to keep only valid tag IDs
         const validTagIds = new Set(tags.map(t => t.id));
         setSelectedTags(prev => prev.filter(tagId => validTagIds.has(tagId)));
       }
     }
   }, [tags]);
 
-  // Persist session photos across Camera remounts using localStorage
   const previousProjectRef = useRef<string>('');
-  const currentProjectRef = useRef<string>(''); // Track current project for async guard
+  const currentProjectRef = useRef<string>('');
   useEffect(() => {
     const sessionKey = selectedProject ? `camera-session-${selectedProject}` : null;
-    currentProjectRef.current = selectedProject; // Update current project ref
+    currentProjectRef.current = selectedProject;
     
-    // Restore session photos from localStorage on mount or project change
     if (sessionKey) {
       const saved = localStorage.getItem(sessionKey);
       if (saved) {
         try {
           const photoIds = JSON.parse(saved) as string[];
-          const restoreForProject = selectedProject; // Capture project for this restore
+          const restoreForProject = selectedProject;
           
-          // Load photos from IndexedDB
           Promise.all(photoIds.map(id => idb.getPhoto(id).catch(() => undefined)))
             .then(photos => {
-              // Guard: Only update if we're still on the same project (check against live ref)
               if (currentProjectRef.current === restoreForProject) {
                 const validPhotos = photos.filter(p => p !== undefined) as LocalPhoto[];
                 sessionPhotosRef.current = validPhotos;
@@ -185,7 +169,6 @@ export default function Camera() {
       }
     }
     
-    // Clear session if project changed
     if (previousProjectRef.current && previousProjectRef.current !== selectedProject) {
       const oldKey = `camera-session-${previousProjectRef.current}`;
       localStorage.removeItem(oldKey);
@@ -195,7 +178,6 @@ export default function Camera() {
     previousProjectRef.current = selectedProject;
     
     return () => {
-      // Clear session storage only on real exit (not to photo/edit pages)
       if (!window.location.pathname.includes('/photo/') && !window.location.pathname.includes('/photo-edit')) {
         if (sessionKey) {
           localStorage.removeItem(sessionKey);
@@ -205,13 +187,10 @@ export default function Camera() {
     };
   }, [selectedProject]);
 
-  // Create blob URLs for thumbnails and cleanup on unmount
   useEffect(() => {
-    // Revoke old URLs
     thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
     thumbnailUrlsRef.current.clear();
 
-    // Create new URLs for session photos (with null check)
     sessionPhotos.forEach(photo => {
       if (photo && photo.id) {
         const url = createPhotoUrl(photo);
@@ -219,7 +198,6 @@ export default function Camera() {
       }
     });
 
-    // Cleanup on unmount
     return () => {
       thumbnailUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
       thumbnailUrlsRef.current.clear();
@@ -228,12 +206,10 @@ export default function Camera() {
 
 
   useEffect(() => {
-    // Check for projectId query parameter
     const urlParams = new URLSearchParams(window.location.search);
     const projectIdFromUrl = urlParams.get('projectId');
     
     if (projects.length > 0 && !selectedProject) {
-      // If projectId in URL and it exists in projects, use it and skip selection screen
       if (projectIdFromUrl && projects.some(p => p.id === projectIdFromUrl)) {
         setSelectedProject(projectIdFromUrl);
         setShowProjectSelection(false);
@@ -241,18 +217,12 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
-  // Detect available cameras after permission is granted
-  // Don't run on mount because labels aren't available until permission granted
-
-  // Auto-start camera when project is selected and camera is not yet active
-  // Don't include currentDeviceId as dependency to avoid repeated permission requests
   useEffect(() => {
     if (selectedProject && !showProjectSelection && !isActive && !permissionDenied) {
       startCamera();
     }
   }, [selectedProject, showProjectSelection]);
   
-  // Restart camera when user explicitly changes facing mode (but not on mount)
   const isInitialMount = useRef(true);
   useEffect(() => {
     if (isInitialMount.current) {
@@ -266,10 +236,8 @@ export default function Camera() {
     }
   }, [cameraFacing]);
 
-  // Cleanup camera when component unmounts
   useEffect(() => {
     return () => {
-      // Clear any pending camera start
       if (startCameraTimeoutRef.current) {
         clearTimeout(startCameraTimeoutRef.current);
       }
@@ -282,23 +250,19 @@ export default function Camera() {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       
-      // Filter cameras by facing mode (front vs back)
       const relevantCameras: CameraDevice[] = [];
       
       for (const device of videoDevices) {
-        // Skip devices with no label or deviceId (permission not granted yet)
         if (!device.label || !device.deviceId) continue;
         
         const label = device.label.toLowerCase();
         
-        // Skip front camera if we're in environment mode, and vice versa
         const isFrontCamera = label.includes('front') || label.includes('user');
         const isBackCamera = label.includes('back') || label.includes('rear') || label.includes('environment');
         
         if (cameraFacing === 'user' && isBackCamera) continue;
         if (cameraFacing === 'environment' && isFrontCamera) continue;
         
-        // Try to determine zoom level based on label
         let zoomLevel: 0.5 | 1 | 2 | 3 = 1;
         
         if (label.includes('ultra') || label.includes('wide') || label.includes('0.5')) {
@@ -308,7 +272,7 @@ export default function Camera() {
         } else if (label.includes('3x') || label.includes('periscope')) {
           zoomLevel = 3;
         } else {
-          zoomLevel = 1; // Main/wide camera
+          zoomLevel = 1;
         }
         
         relevantCameras.push({
@@ -318,10 +282,8 @@ export default function Camera() {
         });
       }
       
-      // Sort by zoom level
       relevantCameras.sort((a, b) => a.zoomLevel - b.zoomLevel);
       
-      // If we have multiple cameras with the same zoom level, keep only the first one
       const uniqueCameras: CameraDevice[] = [];
       const seenZoomLevels = new Set<number>();
       
@@ -334,9 +296,7 @@ export default function Camera() {
       
       setAvailableCameras(uniqueCameras);
       
-      // Only set deviceId if we found valid cameras
       if (uniqueCameras.length > 0) {
-        // Preserve user-selected zoom if available, otherwise use default
         const targetZoom = userSelectedZoomRef.current || 1;
         const preferredCamera = uniqueCameras.find(c => c.zoomLevel === targetZoom) 
           || uniqueCameras.find(c => c.zoomLevel === 1) 
@@ -344,27 +304,22 @@ export default function Camera() {
         
         setCurrentDeviceId(preferredCamera.deviceId);
         
-        // Only update zoom level if user hasn't manually selected one
         if (!userSelectedZoomRef.current) {
           setZoomLevel(preferredCamera.zoomLevel);
         }
       }
     } catch (error) {
       console.error('Error detecting cameras:', error);
-      // Fallback to basic camera if detection fails
       setAvailableCameras([]);
       setCurrentDeviceId(null);
     }
   };
 
-  // Debounced camera start to prevent rapid successive calls
   const startCamera = (): Promise<void> => {
-    // Clear any pending start attempt
     if (startCameraTimeoutRef.current) {
       clearTimeout(startCameraTimeoutRef.current);
     }
     
-    // Return a Promise that resolves when the debounced call completes
     return new Promise<void>((resolve) => {
       startCameraTimeoutRef.current = setTimeout(async () => {
         await startCameraImmediate();
@@ -374,12 +329,10 @@ export default function Camera() {
   };
   
   const startCameraImmediate = async () => {
-    // Generate new session ID to track this camera start attempt
     const sessionId = ++cameraSessionIdRef.current;
     console.log(`[Camera] Starting camera session ${sessionId}`);
     
     try {
-      // Check if permission is already granted to avoid repeated prompts
       try {
         const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
         if (permissionStatus.state === 'denied') {
@@ -394,17 +347,14 @@ export default function Camera() {
           return;
         }
       } catch (permError) {
-        // Permission API not supported, continue with getUserMedia
         console.log('Permission API not supported, continuing with getUserMedia');
       }
       
-      // Check if this session is still current
       if (sessionId !== cameraSessionIdRef.current) {
         console.log(`[Camera] Session ${sessionId} aborted - newer session started`);
         return;
       }
 
-      // Use deviceId only if it's a valid non-empty string, otherwise use facingMode
       const constraints: MediaStreamConstraints = {
         video: (currentDeviceId && currentDeviceId.trim()) ? {
           deviceId: { exact: currentDeviceId },
@@ -422,13 +372,11 @@ export default function Camera() {
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (deviceError) {
-        // Check session still valid before fallback
         if (sessionId !== cameraSessionIdRef.current) {
           console.log(`[Camera] Session ${sessionId} aborted during fallback`);
           return;
         }
         
-        // If deviceId constraint fails, fall back to facingMode
         console.warn('Camera deviceId failed, falling back to facingMode:', deviceError);
         const fallbackConstraints: MediaStreamConstraints = {
           video: {
@@ -438,11 +386,9 @@ export default function Camera() {
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
-        // Clear deviceId since it didn't work
         setCurrentDeviceId(null);
       }
       
-      // Final session check before applying changes
       if (sessionId !== cameraSessionIdRef.current) {
         console.log(`[Camera] Session ${sessionId} aborted - stopping stream`);
         stream.getTracks().forEach(track => track.stop());
@@ -455,7 +401,6 @@ export default function Camera() {
         
         console.log('[Camera] Stream set, videoRef dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
         
-        // Explicitly play the video (required for iOS Safari)
         try {
           await videoRef.current.play();
           console.log('[Camera] Video play() successful');
@@ -466,7 +411,6 @@ export default function Camera() {
         setHasPermission(true);
         setPermissionDenied(false);
 
-        // Wait for video metadata to load so dimensions are available
         await new Promise<void>((resolve) => {
           const video = videoRef.current;
           if (!video) {
@@ -474,14 +418,12 @@ export default function Camera() {
             return;
           }
 
-          // If metadata already loaded, resolve immediately
           if (video.videoWidth > 0 && video.videoHeight > 0) {
             console.log('[Camera] Metadata already loaded, dimensions:', video.videoWidth, 'x', video.videoHeight);
             resolve();
             return;
           }
 
-          // Otherwise wait for loadedmetadata event
           const handleLoadedMetadata = () => {
             console.log('[Camera] Metadata loaded, dimensions:', video.videoWidth, 'x', video.videoHeight);
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -489,7 +431,6 @@ export default function Camera() {
           };
           video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-          // Timeout after 5 seconds
           setTimeout(() => {
             console.warn('[Camera] Metadata load timeout after 5 seconds');
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -497,11 +438,9 @@ export default function Camera() {
           }, 5000);
         });
 
-        // NOW set isActive after metadata has loaded
         setIsActive(true);
         console.log('[Camera] isActive set to true, loading overlay should hide');
         
-        // Detect available cameras after permission is granted (when labels are available)
         await detectAvailableCameras();
       }
     } catch (error) {
@@ -532,20 +471,16 @@ export default function Camera() {
   };
 
   const switchCamera = async () => {
-    // Reset zoom to 1x when switching cameras
     setZoomLevel(1);
     setContinuousZoom(1);
     setAvailableCameras([]);
     setCurrentDeviceId(null);
     
-    // Clear user-selected zoom when switching cameras (different lenses available)
     userSelectedZoomRef.current = null;
     
-    // Just toggle facing mode - the useEffect will handle restarting the camera
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
   };
 
-  // Apply continuous zoom within current lens range
   const applyContinuousZoom = async (zoom: number) => {
     if (!streamRef.current) return;
     
@@ -554,7 +489,7 @@ export default function Camera() {
     
     try {
       await videoTrack.applyConstraints({
-        // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+        // @ts-ignore
         advanced: [{ zoom }]
       });
       setContinuousZoom(zoom);
@@ -564,36 +499,29 @@ export default function Camera() {
   };
 
   const switchZoomLevel = async (level: 0.5 | 1 | 2 | 3) => {
-    // Don't switch if already at this level
     if (zoomLevel === level) return;
     
-    // Store user's selected zoom level to preserve across camera restarts
     userSelectedZoomRef.current = level;
     
-    // Update zoom level state and reset continuous zoom to lens base
     setZoomLevel(level);
     setContinuousZoom(level);
     
-    // Try to apply constraints to existing track first (avoids permission re-prompt)
     if (streamRef.current) {
       const videoTrack = streamRef.current.getVideoTracks()[0];
       if (videoTrack) {
         try {
           await videoTrack.applyConstraints({
-            // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+            // @ts-ignore
             advanced: [{ zoom: level }]
           });
           console.log(`[Camera] Applied zoom ${level}x via applyConstraints`);
-          return; // Success - no need to restart stream
+          return;
         } catch (constraintError) {
           console.warn('[Camera] applyConstraints failed, will restart stream:', constraintError);
-          // Fall through to restart stream approach
         }
       }
     }
     
-    // Fallback: Restart stream with new zoom constraint
-    // (Required on iOS when switching physical lenses)
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -604,14 +532,12 @@ export default function Camera() {
     setIsActive(false);
     
     try {
-      // Use zoom constraint to request specific physical lens
-      // iOS Safari and modern browsers will map this to the appropriate camera
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
-          // @ts-ignore - zoom is not in TypeScript types yet but supported by browsers
+          // @ts-ignore
           advanced: [{ zoom: level }]
         },
       };
@@ -621,7 +547,6 @@ export default function Camera() {
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (zoomError) {
-        // If zoom constraint fails, try without it (fallback for unsupported browsers)
         console.warn('Zoom constraint not supported, falling back to basic constraints:', zoomError);
         const fallbackConstraints: MediaStreamConstraints = {
           video: {
@@ -639,7 +564,6 @@ export default function Camera() {
         
         await videoRef.current.play();
         
-        // Wait for metadata
         await new Promise<void>((resolve) => {
           const video = videoRef.current;
           if (!video) {
@@ -674,16 +598,13 @@ export default function Camera() {
         description: error instanceof Error ? error.message : 'Unable to switch camera lens',
         variant: 'destructive',
       });
-      // Fall back to original camera at 1x zoom
       setZoomLevel(1);
       await startCamera();
     }
   };
 
-  // Pinch-to-zoom gesture handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLVideoElement>) => {
     if (e.touches.length === 2) {
-      // Two fingers detected - start pinch gesture
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
@@ -697,7 +618,7 @@ export default function Camera() {
 
   const handleTouchMove = (e: React.TouchEvent<HTMLVideoElement>) => {
     if (e.touches.length === 2 && pinchStartDistanceRef.current !== null) {
-      e.preventDefault(); // Prevent default pinch-zoom behavior
+      e.preventDefault();
       
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -706,20 +627,13 @@ export default function Camera() {
         touch2.clientY - touch1.clientY
       );
       
-      // Calculate zoom change based on distance change
       const scale = distance / pinchStartDistanceRef.current;
       let newZoom = pinchStartZoomRef.current * scale;
       
-      // Constrain zoom within current lens range
-      // 0.5x lens: 0.5 to 0.99
-      // 1x lens: 1.0 to 1.99
-      // 2x lens: 2.0 to 2.99
-      // 3x lens: 3.0 to 3.99
       const minZoom = zoomLevel;
-      const maxZoom = Math.floor(zoomLevel) + 0.99; // Ensures 0.5x caps at 0.99, 1x at 1.99, etc.
+      const maxZoom = Math.floor(zoomLevel) + 0.99;
       newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
       
-      // Apply zoom
       applyContinuousZoom(newZoom);
     }
   };
@@ -728,7 +642,6 @@ export default function Camera() {
     pinchStartDistanceRef.current = null;
   };
 
-  // Video annotation drawing handlers
   const handleAnnotationTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     if (!isRecording) return;
     
@@ -736,39 +649,13 @@ export default function Camera() {
     const canvas = annotationCanvasRef.current;
     if (!canvas) return;
     
-    // Cancel any pending clear
-    if (clearTimeoutRef.current !== null) {
-      clearTimeout(clearTimeoutRef.current);
-      clearTimeoutRef.current = null;
-    }
-    
-    // Clear previous stroke before starting new one
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    
-    const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    
-    // Scale coordinates from CSS pixels to canvas resolution
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
+    const touch = e.touches[0];
+    const x = ((touch.clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((touch.clientY - rect.top) / rect.height) * canvas.height;
     
     setIsDrawing(true);
-    drawingPathRef.current = [{x, y}];
-    
-    // Draw initial point
-    if (ctx) {
-      ctx.strokeStyle = '#169DF5';
-      ctx.lineWidth = 8 * Math.min(scaleX, scaleY); // Scale line width too
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-    }
+    drawingPathRef.current = [{ x, y }];
   };
 
   const handleAnnotationTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -778,194 +665,149 @@ export default function Camera() {
     const canvas = annotationCanvasRef.current;
     if (!canvas) return;
     
-    const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = ((touch.clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((touch.clientY - rect.top) / rect.height) * canvas.height;
     
-    // Scale coordinates from CSS pixels to canvas resolution
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
+    drawingPathRef.current.push({ x, y });
     
-    drawingPathRef.current.push({x, y});
-    
-    // Draw line
     const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.lineTo(x, y);
+    if (ctx && drawingPathRef.current.length > 1) {
+      const path = drawingPathRef.current;
+      const lastPoint = path[path.length - 2];
+      const currentPoint = path[path.length - 1];
+      
+      ctx.strokeStyle = '#FF0000';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      ctx.beginPath();
+      ctx.moveTo(lastPoint.x, lastPoint.y);
+      ctx.lineTo(currentPoint.x, currentPoint.y);
       ctx.stroke();
     }
   };
 
   const handleAnnotationTouchEnd = () => {
-    if (!isRecording) return;
-    
     setIsDrawing(false);
     drawingPathRef.current = [];
-    
-    // Clear canvas after brief delay to ensure composite loop captures stroke
-    // 50ms gives ~1-2 frames at 30fps, feels temporary to user
-    const canvas = annotationCanvasRef.current;
-    if (canvas) {
-      clearTimeoutRef.current = window.setTimeout(() => {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-        clearTimeoutRef.current = null;
-      }, 50);
-    }
   };
 
   const startRecording = async () => {
-    if (!streamRef.current || isRecording) return;
-
-    // Check subscription access
+    if (!videoRef.current || !annotationCanvasRef.current || !compositeCanvasRef.current) return;
+    
     if (!canWrite) {
       setUpgradeModalOpen(true);
       return;
     }
-    
+
     try {
       const video = videoRef.current;
       const annotationCanvas = annotationCanvasRef.current;
       const compositeCanvas = compositeCanvasRef.current;
       
-      if (!video || !annotationCanvas || !compositeCanvas) {
-        throw new Error('Canvas elements not ready');
-      }
-
-      // Set canvas dimensions to match video
-      const width = video.videoWidth || 1280;
-      const height = video.videoHeight || 720;
+      annotationCanvas.width = video.videoWidth;
+      annotationCanvas.height = video.videoHeight;
       
-      annotationCanvas.width = width;
-      annotationCanvas.height = height;
-      compositeCanvas.width = width;
-      compositeCanvas.height = height;
-
+      compositeCanvas.width = video.videoWidth;
+      compositeCanvas.height = video.videoHeight;
+      
       const compositeCtx = compositeCanvas.getContext('2d');
       if (!compositeCtx) throw new Error('Failed to get composite canvas context');
-
-      // Composite video + annotations continuously
-      let animationFrameId: number;
-      const composite = () => {
-        // Draw video frame
-        compositeCtx.drawImage(video, 0, 0, width, height);
+      
+      const compositeStream = compositeCanvas.captureStream(30);
+      
+      const renderFrame = () => {
+        if (!isRecordingRef.current) return;
         
-        // Draw annotations on top (if any)
-        if (annotationCanvas.width > 0 && annotationCanvas.height > 0) {
+        compositeCtx.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+        
+        compositeCtx.drawImage(video, 0, 0, compositeCanvas.width, compositeCanvas.height);
+        
+        const annotationCtx = annotationCanvas.getContext('2d');
+        if (annotationCtx) {
           compositeCtx.drawImage(annotationCanvas, 0, 0);
         }
         
-        if (isRecordingRef.current) {
-          animationFrameId = requestAnimationFrame(composite);
-        }
+        clearTimeoutRef.current = requestAnimationFrame(renderFrame);
       };
-      composite();
-
-      // Capture composite canvas stream (video only)
-      const compositeStream = compositeCanvas.captureStream(30); // 30 fps
       
-      // Get audio stream from microphone
-      let finalStream = compositeStream;
-      try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Combine video track from canvas with audio track from microphone
-        finalStream = new MediaStream([
-          ...compositeStream.getVideoTracks(),
-          ...audioStream.getAudioTracks()
-        ]);
-      } catch (audioError) {
-        console.warn('[Camera] Could not get audio, recording video only:', audioError);
-      }
+      const mediaRecorder = new MediaRecorder(compositeStream, {
+        mimeType: 'video/webm;codecs=vp8,opus',
+        videoBitsPerSecond: 2500000
+      });
       
       recordedChunksRef.current = [];
-      const mediaRecorder = new MediaRecorder(finalStream, {
-        mimeType: 'video/webm',
-      });
-
+      
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           recordedChunksRef.current.push(event.data);
         }
       };
-
+      
       mediaRecorder.onstop = async () => {
-        // Stop compositing
-        cancelAnimationFrame(animationFrameId);
-        
         const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
         
-        if (!selectedProject) {
+        const project = projects.find(p => p.id === selectedProject);
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
+        const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}_VIDEO` : '';
+        
+        const savedPhoto = await idb.savePhoto({
+          projectId: selectedProject,
+          blob: blob,
+          mediaType: 'video',
+          quality: selectedQuality,
+          caption: autoCaption,
+          timestamp: Date.now(),
+          syncStatus: 'pending',
+          retryCount: 0,
+          pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
+        });
+        
+        toast({
+          title: '✓ Video Saved',
+          description: 'Video recorded successfully',
+          duration: 2000,
+        });
+        
+        syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+          console.error('[Camera] Sync queue error:', err);
           toast({
-            title: 'Video Recorded',
-            description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video ready but no project selected`,
+            title: 'Sync queue failed',
+            description: 'Video saved locally but not queued for upload.',
             variant: 'destructive',
+            duration: 3000,
           });
-          return;
-        }
-
-        try {
-          // Generate auto-caption: [ProjectName]_VIDEO_[Date]_[Time]
-          const project = projects.find(p => p.id === selectedProject);
-          const now = new Date();
-          const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-          const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
-          const autoCaption = project ? `${project.name}_VIDEO_${dateStr}_${timeStr}` : 'VIDEO';
-
-          // Save video to IndexedDB
-          const savedPhoto = await idb.savePhoto({
-            projectId: selectedProject,
-            blob: blob,
-            mediaType: 'video',
-            quality: 'standard',
-            caption: autoCaption,
-            timestamp: Date.now(),
-            syncStatus: 'pending',
-            retryCount: 0,
-          });
-
-          // Queue for sync (non-blocking)
-          syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
-            console.error('[Camera] Video sync queue error:', err);
-          });
-
-          // Add video to session thumbnails (most recent first)
-          sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
-          setSessionPhotos([...sessionPhotosRef.current]);
-          
-          // Persist session to localStorage
-          if (selectedProject) {
-            const photoIds = sessionPhotosRef.current.map(p => p.id);
-            localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
-          }
-
-          toast({
-            title: '✓ Video Saved',
-            description: `${(blob.size / 1024 / 1024).toFixed(1)}MB video saved to ${project?.name || 'project'}`,
-          });
-        } catch (error) {
-          console.error('[Camera] Video save error:', error);
-          toast({
-            title: 'Video Save Failed',
-            description: error instanceof Error ? error.message : 'Failed to save video',
-            variant: 'destructive',
-          });
+        });
+        
+        sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
+        setSessionPhotos([...sessionPhotosRef.current]);
+        
+        if (selectedProject) {
+          const photoIds = sessionPhotosRef.current.map(p => p.id);
+          localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
         }
       };
-
-      mediaRecorder.start();
+      
+      mediaRecorder.start(1000);
       mediaRecorderRef.current = mediaRecorder;
       isRecordingRef.current = true;
       setIsRecording(true);
       
+      renderFrame();
+      
       toast({
-        title: 'Recording Started',
-        description: 'Draw on screen to highlight - lift finger to clear',
+        title: '● Recording',
+        description: 'Tap annotations to draw',
+        duration: 2000,
       });
+      
     } catch (error) {
-      console.error('Recording error:', error);
+      console.error('Recording start error:', error);
       toast({
         title: 'Recording Failed',
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -981,13 +823,11 @@ export default function Camera() {
       isRecordingRef.current = false;
       setIsRecording(false);
       
-      // Cancel any pending clear
       if (clearTimeoutRef.current !== null) {
         cancelAnimationFrame(clearTimeoutRef.current);
         clearTimeoutRef.current = null;
       }
       
-      // Clear annotation canvas when stopping
       const canvas = annotationCanvasRef.current;
       if (canvas) {
         const ctx = canvas.getContext('2d');
@@ -998,11 +838,9 @@ export default function Camera() {
     }
   };
 
-  // Quick capture mode: Capture photo and continue shooting
   const quickCapture = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
-    // Check subscription access
     if (!canWrite) {
       setUpgradeModalOpen(true);
       return;
@@ -1015,11 +853,9 @@ export default function Camera() {
         throw new Error('Video element not available');
       }
 
-      // Verify video has valid dimensions
       if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
-      // Create canvas to capture frame
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
@@ -1030,7 +866,6 @@ export default function Camera() {
 
       ctx.drawImage(video, 0, 0);
 
-      // Convert to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
@@ -1039,17 +874,14 @@ export default function Camera() {
         );
       });
 
-      // Compress photo using Web Worker (non-blocking)
       const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
-      // Generate auto-caption: [ProjectName]_[Date]_[Time]
       const project = projects.find(p => p.id === selectedProject);
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
-      // Save to IndexedDB with tags (blob only - URL created on-demand when loading)
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -1062,17 +894,14 @@ export default function Camera() {
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
-      // Revoke temporary URL from worker (not stored in IndexedDB)
       URL.revokeObjectURL(compressionResult.url);
 
-      // Show brief success toast
       toast({
         title: '✓ Captured',
         description: `${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
-        duration: 1500, // Brief toast for quick mode
+        duration: 1500,
       });
 
-      // Queue for sync (non-blocking but show error if queueing fails)
       syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
         console.error('[Camera] Sync queue error:', err);
         toast({
@@ -1083,19 +912,14 @@ export default function Camera() {
         });
       });
 
-      // Keep selected tags for next capture (persist selection)
-
-      // Add photo to session thumbnails (most recent first)
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
       
-      // Persist session to localStorage
       if (selectedProject) {
         const photoIds = sessionPhotosRef.current.map(p => p.id);
         localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
       }
 
-      // Visual feedback - pulse quick capture button
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
       if (quickButton) {
         quickButton.style.transform = 'scale(0.9)';
@@ -1116,11 +940,9 @@ export default function Camera() {
     }
   };
 
-  // Capture and edit mode: Capture photo then open annotation editor
   const captureAndEdit = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
-    // Check subscription access
     if (!canWrite) {
       setUpgradeModalOpen(true);
       return;
@@ -1133,11 +955,9 @@ export default function Camera() {
         throw new Error('Video element not available');
       }
 
-      // Verify video has valid dimensions
       if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
-      // Create canvas to capture frame
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
@@ -1148,7 +968,6 @@ export default function Camera() {
 
       ctx.drawImage(video, 0, 0);
 
-      // Convert to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
@@ -1157,17 +976,14 @@ export default function Camera() {
         );
       });
 
-      // Compress photo using Web Worker
       const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
-      // Generate auto-caption: [ProjectName]_[Date]_[Time]
       const project = projects.find(p => p.id === selectedProject);
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
-      // Save to IndexedDB with tags
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -1180,10 +996,8 @@ export default function Camera() {
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
       });
 
-      // Revoke temporary URL from worker
       URL.revokeObjectURL(compressionResult.url);
 
-      // Queue for sync (non-blocking but show error if queueing fails)
       syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
         console.error('[Camera] Sync queue error:', err);
         toast({
@@ -1194,20 +1008,14 @@ export default function Camera() {
         });
       });
 
-      // Keep selected tags for next capture (persist selection)
-      
-      // Add photo to session thumbnails (most recent first)
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
       
-      // Persist session to localStorage
       if (selectedProject) {
         const photoIds = sessionPhotosRef.current.map(p => p.id);
         localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
       }
 
-      // DON'T stop camera - keep it running for session continuity
-      // Navigate to photo edit page
       setLocation(`/photo/${savedPhoto.id}/edit`);
 
     } catch (error) {
@@ -1226,11 +1034,9 @@ export default function Camera() {
     try {
       await idb.deletePhoto(photoId);
       
-      // Remove from session photos
       sessionPhotosRef.current = sessionPhotosRef.current.filter(p => p.id !== photoId);
       setSessionPhotos([...sessionPhotosRef.current]);
       
-      // Persist session to localStorage
       if (selectedProject) {
         const photoIds = sessionPhotosRef.current.map(p => p.id);
         localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
@@ -1277,7 +1083,6 @@ export default function Camera() {
     );
   }
 
-  // Project selection screen - Simple camera-focused design
   if (showProjectSelection) {
     const filteredProjects = projectSearchQuery.trim() 
       ? projects.filter(project => 
@@ -1289,7 +1094,6 @@ export default function Camera() {
 
     return (
       <div className="flex flex-col h-screen bg-background">
-        {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-6 border-b border-border">
           <Button
             variant="ghost"
@@ -1305,7 +1109,6 @@ export default function Camera() {
           <div className="w-10" />
         </div>
 
-        {/* Simple Project Grid */}
         <div className="flex-1 overflow-y-auto px-4 pt-6 pb-24">
           <div className="max-w-2xl mx-auto grid grid-cols-1 gap-3">
             {filteredProjects.map((project) => (
@@ -1319,11 +1122,9 @@ export default function Camera() {
                 data-testid={`button-select-project-${project.id}`}
               >
                 <div className="flex items-center gap-4">
-                  {/* Simple camera icon as default picture */}
                   <div className="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
                     <CameraIcon className="w-8 h-8 text-primary" />
                   </div>
-                  {/* Just the name */}
                   <div className="flex-1 text-left">
                     <h3 className="text-lg font-medium text-foreground">
                       {project.name}
@@ -1335,7 +1136,6 @@ export default function Camera() {
           </div>
         </div>
 
-        {/* Minimal Search Bar - Fixed at bottom */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t border-border">
           <div className="max-w-2xl mx-auto">
             <div className="relative">
@@ -1355,13 +1155,11 @@ export default function Camera() {
     );
   }
 
-  // Permission denied state
   if (permissionDenied) {
     const handleRequestAgain = () => {
       setPermissionDenied(false);
       setHasPermission(false);
       setIsActive(false);
-      // Trigger camera start
       if (selectedProject && !showProjectSelection) {
         startCamera();
       }
@@ -1403,159 +1201,123 @@ export default function Camera() {
     );
   }
 
+  const selectedProjectData = projects.find(p => p.id === selectedProject);
+
   return (
-    <div className="fixed inset-0 w-full bg-black" style={{ height: '100dvh', minHeight: '100vh' }}>
-      {/* Loading state while camera starts */}
-      {!isActive && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 z-30 bg-black">
-          <div className="text-center space-y-4">
-            <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
-              <CameraIcon className="w-12 h-12 text-primary" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-white">Starting Camera...</h2>
-              <p className="text-white/60 text-sm">
-                Getting ready to capture
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Video Stream */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${!isActive ? 'opacity-0' : 'opacity-100'}`}
-        style={{ 
-          zIndex: 5,
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        data-testid="video-camera-stream"
-      />
-
-      {/* Annotation Canvas - Visible during recording for drawing */}
-      <canvas
-        ref={annotationCanvasRef}
-        className={`absolute inset-0 w-full h-full object-cover ${isRecording ? 'touch-none' : 'pointer-events-none opacity-0'}`}
-        style={{ zIndex: 15 }}
-        onTouchStart={handleAnnotationTouchStart}
-        onTouchMove={handleAnnotationTouchMove}
-        onTouchEnd={handleAnnotationTouchEnd}
-        data-testid="annotation-canvas"
-      />
-
-      {/* Composite Canvas - Hidden, used for recording video + annotations */}
-      <canvas
-        ref={compositeCanvasRef}
-        className="absolute"
-        style={{ top: '-9999px', left: '-9999px' }}
-      />
-
-      {/* Zoom Indicator - Shows when pinching */}
-      {pinchStartDistanceRef.current !== null && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-black/60 backdrop-blur-md text-white px-6 py-3 rounded-full text-2xl font-semibold">
-          {continuousZoom.toFixed(1)}x
-        </div>
-      )}
-
-      {/* Top Controls - Centered camera flip with quality on right */}
-      <div className="absolute top-0 left-0 right-0 p-3 z-10">
-        <div className="flex items-center justify-between max-w-screen-sm mx-auto">
-          <div className="w-28" />
-          
-          {/* Camera switch - centered */}
+    <div className="fixed inset-0 w-full bg-black overflow-hidden" style={{ height: '100dvh', minHeight: '100vh' }}>
+      {/* Header Bar */}
+      <div className="absolute top-0 left-0 right-0 z-30 bg-black/50 backdrop-blur-md border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* Back Button */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={switchCamera}
-            className="text-white hover:bg-white/20 bg-black/30 backdrop-blur-md"
-            data-testid="button-switch-camera"
+            onClick={() => setLocation('/')}
+            disabled={isRecording}
+            className="text-white hover:bg-white/20"
+            data-testid="button-back"
           >
-            <SwitchCamera className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-
-          {/* Quality selector */}
-          <Select value={selectedQuality} onValueChange={(v) => setSelectedQuality(v as QualityPreset)}>
+          
+          {/* Project Dropdown */}
+          <Select value={selectedProject} onValueChange={(v) => setSelectedProject(v)}>
             <SelectTrigger
-              className="w-28 bg-black/30 backdrop-blur-md border-white/20 text-white text-sm h-9"
-              data-testid="select-quality"
+              className="max-w-xs bg-transparent border-none text-white font-medium h-9"
+              data-testid="select-project"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {QUALITY_PRESETS.map((preset) => (
-                <SelectItem key={preset.value} value={preset.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{preset.label}</span>
-                    <span className="text-xs text-muted-foreground">{preset.description}</span>
-                  </div>
+              {projects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          
+          {/* Info Icon */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => toast({ title: 'Camera Info', description: 'Framed viewfinder camera' })}
+            className="text-white hover:bg-white/20"
+            data-testid="button-info"
+          >
+            <Info className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 
-
-      {/* Zoom Selector - Center, lower position - Hide during video recording */}
-      {!(cameraMode === 'video' && isRecording) && (
-        <div className="absolute bottom-32 left-0 right-0 flex justify-center gap-2 z-10">
-          {availableCameras.length > 0 ? (
-            availableCameras.map((camera) => (
-              <Button
-                key={camera.zoomLevel}
-                variant="ghost"
-                size="sm"
-                onClick={() => switchZoomLevel(camera.zoomLevel)}
-                className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
-                  zoomLevel === camera.zoomLevel ? 'bg-white/25' : 'bg-white/10'
-                }`}
-                data-testid={`button-zoom-${camera.zoomLevel}x`}
-              >
-                {camera.zoomLevel}x
-              </Button>
-            ))
-          ) : (
-            // Fallback to basic zoom if camera detection failed
-            [1].map((level) => (
-              <Button
-                key={level}
-                variant="ghost"
-                size="sm"
-                onClick={() => setZoomLevel(level as 0.5 | 1 | 2 | 3)}
-                className={`text-white backdrop-blur-md text-sm font-medium px-3 ${
-                  zoomLevel === level ? 'bg-white/25' : 'bg-white/10'
-                }`}
-                data-testid={`button-zoom-${level}x`}
-              >
-                {level}x
-              </Button>
-            ))
+      {/* Main Content Container */}
+      <div className="absolute top-16 left-0 right-0 bottom-0 flex flex-col p-4 gap-4">
+        
+        {/* Framed Viewfinder Container (~65% height) */}
+        <div className="relative flex-[0.65] bg-black rounded-3xl overflow-hidden border-2 border-white/20">
+          {/* Loading state */}
+          {!isActive && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
+              <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
+                <CameraIcon className="w-10 h-10 text-primary" />
+              </div>
+              <p className="text-white text-sm">Starting Camera...</p>
+            </div>
+          )}
+          
+          {/* Video Stream */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${!isActive ? 'opacity-0' : 'opacity-100'}`}
+            style={{ zIndex: 1 }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            data-testid="video-camera-stream"
+          />
+          
+          {/* Annotation Canvas */}
+          <canvas
+            ref={annotationCanvasRef}
+            className={`absolute inset-0 w-full h-full object-cover ${isRecording ? 'touch-none' : 'pointer-events-none opacity-0'}`}
+            style={{ zIndex: 2 }}
+            onTouchStart={handleAnnotationTouchStart}
+            onTouchMove={handleAnnotationTouchMove}
+            onTouchEnd={handleAnnotationTouchEnd}
+            data-testid="annotation-canvas"
+          />
+          
+          {/* Recording Indicator */}
+          {isRecording && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 animate-pulse">
+              <div className="w-2 h-2 bg-white rounded-full" />
+              Recording
+            </div>
+          )}
+          
+          {/* Zoom Indicator */}
+          {pinchStartDistanceRef.current !== null && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-black/60 backdrop-blur-md text-white px-6 py-3 rounded-full text-2xl font-semibold">
+              {continuousZoom.toFixed(1)}x
+            </div>
           )}
         </div>
-      )}
-
-      {/* Tag Selector - Collapsible popup (like color picker in edit mode) */}
-      {tags.length > 0 && !isRecording && (
-        <div className="absolute bottom-44 right-4 z-30">
-          {/* Expanded Tag List - Floating above toggle button */}
-          {tagPickerExpanded && (
-            <div 
-              className="absolute bottom-14 right-0 flex flex-col gap-2 py-4 max-h-[220px] overflow-y-auto"
-              style={{ 
-                scrollbarWidth: 'none', 
-                msOverflowStyle: 'none',
-                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-                maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
-              }}
-            >
-              {tags.map((tag) => {
-                const isSelected = selectedTags.includes(tag.id);
+        
+        {/* Horizontal Photo Preview Strip */}
+        {sessionPhotos.length > 0 && !isRecording && (
+          <div className="flex-shrink-0 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 pb-2">
+              {sessionPhotos.slice(0, 5).map((photo) => {
+                const url = thumbnailUrlsRef.current.get(photo.id);
+                if (!url) return null;
+                
+                const photoTags = photo.pendingTagIds
+                  ?.map(tagId => tags.find(t => t.id === tagId))
+                  .filter(Boolean) as Tag[] | undefined;
+                
                 const tagColorMap: Record<string, string> = {
                   red: '#ef4444',
                   orange: '#f97316',
@@ -1563,239 +1325,225 @@ export default function Camera() {
                   blue: '#3b82f6',
                   gray: '#6b7280',
                 };
-                const bgColor = tagColorMap[tag.color] || '#6b7280';
+                
+                const isVideo = photo.mediaType === 'video';
                 
                 return (
-                  <button
-                    key={tag.id}
-                    onClick={() => {
-                      setSelectedTags(prev =>
-                        prev.includes(tag.id)
-                          ? prev.filter(id => id !== tag.id)
-                          : [...prev, tag.id]
-                      );
-                    }}
-                    className={`px-3 py-1.5 rounded-full border hover-elevate transition-all flex-shrink-0 text-xs font-medium shadow-lg whitespace-nowrap ${
-                      isSelected ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
-                    }`}
-                    style={{ backgroundColor: bgColor, color: 'white' }}
-                    data-testid={`button-tag-${tag.name.toLowerCase()}`}
+                  <div
+                    key={photo.id}
+                    className="relative flex-shrink-0 group"
+                    data-testid={`thumbnail-${photo.id}`}
                   >
-                    {tag.name}
-                  </button>
+                    <button
+                      onClick={() => {
+                        if (isVideo) {
+                          setLocation(`/photo/${photo.id}/view`);
+                        } else {
+                          setLocation(`/photo/${photo.id}/edit`);
+                        }
+                      }}
+                      className="block w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
+                    >
+                      {isVideo ? (
+                        <video
+                          src={url}
+                          className="w-full h-full object-cover"
+                          muted
+                        />
+                      ) : (
+                        <img
+                          src={url}
+                          alt="Thumbnail"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      
+                      {isVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                          <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                            <Play className="w-4 h-4 text-black fill-black ml-0.5" />
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                    
+                    {photoTags && photoTags.length > 0 && (
+                      <div 
+                        className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 pointer-events-none"
+                        data-testid={`tag-indicators-${photo.id}`}
+                      >
+                        {photoTags.slice(0, 2).map((tag) => (
+                          <div
+                            key={tag.id}
+                            className="w-1 flex-1 rounded-full"
+                            style={{ backgroundColor: tagColorMap[tag.color] || '#6b7280' }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
+                    {photoTags && photoTags.length > 2 && (
+                      <div 
+                        className="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1 py-0.5 rounded-full pointer-events-none"
+                        data-testid={`tag-overflow-badge-${photo.id}`}
+                      >
+                        +{photoTags.length - 2}
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeletePhoto(photo.id);
+                      }}
+                      className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      data-testid={`button-delete-thumbnail-${photo.id}`}
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
                 );
               })}
             </div>
-          )}
+          </div>
+        )}
+        
+        {/* Tools Row */}
+        <div className="flex-shrink-0 flex items-center justify-between gap-4">
+          {/* Quality: S M L */}
+          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1">
+            {QUALITY_PRESETS.map((preset) => (
+              <button
+                key={preset.value}
+                onClick={() => setSelectedQuality(preset.value)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  selectedQuality === preset.value
+                    ? 'bg-white text-black'
+                    : 'text-white hover:bg-white/20'
+                }`}
+                data-testid={`button-quality-${preset.label}`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
           
-          {/* Fixed Toggle Button */}
-          <button
-            onClick={() => setTagPickerExpanded(!tagPickerExpanded)}
-            className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg bg-white/10"
-            data-testid="button-toggle-tag-picker"
-          >
-            {selectedTags.length > 0 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
-                {selectedTags.length}
-              </div>
-            )}
-            {tagPickerExpanded ? (
-              <ChevronDown className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1">
+            {availableCameras.length > 0 ? (
+              availableCameras.map((camera) => (
+                <button
+                  key={camera.zoomLevel}
+                  onClick={() => switchZoomLevel(camera.zoomLevel)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    zoomLevel === camera.zoomLevel
+                      ? 'bg-white text-black'
+                      : 'text-white hover:bg-white/20'
+                  }`}
+                  data-testid={`button-zoom-${camera.zoomLevel}x`}
+                >
+                  {camera.zoomLevel}x
+                </button>
+              ))
             ) : (
-              <ChevronUp className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
+              <button
+                onClick={() => setZoomLevel(1)}
+                className="px-3 py-1 rounded-full text-xs font-medium bg-white text-black"
+                data-testid="button-zoom-1x"
+              >
+                1x
+              </button>
             )}
-          </button>
+          </div>
+          
+          {/* Flip Camera */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={switchCamera}
+            className="bg-white/10 backdrop-blur-md text-white hover:bg-white/20 rounded-full"
+            data-testid="button-switch-camera"
+          >
+            <SwitchCamera className="w-4 h-4" />
+          </Button>
         </div>
-      )}
-
-      {/* Bottom Capture Controls - 4-button horizontal layout */}
-      <div className="absolute bottom-12 left-0 right-0 pb-safe z-20">
-        <div className="flex items-center justify-center gap-4 px-8 max-w-lg mx-auto">
-          {/* Back Button */}
+        
+        {/* Auto-tag Dropdown */}
+        {tags.length > 0 && !isRecording && (
+          <div className="flex-shrink-0">
+            <Select
+              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
+              onValueChange={(v) => {
+                if (v && v !== 'none') {
+                  setSelectedTags([v]);
+                } else {
+                  setSelectedTags([]);
+                }
+              }}
+            >
+              <SelectTrigger
+                className="w-full bg-white/10 backdrop-blur-md border-white/20 text-white h-10"
+                data-testid="select-auto-tag"
+              >
+                <SelectValue placeholder="No tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No tag</SelectItem>
+                {tags.map((tag) => (
+                  <SelectItem key={tag.id} value={tag.id}>
+                    {tag.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
+        {/* Bottom Action Buttons */}
+        <div className="flex-shrink-0 flex items-center justify-center gap-6 pb-safe">
+          {/* Cancel/Back */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setLocation('/')}
             disabled={isRecording}
-            className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 active:bg-white/30 text-white disabled:opacity-50 shadow-lg"
-            data-testid="button-back"
+            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 text-white disabled:opacity-50"
+            data-testid="button-cancel"
           >
-            <ArrowLeft className="w-7 h-7" />
+            <X className="w-6 h-6" />
           </Button>
-
-          {/* Video Mode Button - Instant Recording */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={async () => {
-              if (isRecording) {
-                stopRecording();
-              } else {
-                startRecording();
-              }
-            }}
-            className={`w-14 h-14 rounded-full ${
-              isRecording 
-                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' 
-                : 'bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40 text-red-500'
-            } shadow-lg transition-all`}
-            data-testid="button-video-mode"
-          >
-            {isRecording ? (
-              <div className="w-5 h-5 bg-white rounded-sm" />
-            ) : (
-              <Video className="w-7 h-7" />
-            )}
-          </Button>
-
-          {/* Normal Camera Button - Quick Capture */}
+          
+          {/* Large Circular Capture Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={quickCapture}
             disabled={isCapturing || isRecording}
-            className="w-16 h-16 rounded-full bg-white/90 hover:bg-white active:bg-white/80 text-black disabled:opacity-50 transition-transform shadow-lg"
+            className="w-20 h-20 rounded-full bg-white hover:bg-white/90 active:bg-white/80 text-black disabled:opacity-50 shadow-lg"
             data-testid="button-quick-capture"
           >
-            <CameraIcon className="w-8 h-8" />
+            <CameraIcon className="w-10 h-10" />
           </Button>
-
-          {/* Edit Mode Button - Capture & Edit */}
+          
+          {/* Flip Camera (duplicate for symmetry) */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={captureAndEdit}
-            disabled={isCapturing || isRecording}
-            className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground disabled:opacity-50 shadow-lg"
-            data-testid="button-capture-edit"
+            onClick={switchCamera}
+            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 text-white"
+            data-testid="button-flip-camera"
           >
-            <PenLine className="w-7 h-7" />
+            <SwitchCamera className="w-6 h-6" />
           </Button>
         </div>
       </div>
 
-      {/* Recording indicator */}
-      {isRecording && (
-        <div className="absolute top-24 left-0 right-0 flex justify-center z-10">
-          <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 animate-pulse">
-            <div className="w-2 h-2 bg-white rounded-full" />
-            Recording
-          </div>
-        </div>
-      )}
-
-      {/* Photo Thumbnail Strip - Session photos only, left side vertical */}
-      {sessionPhotos.length > 0 && !isRecording && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-          <div 
-            className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden scrollbar-hide max-h-[344px]"
-            style={{
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)'
-            }}
-          >
-            {[...sessionPhotos].reverse().map((photo) => {
-              const url = thumbnailUrlsRef.current.get(photo.id);
-              if (!url) return null;
-              
-              // Get photo tags from pendingTagIds
-              const photoTags = photo.pendingTagIds
-                ?.map(tagId => tags.find(t => t.id === tagId))
-                .filter(Boolean) as Tag[] | undefined;
-              
-              const tagColorMap: Record<string, string> = {
-                red: '#ef4444',
-                orange: '#f97316',
-                yellow: '#eab308',
-                blue: '#3b82f6',
-                gray: '#6b7280',
-              };
-              
-              const isVideo = photo.mediaType === 'video';
-              
-              return (
-                <div
-                  key={photo.id}
-                  className="relative flex-shrink-0 group"
-                  data-testid={`thumbnail-${photo.id}`}
-                >
-                  <button
-                    onClick={() => {
-                      if (isVideo) {
-                        // TODO: Open video player
-                        setLocation(`/photo/${photo.id}/view`);
-                      } else {
-                        setLocation(`/photo/${photo.id}/edit`);
-                      }
-                    }}
-                    className="block w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
-                  >
-                    {isVideo ? (
-                      <video
-                        src={url}
-                        className="w-full h-full object-cover"
-                        muted
-                      />
-                    ) : (
-                      <img
-                        src={url}
-                        alt="Thumbnail"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                    
-                    {/* Play button overlay for videos */}
-                    {isVideo && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
-                        <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-4 h-4 text-black fill-black ml-0.5" />
-                        </div>
-                      </div>
-                    )}
-                  </button>
-                  
-                  {/* Tag indicators on left side (matching project view) */}
-                  {photoTags && photoTags.length > 0 && (
-                    <div 
-                      className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 pointer-events-none"
-                      data-testid={`tag-indicators-${photo.id}`}
-                    >
-                      {photoTags.slice(0, 2).map((tag) => (
-                        <div
-                          key={tag.id}
-                          className="w-1 flex-1 rounded-full"
-                          style={{ backgroundColor: tagColorMap[tag.color] || '#6b7280' }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* +N badge if more than 2 tags */}
-                  {photoTags && photoTags.length > 2 && (
-                    <div 
-                      className="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1 py-0.5 rounded-full pointer-events-none"
-                      data-testid={`tag-overflow-badge-${photo.id}`}
-                    >
-                      +{photoTags.length - 2}
-                    </div>
-                  )}
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeletePhoto(photo.id);
-                    }}
-                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    data-testid={`button-delete-thumbnail-${photo.id}`}
-                  >
-                    <X className="w-3 h-3 text-white" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* Composite Canvas - Hidden */}
+      <canvas
+        ref={compositeCanvasRef}
+        className="absolute"
+        style={{ top: '-9999px', left: '-9999px' }}
+      />
 
       {/* Upgrade Modal */}
       <UpgradeModal 
@@ -1803,7 +1551,6 @@ export default function Camera() {
         onClose={() => setUpgradeModalOpen(false)}
         reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
       />
-
     </div>
   );
 }
