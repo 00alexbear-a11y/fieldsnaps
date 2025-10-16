@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -129,7 +129,8 @@ export default function ProjectPhotos() {
       });
       
       if (!res.ok) {
-        throw new Error(`Upload failed: ${res.statusText}`);
+        const errorData = await res.json().catch(() => ({ message: res.statusText }));
+        throw new Error(errorData.message || `Upload failed: ${res.statusText}`);
       }
       
       return await res.json();
@@ -137,6 +138,14 @@ export default function ProjectPhotos() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "photos"] });
       toast({ title: "Photo uploaded successfully" });
+    },
+    onError: (error: any) => {
+      console.error('Upload error:', error);
+      toast({ 
+        title: "Upload failed", 
+        description: error.message || 'Failed to upload photo',
+        variant: "destructive" 
+      });
     },
   });
 
@@ -248,7 +257,12 @@ export default function ProjectPhotos() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Upload the file
     uploadMutation.mutate(file);
+    
+    // Reset the input so the same file can be uploaded again if needed
+    e.target.value = '';
   };
 
   const toggleSelectMode = () => {
@@ -534,10 +548,7 @@ export default function ProjectPhotos() {
           <div className="text-center py-12">
             <Camera className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-semibold mb-2">No photos yet</h2>
-            <p className="text-muted-foreground mb-4">Tap the camera button below to get started</p>
-            <label htmlFor="photo-upload-fab" className="text-sm text-primary hover:underline cursor-pointer">
-              or choose from library
-            </label>
+            <p className="text-muted-foreground">Tap the camera or upload button below to get started</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -1092,12 +1103,24 @@ export default function ProjectPhotos() {
       {/* Hidden file input for photo upload from camera roll */}
       <input
         type="file"
-        id="photo-upload-fab"
+        id="photo-upload-input"
         accept="image/*"
         onChange={handleFileUpload}
         className="hidden"
         data-testid="input-photo-upload"
       />
+
+      {/* Floating Action Button for Upload (bottom right, aligned with camera button) */}
+      <button
+        onClick={() => document.getElementById('photo-upload-input')?.click()}
+        disabled={uploadMutation.isPending}
+        className="fixed right-6 z-40 flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{ bottom: '88px' }}
+        data-testid="button-upload-photo"
+        aria-label="Upload from library"
+      >
+        <Images className="w-6 h-6 text-primary-foreground" />
+      </button>
     </>
   );
 }
