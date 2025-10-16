@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -34,7 +34,7 @@ export default function Settings() {
   const { registerBiometric, authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const { isDark, toggleTheme } = useTheme();
   const { toast } = useToast();
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
     pending: number;
@@ -51,6 +51,15 @@ export default function Settings() {
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('blue');
+  
+  // Camera quality settings
+  const [cameraQuality, setCameraQuality] = useState<'quick' | 'standard' | 'detailed'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('camera-quality');
+      return (saved as 'quick' | 'standard' | 'detailed') || 'standard';
+    }
+    return 'standard';
+  });
 
   useEffect(() => {
     // Load sync status and storage usage
@@ -246,6 +255,18 @@ export default function Settings() {
       createTagMutation.mutate({ name: tagName, color: tagColor });
     }
   };
+  
+  const handleQualityChange = (quality: 'quick' | 'standard' | 'detailed') => {
+    setCameraQuality(quality);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('camera-quality', quality);
+    }
+    toast({
+      title: 'Quality updated',
+      description: 'New photos will use this quality setting',
+      duration: 2000,
+    });
+  };
 
   return (
     <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
@@ -286,6 +307,83 @@ export default function Settings() {
             data-testid="switch-dark-mode"
           />
         </label>
+      </Card>
+
+      {/* Camera Quality */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <Camera className="w-5 h-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Camera Quality</h2>
+        </div>
+        
+        <p className="text-sm text-muted-foreground">
+          Choose default quality for new photos
+        </p>
+
+        <div className="space-y-3">
+          <label
+            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+              cameraQuality === 'quick' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+            }`}
+            data-testid="option-quality-quick"
+          >
+            <div className="flex-1">
+              <div className="font-medium">Quick (S)</div>
+              <div className="text-sm text-muted-foreground">~200 KB per photo</div>
+              <div className="text-xs text-muted-foreground mt-1">Fast upload, good for previews</div>
+            </div>
+            <input
+              type="radio"
+              name="camera-quality"
+              value="quick"
+              checked={cameraQuality === 'quick'}
+              onChange={() => handleQualityChange('quick')}
+              className="w-4 h-4 text-primary"
+            />
+          </label>
+
+          <label
+            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+              cameraQuality === 'standard' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+            }`}
+            data-testid="option-quality-standard"
+          >
+            <div className="flex-1">
+              <div className="font-medium">Standard (M)</div>
+              <div className="text-sm text-muted-foreground">~500 KB per photo</div>
+              <div className="text-xs text-muted-foreground mt-1">Balanced quality and size</div>
+            </div>
+            <input
+              type="radio"
+              name="camera-quality"
+              value="standard"
+              checked={cameraQuality === 'standard'}
+              onChange={() => handleQualityChange('standard')}
+              className="w-4 h-4 text-primary"
+            />
+          </label>
+
+          <label
+            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+              cameraQuality === 'detailed' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+            }`}
+            data-testid="option-quality-detailed"
+          >
+            <div className="flex-1">
+              <div className="font-medium">Detailed (L)</div>
+              <div className="text-sm text-muted-foreground">~1 MB per photo</div>
+              <div className="text-xs text-muted-foreground mt-1">High quality for important shots</div>
+            </div>
+            <input
+              type="radio"
+              name="camera-quality"
+              value="detailed"
+              checked={cameraQuality === 'detailed'}
+              onChange={() => handleQualityChange('detailed')}
+              className="w-4 h-4 text-primary"
+            />
+          </label>
+        </div>
       </Card>
 
       {/* Tags Management */}

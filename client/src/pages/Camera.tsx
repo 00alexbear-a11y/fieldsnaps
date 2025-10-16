@@ -50,7 +50,13 @@ export default function Camera() {
   const [hasPermission, setHasPermission] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [selectedQuality, setSelectedQuality] = useState<QualityPreset>('standard');
+  const [selectedQuality, setSelectedQuality] = useState<QualityPreset>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('camera-quality');
+      return (saved as QualityPreset) || 'standard';
+    }
+    return 'standard';
+  });
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -1395,29 +1401,9 @@ export default function Camera() {
           )}
       </div>
 
-      {/* Controls Row - Quality, Zoom, Tags */}
+      {/* Controls Row - Zoom, Tags */}
       <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10">
         <div className="flex items-center justify-center gap-4">
-          {/* Quality toggles S/M/L */}
-          <div className="flex gap-1">
-            {QUALITY_PRESETS.map((preset) => (
-              <Button
-                key={preset.value}
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedQuality(preset.value)}
-                className={`h-8 w-8 p-0 text-xs ${
-                  selectedQuality === preset.value
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white'
-                }`}
-                data-testid={`button-quality-${preset.value}`}
-              >
-                {preset.label}
-              </Button>
-            ))}
-          </div>
-          
           {/* Zoom controls */}
           <div className="flex gap-1">
             {availableCameras.map((camera) => (
