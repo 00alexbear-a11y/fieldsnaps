@@ -28,6 +28,7 @@ import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { SwipeBackGesture } from "./components/SwipeBackGesture";
 
 function AppContent() {
   const [location, setLocation] = useLocation();
@@ -90,6 +91,9 @@ function AppContent() {
 
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
+      {/* Universal swipe-back gesture */}
+      <SwipeBackGesture />
+      
       {/* Show payment notification for past_due users */}
       <PaymentNotification />
       
