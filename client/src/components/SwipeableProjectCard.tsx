@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect, TouchEvent } from "react";
-import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink, Share2 } from "lucide-react";
+import { Trash2, FolderOpen, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Project, Photo } from "../../../shared/schema";
 
 interface SwipeableProjectCardProps {
@@ -12,6 +18,7 @@ interface SwipeableProjectCardProps {
   onDelete: () => void;
   onCameraClick: () => void;
   onShare: () => void;
+  onToggleComplete: () => void;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -26,6 +33,7 @@ export default function SwipeableProjectCard({
   onDelete,
   onCameraClick,
   onShare,
+  onToggleComplete,
 }: SwipeableProjectCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
@@ -226,6 +234,14 @@ export default function SwipeableProjectCard({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Completion Badge */}
+            {project.completed && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium">Done</span>
+              </div>
+            )}
+            
             {/* Maps Button - Compact square design */}
             {project.address && (
               <button
@@ -258,6 +274,53 @@ export default function SwipeableProjectCard({
             >
               <Camera className="w-5 h-5" />
             </Button>
+            
+            {/* Menu Button */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-11 h-11"
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid={`button-menu-${project.id}`}
+                  aria-label="Project options"
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleComplete();
+                  }}
+                  data-testid={`menu-toggle-complete-${project.id}`}
+                >
+                  {project.completed ? (
+                    <>
+                      <Circle className="w-4 h-4 mr-2" />
+                      Mark as Incomplete
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      Mark as Complete
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShare();
+                  }}
+                  data-testid={`menu-share-${project.id}`}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share Project
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

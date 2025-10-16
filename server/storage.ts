@@ -150,6 +150,7 @@ export class DbStorage implements IStorage {
         createdAt: projects.createdAt,
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
+        completed: projects.completed,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN 1 END) AS INTEGER)`,
       })
       .from(projects)
