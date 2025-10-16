@@ -1213,41 +1213,18 @@ export default function Camera() {
 
   return (
     <div className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
-      {/* Compact Header - Project selector and flip camera only */}
-      <div className="flex-shrink-0 z-30 bg-black/50 backdrop-blur-md border-b border-white/10 px-2 py-2">
-        <div className="flex items-center gap-2">
-          {/* Project Dropdown */}
-          <Select value={selectedProject} onValueChange={(v) => setSelectedProject(v)}>
-            <SelectTrigger
-              className="flex-1 bg-transparent border-none text-white font-medium h-8 text-sm"
-              data-testid="select-project"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          {/* Flip Camera */}
+      {/* Dominant Viewfinder - Extended to top of screen */}
+      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto" style={{ aspectRatio: '16/9' }}>
+          {/* Flip Camera Button - Centered at top, semi-transparent */}
           <Button
             variant="ghost"
             size="icon"
             onClick={switchCamera}
-            className="h-8 w-8 bg-white/10 text-white hover:bg-white/20"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 h-10 w-10 bg-black/30 text-white/60 hover:bg-black/40 hover:text-white/80 backdrop-blur-sm border border-white/10"
             data-testid="button-switch-camera"
           >
-            <SwitchCamera className="w-4 h-4" />
+            <SwitchCamera className="w-5 h-5" />
           </Button>
-        </div>
-      </div>
-
-      {/* Dominant Viewfinder (16:9 aspect ratio, maximized) */}
-      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto" style={{ aspectRatio: '16/9' }}>
           {/* Loading state */}
           {!isActive && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
