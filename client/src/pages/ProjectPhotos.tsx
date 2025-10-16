@@ -1112,7 +1112,7 @@ export default function ProjectPhotos() {
 
       {/* Floating Action Button for Upload (positioned to the right of camera button) */}
       <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        <div className="flex items-center justify-end h-16 max-w-screen-sm mx-auto pb-safe pr-6">
+        <div className="flex items-start justify-end h-16 max-w-screen-sm mx-auto pb-safe pr-6 pt-2">
           <button
             onClick={() => document.getElementById('photo-upload-input')?.click()}
             disabled={uploadMutation.isPending}
