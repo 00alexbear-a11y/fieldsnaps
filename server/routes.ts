@@ -157,6 +157,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
+      // Dev bypass mode - return mock user for testing
+      const skipAuth = req.headers['x-skip-auth'] === 'true' || req.query.skipAuth === 'true';
+      if (process.env.NODE_ENV === 'development' && skipAuth) {
+        return res.json({
+          id: 'dev-user',
+          email: 'dev@test.com',
+          firstName: 'Dev',
+          lastName: 'User',
+          subscriptionStatus: 'active', // Give full access in dev mode
+          profileImageUrl: null,
+          stripeCustomerId: null,
+          trialStartDate: null,
+          trialEndDate: null,
+          pastDueSince: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+
       const userId = req.user?.claims?.sub;
       if (!userId) {
         return res.status(401).json({ message: 'User not authenticated' });
