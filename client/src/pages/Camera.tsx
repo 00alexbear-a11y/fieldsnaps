@@ -1204,26 +1204,14 @@ export default function Camera() {
   const selectedProjectData = projects.find(p => p.id === selectedProject);
 
   return (
-    <div className="fixed inset-0 w-full bg-black overflow-hidden" style={{ height: '100dvh', minHeight: '100vh' }}>
-      {/* Header Bar */}
-      <div className="absolute top-0 left-0 right-0 z-30 bg-black/50 backdrop-blur-md border-b border-white/10">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/')}
-            disabled={isRecording}
-            className="text-white hover:bg-white/20"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          
+    <div className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
+      {/* Compact Header - All secondary controls */}
+      <div className="flex-shrink-0 z-30 bg-black/50 backdrop-blur-md border-b border-white/10 px-2 py-2">
+        <div className="flex items-center gap-2">
           {/* Project Dropdown */}
           <Select value={selectedProject} onValueChange={(v) => setSelectedProject(v)}>
             <SelectTrigger
-              className="max-w-xs bg-transparent border-none text-white font-medium h-9"
+              className="flex-1 bg-transparent border-none text-white font-medium h-8 text-sm"
               data-testid="select-project"
             >
               <SelectValue />
@@ -1237,24 +1225,90 @@ export default function Camera() {
             </SelectContent>
           </Select>
           
-          {/* Info Icon */}
+          {/* Quality toggles S/M/L */}
+          <div className="flex gap-1">
+            {QUALITY_PRESETS.map((preset) => (
+              <Button
+                key={preset.value}
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedQuality(preset.value)}
+                className={`h-8 w-8 p-0 text-xs ${
+                  selectedQuality === preset.value
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white'
+                }`}
+                data-testid={`button-quality-${preset.value}`}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+          
+          {/* Zoom controls */}
+          <div className="flex gap-1">
+            {availableCameras.map((camera) => (
+              <Button
+                key={camera.deviceId}
+                variant="ghost"
+                size="sm"
+                onClick={() => switchZoomLevel(camera.zoomLevel)}
+                className={`h-8 px-2 text-xs ${
+                  zoomLevel === camera.zoomLevel
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white'
+                }`}
+                data-testid={`button-zoom-${camera.zoomLevel}x`}
+              >
+                {camera.zoomLevel}x
+              </Button>
+            ))}
+          </div>
+          
+          {/* Flip Camera */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => toast({ title: 'Camera Info', description: 'Framed viewfinder camera' })}
-            className="text-white hover:bg-white/20"
-            data-testid="button-info"
+            onClick={switchCamera}
+            className="h-8 w-8 bg-white/10 text-white hover:bg-white/20"
+            data-testid="button-switch-camera"
           >
-            <Info className="w-5 h-5" />
+            <SwitchCamera className="w-4 h-4" />
           </Button>
+          
+          {/* Auto-tag Dropdown */}
+          {tags.length > 0 && !isRecording && (
+            <Select
+              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
+              onValueChange={(v) => {
+                if (v && v !== 'none') {
+                  setSelectedTags([v]);
+                } else {
+                  setSelectedTags([]);
+                }
+              }}
+            >
+              <SelectTrigger
+                className="w-24 bg-white/10 border-white/20 text-white h-8 text-xs"
+                data-testid="select-auto-tag"
+              >
+                <SelectValue placeholder="No tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No tag</SelectItem>
+                {tags.map((tag) => (
+                  <SelectItem key={tag.id} value={tag.id}>
+                    {tag.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
 
-      {/* Main Content Container */}
-      <div className="absolute top-16 left-0 right-0 bottom-0 flex flex-col p-4 gap-4">
-        
-        {/* Framed Viewfinder Container (~65% height) */}
-        <div className="relative flex-[0.65] bg-black rounded-3xl overflow-hidden border-2 border-white/20">
+      {/* Dominant Viewfinder (≥75% height) */}
+      <div className="relative flex-1 min-h-0">
           {/* Loading state */}
           {!isActive && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
@@ -1407,135 +1461,73 @@ export default function Camera() {
             </div>
           </div>
         )}
+
+      {/* Bottom Action Rail - 4 Buttons */}
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
+        {/* Quick Capture */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={quickCapture}
+          disabled={isCapturing || isRecording || !selectedProject}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+          data-testid="button-quick-capture"
+        >
+          <CameraIcon className="w-6 h-6" />
+          <span className="text-[10px]">Quick</span>
+        </Button>
         
-        {/* Tools Row */}
-        <div className="flex-shrink-0 flex items-center justify-between gap-4">
-          {/* Quality: S M L */}
-          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1">
-            {QUALITY_PRESETS.map((preset) => (
-              <button
-                key={preset.value}
-                onClick={() => setSelectedQuality(preset.value)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  selectedQuality === preset.value
-                    ? 'bg-white text-black'
-                    : 'text-white hover:bg-white/20'
-                }`}
-                data-testid={`button-quality-${preset.label}`}
-              >
-                {preset.label}
-              </button>
-            ))}
-          </div>
-          
-          {/* Zoom Controls */}
-          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-full p-1">
-            {availableCameras.length > 0 ? (
-              availableCameras.map((camera) => (
-                <button
-                  key={camera.zoomLevel}
-                  onClick={() => switchZoomLevel(camera.zoomLevel)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    zoomLevel === camera.zoomLevel
-                      ? 'bg-white text-black'
-                      : 'text-white hover:bg-white/20'
-                  }`}
-                  data-testid={`button-zoom-${camera.zoomLevel}x`}
-                >
-                  {camera.zoomLevel}x
-                </button>
-              ))
-            ) : (
-              <button
-                onClick={() => setZoomLevel(1)}
-                className="px-3 py-1 rounded-full text-xs font-medium bg-white text-black"
-                data-testid="button-zoom-1x"
-              >
-                1x
-              </button>
-            )}
-          </div>
-          
-          {/* Flip Camera */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={switchCamera}
-            className="bg-white/10 backdrop-blur-md text-white hover:bg-white/20 rounded-full"
-            data-testid="button-switch-camera"
-          >
-            <SwitchCamera className="w-4 h-4" />
-          </Button>
-        </div>
+        {/* Capture & Edit */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={captureAndEdit}
+          disabled={isCapturing || isRecording || !selectedProject}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+          data-testid="button-capture-edit"
+        >
+          <PenLine className="w-6 h-6" />
+          <span className="text-[10px]">Edit</span>
+        </Button>
         
-        {/* Auto-tag Dropdown */}
-        {tags.length > 0 && !isRecording && (
-          <div className="flex-shrink-0">
-            <Select
-              value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
-              onValueChange={(v) => {
-                if (v && v !== 'none') {
-                  setSelectedTags([v]);
-                } else {
-                  setSelectedTags([]);
-                }
-              }}
-            >
-              <SelectTrigger
-                className="w-full bg-white/10 backdrop-blur-md border-white/20 text-white h-10"
-                data-testid="select-auto-tag"
-              >
-                <SelectValue placeholder="No tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No tag</SelectItem>
-                {tags.map((tag) => (
-                  <SelectItem key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* Video Record/Stop */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={!selectedProject}
+          className={`flex flex-col gap-1 w-16 h-16 rounded-full ${
+            isRecording 
+              ? 'bg-red-600 hover:bg-red-700 text-white' 
+              : 'bg-white/10 hover:bg-white/20 text-white'
+          } disabled:opacity-50`}
+          data-testid="button-video-record"
+        >
+          {isRecording ? (
+            <>
+              <div className="w-6 h-6 rounded-sm bg-white" />
+              <span className="text-[10px]">Stop</span>
+            </>
+          ) : (
+            <>
+              <Video className="w-6 h-6" />
+              <span className="text-[10px]">Video</span>
+            </>
+          )}
+        </Button>
         
-        {/* Bottom Action Buttons */}
-        <div className="flex-shrink-0 flex items-center justify-center gap-6 pb-safe">
-          {/* Cancel/Back */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/')}
-            disabled={isRecording}
-            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 text-white disabled:opacity-50"
-            data-testid="button-cancel"
-          >
-            <X className="w-6 h-6" />
-          </Button>
-          
-          {/* Large Circular Capture Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={quickCapture}
-            disabled={isCapturing || isRecording}
-            className="w-20 h-20 rounded-full bg-white hover:bg-white/90 active:bg-white/80 text-black disabled:opacity-50 shadow-lg"
-            data-testid="button-quick-capture"
-          >
-            <CameraIcon className="w-10 h-10" />
-          </Button>
-          
-          {/* Flip Camera (duplicate for symmetry) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={switchCamera}
-            className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 text-white"
-            data-testid="button-flip-camera"
-          >
-            <SwitchCamera className="w-6 h-6" />
-          </Button>
-        </div>
+        {/* Session Photos */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => selectedProject && setLocation(`/projects/${selectedProject}/photos`)}
+          disabled={!selectedProject}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+          data-testid="button-session-photos"
+        >
+          <FolderOpen className="w-6 h-6" />
+          <span className="text-[10px]">Photos</span>
+        </Button>
       </div>
 
       {/* Composite Canvas - Hidden */}
