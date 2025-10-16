@@ -252,7 +252,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if this is the user's first project and start trial if needed
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const user = await storage.getUser(userId);
       
       // Start trial if user has no trial start date yet (first project)

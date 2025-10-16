@@ -170,6 +170,12 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   // Allow skip auth in development mode for testing
   const skipAuth = req.headers['x-skip-auth'] === 'true' || req.query.skipAuth === 'true';
   if (process.env.NODE_ENV === 'development' && skipAuth) {
+    // Set up mock user for dev bypass
+    (req as any).user = {
+      claims: {
+        sub: 'dev-user'
+      }
+    };
     return next();
   }
 
