@@ -17,6 +17,7 @@ import Inbox from "./pages/Inbox";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Impact from "./pages/Impact";
+import BillingSuccess from "./pages/BillingSuccess";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -103,6 +104,7 @@ function AppContent() {
           <Route path="/trash" component={Trash} />
           <Route path="/map" component={Map} />
           <Route path="/inbox" component={Inbox} />
+          <Route path="/billing/success" component={BillingSuccess} />
           <Route path="/shared/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>

@@ -191,6 +191,29 @@ export default function Settings() {
     },
   });
 
+  // Checkout mutation
+  const checkoutMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/billing/create-checkout-session');
+      return await res.json();
+    },
+    onSuccess: (data: { url: string }) => {
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Checkout failed',
+        description: error.message || 'Unable to start checkout process',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleUpgradeClick = () => {
+    checkoutMutation.mutate();
+  };
+
   const handleOpenTagDialog = (tag?: Tag) => {
     if (tag) {
       setEditingTag(tag);
@@ -427,11 +450,12 @@ export default function Settings() {
                     variant="outline"
                     size="default"
                     className="w-full"
-                    onClick={() => setLocation('/billing/upgrade')}
+                    onClick={handleUpgradeClick}
+                    disabled={checkoutMutation.isPending}
                     data-testid="button-upgrade-trial"
                   >
                     <CreditCard className="w-4 h-4 mr-2" />
-                    Upgrade to Pro
+                    {checkoutMutation.isPending ? 'Loading...' : 'Upgrade to Pro'}
                   </Button>
                 </>
               )}
@@ -517,11 +541,12 @@ export default function Settings() {
                 variant="default"
                 size="default"
                 className="w-full"
-                onClick={() => setLocation('/billing/upgrade')}
+                onClick={handleUpgradeClick}
+                disabled={checkoutMutation.isPending}
                 data-testid="button-upgrade-expired"
               >
                 <CreditCard className="w-4 h-4 mr-2" />
-                Upgrade to Pro
+                {checkoutMutation.isPending ? 'Loading...' : 'Upgrade to Pro'}
               </Button>
             </div>
           )}

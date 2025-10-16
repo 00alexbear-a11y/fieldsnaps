@@ -1172,6 +1172,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create Stripe Checkout session
+  app.post("/api/billing/create-checkout-session", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Check if billing is configured
+      if (!billingService.isConfigured()) {
+        console.log("[Billing] Service not configured - dormant mode");
+        return res.status(503).json({ 
+          error: "Billing service not available",
+          message: "Billing is not yet activated for this application" 
+        });
+      }
+
+      // Build success and cancel URLs
+      const baseUrl = process.env.REPLIT_DEPLOYMENT ? 
+        `https://${process.env.REPLIT_DEPLOYMENT}` : 
+        `http://localhost:5000`;
+      const successUrl = `${baseUrl}/billing/success`;
+      const cancelUrl = `${baseUrl}/settings`;
+
+      // Create checkout session
+      const session = await billingService.createCheckoutSession(userId, successUrl, cancelUrl);
+
+      res.json({ url: session.url });
+    } catch (error: any) {
+      console.error("[Billing] Error creating checkout session:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
