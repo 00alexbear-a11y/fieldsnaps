@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -21,6 +21,14 @@ import { useQuery } from '@tanstack/react-query';
 import { type Tag } from '@shared/schema';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Badge } from '@/components/ui/badge';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { useMutation } from '@tanstack/react-query';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
   { value: 'quick', label: 'S', description: '200KB - Fast upload' },
@@ -72,6 +80,8 @@ export default function Camera() {
   
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
+  const [showTaskSheet, setShowTaskSheet] = useState(false);
+  const [taskName, setTaskName] = useState('');
   
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
   const [sessionPhotos, setSessionPhotos] = useState<LocalPhoto[]>([]);
@@ -122,6 +132,38 @@ export default function Camera() {
       credentials: 'include'
     }).then(r => r.json()),
     enabled: !!selectedProject,
+  });
+
+  const { data: teamMembers = [] } = useQuery<any[]>({
+    queryKey: ['/api/companies/members'],
+    enabled: showTaskSheet,
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: async ({ taskName, assignedTo }: { taskName: string; assignedTo: string }) => {
+      return await apiRequest('POST', `/api/projects/${selectedProject}/tasks`, {
+        taskName,
+        assignedTo,
+        projectId: selectedProject,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject, 'tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks/my-tasks'] });
+      setShowTaskSheet(false);
+      setTaskName('');
+      toast({
+        title: 'Task created',
+        description: 'Task added successfully',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to create task',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
   });
   
   useEffect(() => {
@@ -1448,6 +1490,19 @@ export default function Camera() {
               </Select>
             );
           })()}
+          
+          {/* Quick Task Button */}
+          {selectedProject && !isRecording && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTaskSheet(true)}
+              className="h-8 px-3 bg-white/10 text-white hover:bg-white/20"
+              data-testid="button-quick-task"
+            >
+              <ListTodo className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -1532,6 +1587,71 @@ export default function Camera() {
         className="absolute"
         style={{ top: '-9999px', left: '-9999px' }}
       />
+
+      {/* Quick Task Sheet */}
+      <Sheet open={showTaskSheet} onOpenChange={setShowTaskSheet}>
+        <SheetContent side="bottom" className="h-[80vh]">
+          <SheetHeader>
+            <SheetTitle>Create Quick Task</SheetTitle>
+            <SheetDescription>
+              Assign a task to a team member
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-6 space-y-6">
+            {/* Task Name Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Task Name</label>
+              <input
+                type="text"
+                value={taskName}
+                onChange={(e) => setTaskName(e.target.value)}
+                placeholder="Enter task name..."
+                className="w-full h-14 px-4 text-lg border rounded-lg bg-background"
+                data-testid="input-task-name"
+              />
+            </div>
+
+            {/* Team Member Selection - Large Glove-Friendly Buttons */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Assign To</label>
+              <div className="grid grid-cols-1 gap-3">
+                {teamMembers.map((member) => (
+                  <Button
+                    key={member.id}
+                    variant="outline"
+                    size="lg"
+                    onClick={() => {
+                      if (taskName.trim()) {
+                        createTaskMutation.mutate({
+                          taskName: taskName.trim(),
+                          assignedTo: member.id,
+                        });
+                      } else {
+                        toast({
+                          title: 'Task name required',
+                          description: 'Please enter a task name',
+                          variant: 'destructive',
+                        });
+                      }
+                    }}
+                    disabled={createTaskMutation.isPending}
+                    className="h-16 text-lg justify-start"
+                    data-testid={`button-assign-${member.id}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                        {member.name?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                      <span>{member.name}</span>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Upgrade Modal */}
       <UpgradeModal 
