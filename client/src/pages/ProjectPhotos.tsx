@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -57,6 +57,9 @@ export default function ProjectPhotos() {
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [photoSize, setPhotoSize] = useState<'S' | 'M' | 'L'>('M');
+  const [showTaskDialog, setShowTaskDialog] = useState(false);
+  const [taskName, setTaskName] = useState("");
+  const [taskAssignee, setTaskAssignee] = useState("");
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -75,6 +78,12 @@ export default function ProjectPhotos() {
   // Fetch available tags for filtering
   const { data: availableTags = [] } = useQuery<Tag[]>({
     queryKey: ["/api/tags"],
+  });
+
+  // Fetch team members for task assignment
+  const { data: teamMembers = [] } = useQuery<any[]>({
+    queryKey: ["/api/companies/members"],
+    enabled: showTaskDialog,
   });
 
   // Filter photos by selected tags (for use in viewer and display)
@@ -231,6 +240,29 @@ export default function ProjectPhotos() {
     onError: (error: any) => {
       toast({ 
         title: "Failed to apply tags", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: { taskName: string; assignedTo: string; projectId: string }) => {
+      return await apiRequest("POST", "/api/tasks", taskData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "tasks"] });
+      toast({ 
+        title: "Task created successfully",
+        duration: 1500,
+      });
+      setShowTaskDialog(false);
+      setTaskName("");
+      setTaskAssignee("");
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to create task", 
         description: error.message,
         variant: "destructive" 
       });
@@ -554,34 +586,45 @@ export default function ProjectPhotos() {
               <p className="text-xs sm:text-sm text-muted-foreground">{project.description}</p>
             )}
           </div>
-          {project && (
+          <div className="flex items-center gap-2">
             <Button
-              variant={project.completed ? "outline" : "default"}
+              variant="outline"
               size="sm"
-              onClick={() => {
-                apiRequest("PATCH", `/api/projects/${projectId}`, { completed: !project.completed })
-                  .then(() => {
-                    queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
-                    queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
-                    toast({
-                      title: project.completed ? "Job Reopened" : "Job Completed",
-                      description: project.completed ? "This job is now active again" : "This job is marked as complete",
-                    });
-                  })
-                  .catch((error) => {
-                    toast({
-                      title: "Error",
-                      description: "Failed to update job status",
-                      variant: "destructive",
-                    });
-                  });
-              }}
+              onClick={() => setShowTaskDialog(true)}
               className="flex-shrink-0"
-              data-testid="button-toggle-complete"
+              data-testid="button-add-task"
             >
-              {project.completed ? "Reopen" : "Complete"}
+              <ListTodo className="w-4 h-4" />
             </Button>
-          )}
+            {project && (
+              <Button
+                variant={project.completed ? "outline" : "default"}
+                size="sm"
+                onClick={() => {
+                  apiRequest("PATCH", `/api/projects/${projectId}`, { completed: !project.completed })
+                    .then(() => {
+                      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
+                      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
+                      toast({
+                        title: project.completed ? "Job Reopened" : "Job Completed",
+                        description: project.completed ? "This job is now active again" : "This job is marked as complete",
+                      });
+                    })
+                    .catch((error) => {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update job status",
+                        variant: "destructive",
+                      });
+                    });
+                }}
+                className="flex-shrink-0"
+                data-testid="button-toggle-complete"
+              >
+                {project.completed ? "Reopen" : "Complete"}
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -1034,6 +1077,75 @@ export default function ProjectPhotos() {
               data-testid="button-confirm-move"
             >
               {movePhotosMutation.isPending ? "Moving..." : "Move Photos"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Task Creation Dialog */}
+      <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Task</DialogTitle>
+            <DialogDescription>
+              Assign a task to a team member for this project.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="task-name">Task Name</Label>
+              <Input
+                id="task-name"
+                placeholder="e.g., Document foundation work"
+                value={taskName}
+                onChange={(e) => setTaskName(e.target.value)}
+                data-testid="input-task-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="task-assignee">Assign To</Label>
+              <Select value={taskAssignee} onValueChange={setTaskAssignee}>
+                <SelectTrigger id="task-assignee" data-testid="select-task-assignee">
+                  <SelectValue placeholder="Select team member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teamMembers.map((member: any) => (
+                    <SelectItem key={member.id} value={member.id} data-testid={`option-assignee-${member.id}`}>
+                      {member.firstName && member.lastName 
+                        ? `${member.firstName} ${member.lastName}` 
+                        : member.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowTaskDialog(false);
+                setTaskName("");
+                setTaskAssignee("");
+              }}
+              data-testid="button-cancel-task"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (taskName.trim() && taskAssignee && projectId) {
+                  createTaskMutation.mutate({
+                    taskName: taskName.trim(),
+                    assignedTo: taskAssignee,
+                    projectId,
+                  });
+                }
+              }}
+              disabled={!taskName.trim() || !taskAssignee || createTaskMutation.isPending}
+              data-testid="button-create-task"
+            >
+              {createTaskMutation.isPending ? "Creating..." : "Create Task"}
             </Button>
           </DialogFooter>
         </DialogContent>
