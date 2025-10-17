@@ -27,6 +27,7 @@ const createTodoSchema = z.object({
   projectId: z.string().optional(),
   assignedTo: z.string().min(1, "Assignee is required"),
   dueDate: z.string().optional(),
+  photoId: z.string().optional(),
 });
 
 type CreateTodoForm = z.infer<typeof createTodoSchema>;
