@@ -19,6 +19,7 @@ import Landing from "./pages/Landing";
 import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
 import CompanySetup from "./pages/CompanySetup";
+import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -126,6 +127,7 @@ function AppContent() {
           <Route path="/projects/:id" component={ProjectPhotos} />
           <Route path="/photo/:id/edit" component={PhotoEdit} />
           <Route path="/photo/:id/view" component={PhotoView} />
+          <Route path="/my-tasks" component={MyTasks} />
           <Route path="/settings" component={Settings} />
           <Route path="/sync-status" component={SyncStatus} />
           <Route path="/trash" component={Trash} />

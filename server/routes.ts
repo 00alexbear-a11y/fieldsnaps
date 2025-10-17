@@ -1312,6 +1312,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/tasks/my-tasks", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const tasks = await storage.getTasksAssignedToUser(userId);
+      res.json(tasks);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.put("/api/tasks/:id", isAuthenticated, async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
