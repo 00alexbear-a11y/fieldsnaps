@@ -196,19 +196,23 @@ export const photoTags = pgTable("photo_tags", {
   index("idx_photo_tags_tag_id").on(table.tagId),
 ]);
 
-// Subscriptions table - current state for future Stripe billing integration
+// Subscriptions table - company-based subscriptions (owner pays for whole team)
 export const subscriptions = pgTable("subscriptions", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }), // Company (not user)
   stripeSubscriptionId: varchar("stripe_subscription_id").unique(),
   stripePriceId: varchar("stripe_price_id"), // $19.99/month price ID
+  quantity: integer("quantity").default(1).notNull(), // Number of users owner pays for
   status: varchar("status").notNull(), // active, past_due, canceled, trialing
   currentPeriodStart: timestamp("current_period_start"),
   currentPeriodEnd: timestamp("current_period_end"),
   cancelAtPeriodEnd: integer("cancel_at_period_end").default(0).notNull(), // boolean stored as integer (0/1)
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  // Legacy field for backwards compatibility during migration
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
 }, (table) => [
+  index("idx_subscriptions_company_id").on(table.companyId),
   index("idx_subscriptions_user_id").on(table.userId),
   index("idx_subscriptions_stripe_id").on(table.stripeSubscriptionId),
 ]);
