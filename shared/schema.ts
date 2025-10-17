@@ -166,6 +166,28 @@ export const tasks = pgTable("tasks", {
   index("idx_tasks_completed").on(table.completed),
 ]);
 
+// ToDos table - team to-do list with optional photo attachments
+export const todos = pgTable("todos", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
+  description: text("description"),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional - can be general todos
+  photoId: varchar("photo_id").references(() => photos.id, { onDelete: "set null" }), // Optional - attached photo for context
+  assignedTo: varchar("assigned_to").notNull().references(() => users.id, { onDelete: "cascade" }), // Who needs to do it
+  createdBy: varchar("created_by").notNull().references(() => users.id, { onDelete: "cascade" }), // Who created it
+  completed: boolean("completed").default(false).notNull(),
+  completedAt: timestamp("completed_at"),
+  completedBy: varchar("completed_by").references(() => users.id, { onDelete: "set null" }), // Who marked complete
+  dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_todos_project_id").on(table.projectId),
+  index("idx_todos_photo_id").on(table.photoId),
+  index("idx_todos_assigned_to").on(table.assignedTo),
+  index("idx_todos_created_by").on(table.createdBy),
+  index("idx_todos_completed").on(table.completed),
+]);
+
 // Shares table - for generating shareable project links (shows all active photos)
 export const shares = pgTable("shares", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -246,6 +268,7 @@ export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, cre
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, createdAt: true });
+export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, createdAt: true });
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
@@ -264,6 +287,7 @@ export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
+export type ToDo = typeof todos.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type PhotoTag = typeof photoTags.$inferSelect;
@@ -276,6 +300,7 @@ export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
 export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type InsertToDo = z.infer<typeof insertTodoSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
