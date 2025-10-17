@@ -221,10 +221,8 @@ async function verifyTodoCompanyAccess(req: any, res: any, todoId: string): Prom
   }
 
   // Verify user is creator, assignee, or in same company
-  const userWithCompany = await getUserWithCompany(req, res);
-  if (!userWithCompany) return false;
-  
-  const { user } = userWithCompany;
+  const user = await getUserWithCompany(req, res);
+  if (!user) return false;
   
   // User must be creator or assignee
   if (todo.createdBy !== user.id && todo.assignedTo !== user.id) {
@@ -1432,10 +1430,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ToDos Routes
   app.get("/api/todos", isAuthenticated, async (req, res) => {
     try {
-      const userWithCompany = await getUserWithCompany(req, res);
-      if (!userWithCompany) return;
-      
-      const { user, company } = userWithCompany;
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
       
       const filters = {
         projectId: req.query.projectId as string | undefined,
@@ -1443,7 +1439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         view: (req.query.view as 'my-tasks' | 'team-tasks' | 'i-created') || 'my-tasks',
       };
 
-      const todos = await storage.getTodos(company.id, user.id, filters);
+      const todos = await storage.getTodos(user.companyId, user.id, filters);
       res.json(todos);
     } catch (error: any) {
       handleError(res, error);
@@ -1466,15 +1462,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/todos", isAuthenticated, async (req, res) => {
     try {
-      const userWithCompany = await getUserWithCompany(req, res);
-      if (!userWithCompany) return;
-      
-      const { user, company } = userWithCompany;
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
 
-      // Verify assignee is in same company
-      const assignee = await storage.getUser(req.body.assignedTo);
-      if (!assignee || assignee.companyId !== company.id) {
-        return handleError(res, errors.validation("Can only assign to-dos to members of your company"));
+      // Verify assignee is in same company (allow self-assignment)
+      if (req.body.assignedTo !== user.id) {
+        const assignee = await storage.getUser(req.body.assignedTo);
+        if (!assignee) {
+          return handleError(res, errors.validation("Assignee user not found"));
+        }
+        if (assignee.companyId !== user.companyId) {
+          return handleError(res, errors.validation("Can only assign to-dos to members of your company"));
+        }
       }
 
       // If project specified, verify access
@@ -1512,10 +1511,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
-      const userWithCompany = await getUserWithCompany(req, res);
-      if (!userWithCompany) return;
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
       
-      const todo = await storage.completeTodo(req.params.id, userWithCompany.user.id);
+      const todo = await storage.completeTodo(req.params.id, user.id);
       if (!todo) {
         return res.status(404).json({ error: "To-do not found" });
       }
