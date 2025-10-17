@@ -133,6 +133,13 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Check for invite token in query params
+    const inviteToken = req.query.invite as string;
+    if (inviteToken) {
+      // Store invite token in session for use after auth
+      (req.session as any).inviteToken = inviteToken;
+    }
+    
     // Strip port from hostname for strategy lookup
     const strategyHost = req.hostname.split(':')[0];
     passport.authenticate(`replitauth:${strategyHost}`, {
@@ -144,9 +151,63 @@ export async function setupAuth(app: Express) {
   app.get("/api/callback", (req, res, next) => {
     // Strip port from hostname for strategy lookup
     const strategyHost = req.hostname.split(':')[0];
-    passport.authenticate(`replitauth:${strategyHost}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+    passport.authenticate(`replitauth:${strategyHost}`, async (err: any, user: any) => {
+      if (err || !user) {
+        return res.redirect("/api/login");
+      }
+
+      req.login(user, async (loginErr) => {
+        if (loginErr) {
+          return next(loginErr);
+        }
+
+        // Check if user has a company
+        const dbUser = await storage.getUser(user.claims.sub);
+        
+        // Check for invite token in session (stored by login route)
+        const inviteToken = (req.session as any).inviteToken;
+        
+        if (inviteToken && dbUser && !dbUser.companyId) {
+          // User clicked invite link before signup - join company automatically
+          try {
+            const company = await storage.getCompanyByInviteToken(inviteToken);
+            
+            if (company && 
+                company.inviteLinkExpiresAt && 
+                new Date() <= company.inviteLinkExpiresAt &&
+                company.inviteLinkUses < company.inviteLinkMaxUses) {
+              
+              // Add user to company
+              await storage.updateUser(dbUser.id, {
+                companyId: company.id,
+                role: 'member',
+                invitedBy: company.ownerId,
+              });
+
+              // Increment invite uses
+              await storage.updateCompany(company.id, {
+                inviteLinkUses: company.inviteLinkUses + 1,
+              });
+
+              // Clear invite token from session
+              delete (req.session as any).inviteToken;
+
+              // Redirect to app
+              return res.redirect("/");
+            }
+          } catch (error) {
+            console.error('[Auth] Failed to auto-join company via invite:', error);
+          }
+        }
+        
+        if (dbUser && !dbUser.companyId) {
+          // New user without company and no invite - redirect to company setup
+          return res.redirect("/onboarding/company-setup");
+        }
+
+        // User has company - redirect to app
+        return res.redirect("/");
+      });
     })(req, res, next);
   });
 

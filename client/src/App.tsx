@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
+import CompanySetup from "./pages/CompanySetup";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
@@ -41,6 +42,10 @@ function AppContent() {
   // Public routes that don't require authentication
   const publicRoutes = ['/share/', '/shared/', '/impact', '/login'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
+  
+  // Onboarding routes are authenticated but before full setup
+  const onboardingRoutes = ['/onboarding/company-setup'];
+  const isOnboardingRoute = onboardingRoutes.some(route => location.startsWith(route));
 
   // Redirect authenticated users from landing to dashboard
   useEffect(() => {
@@ -51,10 +56,10 @@ function AppContent() {
 
   // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !isPublicRoute) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
       setLocation('/');
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, setLocation]);
+  }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, setLocation]);
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -67,11 +72,24 @@ function AppContent() {
 
   // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
   // This prevents data queries from firing without auth credentials
-  if (!isAuthenticated && !isPublicRoute) {
+  // Allow onboarding routes for authenticated users without companies
+  if (!isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
+    );
+  }
+  
+  // Render onboarding routes without bottom nav
+  if (isAuthenticated && isOnboardingRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          <Route path="/onboarding/company-setup" component={CompanySetup} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
     );
   }
 
