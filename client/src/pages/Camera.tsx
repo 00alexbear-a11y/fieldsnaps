@@ -77,6 +77,7 @@ export default function Camera() {
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [isAttachMode, setIsAttachMode] = useState(false);
   
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
@@ -110,10 +111,18 @@ export default function Camera() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('projectId');
+    const mode = params.get('mode');
+    
     if (projectId && projectId !== selectedProject) {
       console.log('[Camera] Setting project from URL:', projectId);
       setSelectedProject(projectId);
       setShowProjectSelection(false);
+    }
+    
+    // Detect Photo Attachment Mode
+    if (mode === 'attachToTodo') {
+      console.log('[Camera] Photo Attachment Mode activated');
+      setIsAttachMode(true);
     }
   }, [location]);
 
@@ -1066,11 +1075,17 @@ export default function Camera() {
 
       URL.revokeObjectURL(compressionResult.url);
 
-      // Navigate to edit page with createTodo flag if in todo mode
-      const editUrl = mode === 'todo' 
-        ? `/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}` 
-        : `/photo/${savedPhoto.id}/edit`;
-      setLocation(editUrl);
+      // Navigate based on mode
+      if (isAttachMode) {
+        // Photo Attachment Mode: return to todos with photoId
+        setLocation(`/todos?photoId=${savedPhoto.id}`);
+      } else if (mode === 'todo') {
+        // Camera Tab To-Do mode: navigate to edit page with createTodo flag
+        setLocation(`/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}`);
+      } else {
+        // Normal capture: navigate to edit page
+        setLocation(`/photo/${savedPhoto.id}/edit`);
+      }
 
     } catch (error) {
       console.error('Capture and edit error:', error);
@@ -1562,27 +1577,29 @@ export default function Camera() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={quickCapture}
+          onClick={isAttachMode ? () => captureAndEdit() : quickCapture}
           disabled={isCapturing || isRecording || !selectedProject}
           className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
           data-testid="button-quick-capture"
         >
           <CameraIcon className="w-6 h-6" />
-          <span className="text-[10px]">Camera</span>
+          <span className="text-[10px]">{isAttachMode ? 'Capture' : 'Camera'}</span>
         </Button>
         
-        {/* To-Do Mode - Capture & Create To-Do */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => captureAndEdit('todo')}
-          disabled={isCapturing || isRecording || !selectedProject}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-capture-todo"
-        >
-          <CheckSquare className="w-6 h-6" />
-          <span className="text-[10px]">To-Do</span>
-        </Button>
+        {/* To-Do Mode - Capture & Create To-Do (only in Camera Tab, not in Photo Attachment Mode) */}
+        {!isAttachMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => captureAndEdit('todo')}
+            disabled={isCapturing || isRecording || !selectedProject}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+            data-testid="button-capture-todo"
+          >
+            <CheckSquare className="w-6 h-6" />
+            <span className="text-[10px]">To-Do</span>
+          </Button>
+        )}
       </div>
 
       {/* Composite Canvas - Hidden */}
