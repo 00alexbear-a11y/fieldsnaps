@@ -1,0 +1,213 @@
+Context: FieldSnaps is a photo documentation app for contractors. Users organize work into projects/jobs. We need to add a lightweight task management system where team leaders can assign photo documentation tasks to crew members. Tasks are part of the job they belong to - they live and die with that job.
+
+What We're Building: A dead-simple task list for each job that helps small contractor crews (1-5 people) coordinate who needs to take which photos. This isn't project management software - it's just a way to assign and track basic photo-related tasks without endless group texts.
+
+Core Requirements:
+
+1. Job-Centric Task Lists
+
+Every job has its own task list
+Tasks only exist within a job (they're not independent)
+When viewing a job, you see its task list
+Task count visible on job card: "Duplex Remodel - 41 photos, 3 tasks"
+2. Task Assignment
+
+Create task with simple flow: Task name → Assign to team member → Done
+Example tasks: "Get foundation photos", "Document electrical rough-in", "Take final walkthrough shots"
+One task assigned to one person
+Boss/admin can assign tasks to any team member
+3. View Modes (Toggle)
+
+"My Tasks" - shows only tasks assigned to me across all active jobs
+"All Tasks" - shows all tasks for this specific job
+Easy toggle switch between views
+Badge count showing number of incomplete tasks
+4. Task Completion
+
+Single tap checkbox to mark task done
+Task disappears from active list immediately (smooth animation)
+Task marked complete in database (not deleted)
+No confirmation needed - keep it fast
+5. Completed Tasks View
+
+Separate section: "View Completed Tasks"
+Shows tasks marked done with timestamp
+Can restore a completed task back to active (undo button)
+Keeps task history for documentation
+6. Notifications
+
+Push notification when assigned a task: "[Boss Name] assigned you: [Task Name]"
+Tapping notification opens that job's task list
+Only notification type - no other alerts
+7. Camera Integration (Quick Task Creation)
+
+Add "+ Task" button in camera interface (top bar or three-dot menu)
+Tapping opens minimal modal overlay without exiting camera
+Modal contains only 2 fields:
+Task name (text input, keyboard opens immediately)
+Assign to (dropdown of team members)
+Task automatically associates with current project/job being photographed
+On create: Modal closes instantly, returns to camera
+Purpose: Team leader spots something needing follow-up while shooting, assigns task immediately without breaking workflow
+Keep modal design minimal and fast - jobsite use case requires speed
+Job Lifecycle Behavior:
+
+When a job is marked complete:
+
+All incomplete tasks automatically marked complete
+Job + all tasks move to "Completed Jobs" view
+Tasks remain visible when viewing completed job (for records)
+No data is deleted - just archived
+User can toggle "Show Completed Jobs" to see history
+When a job is deleted:
+
+Warning dialog appears: "⚠️ Delete [Job Name]? This will permanently delete: [X] photos, [Y] tasks (Z incomplete), all project data. This cannot be undone."
+User must confirm deletion
+On confirm: Job and ALL associated tasks are permanently deleted (cascade delete)
+Prevents orphaned tasks in database
+Key principle: Tasks are children of jobs. They don't exist independently. When the job goes away (completed or deleted), tasks go with it.
+
+User Flows:
+
+Adding a task from job view:
+
+Open job detail page
+Scroll to "Tasks" section
+Tap "+ Add Task"
+Enter task name
+Select team member from dropdown
+Tap "Create" - done
+Adding a task from camera (NEW):
+
+In camera mode shooting photos for a job
+Spot something needing follow-up documentation
+Tap "+ Task" button in camera UI
+Minimal modal appears over camera view
+Type task name (e.g., "Get final electrical panel shots")
+Select team member to assign
+Tap "Create"
+Modal closes, back to camera instantly
+Task created and linked to current job
+Completing a task:
+
+See task in list with checkbox
+Tap checkbox once
+Task fades out and disappears
+Moves to "Completed Tasks" section
+Viewing my work across all jobs:
+
+Toggle to "My Tasks" view
+See all tasks assigned to me from all active jobs
+Grouped by job name
+Complete tasks right from this view
+Restoring a completed task:
+
+Open "View Completed Tasks"
+Find the task
+Tap restore icon
+Task moves back to active list
+What NOT to Build:
+
+❌ No due dates or deadlines
+❌ No priority levels (high/medium/low)
+❌ No subtasks or dependencies
+❌ No comments or discussion threads (crews use text)
+❌ No time tracking
+❌ No calendar integration
+❌ No task templates
+❌ No recurring tasks
+❌ No attachments to tasks
+Keep it minimal. This is a task checklist, not a project management suite.
+
+Technical Requirements:
+
+Database Schema:
+
+tasks table:
+- id (primary key)
+- job_id (foreign key to jobs table, ON DELETE CASCADE)
+- task_name (text)
+- assigned_to (user_id foreign key)
+- completed (boolean, default false)
+- completed_at (timestamp, nullable)
+- created_at (timestamp)
+- created_by (user_id)
+Key behaviors:
+
+ON DELETE CASCADE: When job is deleted, all tasks delete automatically
+Completed tasks: Set completed = true, don't delete from database
+Restore task: Set completed = false, clear completed_at timestamp
+Camera-created tasks automatically get job_id from current active camera session
+Performance:
+
+Index on job_id for fast lookup
+Index on assigned_to for "My Tasks" view
+Query optimization for showing only active vs completed tasks
+UI/UX Requirements:
+
+Visual Design:
+
+Clean, minimal interface
+Tasks displayed as simple list items with checkbox
+Smooth fade-out animation when completing
+Clear visual separation between active and completed tasks
+Mobile-optimized (primary use case is on jobsite with phone)
+Camera modal overlay should be lightweight and non-intrusive
+Task List Appearance:
+
+┌─────────────────────────────────────┐
+│ Tasks (3 active)                    │
+│ [My Tasks | All Tasks] ← toggle     │
+├─────────────────────────────────────┤
+│ ☐ Get foundation photos             │
+│   Assigned to: John                 │
+├─────────────────────────────────────┤
+│ ☐ Document electrical rough-in      │
+│   Assigned to: Mike                 │
+├─────────────────────────────────────┤
+│ ☐ Final walkthrough shots           │
+│   Assigned to: Sarah                │
+├─────────────────────────────────────┤
+│ [+ Add Task]                        │
+│ [View Completed Tasks (5)]          │
+└─────────────────────────────────────┘
+Camera Quick Task Modal:
+
+┌─────────────────────────────────────┐
+│ Quick Add Task                      │
+├─────────────────────────────────────┤
+│ Task: [                          ]  │
+│       Auto-focus keyboard here      │
+│                                     │
+│ Assign to: [Mike ▼]                │
+│                                     │
+│ [Cancel]              [Create Task] │
+└─────────────────────────────────────┘
+Interactions:
+
+Tap checkbox → mark complete (immediate)
+Tap task text → view details (who assigned, when created)
+Swipe left → delete option (admin only)
+Long press → quick reassign to different person
+Camera task button → modal overlay (doesn't exit camera)
+Success Criteria:
+
+This feature succeeds if:
+
+✅ Team leader can assign a task in under 10 seconds
+✅ Team member can mark task complete in 1 tap
+✅ "My Tasks" view shows everything assigned to me across all jobs
+✅ No orphaned tasks when jobs are deleted
+✅ Interface doesn't feel cluttered or overwhelming
+✅ Crew members understand it without training
+✅ Can create task from camera without breaking workflow (camera integration)
+Goal: Make task coordination faster than sending group texts, without adding complexity that requires a tutorial. Camera integration makes it seamless to assign follow-up work while in the field.
+
+Integration Points:
+
+Tasks section appears in job detail view (below photos and map)
+Home screen shows task count badge on job cards
+Camera interface includes "+ Task" button (top bar or menu)
+Bottom nav could have "Tasks" tab showing "My Tasks" across all jobs (optional)
+Push notifications use existing notification system
+Build this as a focused feature that justifies multiple team members on one account. Keep it stupid simple. Tasks exist to coordinate photo documentation - nothing more. The camera integration is key for real-world jobsite use where the boss spots something needing documentation while actively shooting photos
