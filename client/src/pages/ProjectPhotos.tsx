@@ -645,29 +645,51 @@ export default function ProjectPhotos() {
 
       {/* Tab Navigation */}
       <div className="border-b px-4">
-        <div className="flex gap-4">
-          <button
-            onClick={() => setActiveTab('photos')}
-            className={`py-3 px-1 border-b-2 transition-colors ${
-              activeTab === 'photos'
-                ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            data-testid="tab-photos"
-          >
-            Photos ({photos.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('tasks')}
-            className={`py-3 px-1 border-b-2 transition-colors ${
-              activeTab === 'tasks'
-                ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-            data-testid="tab-tasks"
-          >
-            Tasks ({projectTasks.length})
-          </button>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('photos')}
+              className={`py-3 px-1 border-b-2 transition-colors ${
+                activeTab === 'photos'
+                  ? 'border-primary text-primary font-medium'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+              data-testid="tab-photos"
+            >
+              Photos ({photos.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`py-3 px-1 border-b-2 transition-colors ${
+                activeTab === 'tasks'
+                  ? 'border-primary text-primary font-medium'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+              data-testid="tab-tasks"
+            >
+              Tasks ({projectTasks.length})
+            </button>
+          </div>
+          
+          {/* Photo size selector - only show on Photos tab */}
+          {activeTab === 'photos' && (
+            <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted" data-testid="photo-size-selector">
+              {(['S', 'M', 'L'] as const).map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setPhotoSize(size)}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                    photoSize === size
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover-elevate'
+                  }`}
+                  data-testid={`button-size-${size}`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -901,32 +923,7 @@ export default function ProjectPhotos() {
       </main>
       </div>
 
-      {/* Portal photo size selector to body - positioned at same height as camera buttons */}
-      {createPortal(
-        <div 
-          className="z-40 flex items-center justify-center pointer-events-none"
-          style={{ position: 'fixed', bottom: '80px', left: '0', right: '0' }}
-          data-testid="photo-size-selector"
-        >
-          <div className="inline-flex rounded-lg border border-border p-1 bg-background/80 backdrop-blur-md shadow-lg pointer-events-auto">
-            {(['S', 'M', 'L'] as const).map((size) => (
-              <button
-                key={size}
-                onClick={() => setPhotoSize(size)}
-                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                  photoSize === size
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover-elevate'
-                }`}
-                data-testid={`button-size-${size}`}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Photo size selector moved to header area to avoid overlap with buttons */}
 
       {/* Portal fixed buttons to body - evenly spaced bottom bar */}
       {createPortal(

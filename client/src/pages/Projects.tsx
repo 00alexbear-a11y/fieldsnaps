@@ -374,29 +374,15 @@ export default function Projects() {
               </DialogContent>
             </Dialog>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="outline" className="h-12 w-12" data-testid="button-settings-menu">
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={toggleTheme} data-testid="menu-toggle-theme">
-                  {isDark ? (
-                    <Sun className="w-4 h-4 mr-2" />
-                  ) : (
-                    <Moon className="w-4 h-4 mr-2" />
-                  )}
-                  Toggle Theme
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLocation('/settings')} data-testid="menu-settings">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button 
+              size="icon" 
+              variant="outline" 
+              className="h-12 w-12" 
+              onClick={() => setLocation('/settings')}
+              data-testid="button-settings"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
         </div>
       </div>
 

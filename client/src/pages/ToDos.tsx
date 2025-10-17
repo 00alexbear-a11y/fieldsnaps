@@ -205,19 +205,15 @@ export default function ToDos() {
               <Plus className="w-5 h-5 mr-2" />
               Add To-Do
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="outline" className="h-12 w-12" data-testid="button-settings-menu">
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLocation('/settings')} data-testid="menu-settings">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button 
+              size="icon" 
+              variant="outline" 
+              className="h-12 w-12" 
+              onClick={() => setLocation('/settings')}
+              data-testid="button-settings"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
           </div>
         </div>
 
@@ -389,11 +385,12 @@ export default function ToDos() {
           });
         }
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{editingTodo ? "Edit To-Do" : "Create To-Do"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             <div>
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -452,8 +449,9 @@ export default function ToDos() {
                 <p className="text-sm text-destructive mt-1">{form.formState.errors.assignedTo.message}</p>
               )}
             </div>
+            </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex-shrink-0">
               <Button type="button" variant="outline" onClick={() => {
                 setShowAddDialog(false);
                 setShowEditDialog(false);
