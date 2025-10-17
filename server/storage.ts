@@ -1,12 +1,12 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, tasks, subscriptions, subscriptionEvents } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Task,
+  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Task, ToDo,
   Subscription, SubscriptionEvent,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertTask,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertTask, InsertToDo,
   InsertSubscription, InsertSubscriptionEvent
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
@@ -100,6 +100,14 @@ export interface IStorage {
   completeTask(id: string, userId: string): Promise<Task | undefined>;
   restoreTask(id: string): Promise<Task | undefined>;
   deleteTask(id: string): Promise<boolean>;
+  
+  // ToDos
+  getTodo(id: string): Promise<ToDo | undefined>;
+  getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]>;
+  createTodo(data: InsertToDo): Promise<ToDo>;
+  updateTodo(id: string, data: Partial<InsertToDo>): Promise<ToDo | undefined>;
+  completeTodo(id: string, userId: string): Promise<ToDo | undefined>;
+  deleteTodo(id: string): Promise<boolean>;
   
   // Billing & Subscriptions
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
@@ -771,6 +779,105 @@ export class DbStorage implements IStorage {
 
   async deleteTask(id: string): Promise<boolean> {
     const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // ToDos
+  async getTodo(id: string): Promise<ToDo | undefined> {
+    const result = await db.select().from(todos).where(eq(todos.id, id));
+    return result[0];
+  }
+
+  async getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]> {
+    let query = db
+      .select({
+        id: todos.id,
+        title: todos.title,
+        description: todos.description,
+        projectId: todos.projectId,
+        photoId: todos.photoId,
+        assignedTo: todos.assignedTo,
+        createdBy: todos.createdBy,
+        completed: todos.completed,
+        completedAt: todos.completedAt,
+        completedBy: todos.completedBy,
+        dueDate: todos.dueDate,
+        createdAt: todos.createdAt,
+        project: {
+          id: projects.id,
+          name: projects.name,
+        },
+        photo: {
+          id: photos.id,
+          url: photos.url,
+        },
+        assignee: {
+          id: sql<string>`assignee.id`,
+          firstName: sql<string | null>`assignee.first_name`,
+          lastName: sql<string | null>`assignee.last_name`,
+        },
+        creator: {
+          id: sql<string>`creator.id`,
+          firstName: sql<string | null>`creator.first_name`,
+          lastName: sql<string | null>`creator.last_name`,
+        },
+      })
+      .from(todos)
+      .leftJoin(projects, eq(todos.projectId, projects.id))
+      .leftJoin(photos, eq(todos.photoId, photos.id))
+      .innerJoin(sql`users AS assignee`, sql`${todos.assignedTo} = assignee.id`)
+      .innerJoin(sql`users AS creator`, sql`${todos.createdBy} = creator.id`)
+      .$dynamic();
+
+    // Filter by view
+    if (filters?.view === 'my-tasks') {
+      query = query.where(eq(todos.assignedTo, userId));
+    } else if (filters?.view === 'i-created') {
+      query = query.where(eq(todos.createdBy, userId));
+    }
+    // team-tasks shows all (no additional filter needed, company filter happens via user check)
+
+    // Filter by project if provided
+    if (filters?.projectId) {
+      query = query.where(eq(todos.projectId, filters.projectId));
+    }
+
+    // Filter by completion status if provided
+    if (filters?.completed !== undefined) {
+      query = query.where(eq(todos.completed, filters.completed));
+    }
+
+    const result = await query.orderBy(todos.createdAt);
+    return result as any;
+  }
+
+  async createTodo(data: InsertToDo): Promise<ToDo> {
+    const result = await db.insert(todos).values(data).returning();
+    return result[0];
+  }
+
+  async updateTodo(id: string, data: Partial<InsertToDo>): Promise<ToDo | undefined> {
+    const result = await db.update(todos)
+      .set(data)
+      .where(eq(todos.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async completeTodo(id: string, userId: string): Promise<ToDo | undefined> {
+    const result = await db.update(todos)
+      .set({ 
+        completed: true, 
+        completedAt: new Date(),
+        completedBy: userId 
+      })
+      .where(eq(todos.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTodo(id: string): Promise<boolean> {
+    const result = await db.delete(todos).where(eq(todos.id, id)).returning();
     return result.length > 0;
   }
 

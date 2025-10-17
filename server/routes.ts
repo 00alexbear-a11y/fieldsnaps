@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertTaskSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertTaskSchema, insertTodoSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
@@ -210,6 +210,40 @@ async function verifyTaskCompanyAccess(req: any, res: any, taskId: string): Prom
   }
 
   return verifyCompanyAccess(req, res, project.companyId);
+}
+
+// Helper to verify company access for todos
+async function verifyTodoCompanyAccess(req: any, res: any, todoId: string): Promise<boolean> {
+  const todo = await storage.getTodo(todoId);
+  if (!todo) {
+    res.status(404).json({ error: "To-do not found" });
+    return false;
+  }
+
+  // Verify user is creator, assignee, or in same company
+  const userWithCompany = await getUserWithCompany(req, res);
+  if (!userWithCompany) return false;
+  
+  const { user } = userWithCompany;
+  
+  // User must be creator or assignee
+  if (todo.createdBy !== user.id && todo.assignedTo !== user.id) {
+    // Or if todo has a project, verify company access through project
+    if (todo.projectId) {
+      const project = await storage.getProject(todo.projectId);
+      if (!project || !project.companyId) {
+        res.status(404).json({ error: "Project not found" });
+        return false;
+      }
+      return verifyCompanyAccess(req, res, project.companyId);
+    } else {
+      // General todo - must be creator or assignee
+      res.status(403).json({ error: "Access denied" });
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1392,6 +1426,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ToDos Routes
+  app.get("/api/todos", isAuthenticated, async (req, res) => {
+    try {
+      const userWithCompany = await getUserWithCompany(req, res);
+      if (!userWithCompany) return;
+      
+      const { user, company } = userWithCompany;
+      
+      const filters = {
+        projectId: req.query.projectId as string | undefined,
+        completed: req.query.completed === 'true' ? true : req.query.completed === 'false' ? false : undefined,
+        view: (req.query.view as 'my-tasks' | 'team-tasks' | 'i-created') || 'my-tasks',
+      };
+
+      const todos = await storage.getTodos(company.id, user.id, filters);
+      res.json(todos);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.get("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
+      
+      const todo = await storage.getTodo(req.params.id);
+      if (!todo) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
+      res.json(todo);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.post("/api/todos", isAuthenticated, async (req, res) => {
+    try {
+      const userWithCompany = await getUserWithCompany(req, res);
+      if (!userWithCompany) return;
+      
+      const { user, company } = userWithCompany;
+
+      // Verify assignee is in same company
+      const assignee = await storage.getUser(req.body.assignedTo);
+      if (!assignee || assignee.companyId !== company.id) {
+        return handleError(res, errors.validation("Can only assign to-dos to members of your company"));
+      }
+
+      // If project specified, verify access
+      if (req.body.projectId) {
+        if (!await verifyProjectCompanyAccess(req, res, req.body.projectId)) return;
+      }
+
+      const validated = insertTodoSchema.parse({
+        ...req.body,
+        createdBy: user.id,
+      });
+      
+      const todo = await storage.createTodo(validated);
+      res.status(201).json(todo);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.patch("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
+      
+      const todo = await storage.updateTodo(req.params.id, req.body);
+      if (!todo) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
+      res.json(todo);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.post("/api/todos/:id/complete", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
+      
+      const userWithCompany = await getUserWithCompany(req, res);
+      if (!userWithCompany) return;
+      
+      const todo = await storage.completeTodo(req.params.id, userWithCompany.user.id);
+      if (!todo) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
+      res.json(todo);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.delete("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
+      
+      const deleted = await storage.deleteTodo(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      handleError(res, error);
     }
   });
 
