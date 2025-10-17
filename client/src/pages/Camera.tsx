@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo, CheckSquare } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo, CheckSquare, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -1544,7 +1544,7 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
+      {/* Bottom Action Rail - 5 Buttons: Back, Video, Camera, To-Do, Edit */}
       <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
         {/* Back */}
         <Button
@@ -1596,13 +1596,13 @@ export default function Camera() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={isAttachMode ? () => captureAndEdit() : quickCapture}
+          onClick={quickCapture}
           disabled={isCapturing || isRecording || !selectedProject}
           className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
           data-testid="button-quick-capture"
         >
           <CameraIcon className="w-6 h-6" />
-          <span className="text-[10px]">{isAttachMode ? 'Capture' : 'Camera'}</span>
+          <span className="text-[10px]">Camera</span>
         </Button>
         
         {/* To-Do Mode - Capture & Create To-Do (only in Camera Tab, not in Photo Attachment Mode) */}
@@ -1617,6 +1617,21 @@ export default function Camera() {
           >
             <CheckSquare className="w-6 h-6" />
             <span className="text-[10px]">To-Do</span>
+          </Button>
+        )}
+
+        {/* Edit Mode - Capture & Edit (only in Camera Tab, not in Photo Attachment Mode) */}
+        {!isAttachMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => captureAndEdit()}
+            disabled={isCapturing || isRecording || !selectedProject}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+            data-testid="button-edit-mode"
+          >
+            <Edit className="w-6 h-6" />
+            <span className="text-[10px]">Edit</span>
           </Button>
         )}
       </div>
