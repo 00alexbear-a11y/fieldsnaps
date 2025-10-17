@@ -404,12 +404,12 @@ export default function ToDos() {
       {view === 'calendar' ? (
         <div className="p-4 space-y-6">
           {/* Calendar */}
-          <div className="flex justify-center">
+          <div>
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border"
+              className="rounded-md border w-full"
               data-testid="calendar-view"
               components={{
                 DayContent: ({ date, ...props }) => {
