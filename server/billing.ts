@@ -130,6 +130,66 @@ export class BillingService {
     });
   }
 
+  /**
+   * Update subscription quantity for team pricing ($19.99 × number of users)
+   * Stripe automatically prorates the charge/credit
+   */
+  async updateSubscriptionQuantity(subscriptionId: string, newQuantity: number): Promise<Stripe.Subscription> {
+    if (newQuantity < 1) {
+      throw new Error("Subscription quantity must be at least 1");
+    }
+
+    return await this.stripe.subscriptions.update(subscriptionId, {
+      items: [
+        {
+          id: (await this.stripe.subscriptions.retrieve(subscriptionId)).items.data[0].id,
+          quantity: newQuantity,
+        },
+      ],
+      proration_behavior: 'always_invoice', // Immediately charge/credit the difference
+    });
+  }
+
+  /**
+   * Create company-based subscription with quantity for team size
+   */
+  async createCompanySubscription(
+    companyId: string,
+    customerId: string,
+    priceId: string,
+    quantity: number
+  ): Promise<{ subscription: Stripe.Subscription; clientSecret: string | null }> {
+    const subscription = await this.stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ 
+        price: priceId,
+        quantity: quantity, // Number of team members
+      }],
+      trial_period_days: this.TRIAL_DAYS,
+      payment_behavior: "default_incomplete",
+      payment_settings: {
+        save_default_payment_method: "on_subscription",
+      },
+      expand: ["latest_invoice.payment_intent"],
+      metadata: {
+        companyId,
+        teamSize: quantity.toString(),
+      },
+    });
+
+    const latestInvoice = subscription.latest_invoice;
+    let clientSecret: string | null = null;
+    
+    if (latestInvoice && typeof latestInvoice === 'object' && 'payment_intent' in latestInvoice) {
+      const pi = latestInvoice.payment_intent;
+      if (pi && typeof pi === 'object' && 'client_secret' in pi) {
+        clientSecret = (pi as any).client_secret || null;
+      }
+    }
+
+    return { subscription, clientSecret };
+  }
+
   async updatePaymentMethod(
     customerId: string,
     paymentMethodId: string
