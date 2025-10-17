@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +53,8 @@ export default function ToDos() {
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
+  const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch todos
@@ -70,6 +73,36 @@ export default function ToDos() {
     },
   });
 
+  // Calculate task counts by date (memoized for performance)
+  const taskCountsByDate = useMemo(() => {
+    const counts = new Map<string, number>();
+    
+    // Only count todos that match current filters
+    const filteredTodos = todos.filter((todo) => {
+      if (!todo.dueDate) return false;
+      
+      // Apply project filter
+      if (filterProject !== 'all' && todo.projectId !== filterProject) return false;
+      
+      // Apply completed filter
+      if (filterCompleted === 'active' && todo.completed) return false;
+      if (filterCompleted === 'completed' && !todo.completed) return false;
+      
+      return true;
+    });
+    
+    // Group by date
+    filteredTodos.forEach((todo) => {
+      if (todo.dueDate) {
+        const date = new Date(todo.dueDate);
+        const dateString = format(date, 'yyyy-MM-dd');
+        counts.set(dateString, (counts.get(dateString) || 0) + 1);
+      }
+    });
+    
+    return counts;
+  }, [todos, filterProject, filterCompleted]);
+
   // Filter todos by selected date for calendar view
   const calendarTodos = view === 'calendar' 
     ? todos.filter((todo) => {
@@ -83,6 +116,12 @@ export default function ToDos() {
         );
       })
     : [];
+
+  // Get task count for selected date
+  const selectedDateTaskCount = useMemo(() => {
+    const dateString = format(selectedDate, 'yyyy-MM-dd');
+    return taskCountsByDate.get(dateString) || 0;
+  }, [selectedDate, taskCountsByDate]);
 
   // Fetch projects for filter
   const { data: projects = [] } = useQuery<Project[]>({
@@ -363,7 +402,7 @@ export default function ToDos() {
 
       {/* Content */}
       {view === 'calendar' ? (
-        <div className="max-w-screen-sm mx-auto p-4 space-y-6">
+        <div className="p-4 space-y-6">
           {/* Calendar */}
           <div className="flex justify-center">
             <Calendar
@@ -372,6 +411,26 @@ export default function ToDos() {
               onSelect={(date) => date && setSelectedDate(date)}
               className="rounded-md border"
               data-testid="calendar-view"
+              components={{
+                DayContent: ({ date, ...props }) => {
+                  const dateString = format(date, 'yyyy-MM-dd');
+                  const count = taskCountsByDate.get(dateString) || 0;
+                  
+                  return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <span>{date.getDate()}</span>
+                      {count > 0 && (
+                        <div 
+                          className="absolute top-0 right-0 flex items-center justify-center bg-primary text-primary-foreground rounded-full min-w-[18px] h-[18px] px-1 text-[10px] font-semibold"
+                          data-testid={`badge-count-${dateString}`}
+                        >
+                          {count}
+                        </div>
+                      )}
+                    </div>
+                  );
+                },
+              }}
             />
           </div>
 
@@ -380,6 +439,11 @@ export default function ToDos() {
             <h2 className="text-lg font-semibold" data-testid="text-selected-date">
               {format(selectedDate, "EEEE, MMMM d, yyyy")}
             </h2>
+            {selectedDateTaskCount > 0 && (
+              <p className="text-sm text-muted-foreground mt-1" data-testid="text-task-count">
+                {selectedDateTaskCount} {selectedDateTaskCount === 1 ? 'task' : 'tasks'}
+              </p>
+            )}
           </div>
 
           {/* Tasks for Selected Date */}
@@ -400,7 +464,8 @@ export default function ToDos() {
               {calendarTodos.map((todo) => (
                 <Card
                   key={todo.id}
-                  className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                  className={`hover-elevate cursor-pointer ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                  onClick={() => { setSelectedTodoForDetails(todo); setShowDetailsDrawer(true); }}
                   data-testid={`card-todo-${todo.id}`}
                 >
                   <div className="flex items-center gap-2">
@@ -443,6 +508,7 @@ export default function ToDos() {
                           size="icon"
                           variant="ghost"
                           className="h-12 w-12 flex-shrink-0"
+                          onClick={(e) => e.stopPropagation()}
                           data-testid={`button-menu-todo-${todo.id}`}
                         >
                           <MoreVertical className="w-5 h-5" />
@@ -497,7 +563,8 @@ export default function ToDos() {
             todos.map((todo) => (
               <Card
                 key={todo.id}
-                className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                className={`hover-elevate cursor-pointer ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                onClick={() => { setSelectedTodoForDetails(todo); setShowDetailsDrawer(true); }}
                 data-testid={`card-todo-${todo.id}`}
               >
                 <div className="flex items-center gap-2">
@@ -540,6 +607,7 @@ export default function ToDos() {
                         size="icon"
                         variant="ghost"
                         className="h-12 w-12 flex-shrink-0"
+                        onClick={(e) => e.stopPropagation()}
                         data-testid={`button-menu-todo-${todo.id}`}
                       >
                         <MoreVertical className="w-5 h-5" />
@@ -584,6 +652,95 @@ export default function ToDos() {
         onChange={handleFileSelect}
         data-testid="input-file-photo"
       />
+
+      {/* Task Details Drawer */}
+      <Sheet open={showDetailsDrawer} onOpenChange={setShowDetailsDrawer} data-testid="sheet-task-details">
+        <SheetContent side="bottom" className="h-[85vh] flex flex-col">
+          <SheetHeader>
+            <SheetTitle>Task Details</SheetTitle>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-4 py-4">
+            {/* Photo if attached - large display */}
+            {selectedTodoForDetails?.photo && (
+              <img 
+                src={selectedTodoForDetails.photo.url} 
+                alt="Task photo"
+                className="w-full h-48 object-cover rounded-lg" 
+                data-testid="img-task-detail-photo"
+              />
+            )}
+            
+            {/* Title - bold, large */}
+            <h2 className="text-xl font-bold" data-testid="text-task-detail-title">
+              {selectedTodoForDetails?.title}
+            </h2>
+            
+            {/* Description - secondary color */}
+            {selectedTodoForDetails?.description && (
+              <p className="text-muted-foreground" data-testid="text-task-detail-description">
+                {selectedTodoForDetails.description}
+              </p>
+            )}
+            
+            {/* Metadata with icons */}
+            <div className="space-y-3 pt-2">
+              {selectedTodoForDetails?.dueDate && (
+                <div className="flex items-center gap-3">
+                  <CalendarIconOutline className="w-5 h-5 text-muted-foreground" />
+                  <span>Due: {format(new Date(selectedTodoForDetails.dueDate), "PPP")}</span>
+                </div>
+              )}
+              
+              {selectedTodoForDetails?.assignee && (
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-muted-foreground" />
+                  <span>Assigned: {getDisplayName(selectedTodoForDetails.assignee)}</span>
+                </div>
+              )}
+              
+              {selectedTodoForDetails?.project && (
+                <div className="flex items-center gap-3">
+                  <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                  <span>Project: {selectedTodoForDetails.project.name}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Action buttons at bottom */}
+          <SheetFooter className="flex-row gap-3 sm:gap-3">
+            {!selectedTodoForDetails?.completed && (
+              <Button 
+                className="flex-1" 
+                onClick={() => {
+                  if (selectedTodoForDetails) {
+                    completeMutation.mutate(selectedTodoForDetails.id);
+                    setShowDetailsDrawer(false);
+                  }
+                }}
+                data-testid="button-complete-task"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Complete
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => {
+                if (selectedTodoForDetails) {
+                  handleEditTodo(selectedTodoForDetails);
+                  setShowDetailsDrawer(false);
+                }
+              }}
+              data-testid="button-edit-task"
+            >
+              Edit
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {/* Add/Edit Todo Dialog */}
       <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
@@ -680,7 +837,7 @@ export default function ToDos() {
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {form.watch("dueDate") ? (
-                        format(new Date(form.watch("dueDate")), "PPP")
+                        format(new Date(form.watch("dueDate")!), "PPP")
                       ) : (
                         <span className="text-muted-foreground">Pick a date</span>
                       )}
@@ -689,7 +846,7 @@ export default function ToDos() {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={form.watch("dueDate") ? new Date(form.watch("dueDate")) : undefined}
+                      selected={form.watch("dueDate") ? new Date(form.watch("dueDate")!) : undefined}
                       onSelect={(date) => {
                         if (date) {
                           form.setValue("dueDate", format(date, "yyyy-MM-dd"));
