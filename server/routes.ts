@@ -14,21 +14,73 @@ import { ObjectPermission } from "./objectAcl";
 import { billingService } from "./billing";
 import { emailService } from "./email";
 
-// Configure multer for file uploads
+// Configure multer for file uploads with strict validation
+const ALLOWED_FILE_TYPES = [
+  // Images
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  // Videos
+  'video/mp4',
+  'video/quicktime', // .mov files
+  'video/x-msvideo', // .avi files  
+  'video/webm',
+];
+
 const upload = multer({
   storage: multer.memoryStorage(), // Store in memory for processing
   limits: {
     fileSize: 50 * 1024 * 1024, // 50MB limit for videos
+    files: 1, // Only allow single file upload per request
   },
   fileFilter: (req, file, cb) => {
-    // Accept images and videos
-    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+    // Validate MIME type against whitelist
+    if (ALLOWED_FILE_TYPES.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image and video files are allowed'));
+      cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types: ${ALLOWED_FILE_TYPES.join(', ')}`));
     }
   },
 });
+
+// UUID validation middleware for route parameters
+import { z } from 'zod';
+
+const validateUuidParam = (paramName: string) => {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const schema = z.object({
+      [paramName]: z.string().uuid(`Invalid ${paramName} format`),
+    });
+    
+    try {
+      schema.parse(req.params);
+      next();
+    } catch (error) {
+      handleError(res, error);
+    }
+  };
+};
+
+// Validate multiple UUID parameters
+const validateUuidParams = (...paramNames: string[]) => {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const schemaObject: Record<string, z.ZodString> = {};
+    paramNames.forEach(name => {
+      schemaObject[name] = z.string().uuid(`Invalid ${name} format`);
+    });
+    const schema = z.object(schemaObject);
+    
+    try {
+      schema.parse(req.params);
+      next();
+    } catch (error) {
+      handleError(res, error);
+    }
+  };
+};
 
 // Helper to get authenticated user with company
 async function getUserWithCompany(req: any, res: any) {
@@ -434,7 +486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/companies/members/:userId", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/companies/members/:userId", isAuthenticated, validateUuidParam('userId'), async (req: any, res) => {
     try {
       const currentUserId = req.user.claims.sub;
       const currentUser = await storage.getUser(currentUserId);
@@ -484,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/companies/members/:userId/promote", isAuthenticated, async (req: any, res) => {
+  app.put("/api/companies/members/:userId/promote", isAuthenticated, validateUuidParam('userId'), async (req: any, res) => {
     try {
       const currentUserId = req.user.claims.sub;
       const currentUser = await storage.getUser(currentUserId);
@@ -559,7 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Endpoint for setting ACL policy after photo upload and updating photo URL
-  app.put("/api/photos/:photoId/object-url", isAuthenticated, async (req: any, res) => {
+  app.put("/api/photos/:photoId/object-url", isAuthenticated, validateUuidParam('photoId'), async (req: any, res) => {
     try {
       if (!req.body.photoURL) {
         return res.status(400).json({ error: "photoURL is required" });
@@ -676,7 +728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -762,7 +814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -846,7 +898,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -960,7 +1012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photos
-  app.get("/api/projects/:projectId/photos", isAuthenticated, async (req, res) => {
+  app.get("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -971,7 +1023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/photos/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
       
@@ -985,7 +1037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", isAuthenticated, upload.single('photo'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), upload.single('photo'), async (req: any, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -1073,7 +1125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/photos/:id", isAuthenticated, upload.single('photo'), async (req: any, res) => {
+  app.patch("/api/photos/:id", isAuthenticated, validateUuidParam('id'), upload.single('photo'), async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       
@@ -1142,7 +1194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
     try {
       // Security: Verify company access (any team member can delete their company's photos)
       if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
@@ -1158,7 +1210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photo Annotations
-  app.get("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
+  app.get("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1169,7 +1221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
+  app.post("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1199,7 +1251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Comments
-  app.get("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
+  app.get("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1210,7 +1262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
+  app.post("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1255,7 +1307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:projectId/tasks", isAuthenticated, async (req, res) => {
+  app.get("/api/projects/:projectId/tasks", isAuthenticated, validateUuidParam('projectId'), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -1327,7 +1379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tasks/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/tasks/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
       
@@ -1487,7 +1539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tags/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/tags/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTagCompanyAccess(req, res, req.params.id)) return;
       
@@ -1502,7 +1554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photo Tags - Associate tags with photos
-  app.get("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
+  app.get("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1513,7 +1565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
+  app.post("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
@@ -1528,7 +1580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, async (req, res) => {
+  app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, validateUuidParams('photoId', 'tagId'), async (req, res) => {
     try {
       if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
       
