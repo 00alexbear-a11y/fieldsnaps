@@ -1,0 +1,45 @@
+1. Company Creation: Force it at signup. Even solo users create a company (can be their name). Simpler data model.
+
+2. Invite Security: Links expire after 5 uses OR 7 days (whichever comes first). Owner can revoke and generate new link. Balance of convenience vs security.
+
+3. Billing Owner Invites: Only the billing owner (original account creator) can invite users. Promoted owners get admin powers except inviting. Prevents surprise charges.
+
+4. Removed Members: 7-day grace period with read-only access. Notification sent: "You've been removed from [Company]. You have 7 days to export your data." After 7 days, access revoked.
+
+5. Camera Task Assignment: Replace dropdown with quick tap buttons showing team members. Example: [Mike] [John] [Sarah] [Me] [+More]. Glove-friendly, fast.
+
+6. Subscription Status: Remove user.subscription_status. Derive access from companies.subscription_status only. User has access if their company.subscription_status = 'active'. Single source of truth.
+
+7. Edge Cases:
+
+Payment fails → 3-day grace period, banner notification, then lock access until payment updated
+Owner cancels → Warning about team impact, 30-day read-only export window, then archive
+Member leaves voluntarily → "Leave Team" button, owner notified, billing reduces next cycle
+Last owner protection → Cannot demote self if last owner, must promote someone else first
+Updated database:
+
+companies table:
+- subscription_status (only subscription state that matters)
+- invite_link_token (regenerate on revoke)
+- invite_link_uses (track how many joined)
+- invite_link_expires_at (7 days from generation)
+
+users table:
+- company_id (if null = no company yet, shouldn't happen after forced creation)
+- role (owner/member)
+- removed_at (timestamp, for grace period tracking)
+- Remove: subscription_status field
+Camera UI - Task Assignment:
+
+Quick Add Task
+──────────────
+Task: [Get electrical photos    ]
+
+Assign to:
+┌─────┬─────┬─────┬─────┬──────┐
+│Mike │John │Sarah│ Me  │+More │
+└─────┴─────┴─────┴─────┴──────┘
+
+         [Create Task]
+Does this address all your concerns? Ready to build with these specs?
+

@@ -1,0 +1,514 @@
+Context: FieldSnaps is a photo documentation app for contractors. We need to build a complete team collaboration foundation that allows companies to have multiple users working together, plus a simple task management system for coordinating photo documentation work across the crew.
+
+Business Model & Pricing:
+
+$19.99/month per user subscription
+Owner creates account and pays $19.99/month for themselves
+Owner can invite team members - owner pays $19.99/month for EACH invited member
+Example: Owner + 3 invited crew members = 4 × $19.99 = $79.96/month (owner pays entire bill)
+Invited members don't pay - they're covered by owner's subscription
+Scales fairly: Pay only for the users you actually invite
+Competitive advantage: No forced minimums (CompanyCam requires $90/month minimum for 3 users)
+Stripe Billing Implementation:
+
+Quantity-based subscription model
+Base price: $19.99/month per user
+Owner's subscription quantity = total team size (owner + invited members)
+When owner invites user → subscription quantity +1 → bill increases by $19.99
+When owner removes user → subscription quantity -1 → bill decreases by $19.99
+Stripe handles proration automatically
+What We're Building:
+
+User authentication system (individual accounts)
+Team structure with owner/invited member roles
+Invite system where owner pays for invited users
+Simple role-based permissions (Owner vs Member)
+Job-based task management with assignment to real users
+Camera integration for quick task creation
+This enables small contractor crews (1-10 people) to coordinate photo documentation work without complex project management software or forced minimum subscriptions.
+
+PART 1: Team Foundation & User Management
+User Authentication
+Account Creation:
+
+Standard email/password signup
+Email validation (simple - confirm email exists)
+Password requirements: minimum 8 characters
+Mobile-optimized signup flow
+User immediately starts free trial (7-14 days)
+Login:
+
+Email/password authentication
+"Remember me" option
+Password reset via email
+Session persistence
+Team Structure
+Database Schema:
+
+companies table:
+- id (primary key)
+- name (text)
+- owner_id (user_id who created and pays for team)
+- stripe_customer_id (for billing)
+- stripe_subscription_id (for billing)
+- subscription_quantity (number of users owner is paying for)
+- subscription_status (active/inactive/trial/cancelled)
+- created_at (timestamp)
+
+users table:
+- id (primary key)
+- email (unique)
+- password (hashed)
+- name (text)
+- company_id (foreign key, nullable)
+- role (enum: 'owner', 'member')
+- invited_by (user_id, nullable - tracks who invited this user)
+- subscription_status (enum: 'paying_self', 'covered_by_owner', 'trial')
+- created_at (timestamp)
+
+projects table:
+- id (primary key)
+- name (text)
+- company_id (foreign key)
+- created_by (user_id)
+- status (enum: 'active', 'completed')
+- created_at (timestamp)
+Company Creation Flow:
+
+User signs up → Creates personal account
+Starts free trial (7-14 days)
+Prompted: "Create your team" (optional - can work solo)
+Enter company name (e.g., "Smith Construction")
+User becomes Owner role
+After trial ends, prompted to add payment method
+Subscription starts at $19.99/month (quantity: 1)
+Invite System & Billing Integration
+Invite Link Method:
+
+Owner generates shareable invite link in Settings
+Link format: fieldsnaps.com/invite/[unique-token]
+Link remains active until revoked
+Owner can see: "5 people have joined via this link"
+Owner can revoke and generate new link anytime
+Invite Flow with Billing:
+
+Owner opens Settings → Team Management
+Tap "Generate Invite Link"
+Warning shown: "Each invited member adds $19.99/month to your subscription"
+Copy link, share via text/email with crew
+Recipient clicks link → Taken to signup page
+Creates account (email/password)
+Automatically joins owner's company as invited member
+Billing event: Owner's Stripe subscription quantity +1
+Invited member gets full access, no payment required (owner pays for them)
+Stripe Integration on Invite:
+
+When user accepts invite:
+1. Update companies.subscription_quantity += 1
+2. Update user.invited_by = owner_id
+3. Update user.subscription_status = 'covered_by_owner'
+4. Call Stripe API: Update subscription quantity
+5. Stripe automatically prorates and charges owner
+Removing Team Members
+Owner Removes Member:
+
+Settings → Team Management
+Tap member → "Remove from Team"
+Confirmation: "Remove [Name]? This will reduce your bill by $19.99/month"
+Confirm removal
+Billing event: Owner's Stripe subscription quantity -1
+Removed member loses access to all company projects
+Removed member can create their own account and pay $19.99/month independently
+Stripe Integration on Removal:
+
+When owner removes member:
+1. Update companies.subscription_quantity -= 1
+2. Remove user.company_id (user becomes independent)
+3. Update user.subscription_status = 'trial' or 'needs_payment'
+4. Call Stripe API: Update subscription quantity
+5. Stripe automatically prorates and credits owner
+Permissions & Roles
+Two roles only:
+
+Owner:
+
+Created the team and pays for subscriptions
+Can invite/remove team members (each invite adds $19.99 to their bill)
+Create/delete projects
+Assign tasks to anyone
+Promote members to owner (then shares billing/admin responsibilities)
+Manage billing/subscription
+Full admin access
+Member (Invited):
+
+Invited by owner, covered under owner's subscription
+View all company projects
+Take photos, mark up images
+Complete tasks assigned to them
+Create tasks (can assign to anyone in company)
+Cannot delete projects
+Cannot invite new members
+Cannot remove team members
+Cannot access billing
+Owner Promotion:
+
+In Settings → Team Management, owners see all team members
+Tap any member → Option to "Promote to Owner"
+Multiple owners allowed (useful for partners, managers)
+Warning: "Promoting to owner gives them full admin access and ability to invite users (which increases your bill)"
+Promoted owners share full admin permissions
+Promoted owners can also invite users (which adds to original owner's bill)
+Any owner can demote other owners back to member
+Cannot demote yourself
+Must have at least one owner
+Billing responsibility:
+
+Original account creator always pays the bill
+Even if you promote others to owner, original owner's credit card is charged
+Promoted owners can add users, but original owner pays for them
+Team Management UI
+Settings → Team Management:
+
+┌─────────────────────────────────────┐
+│ Smith Construction                  │
+│ 5 team members                      │
+│ Monthly bill: $99.95                │
+├─────────────────────────────────────┤
+│ John Smith (You) - Owner            │
+│ Mike Jones - Owner                  │
+│ Sarah Lee - Member    [Remove]      │
+│ Dave Wilson - Member  [Remove]      │
+│ Tom Brown - Member    [Remove]      │
+├─────────────────────────────────────┤
+│ [Invite Team Members]               │
+│                                     │
+│ ⚠️ Each invited member adds         │
+│ $19.99/month to your subscription   │
+│                                     │
+│ Current invite link:                │
+│ fieldsnaps.com/invite/abc123        │
+│ [Copy Link] [Revoke]                │
+│                                     │
+│ 5 people joined via this link       │
+└─────────────────────────────────────┘
+Billing Transparency:
+
+Show current monthly cost prominently
+Show cost per member clearly
+Warn before inviting/promoting that it increases bill
+PART 2: Task Management System
+Core Task Functionality
+Task Structure:
+
+Tasks are job-specific (tied to projects)
+One task assigned to one user (real user_id from same company)
+Tasks live and die with their parent project
+Simple checklist model - no complexity
+Database Schema:
+
+tasks table:
+- id (primary key)
+- project_id (foreign key, ON DELETE CASCADE)
+- task_name (text)
+- assigned_to (user_id foreign key)
+- created_by (user_id foreign key)
+- completed (boolean, default false)
+- completed_at (timestamp, nullable)
+- completed_by (user_id, nullable)
+- created_at (timestamp)
+Key Behaviors:
+
+ON DELETE CASCADE: When project deleted, all tasks delete automatically
+Completed tasks: Set completed = true, completed_by = user_id, don't delete
+Task assignment: Must be to user in same company
+Task visibility: All company members see all tasks (transparency)
+Task history: Track who completed what (accountability)
+Task Views & Interfaces
+View Mode Toggle:
+
+Two primary views accessible via segmented control:
+
+"My Tasks" (Default View):
+
+Shows all tasks assigned to logged-in user
+Across all active projects
+Grouped by project name
+Badge count showing number of incomplete tasks
+This is what crew members see first
+Can complete tasks directly from this view
+"All Tasks" (Per-Project View):
+
+Shows all tasks for specific project
+All team members and their assignments visible
+Accessible when viewing project detail
+Owner/manager uses this to see team workload
+Can reassign tasks from this view
+UI Example - My Tasks View:
+
+┌─────────────────────────────────────┐
+│ My Tasks (3)                        │
+│ [My Tasks | All Projects]           │
+├─────────────────────────────────────┤
+│ Duplex Remodel                      │
+│ ☐ Get foundation photos             │
+│   Created by: John, 2 days ago      │
+│                                     │
+│ ☐ Document electrical rough-in      │
+│   Created by: John, today           │
+├─────────────────────────────────────┤
+│ Office Renovation                   │
+│ ☐ Final walkthrough shots           │
+│   Created by: Mike, yesterday       │
+├─────────────────────────────────────┤
+│ [View Completed Tasks (12)]         │
+└─────────────────────────────────────┘
+Task Creation
+From Project Detail:
+
+Open project
+Scroll to "Tasks" section
+Tap "+ Add Task"
+Enter task name (text input)
+Select team member from dropdown (shows all company users)
+Tap "Create"
+Task appears in list immediately
+Assigned user gets in-app notification
+From Camera (Quick Task Creation):
+
+In camera mode shooting photos for a project
+Tap "+ Task" button (in top bar next to tag selector)
+Bottom sheet slides up from bottom (not modal - lighter feel)
+Two fields only:
+Task name (text input, keyboard auto-opens)
+Assign to (dropdown of company users, defaults to "Me")
+Tap "Create"
+Sheet closes with smooth animation, back to camera instantly
+Task created and linked to current project being photographed
+Camera Integration UI Details:
+
+Use bottom drawer/sheet (iOS style) not modal overlay
+Sheet height: 40% of screen (enough for 2 fields + button)
+Minimal, fast interaction - jobsite requires speed
+Task automatically knows which project (you're in camera for that project)
+Smooth slide-up/down animation
+Tap outside sheet or swipe down to cancel
+Purpose: Boss spots something needing follow-up while shooting, assigns immediately without leaving camera
+Camera UI with Task Button:
+
+Top bar of camera:
+[< Back] [🏷️ Framer ▼] [+ Task] [⚙️]
+
+When "+ Task" tapped:
+┌─────────────────────────────────────┐
+│                                     │
+│       [Camera viewfinder]           │
+│                                     │
+│ ┌─────────────────────────────────┐ │
+│ │ Quick Add Task                  │ │
+│ ├─────────────────────────────────┤ │
+│ │ Task: [                      ]  │ │
+│ │       Keyboard opens here       │ │
+│ │                                 │ │
+│ │ Assign to: [Mike Jones     ▼]  │ │
+│ │                                 │ │
+│ │ [Cancel]         [Create Task] │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+Task Completion
+Completing a Task:
+
+Single tap on checkbox next to task
+Task marked complete immediately (no confirmation)
+Smooth fade-out animation (300ms)
+Task disappears from active list
+Database: Set completed = true, completed_at = now(), completed_by = user_id
+Moves to "Completed Tasks" section
+Creator gets in-app notification: "[Name] completed: [Task]"
+Completed Tasks View:
+
+Separate section: "View Completed Tasks"
+Shows tasks with completion info:
+Task name
+Assigned to
+Completed by (might be different person)
+Completion timestamp
+Can restore task back to active (undo completion)
+Keeps task history for documentation/accountability
+Restore Completed Task:
+
+Tap task in completed view
+"Restore to Active Tasks" button
+Confirmation: "Move this back to active tasks?"
+On confirm: completed = false, completed_at = null, completed_by = null
+Task reappears in active list
+Notifications (In-App Only for V1)
+Skip push notifications for V1 - Start with in-app indicators:
+
+Badge counts:
+
+Bottom nav "Tasks" tab shows badge: number of incomplete tasks
+Home screen project cards show task count
+Settings shows team member count
+In-app notifications:
+
+Simple notification list in app
+"John assigned you a task: Get foundation photos"
+"Mike completed: Document electrical"
+Tap notification → Opens relevant project/task
+Mark as read functionality
+V2: Add push notifications later after validating core product works.
+
+Project Lifecycle & Task Behavior
+When project is marked complete:
+
+All incomplete tasks automatically marked complete
+completed_by = null (auto-completed, not manually)
+Project + all tasks move to "Completed Projects" view
+Tasks remain visible for documentation
+Can still view task history
+When project is deleted:
+
+Warning dialog appears:
+┌─────────────────────────────────────┐
+│ ⚠️ Delete "Duplex Remodel"?         │
+│                                     │
+│ This will permanently delete:       │
+│ • 41 photos                         │
+│ • 8 tasks (3 incomplete)            │
+│ • All project data                  │
+│                                     │
+│ This cannot be undone.              │
+│                                     │
+│ [Cancel]         [Delete Forever]   │
+└─────────────────────────────────────┘
+User must type project name to confirm (prevents accidents)
+On confirm: Project and ALL tasks permanently deleted (CASCADE)
+Removed from database completely
+PART 3: User Experience & Design
+Design Principles
+Mobile-first:
+
+Primary use case: On jobsite with phone
+Large tap targets (gloves, dirty hands)
+High contrast (readable in bright sunlight)
+Fast interactions (no multi-step processes)
+Minimal UI (no clutter)
+Visual Style:
+
+Clean, modern interface
+Dark theme option (battery saving, easier on eyes)
+Smooth animations (feel premium, not janky)
+Clear visual hierarchy
+Professional contractor aesthetic (not consumer app)
+Key Interactions
+Task Interactions:
+
+Tap checkbox → complete (instant, no confirmation)
+Tap task text → view details modal (creator, date, project)
+Long press task → quick reassign menu
+Swipe left → delete (owner only, with confirmation)
+Camera Task Creation:
+
+Tap "+ Task" → bottom sheet slides up
+Type and assign in < 10 seconds
+Sheet closes → back to shooting immediately
+No flow interruption
+Team Management:
+
+Invite → copy link → share via text (3 taps)
+Remove member → confirm → billing updates automatically
+Clear cost transparency throughout
+PART 4: Technical Requirements
+Performance
+Database Indexes:
+
+CopyCREATE INDEX idx_tasks_project_id ON tasks(project_id);
+CREATE INDEX idx_tasks_assigned_to ON tasks(assigned_to);
+CREATE INDEX idx_tasks_completed ON tasks(completed);
+CREATE INDEX idx_users_company_id ON users(company_id);
+CREATE INDEX idx_projects_company_id ON projects(company_id);
+Query Optimization:
+
+"My Tasks" query: Filter by assigned_to + completed = false + company projects
+Should execute in < 100ms
+Pagination for large task lists (load 50 at a time)
+Stripe Integration Details
+Required Stripe Setup:
+
+Product: "FieldSnaps Subscription"
+Price: $19.99/month recurring
+Quantity-based billing enabled
+Proration enabled (for mid-cycle adds/removes)
+Stripe Events to Handle:
+
+subscription.created → Activate user account
+subscription.updated → Update subscription_quantity in database
+subscription.deleted → Downgrade to trial, lock features
+invoice.payment_succeeded → Confirm payment
+invoice.payment_failed → Send email, grace period 3 days
+Billing Flow:
+
+User signs up → 7-day free trial starts
+Day 7 → Prompt for payment method
+User adds credit card → Stripe subscription created (quantity: 1)
+First charge: $19.99
+User invites 2 members → subscription.updated event → quantity: 3
+Next billing cycle: $59.97
+Security
+Authentication:
+
+JWT tokens for session management
+HttpOnly cookies (prevent XSS)
+CSRF protection
+Rate limiting on login attempts
+Authorization:
+
+Every API call checks user's company_id
+Tasks/projects only accessible if user.company_id matches resource.company_id
+Owner-only actions check role = 'owner'
+Can't assign tasks to users outside your company
+Data Privacy:
+
+Companies can't see other companies' data (strict isolation)
+Invited members only see their company's projects
+Removed members immediately lose access
+PART 5: Success Criteria
+This feature succeeds if:
+
+✅ Owner can invite member and billing updates automatically
+✅ Team member can create account and join via invite link in < 2 minutes
+✅ Task assignment from camera takes < 10 seconds
+✅ "My Tasks" view shows all assigned work across projects instantly
+✅ Task completion is 1-tap (no friction)
+✅ Removing team member reduces owner's bill next cycle
+✅ No orphaned tasks when projects deleted (CASCADE works)
+✅ Interface feels fast and lightweight (not bloated PM software)
+Goal: Make team coordination and task management faster than group texts, with clear billing that scales fairly. Owner pays for who they invite, no forced minimums like CompanyCam.
+
+What NOT to Build (V1 Scope)
+Skip these for V1:
+
+❌ Push notifications (use in-app badges/notifications only)
+❌ Email invites (just shareable links)
+❌ Task due dates or deadlines
+❌ Task priorities (high/medium/low)
+❌ Subtasks or dependencies
+❌ Comments/discussion on tasks
+❌ Time tracking
+❌ Calendar integration
+❌ File attachments to tasks
+❌ Task templates
+❌ Recurring tasks
+❌ Advanced reporting/analytics
+Keep it minimal. This is task coordination for photo documentation, not project management software.
+
+Timeline Estimate
+Expected build time:
+
+User auth + team structure: 3-4 days
+Invite system + Stripe billing: 2-3 days
+Task CRUD + assignment: 2-3 days
+Camera integration: 1-2 days
+UI/UX polish: 2-3 days
+Testing + bug fixes: 2-3 days
+Total: 12-18 days for complete V1
