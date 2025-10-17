@@ -64,6 +64,7 @@ export interface IStorage {
   cleanupOldDeletedItems(): Promise<void>;
   
   // Photo Annotations
+  getPhotoAnnotation(id: string): Promise<PhotoAnnotation | undefined>;
   getPhotoAnnotations(photoId: string): Promise<PhotoAnnotation[]>;
   createPhotoAnnotation(data: InsertPhotoAnnotation): Promise<PhotoAnnotation>;
   deletePhotoAnnotation(id: string): Promise<boolean>;
@@ -417,6 +418,11 @@ export class DbStorage implements IStorage {
   }
 
   // Photo Annotations
+  async getPhotoAnnotation(id: string): Promise<PhotoAnnotation | undefined> {
+    const result = await db.select().from(photoAnnotations).where(eq(photoAnnotations.id, id));
+    return result[0];
+  }
+
   async getPhotoAnnotations(photoId: string): Promise<PhotoAnnotation[]> {
     return await db.select().from(photoAnnotations)
       .where(eq(photoAnnotations.photoId, photoId))

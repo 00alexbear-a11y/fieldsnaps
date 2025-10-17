@@ -30,19 +30,40 @@ const upload = multer({
   },
 });
 
-// Helper middleware to verify company access for projects
-async function verifyProjectCompanyAccess(req: any, res: any, projectId: string): Promise<boolean> {
+// Helper to get authenticated user with company
+async function getUserWithCompany(req: any, res: any) {
   const userId = req.user?.claims?.sub;
   if (!userId) {
     res.status(401).json({ error: "Unauthorized" });
-    return false;
+    return null;
   }
 
   const user = await storage.getUser(userId);
   if (!user || !user.companyId) {
     res.status(403).json({ error: "User must belong to a company" });
+    return null;
+  }
+
+  return user;
+}
+
+// Generic helper to verify company access for any resource
+async function verifyCompanyAccess(req: any, res: any, resourceCompanyId: string): Promise<boolean> {
+  const user = await getUserWithCompany(req, res);
+  if (!user) return false;
+
+  if (resourceCompanyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
     return false;
   }
+
+  return true;
+}
+
+// Helper to verify company access for projects
+async function verifyProjectCompanyAccess(req: any, res: any, projectId: string): Promise<boolean> {
+  const user = await getUserWithCompany(req, res);
+  if (!user) return false;
 
   const project = await storage.getProject(projectId);
   if (!project) {
@@ -50,28 +71,16 @@ async function verifyProjectCompanyAccess(req: any, res: any, projectId: string)
     return false;
   }
 
-  if (project.companyId !== user.companyId) {
-    res.status(403).json({ error: "Access denied" });
+  if (!project.companyId) {
+    res.status(500).json({ error: "Project has no company association" });
     return false;
   }
 
-  return true;
+  return verifyCompanyAccess(req, res, project.companyId);
 }
 
-// Helper middleware to verify company access for photos (via their project)
+// Helper to verify company access for photos
 async function verifyPhotoCompanyAccess(req: any, res: any, photoId: string): Promise<boolean> {
-  const userId = req.user?.claims?.sub;
-  if (!userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-
-  const user = await storage.getUser(userId);
-  if (!user || !user.companyId) {
-    res.status(403).json({ error: "User must belong to a company" });
-    return false;
-  }
-
   const photo = await storage.getPhoto(photoId);
   if (!photo) {
     res.status(404).json({ error: "Photo not found" });
@@ -79,33 +88,16 @@ async function verifyPhotoCompanyAccess(req: any, res: any, photoId: string): Pr
   }
 
   const project = await storage.getProject(photo.projectId);
-  if (!project) {
+  if (!project || !project.companyId) {
     res.status(404).json({ error: "Project not found" });
     return false;
   }
 
-  if (project.companyId !== user.companyId) {
-    res.status(403).json({ error: "Access denied" });
-    return false;
-  }
-
-  return true;
+  return verifyCompanyAccess(req, res, project.companyId);
 }
 
-// Helper middleware to verify company access for annotations (via photo's project)
+// Helper to verify company access for annotations
 async function verifyAnnotationCompanyAccess(req: any, res: any, annotationId: string): Promise<boolean> {
-  const userId = req.user?.claims?.sub;
-  if (!userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-
-  const user = await storage.getUser(userId);
-  if (!user || !user.companyId) {
-    res.status(403).json({ error: "User must belong to a company" });
-    return false;
-  }
-
   const annotation = await storage.getPhotoAnnotation(annotationId);
   if (!annotation) {
     res.status(404).json({ error: "Annotation not found" });
@@ -119,73 +111,39 @@ async function verifyAnnotationCompanyAccess(req: any, res: any, annotationId: s
   }
 
   const project = await storage.getProject(photo.projectId);
-  if (!project) {
+  if (!project || !project.companyId) {
     res.status(404).json({ error: "Project not found" });
     return false;
   }
 
-  if (project.companyId !== user.companyId) {
-    res.status(403).json({ error: "Access denied" });
-    return false;
-  }
-
-  return true;
+  return verifyCompanyAccess(req, res, project.companyId);
 }
 
-// Helper middleware to verify company access for tags (via their project)
+// Helper to verify company access for tags
 async function verifyTagCompanyAccess(req: any, res: any, tagId: string): Promise<boolean> {
-  const userId = req.user?.claims?.sub;
-  if (!userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-
-  const user = await storage.getUser(userId);
-  if (!user || !user.companyId) {
-    res.status(403).json({ error: "User must belong to a company" });
-    return false;
-  }
-
   const tag = await storage.getTag(tagId);
   if (!tag) {
     res.status(404).json({ error: "Tag not found" });
     return false;
   }
 
-  // Global predefined tags (projectId = null) can't be modified by users
+  // Global predefined tags can't be modified
   if (!tag.projectId) {
     res.status(403).json({ error: "Cannot modify global predefined tags" });
     return false;
   }
 
   const project = await storage.getProject(tag.projectId);
-  if (!project) {
+  if (!project || !project.companyId) {
     res.status(404).json({ error: "Project not found" });
     return false;
   }
 
-  if (project.companyId !== user.companyId) {
-    res.status(403).json({ error: "Access denied" });
-    return false;
-  }
-
-  return true;
+  return verifyCompanyAccess(req, res, project.companyId);
 }
 
-// Helper middleware to verify company access for tasks (via their project)
+// Helper to verify company access for tasks
 async function verifyTaskCompanyAccess(req: any, res: any, taskId: string): Promise<boolean> {
-  const userId = req.user?.claims?.sub;
-  if (!userId) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-
-  const user = await storage.getUser(userId);
-  if (!user || !user.companyId) {
-    res.status(403).json({ error: "User must belong to a company" });
-    return false;
-  }
-
   const task = await storage.getTask(taskId);
   if (!task) {
     res.status(404).json({ error: "Task not found" });
@@ -193,17 +151,12 @@ async function verifyTaskCompanyAccess(req: any, res: any, taskId: string): Prom
   }
 
   const project = await storage.getProject(task.projectId);
-  if (!project) {
+  if (!project || !project.companyId) {
     res.status(404).json({ error: "Project not found" });
     return false;
   }
 
-  if (project.companyId !== user.companyId) {
-    res.status(403).json({ error: "Access denied" });
-    return false;
-  }
-
-  return true;
+  return verifyCompanyAccess(req, res, project.companyId);
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
