@@ -60,6 +60,7 @@ export default function ProjectPhotos() {
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [taskAssignee, setTaskAssignee] = useState("");
+  const [activeTab, setActiveTab] = useState<'photos' | 'tasks'>('photos');
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -83,7 +84,21 @@ export default function ProjectPhotos() {
   // Fetch team members for task assignment
   const { data: teamMembers = [] } = useQuery<any[]>({
     queryKey: ["/api/companies/members"],
-    enabled: showTaskDialog,
+    enabled: showTaskDialog || activeTab === 'tasks',
+  });
+
+  // Fetch all tasks for this project
+  const { data: projectTasks = [], isLoading: isLoadingTasks } = useQuery<any[]>({
+    queryKey: ["/api/projects", projectId, "tasks"],
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${projectId}/tasks`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch tasks");
+      }
+      return response.json();
+    },
   });
 
   // Filter photos by selected tags (for use in viewer and display)
@@ -628,8 +643,135 @@ export default function ProjectPhotos() {
         </div>
       </header>
 
+      {/* Tab Navigation */}
+      <div className="border-b px-4">
+        <div className="flex gap-4">
+          <button
+            onClick={() => setActiveTab('photos')}
+            className={`py-3 px-1 border-b-2 transition-colors ${
+              activeTab === 'photos'
+                ? 'border-primary text-primary font-medium'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+            data-testid="tab-photos"
+          >
+            Photos ({photos.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('tasks')}
+            className={`py-3 px-1 border-b-2 transition-colors ${
+              activeTab === 'tasks'
+                ? 'border-primary text-primary font-medium'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+            data-testid="tab-tasks"
+          >
+            Tasks ({projectTasks.length})
+          </button>
+        </div>
+      </div>
+
       <main className="flex-1 p-4">
-        {isLoading ? (
+        {activeTab === 'tasks' ? (
+          // Tasks View
+          <div className="space-y-4">
+            {isLoadingTasks ? (
+              <div className="text-center py-12">Loading tasks...</div>
+            ) : projectTasks.length === 0 ? (
+              <div className="text-center py-12">
+                <ListTodo className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-xl font-semibold mb-2">No tasks yet</h2>
+                <p className="text-muted-foreground mb-4">Create tasks to organize work for this project</p>
+                <Button
+                  onClick={() => setShowTaskDialog(true)}
+                  data-testid="button-create-first-task"
+                >
+                  Create Task
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Active Tasks */}
+                {projectTasks.filter(t => !t.completed).length > 0 && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">
+                      Active Tasks ({projectTasks.filter(t => !t.completed).length})
+                    </h2>
+                    <div className="space-y-2">
+                      {projectTasks.filter(t => !t.completed).map((task: any) => {
+                        const assignee = teamMembers.find(m => m.id === task.assignedTo);
+                        return (
+                          <div
+                            key={task.id}
+                            className="bg-card border rounded-lg p-4 hover-elevate"
+                            data-testid={`project-task-${task.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-medium" data-testid={`task-name-${task.id}`}>
+                                  {task.taskName}
+                                </h3>
+                                <div className="mt-1 flex items-center gap-2">
+                                  {assignee && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {assignee.name}
+                                    </Badge>
+                                  )}
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(task.createdAt), 'MMM d, yyyy')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+                {/* Completed Tasks */}
+                {projectTasks.filter(t => t.completed).length > 0 && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">
+                      Completed ({projectTasks.filter(t => t.completed).length})
+                    </h2>
+                    <div className="space-y-2">
+                      {projectTasks.filter(t => t.completed).map((task: any) => {
+                        const assignee = teamMembers.find(m => m.id === task.assignedTo);
+                        return (
+                          <div
+                            key={task.id}
+                            className="bg-card border rounded-lg p-4 opacity-60"
+                            data-testid={`project-task-completed-${task.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-medium line-through" data-testid={`task-name-completed-${task.id}`}>
+                                  {task.taskName}
+                                </h3>
+                                <div className="mt-1 flex items-center gap-2">
+                                  {assignee && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {assignee.name}
+                                    </Badge>
+                                  )}
+                                  <span className="text-xs text-muted-foreground">
+                                    Completed {format(new Date(task.completedAt!), 'MMM d, yyyy')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+              </>
+            )}
+          </div>
+        ) : isLoading ? (
           <div className="text-center py-12">Loading photos...</div>
         ) : photos.length === 0 ? (
           <div className="text-center py-12">
