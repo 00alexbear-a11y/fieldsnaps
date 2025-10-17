@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -41,6 +42,8 @@ export default function ToDos() {
   const [filterProject, setFilterProject] = useState<string>('all');
   const [filterCompleted, setFilterCompleted] = useState<string>('active');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
 
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<TodoWithDetails[]>({
@@ -112,6 +115,23 @@ export default function ToDos() {
     },
   });
 
+  // Update todo mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<CreateTodoForm> }) => {
+      return apiRequest('PATCH', `/api/todos/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      toast({ title: "To-do updated!" });
+      setShowEditDialog(false);
+      setEditingTodo(null);
+      form.reset();
+    },
+    onError: () => {
+      toast({ title: "Failed to update to-do", variant: "destructive" });
+    },
+  });
+
   const form = useForm<CreateTodoForm>({
     resolver: zodResolver(createTodoSchema),
     defaultValues: {
@@ -134,7 +154,23 @@ export default function ToDos() {
     if (data.projectId) payload.projectId = data.projectId;
     if (data.dueDate) payload.dueDate = data.dueDate;
     
-    createMutation.mutate(payload);
+    if (editingTodo) {
+      updateMutation.mutate({ id: editingTodo.id, data: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
+  };
+
+  const handleEditTodo = (todo: TodoWithDetails) => {
+    setEditingTodo(todo);
+    form.reset({
+      title: todo.title,
+      description: todo.description || "",
+      projectId: todo.projectId || "",
+      assignedTo: todo.assignedTo,
+      dueDate: todo.dueDate ? (typeof todo.dueDate === 'string' ? todo.dueDate : todo.dueDate.toISOString().split('T')[0]) : "",
+    });
+    setShowEditDialog(true);
   };
 
   const getDisplayName = (user: { firstName: string | null; lastName: string | null }) => {
@@ -148,16 +184,41 @@ export default function ToDos() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
-        <div className="flex items-center justify-between p-4 max-w-screen-sm mx-auto">
+        <div className="flex items-center justify-between p-4">
           <h1 className="text-2xl font-bold">To-Do</h1>
-          <Button
-            onClick={() => setShowAddDialog(true)}
-            className="h-12 px-6"
-            data-testid="button-add-todo"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Add To-Do
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => {
+                setEditingTodo(null);
+                form.reset({
+                  title: "",
+                  description: "",
+                  projectId: "",
+                  assignedTo: "",
+                  dueDate: "",
+                });
+                setShowAddDialog(true);
+              }}
+              className="h-12"
+              data-testid="button-add-todo"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Add To-Do
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline" className="h-12 w-12" data-testid="button-settings-menu">
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLocation('/settings')} data-testid="menu-settings">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -236,14 +297,14 @@ export default function ToDos() {
           todos.map((todo) => (
             <Card
               key={todo.id}
-              className={`p-4 hover-elevate ${todo.completed ? 'opacity-60' : ''}`}
+              className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
               data-testid={`card-todo-${todo.id}`}
             >
-              <div className="flex items-start gap-3">
-                {/* Photo thumbnail if available */}
+              <div className="flex items-center gap-2">
+                {/* Photo thumbnail if available - 60px square */}
                 {todo.photo && (
                   <div
-                    className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-muted cursor-pointer"
+                    className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
                     onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
                     data-testid={`img-todo-photo-${todo.id}`}
                   >
@@ -255,74 +316,82 @@ export default function ToDos() {
                   </div>
                 )}
 
-                {/* Content */}
+                {/* Content - flex-1 to take remaining space */}
                 <div className="flex-1 min-w-0">
                   <h3
-                    className={`font-semibold mb-1 ${todo.completed ? 'line-through' : ''}`}
+                    className={`font-medium text-sm leading-snug ${todo.completed ? 'line-through' : ''}`}
                     data-testid={`text-todo-title-${todo.id}`}
                   >
                     {todo.title}
                   </h3>
-                  {todo.description && (
-                    <p className="text-sm text-muted-foreground mb-2" data-testid={`text-todo-description-${todo.id}`}>
-                      {todo.description}
+                  
+                  {/* Only show project if viewing all projects */}
+                  {filterProject === 'all' && todo.project && (
+                    <p className="text-xs text-muted-foreground leading-none mt-0.5" data-testid={`text-todo-project-${todo.id}`}>
+                      {todo.project.name}
                     </p>
                   )}
-                  
-                  {/* Meta info */}
-                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    {todo.project && (
-                      <span className="bg-muted px-2 py-1 rounded" data-testid={`text-todo-project-${todo.id}`}>
-                        {todo.project.name}
-                      </span>
-                    )}
-                    <span data-testid={`text-todo-assignee-${todo.id}`}>
-                      Assigned to: {getDisplayName(todo.assignee)}
-                    </span>
-                    <span data-testid={`text-todo-creator-${todo.id}`}>
-                      By: {getDisplayName(todo.creator)}
-                    </span>
-                  </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex-shrink-0 flex gap-2">
-                  {!todo.completed ? (
+                {/* Three-dot menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => completeMutation.mutate(todo.id)}
-                      disabled={completeMutation.isPending}
-                      data-testid={`button-complete-todo-${todo.id}`}
+                      className="h-12 w-12 flex-shrink-0"
+                      data-testid={`button-menu-todo-${todo.id}`}
                     >
-                      <Check className="w-5 h-5 text-green-600" />
+                      <MoreVertical className="w-5 h-5" />
                     </Button>
-                  ) : (
-                    <div className="px-3 py-2 bg-green-100 dark:bg-green-900 rounded text-green-700 dark:text-green-300 text-xs font-medium">
-                      Done
-                    </div>
-                  )}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => deleteMutation.mutate(todo.id)}
-                    disabled={deleteMutation.isPending}
-                    data-testid={`button-delete-todo-${todo.id}`}
-                  >
-                    <X className="w-5 h-5 text-destructive" />
-                  </Button>
-                </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
+                      Edit
+                    </DropdownMenuItem>
+                    {!todo.completed && (
+                      <DropdownMenuItem
+                        onClick={() => completeMutation.mutate(todo.id)}
+                        disabled={completeMutation.isPending}
+                        data-testid={`menu-complete-todo-${todo.id}`}
+                      >
+                        Mark Complete
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      onClick={() => deleteMutation.mutate(todo.id)}
+                      disabled={deleteMutation.isPending}
+                      className="text-destructive"
+                      data-testid={`menu-delete-todo-${todo.id}`}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </Card>
           ))
         )}
       </div>
 
-      {/* Add Todo Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      {/* Add/Edit Todo Dialog */}
+      <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowAddDialog(false);
+          setShowEditDialog(false);
+          setEditingTodo(null);
+          form.reset({
+            title: "",
+            description: "",
+            projectId: "",
+            assignedTo: "",
+            dueDate: "",
+          });
+        }
+      }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Create To-Do</DialogTitle>
+            <DialogTitle>{editingTodo ? "Edit To-Do" : "Create To-Do"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div>
@@ -372,7 +441,7 @@ export default function ToDos() {
                   <SelectValue placeholder="Select team member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {members.map((member: any) => (
+                  {members.map((member) => (
                     <SelectItem key={member.id} value={member.id}>
                       {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
                     </SelectItem>
@@ -385,11 +454,22 @@ export default function ToDos() {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+              <Button type="button" variant="outline" onClick={() => {
+                setShowAddDialog(false);
+                setShowEditDialog(false);
+                setEditingTodo(null);
+              }}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-todo">
-                {createMutation.isPending ? "Creating..." : "Create"}
+              <Button 
+                type="submit" 
+                disabled={createMutation.isPending || updateMutation.isPending} 
+                data-testid="button-submit-todo"
+              >
+                {editingTodo 
+                  ? (updateMutation.isPending ? "Updating..." : "Update")
+                  : (createMutation.isPending ? "Creating..." : "Create")
+                }
               </Button>
             </DialogFooter>
           </form>
