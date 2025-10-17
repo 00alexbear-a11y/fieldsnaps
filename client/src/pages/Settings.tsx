@@ -63,6 +63,7 @@ export default function Settings() {
   
   // Team management state
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
+  const [showCancellationWarning, setShowCancellationWarning] = useState(false);
 
   // Company data
   const { data: company } = useQuery<Company>({
@@ -706,7 +707,13 @@ export default function Settings() {
                 variant="outline"
                 size="default"
                 className="w-full"
-                onClick={() => window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank')}
+                onClick={() => {
+                  if (members.length > 1) {
+                    setShowCancellationWarning(true);
+                  } else {
+                    window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank');
+                  }
+                }}
                 data-testid="button-manage-subscription"
               >
                 <CreditCard className="w-4 h-4 mr-2" />
@@ -1116,6 +1123,45 @@ export default function Settings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cancellation Warning Dialog */}
+      <AlertDialog open={showCancellationWarning} onOpenChange={setShowCancellationWarning}>
+        <AlertDialogContent data-testid="dialog-cancellation-warning">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Important: Team Impact</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                You're managing a subscription for <strong>{members.length} team {members.length === 1 ? 'member' : 'members'}</strong>.
+              </p>
+              <p>
+                If you cancel your subscription:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>All {members.length - 1} team {members.length - 1 === 1 ? 'member' : 'members'} will lose access</li>
+                <li>Projects and photos remain viewable but read-only</li>
+                <li>No new content can be created</li>
+              </ul>
+              <p className="font-medium">
+                Continue to Stripe to manage your subscription?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-warning">
+              Go Back
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowCancellationWarning(false);
+                window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank');
+              }}
+              data-testid="button-continue-to-stripe"
+            >
+              Continue to Stripe
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
