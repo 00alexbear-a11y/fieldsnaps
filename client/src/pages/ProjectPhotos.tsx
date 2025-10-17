@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -61,6 +61,15 @@ export default function ProjectPhotos() {
   const [taskName, setTaskName] = useState("");
   const [taskAssignee, setTaskAssignee] = useState("");
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks'>('photos');
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportOptions, setExportOptions] = useState({
+    includeName: true,
+    includeDate: true,
+    includeTimestamp: true,
+    includeComments: true,
+    includeTags: true,
+    includeProjectHeader: true,
+  });
   const { toast } = useToast();
 
   const { data: project } = useQuery<Project>({
@@ -450,6 +459,190 @@ export default function ProjectPhotos() {
       console.error('Delete error:', error);
       toast({
         title: 'Failed to delete photos',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleExportToPDF = async () => {
+    try {
+      // Dynamically import jsPDF
+      const { jsPDF } = await import('jspdf');
+      
+      // Get selected photos
+      const selectedPhotos = photos.filter(photo => selectedPhotoIds.has(photo.id));
+      
+      if (selectedPhotos.length === 0) {
+        toast({
+          title: 'No photos selected',
+          description: 'Please select at least one photo to export',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Generating PDF...',
+        description: 'This may take a moment',
+      });
+
+      // Create new PDF document
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - 2 * margin;
+
+      // Add project header if enabled
+      if (exportOptions.includeProjectHeader && project) {
+        doc.setFontSize(20);
+        doc.setFont(undefined, 'bold');
+        doc.text(project.name, margin, margin);
+        
+        let yPos = margin + 8;
+        
+        if (project.address) {
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+          doc.text(project.address, margin, yPos);
+          yPos += 6;
+        }
+        
+        doc.setFontSize(10);
+        doc.text(`Exported: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, margin, yPos);
+        yPos += 10;
+        
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 10;
+      }
+
+      let currentY = exportOptions.includeProjectHeader && project ? margin + 40 : margin;
+
+      // Process each photo
+      for (let i = 0; i < selectedPhotos.length; i++) {
+        const photo = selectedPhotos[i];
+        
+        // Add new page if not first photo
+        if (i > 0) {
+          doc.addPage();
+          currentY = margin;
+        }
+
+        // Fetch photo as blob
+        try {
+          const response = await fetch(photo.url);
+          const blob = await response.blob();
+          
+          // Convert blob to data URL
+          const reader = new FileReader();
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          // Calculate image dimensions to fit within page
+          const img = new Image();
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = dataUrl;
+          });
+
+          const imgAspectRatio = img.width / img.height;
+          let imgWidth = contentWidth;
+          let imgHeight = imgWidth / imgAspectRatio;
+          
+          // If image is too tall, scale it down
+          const maxImgHeight = pageHeight - currentY - margin - 60; // Reserve space for details
+          if (imgHeight > maxImgHeight) {
+            imgHeight = maxImgHeight;
+            imgWidth = imgHeight * imgAspectRatio;
+          }
+
+          // Add image
+          doc.addImage(dataUrl, 'JPEG', margin, currentY, imgWidth, imgHeight);
+          currentY += imgHeight + 10;
+
+          // Add photo details
+          doc.setFontSize(10);
+          
+          if (exportOptions.includeName && photo.name) {
+            doc.setFont(undefined, 'bold');
+            doc.text(`Name: `, margin, currentY);
+            doc.setFont(undefined, 'normal');
+            doc.text(photo.name, margin + 15, currentY);
+            currentY += 6;
+          }
+
+          if (exportOptions.includeDate) {
+            doc.setFont(undefined, 'bold');
+            doc.text(`Date: `, margin, currentY);
+            doc.setFont(undefined, 'normal');
+            doc.text(format(new Date(photo.createdAt), 'MMMM d, yyyy'), margin + 15, currentY);
+            currentY += 6;
+          }
+
+          if (exportOptions.includeTimestamp) {
+            doc.setFont(undefined, 'bold');
+            doc.text(`Time: `, margin, currentY);
+            doc.setFont(undefined, 'normal');
+            doc.text(format(new Date(photo.createdAt), 'h:mm a'), margin + 15, currentY);
+            currentY += 6;
+          }
+
+          if (exportOptions.includeTags && photo.tags && photo.tags.length > 0) {
+            doc.setFont(undefined, 'bold');
+            doc.text(`Tags: `, margin, currentY);
+            doc.setFont(undefined, 'normal');
+            const tagNames = photo.tags.map(t => t.name).join(', ');
+            doc.text(tagNames, margin + 15, currentY);
+            currentY += 6;
+          }
+
+          if (exportOptions.includeComments && photo.caption) {
+            doc.setFont(undefined, 'bold');
+            doc.text(`Comment:`, margin, currentY);
+            currentY += 6;
+            doc.setFont(undefined, 'normal');
+            
+            // Word wrap comment text
+            const lines = doc.splitTextToSize(photo.caption, contentWidth);
+            doc.text(lines, margin, currentY);
+            currentY += lines.length * 5;
+          }
+        } catch (error) {
+          console.error(`Failed to add photo ${photo.id} to PDF:`, error);
+          // Continue with next photo
+        }
+      }
+
+      // Save PDF
+      const fileName = project 
+        ? `${project.name.replace(/[^a-z0-9]/gi, '_')}_photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`
+        : `photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+      
+      doc.save(fileName);
+
+      toast({
+        title: 'PDF exported successfully',
+        description: `${selectedPhotos.length} photo${selectedPhotos.length === 1 ? '' : 's'} exported`,
+      });
+
+      // Exit select mode
+      setIsSelectMode(false);
+      setSelectedPhotoIds(new Set());
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: 'Failed to export PDF',
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });
@@ -1020,6 +1213,15 @@ export default function ProjectPhotos() {
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
               </Button>
+              <Button
+                variant="default"
+                onClick={() => setShowExportDialog(true)}
+                disabled={selectedPhotoIds.size === 0}
+                data-testid="button-export-pdf"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Export PDF
+              </Button>
             </div>
           </div>
         </div>
@@ -1346,6 +1548,134 @@ export default function ProjectPhotos() {
               data-testid="button-close-batch-tag"
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export to PDF Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export to PDF</DialogTitle>
+            <DialogDescription>
+              Select the details to include in the PDF export of {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-project-header"
+                checked={exportOptions.includeProjectHeader}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeProjectHeader: !!checked }))
+                }
+                data-testid="checkbox-export-project-header"
+              />
+              <label
+                htmlFor="export-project-header"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Project header
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-name"
+                checked={exportOptions.includeName}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeName: !!checked }))
+                }
+                data-testid="checkbox-export-name"
+              />
+              <label
+                htmlFor="export-name"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Photo name
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-date"
+                checked={exportOptions.includeDate}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeDate: !!checked }))
+                }
+                data-testid="checkbox-export-date"
+              />
+              <label
+                htmlFor="export-date"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Date
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-timestamp"
+                checked={exportOptions.includeTimestamp}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeTimestamp: !!checked }))
+                }
+                data-testid="checkbox-export-timestamp"
+              />
+              <label
+                htmlFor="export-timestamp"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Timestamp
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-comments"
+                checked={exportOptions.includeComments}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeComments: !!checked }))
+                }
+                data-testid="checkbox-export-comments"
+              />
+              <label
+                htmlFor="export-comments"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Comments
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="export-tags"
+                checked={exportOptions.includeTags}
+                onCheckedChange={(checked) => 
+                  setExportOptions(prev => ({ ...prev, includeTags: !!checked }))
+                }
+                data-testid="checkbox-export-tags"
+              />
+              <label
+                htmlFor="export-tags"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Tags
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setShowExportDialog(false)}
+              data-testid="button-cancel-export"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                await handleExportToPDF();
+                setShowExportDialog(false);
+              }}
+              data-testid="button-confirm-export"
+            >
+              Generate PDF
             </Button>
           </DialogFooter>
         </DialogContent>
