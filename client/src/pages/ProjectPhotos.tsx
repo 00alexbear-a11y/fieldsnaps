@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,6 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
@@ -490,7 +498,56 @@ export default function ProjectPhotos() {
     <>
       <div className="h-screen flex flex-col overflow-auto pb-20">
         <header className="border-b p-4 bg-background sticky top-0 z-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
+          {/* Tag Filter Dropdown on left */}
+          {availableTags.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant={selectedTagIds.size > 0 ? "default" : "outline"} 
+                  size="sm" 
+                  data-testid="button-tag-filter"
+                >
+                  <TagIcon className="w-4 h-4 mr-1.5" />
+                  {selectedTagIds.size > 0 
+                    ? availableTags.find(t => selectedTagIds.has(t.id))?.name || "Tags"
+                    : "Tags"
+                  }
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuLabel>Filter by Tag</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => setSelectedTagIds(new Set())}
+                  data-testid="filter-all-photos"
+                >
+                  <div className={`w-2 h-2 rounded-full mr-2 ${selectedTagIds.size === 0 ? 'bg-primary' : 'bg-transparent border border-border'}`} />
+                  All Photos
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {availableTags.map((tag) => (
+                  <DropdownMenuItem 
+                    key={tag.id}
+                    onClick={() => {
+                      const newSelected = new Set<string>();
+                      newSelected.add(tag.id);
+                      setSelectedTagIds(newSelected);
+                    }}
+                    data-testid={`filter-tag-${tag.id}`}
+                  >
+                    <div 
+                      className={`w-2 h-2 rounded-full mr-2`}
+                      style={{ backgroundColor: selectedTagIds.has(tag.id) ? 'hsl(var(--primary))' : tag.color }}
+                    />
+                    {tag.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
           <div className="flex-1 text-center">
             <h1 className="text-lg sm:text-xl font-bold">{project?.name || "Project Photos"}</h1>
             {project?.description && (
@@ -519,7 +576,7 @@ export default function ProjectPhotos() {
                     });
                   });
               }}
-              className="flex-shrink-0 ml-2"
+              className="flex-shrink-0"
               data-testid="button-toggle-complete"
             >
               {project.completed ? "Reopen" : "Complete"}
@@ -539,58 +596,6 @@ export default function ProjectPhotos() {
           </div>
         ) : (
           <div className="space-y-4">
-            
-            {/* Tag Filter */}
-            {availableTags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 pb-2 border-b" data-testid="tag-filter-bar">
-                <span className="text-sm text-muted-foreground font-medium">Filter:</span>
-                {availableTags.map((tag) => {
-                  const isSelected = selectedTagIds.has(tag.id);
-                  return (
-                    <Badge
-                      key={tag.id}
-                      onClick={() => {
-                        const newSelected = new Set(selectedTagIds);
-                        if (isSelected) {
-                          newSelected.delete(tag.id);
-                        } else {
-                          newSelected.add(tag.id);
-                        }
-                        setSelectedTagIds(newSelected);
-                      }}
-                      className={`cursor-pointer gap-1.5 ${
-                        isSelected 
-                          ? 'ring-2 ring-primary' 
-                          : ''
-                      }`}
-                      style={{
-                        backgroundColor: isSelected ? tag.color : undefined,
-                        color: isSelected ? 'white' : undefined,
-                      }}
-                      data-testid={`tag-filter-${tag.id}`}
-                    >
-                      <div 
-                        className="w-2 h-2 rounded-full" 
-                        style={{ backgroundColor: isSelected ? 'white' : tag.color }}
-                      />
-                      {tag.name}
-                    </Badge>
-                  );
-                })}
-                {selectedTagIds.size > 0 && (
-                  <Button
-                    onClick={() => setSelectedTagIds(new Set())}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-xs"
-                    data-testid="button-clear-filters"
-                  >
-                    Clear
-                  </Button>
-                )}
-              </div>
-            )}
-            
             {/* Empty state when filter yields no results */}
             {selectedTagIds.size > 0 && photosByDate.length === 0 && (
               <div className="text-center py-12">
