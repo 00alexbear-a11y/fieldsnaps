@@ -14,6 +14,25 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// Companies table - team/organization structure
+export const companies = pgTable("companies", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 255 }).notNull(),
+  ownerId: varchar("owner_id").notNull(), // Original creator who pays (FK enforced at app level to avoid circular ref)
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  subscriptionQuantity: integer("subscription_quantity").default(1).notNull(), // Number of users owner pays for
+  subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled
+  inviteLinkToken: varchar("invite_link_token", { length: 32 }).unique(), // Current invite link token
+  inviteLinkUses: integer("invite_link_uses").default(0).notNull(), // How many joined via current link
+  inviteLinkMaxUses: integer("invite_link_max_uses").default(5).notNull(), // Max uses before expiry
+  inviteLinkExpiresAt: timestamp("invite_link_expires_at"), // 7 days from generation
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_companies_owner_id").on(table.ownerId),
+  index("idx_companies_invite_token").on(table.inviteLinkToken),
+]);
+
 // Users table (for authentication)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -21,15 +40,22 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  companyId: varchar("company_id").references(() => companies.id, { onDelete: "set null" }),
+  role: varchar("role").default("member"), // owner or member
+  invitedBy: varchar("invited_by").references(() => users.id, { onDelete: "set null" }), // Who invited this user
+  removedAt: timestamp("removed_at"), // Timestamp when removed from company (for grace period)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  // Subscription fields (for future Stripe integration)
+  // Legacy subscription fields (kept for backwards compatibility during migration)
   subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled, none
   stripeCustomerId: varchar("stripe_customer_id"),
   trialStartDate: timestamp("trial_start_date"), // When trial started (on first project creation)
   trialEndDate: timestamp("trial_end_date"),
   pastDueSince: timestamp("past_due_since"), // When payment failed (for 14-day grace period)
-});
+}, (table) => [
+  index("idx_users_company_id").on(table.companyId),
+  index("idx_users_invited_by").on(table.invitedBy),
+]);
 
 // WebAuthn credentials table (for biometric authentication)
 export const credentials = pgTable("credentials", {
@@ -53,16 +79,21 @@ export const projects = pgTable("projects", {
   latitude: text("latitude"), // GPS latitude for map view
   longitude: text("longitude"), // GPS longitude for map view
   coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
-  userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
+  companyId: varchar("company_id").references(() => companies.id, { onDelete: "cascade" }), // Company that owns this project
+  createdBy: varchar("created_by").references(() => users.id), // User who created the project
   completed: boolean("completed").default(false).notNull(), // Mark job as complete
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
+  // Legacy field for backwards compatibility
+  userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
 }, (table) => [
   // Partial index for active projects: filter deletedAt IS NULL, sort by createdAt
   index("idx_projects_active").on(table.createdAt).where(sql`${table.deletedAt} IS NULL`),
   // Index for trash queries: filter deletedAt IS NOT NULL, sort by deletedAt
   index("idx_projects_trash").on(table.deletedAt.desc()).where(sql`${table.deletedAt} IS NOT NULL`),
+  index("idx_projects_company_id").on(table.companyId),
+  index("idx_projects_created_by").on(table.createdBy),
 ]);
 
 // Photos table
@@ -111,6 +142,24 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_comments_photo_id").on(table.photoId),
+]);
+
+// Tasks table - lightweight task management for photo documentation
+export const tasks = pgTable("tasks", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }), // Tasks die with projects
+  taskName: text("task_name").notNull(),
+  assignedTo: varchar("assigned_to").notNull().references(() => users.id, { onDelete: "cascade" }), // Must be user in same company
+  createdBy: varchar("created_by").notNull().references(() => users.id, { onDelete: "cascade" }), // Who created the task
+  completed: boolean("completed").default(false).notNull(),
+  completedAt: timestamp("completed_at"),
+  completedBy: varchar("completed_by").references(() => users.id, { onDelete: "set null" }), // Who completed it
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_tasks_project_id").on(table.projectId),
+  index("idx_tasks_assigned_to").on(table.assignedTo),
+  index("idx_tasks_created_by").on(table.createdBy),
+  index("idx_tasks_completed").on(table.completed),
 ]);
 
 // Shares table - for generating shareable project links (shows all active photos)
@@ -183,10 +232,12 @@ export const subscriptionEvents = pgTable("subscription_events", {
 ]);
 
 // Zod schemas for validation
+export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
+export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, createdAt: true });
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
@@ -195,6 +246,7 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEvents).omit({ id: true, createdAt: true });
 
 // TypeScript types
+export type Company = typeof companies.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
 export type Credential = typeof credentials.$inferSelect;
@@ -203,16 +255,19 @@ export type Project = typeof projects.$inferSelect;
 export type Photo = typeof photos.$inferSelect;
 export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type PhotoTag = typeof photoTags.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type SubscriptionEvent = typeof subscriptionEvents.$inferSelect;
 
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
 export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;

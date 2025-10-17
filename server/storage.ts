@@ -1,11 +1,12 @@
 import { db } from "./db";
-import { projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, subscriptions, subscriptionEvents } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, tasks, subscriptions, subscriptionEvents } from "../shared/schema";
 import type {
+  Company, InsertCompany,
   User, UpsertUser,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag,
+  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Task,
   Subscription, SubscriptionEvent,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertTask,
   InsertSubscription, InsertSubscriptionEvent
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
@@ -15,6 +16,16 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(userId: string, data: Partial<User>): Promise<User | undefined>;
+  
+  // Company operations
+  getCompany(id: string): Promise<Company | undefined>;
+  getCompanyByOwnerId(ownerId: string): Promise<Company | undefined>;
+  getCompanyByInviteToken(token: string): Promise<Company | undefined>;
+  createCompany(data: InsertCompany): Promise<Company>;
+  updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined>;
+  getCompanyMembers(companyId: string): Promise<User[]>;
+  removeUserFromCompany(userId: string): Promise<User | undefined>;
   
   // WebAuthn Credentials
   getUserCredentials(userId: string): Promise<Credential[]>;
@@ -75,6 +86,16 @@ export interface IStorage {
   addPhotoTag(data: InsertPhotoTag): Promise<PhotoTag>;
   removePhotoTag(photoId: string, tagId: string): Promise<boolean>;
   
+  // Tasks
+  getTask(id: string): Promise<Task | undefined>;
+  getProjectTasks(projectId: string): Promise<Task[]>;
+  getTasksAssignedToUser(userId: string): Promise<(Task & { project: { id: string; name: string } })[]>;
+  createTask(data: InsertTask): Promise<Task>;
+  updateTask(id: string, data: Partial<InsertTask>): Promise<Task | undefined>;
+  completeTask(id: string, userId: string): Promise<Task | undefined>;
+  restoreTask(id: string): Promise<Task | undefined>;
+  deleteTask(id: string): Promise<boolean>;
+  
   // Billing & Subscriptions
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
   updateUserSubscriptionStatus(userId: string, status: string, trialEndDate?: Date): Promise<User | undefined>;
@@ -107,6 +128,60 @@ export class DbStorage implements IStorage {
           updatedAt: new Date(),
         },
       })
+      .returning();
+    return result[0];
+  }
+
+  async updateUser(userId: string, data: Partial<User>): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  // Company operations
+  async getCompany(id: string): Promise<Company | undefined> {
+    const result = await db.select().from(companies).where(eq(companies.id, id));
+    return result[0];
+  }
+
+  async getCompanyByOwnerId(ownerId: string): Promise<Company | undefined> {
+    const result = await db.select().from(companies).where(eq(companies.ownerId, ownerId));
+    return result[0];
+  }
+
+  async getCompanyByInviteToken(token: string): Promise<Company | undefined> {
+    const result = await db.select().from(companies).where(eq(companies.inviteLinkToken, token));
+    return result[0];
+  }
+
+  async createCompany(data: InsertCompany): Promise<Company> {
+    const result = await db.insert(companies).values(data).returning();
+    return result[0];
+  }
+
+  async updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined> {
+    const result = await db.update(companies)
+      .set(data)
+      .where(eq(companies.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getCompanyMembers(companyId: string): Promise<User[]> {
+    return await db.select().from(users)
+      .where(and(eq(users.companyId, companyId), isNull(users.removedAt)))
+      .orderBy(users.createdAt);
+  }
+
+  async removeUserFromCompany(userId: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({ 
+        removedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
       .returning();
     return result[0];
   }
@@ -147,6 +222,8 @@ export class DbStorage implements IStorage {
         latitude: projects.latitude,
         longitude: projects.longitude,
         coverPhotoId: projects.coverPhotoId,
+        companyId: projects.companyId,
+        createdBy: projects.createdBy,
         userId: projects.userId,
         createdAt: projects.createdAt,
         lastActivityAt: projects.lastActivityAt,
@@ -495,6 +572,88 @@ export class DbStorage implements IStorage {
     const result = await db.delete(photoTags)
       .where(and(eq(photoTags.photoId, photoId), eq(photoTags.tagId, tagId)))
       .returning();
+    return result.length > 0;
+  }
+
+  // Tasks
+  async getTask(id: string): Promise<Task | undefined> {
+    const result = await db.select().from(tasks).where(eq(tasks.id, id));
+    return result[0];
+  }
+
+  async getProjectTasks(projectId: string): Promise<Task[]> {
+    return await db.select().from(tasks)
+      .where(eq(tasks.projectId, projectId))
+      .orderBy(tasks.createdAt);
+  }
+
+  async getTasksAssignedToUser(userId: string): Promise<(Task & { project: { id: string; name: string } })[]> {
+    const result = await db
+      .select({
+        id: tasks.id,
+        projectId: tasks.projectId,
+        taskName: tasks.taskName,
+        assignedTo: tasks.assignedTo,
+        createdBy: tasks.createdBy,
+        completed: tasks.completed,
+        completedAt: tasks.completedAt,
+        completedBy: tasks.completedBy,
+        createdAt: tasks.createdAt,
+        project: {
+          id: projects.id,
+          name: projects.name,
+        },
+      })
+      .from(tasks)
+      .innerJoin(projects, eq(tasks.projectId, projects.id))
+      .where(and(
+        eq(tasks.assignedTo, userId),
+        isNull(projects.deletedAt) // Only tasks from active projects
+      ))
+      .orderBy(tasks.createdAt);
+    
+    return result as any;
+  }
+
+  async createTask(data: InsertTask): Promise<Task> {
+    const result = await db.insert(tasks).values(data).returning();
+    return result[0];
+  }
+
+  async updateTask(id: string, data: Partial<InsertTask>): Promise<Task | undefined> {
+    const result = await db.update(tasks)
+      .set(data)
+      .where(eq(tasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async completeTask(id: string, userId: string): Promise<Task | undefined> {
+    const result = await db.update(tasks)
+      .set({ 
+        completed: true, 
+        completedAt: new Date(),
+        completedBy: userId 
+      })
+      .where(eq(tasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async restoreTask(id: string): Promise<Task | undefined> {
+    const result = await db.update(tasks)
+      .set({ 
+        completed: false, 
+        completedAt: null,
+        completedBy: null 
+      })
+      .where(eq(tasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTask(id: string): Promise<boolean> {
+    const result = await db.delete(tasks).where(eq(tasks.id, id)).returning();
     return result.length > 0;
   }
 
