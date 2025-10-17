@@ -50,7 +50,11 @@ export default function ToDos() {
       if (filterProject !== 'all') params.append('projectId', filterProject);
       if (filterCompleted !== 'all') params.append('completed', filterCompleted === 'completed' ? 'true' : 'false');
       const response = await fetch(`/api/todos?${params.toString()}`);
-      return response.json();
+      if (!response.ok) {
+        throw new Error(`Failed to fetch todos: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
