@@ -408,6 +408,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         inviteLinkUses: company.inviteLinkUses + 1,
       });
 
+      // Update Stripe subscription quantity (if subscription exists)
+      const subscription = await storage.getSubscriptionByCompanyId(company.id);
+      if (subscription?.stripeSubscriptionId) {
+        try {
+          const members = await storage.getCompanyMembers(company.id);
+          await billingService.updateSubscriptionQuantity(
+            subscription.stripeSubscriptionId,
+            members.length
+          );
+        } catch (error) {
+          console.error('Failed to update Stripe subscription quantity:', error);
+          // Don't fail the invite acceptance if Stripe update fails
+        }
+      }
+
       res.json({ success: true, company });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -459,6 +474,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Remove user from company
       await storage.removeUserFromCompany(targetUserId);
+
+      // Update Stripe subscription quantity (if subscription exists)
+      const subscription = await storage.getSubscriptionByCompanyId(currentUser.companyId);
+      if (subscription?.stripeSubscriptionId) {
+        try {
+          const members = await storage.getCompanyMembers(currentUser.companyId);
+          await billingService.updateSubscriptionQuantity(
+            subscription.stripeSubscriptionId,
+            members.length
+          );
+        } catch (error) {
+          console.error('Failed to update Stripe subscription quantity:', error);
+          // Don't fail the member removal if Stripe update fails
+        }
+      }
 
       res.json({ success: true });
     } catch (error: any) {
@@ -1792,6 +1822,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Get user's company and team size for quantity-based pricing
+      const user = await storage.getUser(userId);
+      if (!user || !user.companyId) {
+        return res.status(400).json({ error: "User must belong to a company to subscribe" });
+      }
+
+      const members = await storage.getCompanyMembers(user.companyId);
+      const teamSize = members.length;
+
       // Build success and cancel URLs
       const baseUrl = process.env.REPLIT_DEPLOYMENT ? 
         `https://${process.env.REPLIT_DEPLOYMENT}` : 
@@ -1799,8 +1838,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const successUrl = `${baseUrl}/billing/success`;
       const cancelUrl = `${baseUrl}/settings`;
 
-      // Create checkout session
-      const session = await billingService.createCheckoutSession(userId, successUrl, cancelUrl);
+      // Create checkout session with team quantity
+      const session = await billingService.createCheckoutSession(userId, successUrl, cancelUrl, teamSize);
 
       res.json({ url: session.url });
     } catch (error: any) {

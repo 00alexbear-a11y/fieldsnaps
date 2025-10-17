@@ -52,24 +52,28 @@ export class BillingService {
     return customer.id;
   }
 
-  async createCheckoutSession(userId: string, successUrl: string, cancelUrl: string): Promise<Stripe.Checkout.Session> {
+  async createCheckoutSession(userId: string, successUrl: string, cancelUrl: string, quantity: number = 1): Promise<Stripe.Checkout.Session> {
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) {
       throw new Error("Billing not configured: Missing STRIPE_PRICE_ID");
     }
+
+    // Ensure quantity is at least 1
+    const safeQuantity = Math.max(1, quantity);
 
     const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity: safeQuantity,
         },
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
         userId,
+        teamSize: safeQuantity.toString(),
       },
     });
 
@@ -135,15 +139,18 @@ export class BillingService {
    * Stripe automatically prorates the charge/credit
    */
   async updateSubscriptionQuantity(subscriptionId: string, newQuantity: number): Promise<Stripe.Subscription> {
-    if (newQuantity < 1) {
-      throw new Error("Subscription quantity must be at least 1");
+    // Clamp quantity to minimum of 1 to prevent Stripe errors
+    const safeQuantity = Math.max(1, newQuantity);
+    
+    if (safeQuantity !== newQuantity) {
+      console.warn(`Subscription quantity clamped from ${newQuantity} to ${safeQuantity}`);
     }
 
     return await this.stripe.subscriptions.update(subscriptionId, {
       items: [
         {
           id: (await this.stripe.subscriptions.retrieve(subscriptionId)).items.data[0].id,
-          quantity: newQuantity,
+          quantity: safeQuantity,
         },
       ],
       proration_behavior: 'always_invoice', // Immediately charge/credit the difference
