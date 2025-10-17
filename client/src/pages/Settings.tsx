@@ -17,7 +17,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import type { Tag } from '@shared/schema';
+import type { Tag, Company, User as UserType } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 const TAG_COLORS = [
@@ -63,6 +63,119 @@ export default function Settings() {
   
   // Team management state
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
+
+  // Company data
+  const { data: company } = useQuery<Company>({
+    queryKey: ['/api/companies/me'],
+    enabled: !!user?.companyId,
+  });
+
+  // Team members data
+  const { data: members = [] } = useQuery<UserType[]>({
+    queryKey: ['/api/companies/members'],
+    enabled: !!user?.companyId,
+  });
+
+  // Generate invite link mutation
+  const generateInviteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/companies/invite-link');
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      toast({
+        title: 'Invite link generated',
+        description: 'Share this link with your team members',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to generate invite link',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Revoke invite link mutation
+  const revokeInviteMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest('DELETE', '/api/companies/invite-link');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      toast({
+        title: 'Invite link revoked',
+        description: 'Previous link is no longer valid',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to revoke invite link',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Remove member mutation
+  const removeMemberMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await apiRequest('DELETE', `/api/companies/members/${userId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/members'] });
+      toast({
+        title: 'Member removed',
+        description: 'Team member has been removed from the company',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to remove member',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Promote member mutation
+  const promoteMemberMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await apiRequest('PUT', `/api/companies/members/${userId}/promote`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/members'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      toast({
+        title: 'Ownership transferred',
+        description: 'Team member is now the billing owner',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to transfer ownership',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const copyInviteLink = () => {
+    if (company?.inviteLinkToken) {
+      const inviteUrl = `${window.location.origin}/api/companies/invite/${company.inviteLinkToken}`;
+      navigator.clipboard.writeText(inviteUrl);
+      setInviteLinkCopied(true);
+      setTimeout(() => setInviteLinkCopied(false), 2000);
+      toast({
+        title: 'Invite link copied',
+        description: 'Share this link with your team members',
+        duration: 2000,
+      });
+    }
+  };
 
   useEffect(() => {
     // Load sync status and storage usage
@@ -653,6 +766,160 @@ export default function Settings() {
           )}
         </div>
       </Card>
+
+      {/* Team Management */}
+      {user?.companyId && (
+        <Card className="p-4 space-y-4">
+          <div className="flex items-center gap-3">
+            <Users className="w-5 h-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Team</h2>
+          </div>
+
+          {/* Billing Info */}
+          {company?.ownerId === user.id && (
+            <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Team Size</span>
+                <span className="font-medium">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Cost per user</span>
+                <span className="font-medium">$19.99/month</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-border">
+                <span className="text-sm font-medium">Total Monthly Cost</span>
+                <span className="font-semibold">${(members.length * 19.99).toFixed(2)}/month</span>
+              </div>
+            </div>
+          )}
+
+          {/* Invite Link Section (Owner Only) */}
+          {company?.ownerId === user.id && (
+            <div className="space-y-3">
+              {company?.inviteLinkToken ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">Active Invite Link</p>
+                      <p className="text-xs text-muted-foreground">
+                        {company.inviteLinkUses} / {company.inviteLinkMaxUses} uses
+                        {company.inviteLinkExpiresAt && ` • Expires ${new Date(company.inviteLinkExpiresAt).toLocaleDateString()}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="default"
+                      className="flex-1"
+                      onClick={copyInviteLink}
+                      data-testid="button-copy-invite"
+                    >
+                      {inviteLinkCopied ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy Link
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="default"
+                      onClick={() => revokeInviteMutation.mutate()}
+                      disabled={revokeInviteMutation.isPending}
+                      data-testid="button-revoke-invite"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Revoke
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full"
+                  onClick={() => generateInviteMutation.mutate()}
+                  disabled={generateInviteMutation.isPending}
+                  data-testid="button-generate-invite"
+                >
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  {generateInviteMutation.isPending ? 'Generating...' : 'Generate Invite Link'}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Team Members List */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Team Members</p>
+            {members.map((member: any) => (
+              <div
+                key={member.id}
+                className="flex items-center justify-between p-3 rounded-lg border"
+                data-testid={`member-item-${member.id}`}
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={member.profileImageUrl || undefined} />
+                    <AvatarFallback>
+                      {member.firstName?.[0] || member.email?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">
+                      {member.firstName && member.lastName 
+                        ? `${member.firstName} ${member.lastName}` 
+                        : member.email}
+                      {member.id === user.id && (
+                        <span className="text-xs text-muted-foreground ml-2">(You)</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{member.email}</p>
+                  </div>
+                  {company?.ownerId === member.id && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10">
+                      <Crown className="w-3 h-3 text-primary" />
+                      <span className="text-xs font-medium text-primary">Owner</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Owner Actions */}
+                {company?.ownerId === user.id && member.id !== user.id && (
+                  <div className="flex items-center gap-1 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => promoteMemberMutation.mutate(member.id)}
+                      disabled={promoteMemberMutation.isPending}
+                      title="Transfer ownership"
+                      data-testid={`button-promote-${member.id}`}
+                    >
+                      <Crown className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeMemberMutation.mutate(member.id)}
+                      disabled={removeMemberMutation.isPending}
+                      title="Remove member"
+                      data-testid={`button-remove-${member.id}`}
+                    >
+                      <UserMinus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Sync Status */}
       <Card 
