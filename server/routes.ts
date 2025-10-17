@@ -414,6 +414,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Team Management Routes
+  app.get("/api/companies/members", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      const members = await storage.getCompanyMembers(user.companyId);
+      res.json(members);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/companies/members/:userId", isAuthenticated, async (req: any, res) => {
+    try {
+      const currentUserId = req.user.claims.sub;
+      const currentUser = await storage.getUser(currentUserId);
+      const targetUserId = req.params.userId;
+
+      if (!currentUser || !currentUser.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only the billing owner can remove members
+      const company = await storage.getCompany(currentUser.companyId);
+      if (!company || company.ownerId !== currentUserId) {
+        return res.status(403).json({ error: "Only the billing owner can remove members" });
+      }
+
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser || targetUser.companyId !== currentUser.companyId) {
+        return res.status(404).json({ error: "User not found in your company" });
+      }
+
+      // Can't remove yourself
+      if (targetUserId === currentUserId) {
+        return res.status(400).json({ error: "Cannot remove yourself. Transfer ownership first." });
+      }
+
+      // Remove user from company
+      await storage.removeUserFromCompany(targetUserId);
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/companies/members/:userId/promote", isAuthenticated, async (req: any, res) => {
+    try {
+      const currentUserId = req.user.claims.sub;
+      const currentUser = await storage.getUser(currentUserId);
+      const targetUserId = req.params.userId;
+
+      if (!currentUser || !currentUser.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only the current owner can promote someone else
+      const company = await storage.getCompany(currentUser.companyId);
+      if (!company || company.ownerId !== currentUserId) {
+        return res.status(403).json({ error: "Only the billing owner can transfer ownership" });
+      }
+
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser || targetUser.companyId !== currentUser.companyId) {
+        return res.status(404).json({ error: "User not found in your company" });
+      }
+
+      // Can't promote yourself
+      if (targetUserId === currentUserId) {
+        return res.status(400).json({ error: "You are already the owner" });
+      }
+
+      // Transfer ownership
+      await storage.updateCompany(company.id, { ownerId: targetUserId });
+      await storage.updateUser(targetUserId, { role: 'owner' });
+      await storage.updateUser(currentUserId, { role: 'member' });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Object Storage routes - Referenced from blueprint:javascript_object_storage
   // Endpoint for serving private objects (photos) with ACL checks
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
