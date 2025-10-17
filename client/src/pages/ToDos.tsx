@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -44,6 +44,9 @@ export default function ToDos() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<TodoWithDetails[]>({
@@ -132,6 +135,44 @@ export default function ToDos() {
     },
   });
 
+  // Photo upload mutation
+  const uploadPhotoMutation = useMutation({
+    mutationFn: async ({ file, projectId }: { file: File; projectId?: string }) => {
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('caption', file.name);
+      
+      const endpoint = projectId 
+        ? `/api/projects/${projectId}/photos`
+        : '/api/photos/standalone'; // Will need to create this endpoint
+      
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: res.statusText }));
+        throw new Error(errorData.message || `Upload failed: ${res.statusText}`);
+      }
+      
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      setSelectedPhotoId(data.id);
+      setSelectedPhotoUrl(data.url);
+      toast({ title: "Photo attached!" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Photo upload failed", 
+        description: error.message || 'Failed to upload photo',
+        variant: "destructive" 
+      });
+    },
+  });
+
   const form = useForm<CreateTodoForm>({
     resolver: zodResolver(createTodoSchema),
     defaultValues: {
@@ -153,12 +194,27 @@ export default function ToDos() {
     if (data.description) payload.description = data.description;
     if (data.projectId) payload.projectId = data.projectId;
     if (data.dueDate) payload.dueDate = data.dueDate;
+    if (selectedPhotoId) payload.photoId = selectedPhotoId;
     
     if (editingTodo) {
       updateMutation.mutate({ id: editingTodo.id, data: payload });
     } else {
       createMutation.mutate(payload);
     }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const projectId = form.watch('projectId');
+      uploadPhotoMutation.mutate({ file, projectId });
+    }
+  };
+
+  const handleCameraClick = () => {
+    const projectId = form.watch('projectId');
+    // Navigate to camera with return URL
+    setLocation(`/camera?projectId=${projectId || ''}&returnUrl=/todos`);
   };
 
   const handleEditTodo = (todo: TodoWithDetails) => {
@@ -170,6 +226,10 @@ export default function ToDos() {
       assignedTo: todo.assignedTo,
       dueDate: todo.dueDate ? (typeof todo.dueDate === 'string' ? todo.dueDate : todo.dueDate.toISOString().split('T')[0]) : "",
     });
+    if (todo.photo) {
+      setSelectedPhotoId(todo.photoId || null);
+      setSelectedPhotoUrl(todo.photo.url);
+    }
     setShowEditDialog(true);
   };
 
@@ -370,12 +430,24 @@ export default function ToDos() {
         )}
       </div>
 
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+        data-testid="input-file-photo"
+      />
+
       {/* Add/Edit Todo Dialog */}
       <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
         if (!open) {
           setShowAddDialog(false);
           setShowEditDialog(false);
           setEditingTodo(null);
+          setSelectedPhotoId(null);
+          setSelectedPhotoUrl(null);
           form.reset({
             title: "",
             description: "",
@@ -447,6 +519,63 @@ export default function ToDos() {
               </Select>
               {form.formState.errors.assignedTo && (
                 <p className="text-sm text-destructive mt-1">{form.formState.errors.assignedTo.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label>Attach Photo (optional)</Label>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCameraClick}
+                  className="flex-1"
+                  data-testid="button-camera"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Take Photo
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1"
+                  data-testid="button-album"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  From Album
+                </Button>
+              </div>
+              
+              {uploadPhotoMutation.isPending && (
+                <div className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  <span>Uploading photo...</span>
+                </div>
+              )}
+
+              {selectedPhotoUrl && !uploadPhotoMutation.isPending && (
+                <div className="mt-3 relative rounded-md overflow-hidden border">
+                  <img
+                    src={selectedPhotoUrl}
+                    alt="Selected photo"
+                    className="w-full h-40 object-cover"
+                    data-testid="img-preview-photo"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={() => {
+                      setSelectedPhotoId(null);
+                      setSelectedPhotoUrl(null);
+                    }}
+                    data-testid="button-remove-photo"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
               )}
             </div>
             </div>
