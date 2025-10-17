@@ -41,9 +41,10 @@ type TodoWithDetails = ToDo & {
 export default function ToDos() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [view, setView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
+  const [view, setView] = useState<'my-tasks' | 'team-tasks' | 'i-created' | 'calendar'>('my-tasks');
   const [filterProject, setFilterProject] = useState<string>('all');
   const [filterCompleted, setFilterCompleted] = useState<string>('active');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
@@ -54,7 +55,7 @@ export default function ToDos() {
 
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<TodoWithDetails[]>({
-    queryKey: ['/api/todos', view, filterProject, filterCompleted],
+    queryKey: ['/api/todos', view, filterProject, filterCompleted, selectedDate],
     queryFn: async () => {
       const params = new URLSearchParams({ view });
       if (filterProject !== 'all') params.append('projectId', filterProject);
@@ -67,6 +68,20 @@ export default function ToDos() {
       return Array.isArray(data) ? data : [];
     },
   });
+
+  // Filter todos by selected date for calendar view
+  const calendarTodos = view === 'calendar' 
+    ? todos.filter((todo) => {
+        if (!todo.dueDate) return false;
+        const todoDate = new Date(todo.dueDate);
+        const selected = new Date(selectedDate);
+        return (
+          todoDate.getFullYear() === selected.getFullYear() &&
+          todoDate.getMonth() === selected.getMonth() &&
+          todoDate.getDate() === selected.getDate()
+        );
+      })
+    : [];
 
   // Fetch projects for filter
   const { data: projects = [] } = useQuery<Project[]>({
@@ -306,6 +321,13 @@ export default function ToDos() {
             >
               I Created
             </TabsTrigger>
+            <TabsTrigger
+              value="calendar"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              data-testid="tab-calendar"
+            >
+              Calendar
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -339,101 +361,218 @@ export default function ToDos() {
       </div>
 
       {/* Content */}
-      <div className="max-w-screen-sm mx-auto p-4 space-y-3">
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      {view === 'calendar' ? (
+        <div className="max-w-screen-sm mx-auto p-4 space-y-6">
+          {/* Calendar */}
+          <div className="flex justify-center">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              className="rounded-md border"
+              data-testid="calendar-view"
+            />
           </div>
-        ) : todos.length === 0 ? (
-          <div className="text-center py-12">
-            <CheckSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No tasks yet</h2>
-            <p className="text-muted-foreground">
-              {view === 'my-tasks' ? 'You have no assigned tasks' :
-               view === 'team-tasks' ? 'Your team has no tasks' :
-               'You haven\'t created any tasks'}
-            </p>
+
+          {/* Selected Date Header */}
+          <div className="text-center">
+            <h2 className="text-lg font-semibold" data-testid="text-selected-date">
+              {format(selectedDate, "EEEE, MMMM d, yyyy")}
+            </h2>
           </div>
-        ) : (
-          todos.map((todo) => (
-            <Card
-              key={todo.id}
-              className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
-              data-testid={`card-todo-${todo.id}`}
-            >
-              <div className="flex items-center gap-2">
-                {/* Photo thumbnail if available - 60px square */}
-                {todo.photo && (
-                  <div
-                    className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
-                    onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
-                    data-testid={`img-todo-photo-${todo.id}`}
-                  >
-                    <img
-                      src={todo.photo.url}
-                      alt="Todo photo"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
 
-                {/* Content - flex-1 to take remaining space */}
-                <div className="flex-1 min-w-0">
-                  <h3
-                    className={`font-medium text-sm leading-snug ${todo.completed ? 'line-through' : ''}`}
-                    data-testid={`text-todo-title-${todo.id}`}
-                  >
-                    {todo.title}
-                  </h3>
-                  
-                  {/* Only show project if viewing all projects */}
-                  {filterProject === 'all' && todo.project && (
-                    <p className="text-xs text-muted-foreground leading-none mt-0.5" data-testid={`text-todo-project-${todo.id}`}>
-                      {todo.project.name}
-                    </p>
-                  )}
-                </div>
-
-                {/* Three-dot menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-12 w-12 flex-shrink-0"
-                      data-testid={`button-menu-todo-${todo.id}`}
-                    >
-                      <MoreVertical className="w-5 h-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
-                      Edit
-                    </DropdownMenuItem>
-                    {!todo.completed && (
-                      <DropdownMenuItem
-                        onClick={() => completeMutation.mutate(todo.id)}
-                        disabled={completeMutation.isPending}
-                        data-testid={`menu-complete-todo-${todo.id}`}
+          {/* Tasks for Selected Date */}
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : calendarTodos.length === 0 ? (
+            <div className="text-center py-12">
+              <CheckSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No tasks</h3>
+              <p className="text-muted-foreground">
+                No tasks scheduled for this date
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {calendarTodos.map((todo) => (
+                <Card
+                  key={todo.id}
+                  className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                  data-testid={`card-todo-${todo.id}`}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* Photo thumbnail if available - 60px square */}
+                    {todo.photo && (
+                      <div
+                        className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
+                        onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
+                        data-testid={`img-todo-photo-${todo.id}`}
                       >
-                        Mark Complete
-                      </DropdownMenuItem>
+                        <img
+                          src={todo.photo.url}
+                          alt="Todo photo"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     )}
-                    <DropdownMenuItem
-                      onClick={() => deleteMutation.mutate(todo.id)}
-                      disabled={deleteMutation.isPending}
-                      className="text-destructive"
-                      data-testid={`menu-delete-todo-${todo.id}`}
+
+                    {/* Content - flex-1 to take remaining space */}
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className={`font-medium text-sm leading-snug ${todo.completed ? 'line-through' : ''}`}
+                        data-testid={`text-todo-title-${todo.id}`}
+                      >
+                        {todo.title}
+                      </h3>
+                      
+                      {/* Only show project if viewing all projects */}
+                      {filterProject === 'all' && todo.project && (
+                        <p className="text-xs text-muted-foreground leading-none mt-0.5" data-testid={`text-todo-project-${todo.id}`}>
+                          {todo.project.name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Three-dot menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-12 w-12 flex-shrink-0"
+                          data-testid={`button-menu-todo-${todo.id}`}
+                        >
+                          <MoreVertical className="w-5 h-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
+                          Edit
+                        </DropdownMenuItem>
+                        {!todo.completed && (
+                          <DropdownMenuItem
+                            onClick={() => completeMutation.mutate(todo.id)}
+                            disabled={completeMutation.isPending}
+                            data-testid={`menu-complete-todo-${todo.id}`}
+                          >
+                            Mark Complete
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          onClick={() => deleteMutation.mutate(todo.id)}
+                          disabled={deleteMutation.isPending}
+                          className="text-destructive"
+                          data-testid={`menu-delete-todo-${todo.id}`}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="max-w-screen-sm mx-auto p-4 space-y-3">
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : todos.length === 0 ? (
+            <div className="text-center py-12">
+              <CheckSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <h2 className="text-xl font-semibold mb-2">No tasks yet</h2>
+              <p className="text-muted-foreground">
+                {view === 'my-tasks' ? 'You have no assigned tasks' :
+                 view === 'team-tasks' ? 'Your team has no tasks' :
+                 'You haven\'t created any tasks'}
+              </p>
+            </div>
+          ) : (
+            todos.map((todo) => (
+              <Card
+                key={todo.id}
+                className={`hover-elevate ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                data-testid={`card-todo-${todo.id}`}
+              >
+                <div className="flex items-center gap-2">
+                  {/* Photo thumbnail if available - 60px square */}
+                  {todo.photo && (
+                    <div
+                      className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
+                      onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
+                      data-testid={`img-todo-photo-${todo.id}`}
                     >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </Card>
-          ))
-        )}
-      </div>
+                      <img
+                        src={todo.photo.url}
+                        alt="Todo photo"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {/* Content - flex-1 to take remaining space */}
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className={`font-medium text-sm leading-snug ${todo.completed ? 'line-through' : ''}`}
+                      data-testid={`text-todo-title-${todo.id}`}
+                    >
+                      {todo.title}
+                    </h3>
+                    
+                    {/* Only show project if viewing all projects */}
+                    {filterProject === 'all' && todo.project && (
+                      <p className="text-xs text-muted-foreground leading-none mt-0.5" data-testid={`text-todo-project-${todo.id}`}>
+                        {todo.project.name}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Three-dot menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-12 w-12 flex-shrink-0"
+                        data-testid={`button-menu-todo-${todo.id}`}
+                      >
+                        <MoreVertical className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
+                        Edit
+                      </DropdownMenuItem>
+                      {!todo.completed && (
+                        <DropdownMenuItem
+                          onClick={() => completeMutation.mutate(todo.id)}
+                          disabled={completeMutation.isPending}
+                          data-testid={`menu-complete-todo-${todo.id}`}
+                        >
+                          Mark Complete
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        onClick={() => deleteMutation.mutate(todo.id)}
+                        disabled={deleteMutation.isPending}
+                        className="text-destructive"
+                        data-testid={`menu-delete-todo-${todo.id}`}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Hidden file input */}
       <input
