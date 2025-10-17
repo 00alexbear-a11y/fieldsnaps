@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -10,9 +10,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { format } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -46,6 +49,7 @@ export default function ToDos() {
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch todos
@@ -250,6 +254,7 @@ export default function ToDos() {
             <Button
               onClick={() => {
                 setEditingTodo(null);
+                setDatePickerOpen(false);
                 form.reset({
                   title: "",
                   description: "",
@@ -448,6 +453,7 @@ export default function ToDos() {
           setEditingTodo(null);
           setSelectedPhotoId(null);
           setSelectedPhotoUrl(null);
+          setDatePickerOpen(false);
           form.reset({
             title: "",
             description: "",
@@ -523,6 +529,55 @@ export default function ToDos() {
             </div>
 
             <div>
+              <Label>Due Date (optional)</Label>
+              <div className="flex gap-2 mt-2">
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex-1 justify-start text-left font-normal h-12"
+                      data-testid="button-date-picker"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch("dueDate") ? (
+                        format(new Date(form.watch("dueDate")), "PPP")
+                      ) : (
+                        <span className="text-muted-foreground">Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch("dueDate") ? new Date(form.watch("dueDate")) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          form.setValue("dueDate", format(date, "yyyy-MM-dd"));
+                          setDatePickerOpen(false);
+                        }
+                      }}
+                      initialFocus
+                      data-testid="calendar-date-picker"
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                {form.watch("dueDate") && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-12 w-12 flex-shrink-0"
+                    onClick={() => form.setValue("dueDate", "")}
+                    data-testid="button-clear-date"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div>
               <Label>Attach Photo (optional)</Label>
               <div className="flex gap-2 mt-2">
                 <Button
@@ -585,6 +640,7 @@ export default function ToDos() {
                 setShowAddDialog(false);
                 setShowEditDialog(false);
                 setEditingTodo(null);
+                setDatePickerOpen(false);
               }}>
                 Cancel
               </Button>
