@@ -81,8 +81,6 @@ export default function Camera() {
   
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
-  const [showTaskSheet, setShowTaskSheet] = useState(false);
-  const [taskName, setTaskName] = useState('');
   
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
   const [sessionPhotos, setSessionPhotos] = useState<LocalPhoto[]>([]);
@@ -149,38 +147,6 @@ export default function Camera() {
     enabled: !!selectedProject,
   });
 
-  const { data: teamMembers = [] } = useQuery<any[]>({
-    queryKey: ['/api/companies/members'],
-    enabled: showTaskSheet,
-  });
-
-  const createTaskMutation = useMutation({
-    mutationFn: async ({ taskName, assignedTo }: { taskName: string; assignedTo: string }) => {
-      return await apiRequest('POST', `/api/projects/${selectedProject}/tasks`, {
-        taskName,
-        assignedTo,
-        projectId: selectedProject,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject, 'tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/tasks/my-tasks'] });
-      setShowTaskSheet(false);
-      setTaskName('');
-      toast({
-        title: 'Task created',
-        description: 'Task added successfully',
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Failed to create task',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
-  
   useEffect(() => {
     console.log('[Camera Tags] Selected project:', selectedProject);
     console.log('[Camera Tags] Tags loaded:', tags);
@@ -1529,22 +1495,23 @@ export default function Camera() {
             );
           })()}
           
-          {/* Quick Task Button */}
-          {selectedProject && !isRecording && (
+          {/* To-Do Button - Capture & Create To-Do */}
+          {selectedProject && !isRecording && !isAttachMode && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowTaskSheet(true)}
-              className="h-8 px-3 bg-white/10 text-white hover:bg-white/20"
-              data-testid="button-quick-task"
+              onClick={() => captureAndEdit('todo')}
+              disabled={isCapturing}
+              className="h-8 px-3 bg-white/10 text-white hover:bg-white/20 disabled:opacity-50"
+              data-testid="button-todo"
             >
-              <ListTodo className="w-4 h-4" />
+              <CheckSquare className="w-4 h-4" />
             </Button>
           )}
         </div>
       </div>
 
-      {/* Bottom Action Rail - 5 Buttons: Back, Video, Camera, To-Do, Edit */}
+      {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
       <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
         {/* Back */}
         <Button
@@ -1604,21 +1571,6 @@ export default function Camera() {
           <CameraIcon className="w-6 h-6" />
           <span className="text-[10px]">Camera</span>
         </Button>
-        
-        {/* To-Do Mode - Capture & Create To-Do (only in Camera Tab, not in Photo Attachment Mode) */}
-        {!isAttachMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => captureAndEdit('todo')}
-            disabled={isCapturing || isRecording || !selectedProject}
-            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-            data-testid="button-capture-todo"
-          >
-            <CheckSquare className="w-6 h-6" />
-            <span className="text-[10px]">To-Do</span>
-          </Button>
-        )}
 
         {/* Edit Mode - Capture & Edit (only in Camera Tab, not in Photo Attachment Mode) */}
         {!isAttachMode && (
@@ -1642,71 +1594,6 @@ export default function Camera() {
         className="absolute"
         style={{ top: '-9999px', left: '-9999px' }}
       />
-
-      {/* Quick Task Sheet */}
-      <Sheet open={showTaskSheet} onOpenChange={setShowTaskSheet}>
-        <SheetContent side="bottom" className="h-[80vh]">
-          <SheetHeader>
-            <SheetTitle>Create Quick Task</SheetTitle>
-            <SheetDescription>
-              Assign a task to a team member
-            </SheetDescription>
-          </SheetHeader>
-          
-          <div className="mt-6 space-y-6">
-            {/* Task Name Input */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Task Name</label>
-              <input
-                type="text"
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                placeholder="Enter task name..."
-                className="w-full h-14 px-4 text-lg border rounded-lg bg-background"
-                data-testid="input-task-name"
-              />
-            </div>
-
-            {/* Team Member Selection - Large Glove-Friendly Buttons */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Assign To</label>
-              <div className="grid grid-cols-1 gap-3">
-                {teamMembers.map((member) => (
-                  <Button
-                    key={member.id}
-                    variant="outline"
-                    size="lg"
-                    onClick={() => {
-                      if (taskName.trim()) {
-                        createTaskMutation.mutate({
-                          taskName: taskName.trim(),
-                          assignedTo: member.id,
-                        });
-                      } else {
-                        toast({
-                          title: 'Task name required',
-                          description: 'Please enter a task name',
-                          variant: 'destructive',
-                        });
-                      }
-                    }}
-                    disabled={createTaskMutation.isPending}
-                    className="h-16 text-lg justify-start"
-                    data-testid={`button-assign-${member.id}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        {member.name?.[0]?.toUpperCase() || 'U'}
-                      </div>
-                      <span>{member.name}</span>
-                    </div>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Upgrade Modal */}
       <UpgradeModal 
