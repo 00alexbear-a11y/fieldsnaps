@@ -268,7 +268,9 @@ export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, cre
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, createdAt: true });
-export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, createdAt: true });
+export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, createdAt: true }).extend({
+  dueDate: z.coerce.date().optional(),
+});
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });

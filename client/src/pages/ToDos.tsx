@@ -213,7 +213,7 @@ export default function ToDos() {
     
     if (data.description) payload.description = data.description;
     if (data.projectId) payload.projectId = data.projectId;
-    if (data.dueDate) payload.dueDate = data.dueDate;
+    if (data.dueDate) payload.dueDate = data.dueDate; // Backend will coerce string to Date
     if (selectedPhotoId) payload.photoId = selectedPhotoId;
     
     if (editingTodo) {
