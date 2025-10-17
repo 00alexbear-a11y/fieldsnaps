@@ -13,7 +13,7 @@ import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
-import Inbox from "./pages/Inbox";
+import ToDos from "./pages/ToDos";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Impact from "./pages/Impact";
@@ -132,7 +132,7 @@ function AppContent() {
           <Route path="/sync-status" component={SyncStatus} />
           <Route path="/trash" component={Trash} />
           <Route path="/map" component={Map} />
-          <Route path="/inbox" component={Inbox} />
+          <Route path="/todos" component={ToDos} />
           <Route path="/billing/success" component={BillingSuccess} />
           <Route path="/shared/:token" component={ShareView} />
           <Route component={NotFound} />
