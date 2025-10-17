@@ -57,6 +57,54 @@ export default function ToDos() {
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle photo attachment return from camera
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const photoId = params.get('photoId');
+    
+    if (photoId) {
+      // Restore form data from localStorage
+      const savedFormData = localStorage.getItem('todo-form-draft');
+      if (savedFormData) {
+        const formData = JSON.parse(savedFormData);
+        
+        // Restore form fields
+        form.reset({
+          title: formData.title || '',
+          description: formData.description || '',
+          projectId: formData.projectId || '',
+          assignedTo: formData.assignedTo || '',
+          dueDate: formData.dueDate || '',
+        });
+        
+        // Fetch photo details and attach it
+        fetch(`/api/photos/${photoId}`)
+          .then(res => res.json())
+          .then(photo => {
+            setSelectedPhotoId(photo.id);
+            setSelectedPhotoUrl(photo.url);
+            toast({ title: "Photo attached!" });
+          })
+          .catch(err => {
+            console.error('Failed to fetch photo:', err);
+            toast({ 
+              title: "Failed to attach photo", 
+              variant: "destructive" 
+            });
+          });
+        
+        // Clean up
+        localStorage.removeItem('todo-form-draft');
+        
+        // Open the dialog
+        setShowAddDialog(true);
+      }
+      
+      // Clean URL (remove photoId param)
+      window.history.replaceState({}, '', '/todos');
+    }
+  }, []);
+
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<TodoWithDetails[]>({
     queryKey: ['/api/todos', view, filterProject, filterCompleted, selectedDate],
@@ -271,9 +319,19 @@ export default function ToDos() {
   };
 
   const handleCameraClick = () => {
+    // Save current form data to localStorage before navigating
+    const formData = {
+      title: form.watch('title'),
+      description: form.watch('description'),
+      projectId: form.watch('projectId'),
+      assignedTo: form.watch('assignedTo'),
+      dueDate: form.watch('dueDate'),
+    };
+    localStorage.setItem('todo-form-draft', JSON.stringify(formData));
+    
     const projectId = form.watch('projectId');
-    // Navigate to camera with return URL
-    setLocation(`/camera?projectId=${projectId || ''}&returnUrl=/todos`);
+    // Navigate to camera in Photo Attachment Mode
+    setLocation(`/camera?projectId=${projectId || ''}&mode=attachToTodo`);
   };
 
   const handleEditTodo = (todo: TodoWithDetails) => {
