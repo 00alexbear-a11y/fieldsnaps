@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, Home, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw, Tag as TagIcon, ChevronDown } from "lucide-react";
+import { Plus, Home, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -300,41 +300,12 @@ export default function Projects() {
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
       <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <img 
-            src={logoPath} 
-            alt="FieldSnaps" 
-            className="h-9 w-auto object-contain"
-            data-testid="img-fieldsnaps-logo"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" data-testid="button-filter-dropdown">
-                <TagIcon className="w-4 h-4 mr-1.5" />
-                Tags
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuLabel>Filter Projects</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => setShowCompleted(false)}
-                data-testid="filter-active-only"
-              >
-                <div className={`w-2 h-2 rounded-full mr-2 ${!showCompleted ? 'bg-primary' : 'bg-transparent border border-border'}`} />
-                Active Only
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setShowCompleted(true)}
-                data-testid="filter-show-all"
-              >
-                <div className={`w-2 h-2 rounded-full mr-2 ${showCompleted ? 'bg-primary' : 'bg-transparent border border-border'}`} />
-                Show All
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <img 
+          src={logoPath} 
+          alt="FieldSnaps" 
+          className="h-9 w-auto object-contain"
+          data-testid="img-fieldsnaps-logo"
+        />
         <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <Button 
@@ -526,6 +497,21 @@ export default function Projects() {
                 <SelectItem value="created">Date Created</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex items-center justify-between gap-2 pl-1">
+            <label 
+              htmlFor="show-completed" 
+              className="text-sm text-muted-foreground cursor-pointer select-none"
+            >
+              Show completed
+            </label>
+            <Switch 
+              id="show-completed" 
+              checked={showCompleted}
+              onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+              className="scale-75"
+              data-testid="switch-show-completed"
+            />
           </div>
         </div>
       </div>
