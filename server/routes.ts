@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertTaskSchema } from "../shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
@@ -159,6 +159,40 @@ async function verifyTagCompanyAccess(req: any, res: any, tagId: string): Promis
   }
 
   const project = await storage.getProject(tag.projectId);
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return false;
+  }
+
+  if (project.companyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
+    return false;
+  }
+
+  return true;
+}
+
+// Helper middleware to verify company access for tasks (via their project)
+async function verifyTaskCompanyAccess(req: any, res: any, taskId: string): Promise<boolean> {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+
+  const user = await storage.getUser(userId);
+  if (!user || !user.companyId) {
+    res.status(403).json({ error: "User must belong to a company" });
+    return false;
+  }
+
+  const task = await storage.getTask(taskId);
+  if (!task) {
+    res.status(404).json({ error: "Task not found" });
+    return false;
+  }
+
+  const project = await storage.getProject(task.projectId);
   if (!project) {
     res.status(404).json({ error: "Project not found" });
     return false;
@@ -1234,6 +1268,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(comment);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Tasks
+  app.post("/api/tasks", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Verify project access first
+      if (!await verifyProjectCompanyAccess(req, res, req.body.projectId)) return;
+
+      // Verify assignee is in same company
+      const user = await storage.getUser(userId);
+      const assignee = await storage.getUser(req.body.assignedTo);
+      
+      if (!assignee || assignee.companyId !== user.companyId) {
+        return res.status(400).json({ error: "Can only assign tasks to members of your company" });
+      }
+
+      const validated = insertTaskSchema.parse({
+        ...req.body,
+        createdBy: userId,
+      });
+      const task = await storage.createTask(validated);
+      res.status(201).json(task);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/projects/:projectId/tasks", isAuthenticated, async (req, res) => {
+    try {
+      if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
+      
+      const tasks = await storage.getProjectTasks(req.params.projectId);
+      res.json(tasks);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/tasks/:id", isAuthenticated, async (req, res) => {
+    try {
+      if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
+      
+      const task = await storage.updateTask(req.params.id, req.body);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json(task);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/tasks/:id/complete", isAuthenticated, async (req, res) => {
+    try {
+      if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
+      
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const task = await storage.completeTask(req.params.id, userId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json(task);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/tasks/:id/restore", isAuthenticated, async (req, res) => {
+    try {
+      if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
+      
+      const task = await storage.restoreTask(req.params.id);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json(task);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/tasks/:id", isAuthenticated, async (req, res) => {
+    try {
+      if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
+      
+      const deleted = await storage.deleteTask(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 
