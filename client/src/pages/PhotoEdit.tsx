@@ -5,6 +5,36 @@ import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Annotation {
   id: string;
@@ -26,6 +56,15 @@ interface Annotation {
   };
 }
 
+// Todo form schema
+const todoFormSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+  assignedTo: z.string().min(1, 'Please assign to a team member'),
+});
+
+type TodoFormValues = z.infer<typeof todoFormSchema>;
+
 export default function PhotoEdit() {
   const { id: photoId } = useParams();
   const [, setLocation] = useLocation();
@@ -34,8 +73,59 @@ export default function PhotoEdit() {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [todoDialogOpen, setTodoDialogOpen] = useState(false);
   const { toast } = useToast();
   const photoUrlRef = useRef<string | null>(null);
+  
+  // Check if we should create a todo after save
+  const urlParams = new URLSearchParams(window.location.search);
+  const shouldCreateTodo = urlParams.get('createTodo') === 'true';
+  const todoProjectId = urlParams.get('projectId');
+  
+  // Fetch team members for assignment
+  const { data: teamMembers = [] } = useQuery<{ id: string; email: string; fullName: string | null }[]>({
+    queryKey: ['/api/users/company'],
+  });
+  
+  // Todo creation form
+  const todoForm = useForm<TodoFormValues>({
+    resolver: zodResolver(todoFormSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      assignedTo: '',
+    },
+  });
+  
+  // Todo creation mutation
+  const createTodoMutation = useMutation({
+    mutationFn: async (data: TodoFormValues) => {
+      const response = await apiRequest('POST', '/api/todos', {
+        ...data,
+        projectId: todoProjectId || projectId,
+        photoId: photoId,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      toast({
+        title: 'To-Do Created',
+        description: 'Task has been assigned successfully',
+        duration: 2000,
+      });
+      setTodoDialogOpen(false);
+      // Navigate to todos page
+      setLocation('/todos');
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Failed to create to-do',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   useEffect(() => {
     if (!photoId) return;
@@ -157,11 +247,16 @@ export default function PhotoEdit() {
         photoUrlRef.current = null;
       }
 
-      // Return to camera with project context
-      if (projectId) {
-        setLocation(`/camera?projectId=${projectId}`);
+      // If we should create a todo, show the dialog
+      if (shouldCreateTodo) {
+        setTodoDialogOpen(true);
       } else {
-        setLocation('/camera');
+        // Return to camera with project context
+        if (projectId) {
+          setLocation(`/camera?projectId=${projectId}`);
+        } else {
+          setLocation('/camera');
+        }
       }
     } catch (error) {
       console.error('[PhotoEdit] Error saving annotations:', error);
@@ -249,6 +344,101 @@ export default function PhotoEdit() {
         onClose={() => setUpgradeModalOpen(false)}
         reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
       />
+      
+      {/* Todo Creation Dialog */}
+      <Dialog open={todoDialogOpen} onOpenChange={setTodoDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create To-Do</DialogTitle>
+            <DialogDescription>
+              Assign this task to a team member
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...todoForm}>
+            <form onSubmit={todoForm.handleSubmit((data) => createTodoMutation.mutate(data))} className="space-y-4">
+              <FormField
+                control={todoForm.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g., Fix electrical outlet" data-testid="input-todo-title" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={todoForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Additional details..." rows={3} data-testid="input-todo-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={todoForm.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign To</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-todo-assignee">
+                          <SelectValue placeholder="Select team member" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {teamMembers.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            {member.fullName || member.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex justify-end gap-2 pt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setTodoDialogOpen(false);
+                    // Navigate back to camera
+                    if (projectId) {
+                      setLocation(`/camera?projectId=${projectId}`);
+                    } else {
+                      setLocation('/camera');
+                    }
+                  }}
+                  data-testid="button-cancel-todo"
+                >
+                  Skip
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={createTodoMutation.isPending}
+                  data-testid="button-create-todo"
+                >
+                  {createTodoMutation.isPending ? 'Creating...' : 'Create To-Do'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

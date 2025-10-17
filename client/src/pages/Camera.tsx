@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -988,7 +988,7 @@ export default function Camera() {
     }
   };
 
-  const captureAndEdit = async () => {
+  const captureAndEdit = async (mode?: 'todo' | 'edit') => {
     if (!selectedProject || isCapturing || !isActive) return;
 
     if (!canWrite) {
@@ -1066,7 +1066,11 @@ export default function Camera() {
 
       URL.revokeObjectURL(compressionResult.url);
 
-      setLocation(`/photo/${savedPhoto.id}/edit`);
+      // Navigate to edit page with createTodo flag if in todo mode
+      const editUrl = mode === 'todo' 
+        ? `/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}` 
+        : `/photo/${savedPhoto.id}/edit`;
+      setLocation(editUrl);
 
     } catch (error) {
       console.error('Capture and edit error:', error);
@@ -1567,17 +1571,17 @@ export default function Camera() {
           <span className="text-[10px]">Camera</span>
         </Button>
         
-        {/* Edit Mode - Capture & Edit */}
+        {/* To-Do Mode - Capture & Create To-Do */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={captureAndEdit}
+          onClick={() => captureAndEdit('todo')}
           disabled={isCapturing || isRecording || !selectedProject}
           className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-capture-edit"
+          data-testid="button-capture-todo"
         >
-          <PenLine className="w-6 h-6" />
-          <span className="text-[10px]">Edit</span>
+          <CheckSquare className="w-6 h-6" />
+          <span className="text-[10px]">To-Do</span>
         </Button>
       </div>
 
