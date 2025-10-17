@@ -24,6 +24,8 @@ export interface IStorage {
   getCompanyByInviteToken(token: string): Promise<Company | undefined>;
   createCompany(data: InsertCompany): Promise<Company>;
   updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined>;
+  generateInviteLink(companyId: string): Promise<Company>;
+  revokeInviteLink(companyId: string): Promise<Company>;
   getCompanyMembers(companyId: string): Promise<User[]>;
   removeUserFromCompany(userId: string): Promise<User | undefined>;
   
@@ -35,7 +37,9 @@ export interface IStorage {
   
   // Projects
   getProjects(): Promise<Project[]>;
+  getProjectsByCompany(companyId: string): Promise<Project[]>;
   getProjectsWithPhotoCounts(): Promise<(Project & { photoCount: number })[]>;
+  getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number })[]>;
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
@@ -170,6 +174,38 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async generateInviteLink(companyId: string): Promise<Company> {
+    // Generate a random 32-character token
+    const token = crypto.randomUUID().replace(/-/g, '');
+    
+    // Set expiration to 7 days from now
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    const result = await db.update(companies)
+      .set({
+        inviteLinkToken: token,
+        inviteLinkUses: 0,
+        inviteLinkMaxUses: 5,
+        inviteLinkExpiresAt: expiresAt,
+      })
+      .where(eq(companies.id, companyId))
+      .returning();
+    return result[0];
+  }
+
+  async revokeInviteLink(companyId: string): Promise<Company> {
+    const result = await db.update(companies)
+      .set({
+        inviteLinkToken: null,
+        inviteLinkUses: 0,
+        inviteLinkExpiresAt: null,
+      })
+      .where(eq(companies.id, companyId))
+      .returning();
+    return result[0];
+  }
+
   async getCompanyMembers(companyId: string): Promise<User[]> {
     return await db.select().from(users)
       .where(and(eq(users.companyId, companyId), isNull(users.removedAt)))
@@ -213,6 +249,12 @@ export class DbStorage implements IStorage {
       .orderBy(projects.createdAt);
   }
 
+  async getProjectsByCompany(companyId: string): Promise<Project[]> {
+    return await db.select().from(projects)
+      .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
+      .orderBy(projects.createdAt);
+  }
+
   async getProjectsWithPhotoCounts(): Promise<(Project & { photoCount: number })[]> {
     const result = await db
       .select({
@@ -235,6 +277,34 @@ export class DbStorage implements IStorage {
       .from(projects)
       .leftJoin(photos, eq(photos.projectId, projects.id))
       .where(isNull(projects.deletedAt))
+      .groupBy(projects.id)
+      .orderBy(projects.createdAt);
+    
+    return result;
+  }
+
+  async getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number })[]> {
+    const result = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        description: projects.description,
+        address: projects.address,
+        latitude: projects.latitude,
+        longitude: projects.longitude,
+        coverPhotoId: projects.coverPhotoId,
+        companyId: projects.companyId,
+        createdBy: projects.createdBy,
+        userId: projects.userId,
+        createdAt: projects.createdAt,
+        lastActivityAt: projects.lastActivityAt,
+        deletedAt: projects.deletedAt,
+        completed: projects.completed,
+        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN 1 END) AS INTEGER)`,
+      })
+      .from(projects)
+      .leftJoin(photos, eq(photos.projectId, projects.id))
+      .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
       .groupBy(projects.id)
       .orderBy(projects.createdAt);
     

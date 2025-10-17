@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -60,6 +60,9 @@ export default function Settings() {
     }
     return 'standard';
   });
+  
+  // Team management state
+  const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
 
   useEffect(() => {
     // Load sync status and storage usage

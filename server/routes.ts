@@ -30,6 +30,148 @@ const upload = multer({
   },
 });
 
+// Helper middleware to verify company access for projects
+async function verifyProjectCompanyAccess(req: any, res: any, projectId: string): Promise<boolean> {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+
+  const user = await storage.getUser(userId);
+  if (!user || !user.companyId) {
+    res.status(403).json({ error: "User must belong to a company" });
+    return false;
+  }
+
+  const project = await storage.getProject(projectId);
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return false;
+  }
+
+  if (project.companyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
+    return false;
+  }
+
+  return true;
+}
+
+// Helper middleware to verify company access for photos (via their project)
+async function verifyPhotoCompanyAccess(req: any, res: any, photoId: string): Promise<boolean> {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+
+  const user = await storage.getUser(userId);
+  if (!user || !user.companyId) {
+    res.status(403).json({ error: "User must belong to a company" });
+    return false;
+  }
+
+  const photo = await storage.getPhoto(photoId);
+  if (!photo) {
+    res.status(404).json({ error: "Photo not found" });
+    return false;
+  }
+
+  const project = await storage.getProject(photo.projectId);
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return false;
+  }
+
+  if (project.companyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
+    return false;
+  }
+
+  return true;
+}
+
+// Helper middleware to verify company access for annotations (via photo's project)
+async function verifyAnnotationCompanyAccess(req: any, res: any, annotationId: string): Promise<boolean> {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+
+  const user = await storage.getUser(userId);
+  if (!user || !user.companyId) {
+    res.status(403).json({ error: "User must belong to a company" });
+    return false;
+  }
+
+  const annotation = await storage.getPhotoAnnotation(annotationId);
+  if (!annotation) {
+    res.status(404).json({ error: "Annotation not found" });
+    return false;
+  }
+
+  const photo = await storage.getPhoto(annotation.photoId);
+  if (!photo) {
+    res.status(404).json({ error: "Photo not found" });
+    return false;
+  }
+
+  const project = await storage.getProject(photo.projectId);
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return false;
+  }
+
+  if (project.companyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
+    return false;
+  }
+
+  return true;
+}
+
+// Helper middleware to verify company access for tags (via their project)
+async function verifyTagCompanyAccess(req: any, res: any, tagId: string): Promise<boolean> {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+
+  const user = await storage.getUser(userId);
+  if (!user || !user.companyId) {
+    res.status(403).json({ error: "User must belong to a company" });
+    return false;
+  }
+
+  const tag = await storage.getTag(tagId);
+  if (!tag) {
+    res.status(404).json({ error: "Tag not found" });
+    return false;
+  }
+
+  // Global predefined tags (projectId = null) can't be modified by users
+  if (!tag.projectId) {
+    res.status(403).json({ error: "Cannot modify global predefined tags" });
+    return false;
+  }
+
+  const project = await storage.getProject(tag.projectId);
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return false;
+  }
+
+  if (project.companyId !== user.companyId) {
+    res.status(403).json({ error: "Access denied" });
+    return false;
+  }
+
+  return true;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from public directory (PWA assets: manifest, icons, sw)
   // This MUST be first to prevent Vite catch-all from intercepting these files
@@ -73,6 +215,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup WebAuthn biometric authentication
   setupWebAuthn(app);
+
+  // ========================================
+  // Company Routes
+  // ========================================
+
+  // Create company during onboarding
+  app.post("/api/companies", isAuthenticated, async (req: any, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ error: "Company name is required" });
+      }
+
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (user.companyId) {
+        return res.status(400).json({ error: "User already belongs to a company" });
+      }
+
+      // Create company with user as owner
+      const company = await storage.createCompany({
+        name: name.trim(),
+        ownerId: userId,
+      });
+
+      // Update user to join company as owner
+      await storage.updateUser(userId, {
+        companyId: company.id,
+        role: 'owner',
+      });
+
+      res.json(company);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get current user's company
+  app.get("/api/companies/me", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!user.companyId) {
+        return res.status(404).json({ error: "User does not belong to a company" });
+      }
+
+      const company = await storage.getCompany(user.companyId);
+      res.json(company);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Generate invite link (owner only)
+  app.post("/api/companies/invite-link", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(404).json({ error: "User does not belong to a company" });
+      }
+
+      const company = await storage.getCompany(user.companyId);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      // Only billing owner can generate invite links
+      if (company.ownerId !== userId) {
+        return res.status(403).json({ error: "Only the company owner can generate invite links" });
+      }
+
+      // Generate new invite link
+      const inviteLink = await storage.generateInviteLink(user.companyId);
+      
+      res.json(inviteLink);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Revoke invite link (owner only)
+  app.delete("/api/companies/invite-link", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(404).json({ error: "User does not belong to a company" });
+      }
+
+      const company = await storage.getCompany(user.companyId);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      // Only billing owner can revoke invite links
+      if (company.ownerId !== userId) {
+        return res.status(403).json({ error: "Only the company owner can revoke invite links" });
+      }
+
+      await storage.revokeInviteLink(user.companyId);
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Validate invite token (public endpoint for pre-signup validation)
+  app.get("/api/companies/invite/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const company = await storage.getCompanyByInviteToken(token);
+
+      if (!company) {
+        return res.status(404).json({ error: "Invalid invite link" });
+      }
+
+      // Check if token is expired
+      if (company.inviteLinkExpiresAt && new Date() > company.inviteLinkExpiresAt) {
+        return res.status(410).json({ error: "Invite link has expired" });
+      }
+
+      // Check if max uses reached
+      if (company.inviteLinkUses >= company.inviteLinkMaxUses) {
+        return res.status(410).json({ error: "Invite link has reached maximum uses" });
+      }
+
+      // Return company info for UI display
+      res.json({
+        companyName: company.name,
+        valid: true,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Accept invite and join company (authenticated users)
+  app.post("/api/companies/invite/:token/accept", isAuthenticated, async (req: any, res) => {
+    try {
+      const { token } = req.params;
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (user.companyId) {
+        return res.status(400).json({ error: "User already belongs to a company" });
+      }
+
+      const company = await storage.getCompanyByInviteToken(token);
+
+      if (!company) {
+        return res.status(404).json({ error: "Invalid invite link" });
+      }
+
+      // Check if token is expired
+      if (company.inviteLinkExpiresAt && new Date() > company.inviteLinkExpiresAt) {
+        return res.status(410).json({ error: "Invite link has expired" });
+      }
+
+      // Check if max uses reached
+      if (company.inviteLinkUses >= company.inviteLinkMaxUses) {
+        return res.status(410).json({ error: "Invite link has reached maximum uses" });
+      }
+
+      // Add user to company
+      await storage.updateUser(userId, {
+        companyId: company.id,
+        role: 'member',
+        invitedBy: company.ownerId,
+      });
+
+      // Increment invite uses
+      await storage.updateCompany(company.id, {
+        inviteLinkUses: company.inviteLinkUses + 1,
+      });
+
+      res.json({ success: true, company });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Object Storage routes - Referenced from blueprint:javascript_object_storage
   // Endpoint for serving private objects (photos) with ACL checks
@@ -196,9 +536,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Projects - protected routes
-  app.get("/api/projects", isAuthenticated, async (req, res) => {
+  app.get("/api/projects", isAuthenticated, async (req: any, res) => {
     try {
-      const projects = await storage.getProjects();
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.json([]); // Return empty if no company
+      }
+
+      const projects = await storage.getProjectsByCompany(user.companyId);
       res.json(projects);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -206,20 +553,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk endpoint to get all projects with photo counts in one query (eliminates N+1)
-  app.get("/api/projects/with-counts", isAuthenticated, async (req, res) => {
+  app.get("/api/projects/with-counts", isAuthenticated, async (req: any, res) => {
     try {
-      const projectsWithCounts = await storage.getProjectsWithPhotoCounts();
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.json([]); // Return empty if no company
+      }
+
+      const projectsWithCounts = await storage.getProjectsByCompanyWithPhotoCounts(user.companyId);
       res.json(projectsWithCounts);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.get("/api/projects/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/projects/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
       const project = await storage.getProject(req.params.id);
       if (!project) {
         throw errors.notFound('Project');
+      }
+      
+      // Verify project belongs to user's company
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
       }
       
       // Update project's last activity timestamp when viewed
@@ -265,21 +631,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const user = await storage.getUser(userId);
       
+      if (!user || !user.companyId) {
+        return res.status(400).json({ error: "User must belong to a company to create projects" });
+      }
+      
       // Start trial if user has no trial start date yet (first project)
       if (user && !user.trialStartDate && user.subscriptionStatus === 'trial') {
         console.log(`[Trial] Starting 7-day trial for user ${userId} on first project creation`);
         await storage.startUserTrial(userId);
       }
       
-      const project = await storage.createProject(validated);
+      // Assign companyId and createdBy
+      const projectData = {
+        ...validated,
+        companyId: user.companyId,
+        createdBy: userId,
+      };
+      
+      const project = await storage.createProject(projectData);
       res.status(201).json(project);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
   });
 
-  app.patch("/api/projects/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/projects/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
       // Validate with partial schema (all fields optional)
       const validated = insertProjectSchema.partial().parse(req.body);
       
@@ -316,8 +710,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id/toggle-complete", isAuthenticated, async (req, res) => {
+  app.patch("/api/projects/:id/toggle-complete", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
       const updated = await storage.toggleProjectCompletion(req.params.id);
       if (!updated) {
         return res.status(404).json({ error: "Project not found" });
@@ -328,8 +739,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/projects/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
       const deleted = await storage.deleteProject(req.params.id);
       if (!deleted) {
         return res.status(404).json({ error: "Project not found" });
@@ -341,11 +769,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Project sharing - generate or get share token
-  app.post("/api/projects/:id/share", isAuthenticated, async (req, res) => {
+  app.post("/api/projects/:id/share", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
       const project = await storage.getProject(req.params.id);
       if (!project) {
         return res.status(404).json({ error: "Project not found" });
+      }
+
+      // Verify project belongs to user's company
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
       }
 
       // Check if share already exists
@@ -415,6 +855,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photos
   app.get("/api/projects/:projectId/photos", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
+      
       const photos = await storage.getProjectPhotos(req.params.projectId);
       res.json(photos);
     } catch (error: any) {
@@ -424,6 +866,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/photos/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
+      
       const photo = await storage.getPhoto(req.params.id);
       if (!photo) {
         throw errors.notFound('Photo');
@@ -436,6 +880,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects/:projectId/photos", isAuthenticated, upload.single('photo'), async (req: any, res) => {
     try {
+      if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
+      
       if (!req.file) {
         throw errors.badRequest("No photo file provided");
       }
@@ -591,16 +1037,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/photos/:id", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
-      
-      // Security: Verify photo ownership before allowing deletion
-      const existingPhoto = await storage.getPhoto(req.params.id);
-      if (!existingPhoto) {
-        return res.status(404).json({ error: "Photo not found" });
-      }
-      if (existingPhoto.photographerId !== userId) {
-        return res.status(403).json({ error: "You don't have permission to delete this photo" });
-      }
+      // Security: Verify company access (any team member can delete their company's photos)
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
       
       const deleted = await storage.deletePhoto(req.params.id);
       if (!deleted) {
@@ -615,6 +1053,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photo Annotations
   app.get("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const annotations = await storage.getPhotoAnnotations(req.params.photoId);
       res.json(annotations);
     } catch (error: any) {
@@ -624,6 +1064,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/annotations", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const validated = insertPhotoAnnotationSchema.parse({
         ...req.body,
         photoId: req.params.photoId,
@@ -637,6 +1079,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/annotations/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyAnnotationCompanyAccess(req, res, req.params.id)) return;
+      
       const deleted = await storage.deletePhotoAnnotation(req.params.id);
       if (!deleted) {
         return res.status(404).json({ error: "Annotation not found" });
@@ -650,6 +1094,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Comments
   app.get("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const comments = await storage.getPhotoComments(req.params.photoId);
       res.json(comments);
     } catch (error: any) {
@@ -659,6 +1105,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/comments", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const validated = insertCommentSchema.parse({
         ...req.body,
         photoId: req.params.photoId,
@@ -772,6 +1220,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tags", isAuthenticated, async (req, res) => {
     try {
       const projectId = req.query.projectId as string | undefined;
+      
+      // If querying tags for a specific project, verify user has access to that project
+      if (projectId) {
+        if (!await verifyProjectCompanyAccess(req, res, projectId)) return;
+      }
+      
       const tags = await storage.getTags(projectId);
       res.json(tags);
     } catch (error: any) {
@@ -779,9 +1233,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/tags", isAuthenticated, async (req, res) => {
+  app.post("/api/tags", isAuthenticated, async (req: any, res) => {
     try {
       const validated = insertTagSchema.parse(req.body);
+      
+      // If creating a project-specific tag, verify user has access to that project
+      if (validated.projectId) {
+        if (!await verifyProjectCompanyAccess(req, res, validated.projectId)) return;
+      }
+      
       const tag = await storage.createTag(validated);
       res.status(201).json(tag);
     } catch (error: any) {
@@ -791,6 +1251,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/tags/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyTagCompanyAccess(req, res, req.params.id)) return;
+      
       const validated = insertTagSchema.partial().parse(req.body);
       const tag = await storage.updateTag(req.params.id, validated);
       if (!tag) {
@@ -804,6 +1266,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/tags/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyTagCompanyAccess(req, res, req.params.id)) return;
+      
       const deleted = await storage.deleteTag(req.params.id);
       if (!deleted) {
         return res.status(404).json({ error: "Tag not found" });
@@ -817,6 +1281,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photo Tags - Associate tags with photos
   app.get("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const photoTags = await storage.getPhotoTags(req.params.photoId);
       res.json(photoTags);
     } catch (error: any) {
@@ -826,6 +1292,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/tags", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const validated = insertPhotoTagSchema.parse({
         photoId: req.params.photoId,
         tagId: req.body.tagId,
@@ -839,6 +1307,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, async (req, res) => {
     try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      
       const deleted = await storage.removePhotoTag(req.params.photoId, req.params.tagId);
       if (!deleted) {
         return res.status(404).json({ error: "Photo tag association not found" });
