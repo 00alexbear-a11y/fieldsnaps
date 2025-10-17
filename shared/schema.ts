@@ -122,6 +122,7 @@ export const photos = pgTable("photos", {
 export const photoAnnotations = pgTable("photo_annotations", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   photoId: varchar("photo_id").notNull().references(() => photos.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }), // Annotation author (nullable for backwards compat)
   type: varchar("type", { length: 50 }).notNull(), // text, arrow, line, circle, pen
   content: text("content"), // For text annotations
   color: varchar("color", { length: 50 }).notNull(),
@@ -131,17 +132,20 @@ export const photoAnnotations = pgTable("photo_annotations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_photo_annotations_photo_id").on(table.photoId),
+  index("idx_photo_annotations_user_id").on(table.userId),
 ]);
 
 // Comments table
 export const comments = pgTable("comments", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   photoId: varchar("photo_id").notNull().references(() => photos.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }), // Comment author (nullable for backwards compat)
   content: text("content").notNull(),
   mentions: text("mentions").array().$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_comments_photo_id").on(table.photoId),
+  index("idx_comments_user_id").on(table.userId),
 ]);
 
 // Tasks table - lightweight task management for photo documentation

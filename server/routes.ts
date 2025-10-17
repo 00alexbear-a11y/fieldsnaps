@@ -1228,6 +1228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertPhotoAnnotationSchema.parse({
         ...req.body,
         photoId: req.params.photoId,
+        userId: req.user.claims.sub, // Set annotation author
       });
       const annotation = await storage.createPhotoAnnotation(validated);
       res.status(201).json(annotation);
@@ -1269,6 +1270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertCommentSchema.parse({
         ...req.body,
         photoId: req.params.photoId,
+        userId: req.user.claims.sub, // Set comment author
       });
       const comment = await storage.createComment(validated);
       res.status(201).json(comment);

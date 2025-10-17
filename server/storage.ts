@@ -65,12 +65,12 @@ export interface IStorage {
   
   // Photo Annotations
   getPhotoAnnotation(id: string): Promise<PhotoAnnotation | undefined>;
-  getPhotoAnnotations(photoId: string): Promise<PhotoAnnotation[]>;
+  getPhotoAnnotations(photoId: string): Promise<(PhotoAnnotation & { user?: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
   createPhotoAnnotation(data: InsertPhotoAnnotation): Promise<PhotoAnnotation>;
   deletePhotoAnnotation(id: string): Promise<boolean>;
   
   // Comments
-  getPhotoComments(photoId: string): Promise<Comment[]>;
+  getPhotoComments(photoId: string): Promise<(Comment & { user?: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
   createComment(data: InsertComment): Promise<Comment>;
   
   // Shares
@@ -423,10 +423,32 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async getPhotoAnnotations(photoId: string): Promise<PhotoAnnotation[]> {
-    return await db.select().from(photoAnnotations)
+  async getPhotoAnnotations(photoId: string): Promise<(PhotoAnnotation & { user?: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]> {
+    const result = await db
+      .select({
+        id: photoAnnotations.id,
+        photoId: photoAnnotations.photoId,
+        userId: photoAnnotations.userId,
+        type: photoAnnotations.type,
+        content: photoAnnotations.content,
+        color: photoAnnotations.color,
+        strokeWidth: photoAnnotations.strokeWidth,
+        fontSize: photoAnnotations.fontSize,
+        position: photoAnnotations.position,
+        createdAt: photoAnnotations.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(photoAnnotations)
+      .leftJoin(users, eq(photoAnnotations.userId, users.id))
       .where(eq(photoAnnotations.photoId, photoId))
       .orderBy(photoAnnotations.createdAt);
+    
+    return result as any;
   }
 
   async createPhotoAnnotation(data: InsertPhotoAnnotation): Promise<PhotoAnnotation> {
@@ -440,10 +462,28 @@ export class DbStorage implements IStorage {
   }
 
   // Comments
-  async getPhotoComments(photoId: string): Promise<Comment[]> {
-    return await db.select().from(comments)
+  async getPhotoComments(photoId: string): Promise<(Comment & { user?: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]> {
+    const result = await db
+      .select({
+        id: comments.id,
+        photoId: comments.photoId,
+        userId: comments.userId,
+        content: comments.content,
+        mentions: comments.mentions,
+        createdAt: comments.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
       .where(eq(comments.photoId, photoId))
       .orderBy(comments.createdAt);
+    
+    return result as any;
   }
 
   async createComment(data: InsertComment): Promise<Comment> {
@@ -833,19 +873,25 @@ export class DbStorage implements IStorage {
       { name: 'Framer', color: 'orange' },
     ];
 
-    for (const tag of predefinedTags) {
-      // Check if tag already exists
-      const existingTags = await db.select().from(tags)
-        .where(and(eq(tags.name, tag.name), isNull(tags.projectId)));
-      
-      if (existingTags.length === 0) {
-        // Create tag only if it doesn't exist
-        await db.insert(tags).values({
-          name: tag.name,
-          color: tag.color,
-          projectId: null, // Global tag
-        });
-      }
+    // Batch check: get all existing global tags in one query
+    const tagNames = predefinedTags.map(t => t.name);
+    const existingTags = await db.select().from(tags)
+      .where(and(inArray(tags.name, tagNames), isNull(tags.projectId)));
+    
+    // Create set of existing tag names for O(1) lookup
+    const existingNames = new Set(existingTags.map(t => t.name));
+    
+    // Insert only missing tags in batch
+    const tagsToInsert = predefinedTags
+      .filter(tag => !existingNames.has(tag.name))
+      .map(tag => ({
+        name: tag.name,
+        color: tag.color,
+        projectId: null, // Global tag
+      }));
+    
+    if (tagsToInsert.length > 0) {
+      await db.insert(tags).values(tagsToInsert);
     }
   }
 }
