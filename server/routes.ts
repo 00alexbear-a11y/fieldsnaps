@@ -48,11 +48,12 @@ async function getUserWithCompany(req: any, res: any) {
 }
 
 // Generic helper to verify company access for any resource
-async function verifyCompanyAccess(req: any, res: any, resourceCompanyId: string): Promise<boolean> {
-  const user = await getUserWithCompany(req, res);
-  if (!user) return false;
+async function verifyCompanyAccess(req: any, res: any, resourceCompanyId: string, user?: any): Promise<boolean> {
+  // Use provided user or fetch it
+  const validUser = user || await getUserWithCompany(req, res);
+  if (!validUser) return false;
 
-  if (resourceCompanyId !== user.companyId) {
+  if (resourceCompanyId !== validUser.companyId) {
     res.status(403).json({ error: "Access denied" });
     return false;
   }
@@ -76,7 +77,7 @@ async function verifyProjectCompanyAccess(req: any, res: any, projectId: string)
     return false;
   }
 
-  return verifyCompanyAccess(req, res, project.companyId);
+  return verifyCompanyAccess(req, res, project.companyId, user);
 }
 
 // Helper to verify company access for photos
