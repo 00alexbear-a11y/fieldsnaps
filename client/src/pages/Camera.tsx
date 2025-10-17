@@ -123,6 +123,12 @@ export default function Camera() {
     if (mode === 'attachToTodo') {
       console.log('[Camera] Photo Attachment Mode activated');
       setIsAttachMode(true);
+    } else {
+      // Reset attach mode when not in attachment flow
+      if (isAttachMode) {
+        console.log('[Camera] Photo Attachment Mode deactivated');
+      }
+      setIsAttachMode(false);
     }
   }, [location]);
 
@@ -848,6 +854,12 @@ export default function Camera() {
           const photoIds = sessionPhotosRef.current.map(p => p.id);
           localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
         }
+
+        // Navigate back to todos if in Photo Attachment Mode
+        if (isAttachMode) {
+          console.log('[Camera] Video recorded in attach mode, navigating to todos with photoId:', savedPhoto.id);
+          setLocation(`/todos?photoId=${savedPhoto.id}`);
+        }
       };
       
       mediaRecorder.start(1000);
@@ -975,6 +987,13 @@ export default function Camera() {
       if (selectedProject) {
         const photoIds = sessionPhotosRef.current.map(p => p.id);
         localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
+      }
+
+      // Navigate back to todos if in Photo Attachment Mode
+      if (isAttachMode) {
+        console.log('[Camera] Quick capture in attach mode, navigating to todos with photoId:', savedPhoto.id);
+        setLocation(`/todos?photoId=${savedPhoto.id}`);
+        return; // Early return to prevent button animation
       }
 
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
