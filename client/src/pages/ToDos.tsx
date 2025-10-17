@@ -64,7 +64,7 @@ export default function ToDos() {
   });
 
   // Fetch company members for assignment
-  const { data: members = [] } = useQuery({
+  const { data: members = [] } = useQuery<Array<{ id: string; firstName: string | null; lastName: string | null }>>({
     queryKey: ['/api/companies/members'],
   });
 
@@ -124,7 +124,17 @@ export default function ToDos() {
   });
 
   const handleSubmit = (data: CreateTodoForm) => {
-    createMutation.mutate(data);
+    // Remove empty optional fields
+    const payload: any = {
+      title: data.title,
+      assignedTo: data.assignedTo,
+    };
+    
+    if (data.description) payload.description = data.description;
+    if (data.projectId) payload.projectId = data.projectId;
+    if (data.dueDate) payload.dueDate = data.dueDate;
+    
+    createMutation.mutate(payload);
   };
 
   const getDisplayName = (user: { firstName: string | null; lastName: string | null }) => {
@@ -341,12 +351,11 @@ export default function ToDos() {
 
             <div>
               <Label htmlFor="projectId">Project (optional)</Label>
-              <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId")}>
+              <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
                 <SelectTrigger id="projectId" data-testid="select-todo-project">
-                  <SelectValue placeholder="Select project" />
+                  <SelectValue placeholder="None" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
