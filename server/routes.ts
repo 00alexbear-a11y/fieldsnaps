@@ -1157,6 +1157,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Standalone photo upload (for to-dos and other non-project attachments)
+  app.post("/api/photos/standalone", isAuthenticated, upload.single('photo'), async (req: any, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      if (!req.file) {
+        throw errors.badRequest("No photo file provided");
+      }
+
+      const userId = req.user?.claims?.sub;
+      
+      // Ensure dev user exists in database (for dev bypass mode)
+      if (userId === 'dev-user') {
+        const existingUser = await storage.getUser(userId);
+        if (!existingUser) {
+          await storage.upsertUser({
+            id: 'dev-user',
+            email: 'dev@test.com',
+            firstName: 'Dev',
+            lastName: 'User',
+            subscriptionStatus: 'active',
+          });
+        }
+      }
+      
+      const objectStorageService = new ObjectStorageService();
+
+      // Get presigned upload URL for object storage
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+
+      // Upload file directly to object storage using presigned URL
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: req.file.buffer,
+        headers: {
+          'Content-Type': req.file.mimetype,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+      }
+
+      // Set ACL policy and get normalized object path
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        uploadURL,
+        {
+          owner: userId,
+          visibility: "private", // Photos are private by default
+        }
+      );
+
+      // Get photographer info from auth or request body (for offline support)
+      let photographerId = req.body.photographerId;
+      let photographerName = req.body.photographerName;
+      
+      if (req.user) {
+        photographerId = req.user.claims.sub;
+        photographerName = req.user.claims.name || req.user.claims.email;
+      }
+
+      // Store photo metadata in database with object storage path (no projectId)
+      const validated = insertPhotoSchema.parse({
+        projectId: null, // Standalone photo - not attached to a project
+        url: objectPath,
+        mediaType: req.body.mediaType || 'photo', // Default to 'photo' if not provided
+        caption: req.body.caption || req.file.originalname,
+        photographerId,
+        photographerName,
+      });
+      
+      const photo = await storage.createPhoto(validated);
+      
+      // Return id and url for attaching to to-dos
+      res.status(201).json({ id: photo.id, url: photo.url });
+    } catch (error: any) {
+      console.error('Standalone photo upload error:', error);
+      handleError(res, error);
+    }
+  });
+
   app.patch("/api/photos/:id", isAuthenticated, validateUuidParam('id'), upload.single('photo'), async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
@@ -1497,7 +1579,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
-      const todo = await storage.updateTodo(req.params.id, req.body);
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Validate request body using partial schema (all fields optional for updates)
+      const validated = insertTodoSchema.partial().parse(req.body);
+
+      // If photoId provided, verify photo exists and belongs to user's company
+      if (validated.photoId) {
+        const photo = await storage.getPhoto(validated.photoId);
+        if (!photo) {
+          return handleError(res, errors.validation("Photo not found"));
+        }
+        
+        // Verify photo belongs to user's company (either through project or photographer)
+        if (photo.projectId) {
+          // Photo is attached to a project - verify project access
+          const project = await storage.getProject(photo.projectId);
+          if (!project || project.companyId !== user.companyId) {
+            return handleError(res, errors.validation("Photo does not belong to your company"));
+          }
+        } else {
+          // Standalone photo - verify photographer belongs to same company
+          if (photo.photographerId) {
+            const photographer = await storage.getUser(photo.photographerId);
+            if (!photographer || photographer.companyId !== user.companyId) {
+              return handleError(res, errors.validation("Photo does not belong to your company"));
+            }
+          }
+        }
+      }
+
+      // If assignedTo is being updated, verify assignee is in same company
+      if (validated.assignedTo && validated.assignedTo !== user.id) {
+        const assignee = await storage.getUser(validated.assignedTo);
+        if (!assignee) {
+          return handleError(res, errors.validation("Assignee user not found"));
+        }
+        if (assignee.companyId !== user.companyId) {
+          return handleError(res, errors.validation("Can only assign to-dos to members of your company"));
+        }
+      }
+
+      // If projectId is being updated, verify access
+      if (validated.projectId) {
+        if (!await verifyProjectCompanyAccess(req, res, validated.projectId)) return;
+      }
+      
+      const todo = await storage.updateTodo(req.params.id, validated);
       if (!todo) {
         return res.status(404).json({ error: "To-do not found" });
       }

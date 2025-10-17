@@ -99,7 +99,7 @@ export const projects = pgTable("projects", {
 // Photos table
 export const photos = pgTable("photos", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Nullable for standalone photos (e.g., todo attachments)
   url: text("url").notNull(),
   mediaType: varchar("media_type", { length: 10 }).default('photo').notNull(), // 'photo' or 'video'
   caption: text("caption"),
