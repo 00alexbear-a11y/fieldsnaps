@@ -69,6 +69,7 @@ export default function ProjectPhotos() {
     includeComments: true,
     includeTags: true,
     includeProjectHeader: true,
+    photosPerPage: 1 as 1 | 2 | 3 | 4,
   });
   const { toast } = useToast();
 
@@ -519,138 +520,140 @@ export default function ProjectPhotos() {
         yPos += 10;
       }
 
-      let currentY = exportOptions.includeProjectHeader && project ? margin + 40 : margin;
+      const startY = exportOptions.includeProjectHeader && project ? margin + 40 : margin;
       let successCount = 0;
       let failureCount = 0;
-      let needsNewPage = false;
-
-      // Process each photo
-      for (let i = 0; i < selectedPhotos.length; i++) {
-        const photo = selectedPhotos[i];
-
-        // Fetch photo as blob
-        try {
-          const response = await fetch(photo.url);
-          const blob = await response.blob();
+      
+      // Calculate grid layout based on photos per page
+      const photosPerPage = exportOptions.photosPerPage;
+      const gridLayouts: Record<1 | 2 | 3 | 4, { cols: number; rows: number }> = {
+        1: { cols: 1, rows: 1 },
+        2: { cols: 2, rows: 1 },
+        3: { cols: 2, rows: 2 }, // 2 top, 1 bottom (will use 3 of 4 slots)
+        4: { cols: 2, rows: 2 },
+      };
+      
+      const layout = gridLayouts[photosPerPage];
+      const cellWidth = (contentWidth - (layout.cols - 1) * 10) / layout.cols; // 10mm gap between columns
+      const cellHeight = cellWidth * 0.75; // 4:3 aspect ratio
+      const detailHeight = 30; // Space reserved for photo details
+      
+      // Process photos in batches based on photosPerPage
+      for (let pageStart = 0; pageStart < selectedPhotos.length; pageStart += photosPerPage) {
+        const pagePhotos = selectedPhotos.slice(pageStart, pageStart + photosPerPage);
+        
+        // Add new page if not the first
+        if (pageStart > 0) {
+          doc.addPage();
+        }
+        
+        let currentY = startY;
+        
+        // Process each photo in the grid
+        for (let i = 0; i < pagePhotos.length; i++) {
+          const photo = pagePhotos[i];
+          const row = Math.floor(i / layout.cols);
+          const col = i % layout.cols;
           
-          // Skip non-image files (e.g., videos)
-          if (!blob.type.startsWith('image/')) {
-            console.log(`Skipping non-image file: ${photo.id}, type: ${blob.type}`);
-            failureCount++;
-            continue;
-          }
+          // Calculate position in grid
+          const x = margin + col * (cellWidth + 10);
+          const y = currentY + row * (cellHeight + detailHeight + 15); // 15mm gap between rows
           
-          // Convert blob to data URL
-          const reader = new FileReader();
-          const dataUrl = await new Promise<string>((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-
-          // Calculate image dimensions to fit within page
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = dataUrl;
-          });
-
-          const imgAspectRatio = img.width / img.height;
-          let imgWidth = contentWidth;
-          let imgHeight = imgWidth / imgAspectRatio;
-          
-          // If image is too tall, scale it down
-          const maxImgHeight = pageHeight - currentY - margin - 60; // Reserve space for details
-          if (imgHeight > maxImgHeight) {
-            imgHeight = maxImgHeight;
-            imgWidth = imgHeight * imgAspectRatio;
-          }
-
-          // Determine image format from blob type
-          let imageFormat: 'JPEG' | 'PNG' | 'WEBP' = 'JPEG';
-          if (blob.type === 'image/png') {
-            imageFormat = 'PNG';
-          } else if (blob.type === 'image/webp') {
-            imageFormat = 'WEBP';
-          }
-          
-          // Test that addImage will work by trying it in a try block
-          // If this succeeds, we know we can safely add a page
           try {
-            // Add new page if we successfully added a photo previously
-            if (needsNewPage) {
-              doc.addPage();
-              currentY = margin;
+            const response = await fetch(photo.url);
+            const blob = await response.blob();
+            
+            // Skip non-image files
+            if (!blob.type.startsWith('image/')) {
+              console.log(`Skipping non-image file: ${photo.id}`);
+              failureCount++;
+              continue;
             }
             
-            // Add image with correct format
-            doc.addImage(dataUrl, imageFormat, margin, currentY, imgWidth, imgHeight);
-            currentY += imgHeight + 10;
-          } catch (addImageError) {
-            // If addImage failed, we may have added a blank page
-            // Since jsPDF doesn't support page removal, track this as a failure
-            console.error(`Failed to add image to PDF for photo ${photo.id}:`, addImageError);
-            throw addImageError; // Re-throw to be caught by outer catch
-          }
-
-          // Add photo details
-          doc.setFontSize(10);
-          
-          // Generate photo name from createdAt if not available
-          const photoName = `Photo_${format(new Date(photo.createdAt), 'yyyy-MM-dd_HHmmss')}`;
-          
-          if (exportOptions.includeName) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Name: `, margin, currentY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(photoName, margin + 15, currentY);
-            currentY += 6;
-          }
-
-          if (exportOptions.includeDate) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Date: `, margin, currentY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(format(new Date(photo.createdAt), 'MMMM d, yyyy'), margin + 15, currentY);
-            currentY += 6;
-          }
-
-          if (exportOptions.includeTimestamp) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Time: `, margin, currentY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(format(new Date(photo.createdAt), 'h:mm a'), margin + 15, currentY);
-            currentY += 6;
-          }
-
-          if (exportOptions.includeTags && photo.tags && photo.tags.length > 0) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Tags: `, margin, currentY);
-            doc.setFont('helvetica', 'normal');
-            const tagNames = photo.tags.map(t => t.name).join(', ');
-            doc.text(tagNames, margin + 15, currentY);
-            currentY += 6;
-          }
-
-          if (exportOptions.includeComments && photo.caption) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Comment:`, margin, currentY);
-            currentY += 6;
-            doc.setFont('helvetica', 'normal');
+            // Load image to check aspect ratio and crop if needed
+            const img = new Image();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const url = reader.result as string;
+                img.onload = () => resolve(url);
+                img.onerror = reject;
+                img.src = url;
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
             
-            // Word wrap comment text
-            const lines = doc.splitTextToSize(photo.caption, contentWidth);
-            doc.text(lines, margin, currentY);
-            currentY += lines.length * 5;
+            // Crop image to 4:3 if not already
+            const imgAspect = img.width / img.height;
+            const targetAspect = 4 / 3;
+            let finalDataUrl = dataUrl;
+            
+            if (Math.abs(imgAspect - targetAspect) > 0.01) {
+              // Need to crop to 4:3
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              if (!ctx) throw new Error('Failed to get canvas context');
+              
+              let sourceX = 0, sourceY = 0, sourceW = img.width, sourceH = img.height;
+              
+              if (imgAspect > targetAspect) {
+                // Image is wider - crop sides
+                sourceW = img.height * targetAspect;
+                sourceX = (img.width - sourceW) / 2;
+              } else {
+                // Image is taller - crop top/bottom
+                sourceH = img.width / targetAspect;
+                sourceY = (img.height - sourceH) / 2;
+              }
+              
+              canvas.width = sourceW;
+              canvas.height = sourceH;
+              ctx.drawImage(img, sourceX, sourceY, sourceW, sourceH, 0, 0, sourceW, sourceH);
+              
+              finalDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            }
+            
+            // Determine format
+            let imageFormat: 'JPEG' | 'PNG' | 'WEBP' = 'JPEG';
+            if (blob.type === 'image/png') imageFormat = 'PNG';
+            else if (blob.type === 'image/webp') imageFormat = 'WEBP';
+            
+            // Add cropped/original image at 4:3 aspect ratio
+            doc.addImage(finalDataUrl, imageFormat, x, y, cellWidth, cellHeight);
+            
+            // Add details below photo
+            let detailY = y + cellHeight + 5;
+            doc.setFontSize(8);
+            
+            const photoName = photo.caption || `Photo_${format(new Date(photo.createdAt), 'yyyy-MM-dd_HHmmss')}`;
+            
+            if (exportOptions.includeName) {
+              doc.setFont('helvetica', 'bold');
+              const nameText = doc.splitTextToSize(photoName, cellWidth);
+              doc.text(nameText, x, detailY);
+              detailY += nameText.length * 4;
+            }
+            
+            if (exportOptions.includeDate || exportOptions.includeTimestamp) {
+              doc.setFont('helvetica', 'normal');
+              const dateTimeText = `${format(new Date(photo.createdAt), 'MMM d, yyyy')}${exportOptions.includeTimestamp ? ` ${format(new Date(photo.createdAt), 'h:mm a')}` : ''}`;
+              doc.text(dateTimeText, x, detailY);
+              detailY += 4;
+            }
+            
+            if (exportOptions.includeTags && photo.tags && photo.tags.length > 0) {
+              doc.setFont('helvetica', 'italic');
+              const tagText = photo.tags.map(t => t.name).join(', ');
+              const tagLines = doc.splitTextToSize(tagText, cellWidth);
+              doc.text(tagLines, x, detailY);
+            }
+            
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to add photo ${photo.id}:`, error);
+            failureCount++;
           }
-          
-          successCount++;
-          needsNewPage = true; // Next successful photo will need a new page
-        } catch (error) {
-          console.error(`Failed to add photo ${photo.id} to PDF:`, error);
-          failureCount++;
-          // Continue with next photo
         }
       }
 
@@ -1168,7 +1171,7 @@ export default function ProjectPhotos() {
       {createPortal(
         <div 
           className="z-40 flex items-center justify-between px-4 max-w-screen-sm mx-auto"
-          style={{ position: 'fixed', bottom: '96px', left: '0', right: '0' }}
+          style={{ position: 'fixed', bottom: '16px', left: '0', right: '0' }}
         >
           {/* Back Button */}
           <Button
@@ -1605,10 +1608,38 @@ export default function ProjectPhotos() {
           <DialogHeader>
             <DialogTitle>Export to PDF</DialogTitle>
             <DialogDescription>
-              Select the details to include in the PDF export of {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'}.
+              Export {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} to PDF with customizable layout and details.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Photos per page selector */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Photos per page</label>
+              <div className="grid grid-cols-4 gap-2">
+                {[1, 2, 3, 4].map((count) => (
+                  <button
+                    key={count}
+                    onClick={() => setExportOptions(prev => ({ ...prev, photosPerPage: count as 1 | 2 | 3 | 4 }))}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-colors ${
+                      exportOptions.photosPerPage === count
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    data-testid={`button-photos-per-page-${count}`}
+                  >
+                    <span className="text-2xl font-bold">{count}</span>
+                    <span className="text-xs text-muted-foreground mt-1">
+                      {count === 1 ? 'Large' : count === 2 ? 'Medium' : count === 3 ? 'Compact' : 'Grid'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="border-t pt-4">
+              <label className="text-sm font-medium mb-3 block">Include details</label>
+            </div>
+            
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="export-project-header"
