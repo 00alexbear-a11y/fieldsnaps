@@ -894,22 +894,21 @@ export default function Camera() {
     let sourceWidth = videoWidth;
     let sourceHeight = videoHeight;
 
-    // Crop to 4:3 from center
-    if (Math.abs(videoAspect - targetAspect) > 0.01) {
-      if (videoAspect > targetAspect) {
-        // Video is wider than 4:3, crop sides
-        sourceWidth = videoHeight * targetAspect;
-        sourceX = (videoWidth - sourceWidth) / 2;
-      } else {
-        // Video is taller than 4:3, crop top/bottom
-        sourceHeight = videoWidth / targetAspect;
-        sourceY = (videoHeight - sourceHeight) / 2;
-      }
+    // Always crop to exact 4:3 from center (no threshold check)
+    if (videoAspect > targetAspect) {
+      // Video is wider than 4:3, crop sides
+      sourceWidth = videoHeight * targetAspect;
+      sourceX = (videoWidth - sourceWidth) / 2;
+    } else if (videoAspect < targetAspect) {
+      // Video is taller than 4:3, crop top/bottom
+      sourceHeight = videoWidth / targetAspect;
+      sourceY = (videoHeight - sourceHeight) / 2;
     }
 
-    // Set canvas to 4:3 at high resolution
-    canvas.width = sourceWidth;
-    canvas.height = sourceHeight;
+    // Force canvas to exact 4:3 dimensions
+    // Use sourceWidth as base, calculate exact height
+    canvas.width = Math.round(sourceWidth);
+    canvas.height = Math.round(sourceWidth / targetAspect);
 
     // Draw the cropped portion
     ctx.drawImage(
