@@ -2251,7 +2251,7 @@ export function PhotoAnnotationEditor({
         </div>
 
         {/* Canvas - Centered */}
-        <div className="relative w-full px-4 pointer-events-none" style={{ aspectRatio: '4/3' }}>
+        <div className="relative w-full px-4 pointer-events-none flex items-center justify-center" style={{ maxHeight: '70vh' }}>
         <img
           ref={imageRef}
           alt="Photo to annotate"
