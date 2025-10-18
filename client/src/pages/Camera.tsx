@@ -388,11 +388,13 @@ export default function Camera() {
         video: (currentDeviceId && currentDeviceId.trim()) ? {
           deviceId: { exact: currentDeviceId },
           width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          height: { ideal: 1440 },
+          aspectRatio: { ideal: 4/3 },
         } : {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          height: { ideal: 1440 },
+          aspectRatio: { ideal: 4/3 },
         },
       };
       
@@ -411,7 +413,8 @@ export default function Camera() {
           video: {
             facingMode: cameraFacing,
             width: { ideal: 1920 },
-            height: { ideal: 1080 },
+            height: { ideal: 1440 },
+            aspectRatio: { ideal: 4/3 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -565,7 +568,8 @@ export default function Camera() {
         video: {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          height: { ideal: 1440 },
+          aspectRatio: { ideal: 4/3 },
           // @ts-ignore
           advanced: [{ zoom: level }]
         },
@@ -581,7 +585,8 @@ export default function Camera() {
           video: {
             facingMode: cameraFacing,
             width: { ideal: 1920 },
-            height: { ideal: 1080 },
+            height: { ideal: 1440 },
+            aspectRatio: { ideal: 4/3 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -873,6 +878,49 @@ export default function Camera() {
     }
   };
 
+  // Helper function to capture video frame at forced 4:3 aspect ratio
+  const captureVideoTo43Canvas = (video: HTMLVideoElement): HTMLCanvasElement => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Failed to get canvas context');
+
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
+    const videoAspect = videoWidth / videoHeight;
+    const targetAspect = 4 / 3;
+
+    let sourceX = 0;
+    let sourceY = 0;
+    let sourceWidth = videoWidth;
+    let sourceHeight = videoHeight;
+
+    // Crop to 4:3 from center
+    if (Math.abs(videoAspect - targetAspect) > 0.01) {
+      if (videoAspect > targetAspect) {
+        // Video is wider than 4:3, crop sides
+        sourceWidth = videoHeight * targetAspect;
+        sourceX = (videoWidth - sourceWidth) / 2;
+      } else {
+        // Video is taller than 4:3, crop top/bottom
+        sourceHeight = videoWidth / targetAspect;
+        sourceY = (videoHeight - sourceHeight) / 2;
+      }
+    }
+
+    // Set canvas to 4:3 at high resolution
+    canvas.width = sourceWidth;
+    canvas.height = sourceHeight;
+
+    // Draw the cropped portion
+    ctx.drawImage(
+      video,
+      sourceX, sourceY, sourceWidth, sourceHeight,
+      0, 0, canvas.width, canvas.height
+    );
+
+    return canvas;
+  };
+
   const quickCapture = async () => {
     if (!selectedProject || isCapturing || !isActive) return;
 
@@ -892,14 +940,7 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
-
-      ctx.drawImage(video, 0, 0);
+      const canvas = captureVideoTo43Canvas(video);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
@@ -1001,14 +1042,7 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Failed to get canvas context');
-
-      ctx.drawImage(video, 0, 0);
+      const canvas = captureVideoTo43Canvas(video);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
