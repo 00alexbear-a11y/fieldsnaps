@@ -1,0 +1,144 @@
+Checkbox positioning:
+
+Move checkbox to RIGHT side of task row (before 3-dot menu)
+Increase checkbox size to 44x44pt minimum (easier tap target for gloves/dirty hands)
+Layout: [Task Title] ────────────────── [☑] [⋮]
+Example:
+
+Get foundation photos                ☑ ⋮
+Assigned to: Mike • Due: Oct 20
+Task Detail View
+Button order:
+
+[Edit] button on LEFT
+[Complete] button on RIGHT
+Right side = primary action (complete task)
+Consistent with checkbox position on right
+Icon changes:
+
+Project icon = House 🏠 (not folder icon)
+Represents construction/buildings better for contractor context
+Create To-Do Form (Simplified)
+Field order (top to bottom):
+
+Add Photo (optional) - At the very top
+
+Allow multiple photo selection
+Show thumbnails of attached photos in grid
+Each thumbnail has X button to remove
+[+ Add Photo] button to attach additional photos
+Grid layout for multiple photos
+Title (required) - "What needs to be done?"
+
+Single line text input
+Only required field
+Placeholder: "What needs to be done?"
+Assign to (optional) - Dropdown
+
+Remove required asterisk
+Make this optional
+If left blank, task assigned to creator by default
+Dropdown shows all company team members
+Due Date (optional) - Date picker
+
+Use full-width native date picker
+iOS: UIDatePicker (native, full width)
+Android: Material DatePicker (native, full width)
+NOT half-width custom calendar (current implementation is unusable)
+REMOVE Description field entirely - Title is the task detail. Construction tasks are simple ("Sweep upstairs", "Move drywall", "Get photos"). If context needed, photos provide it better than text descriptions.
+
+Smart Project Context
+When creating task FROM a project view:
+
+Do NOT show "Project" dropdown selector
+Task automatically assigns to current project
+User is already in project context - no need to select again
+When creating task from "My Tasks" global view:
+
+Show "Project" dropdown (optional)
+User needs to specify which project if not in project context
+Multiple Photo Attachments
+Implementation:
+
+Support selecting and attaching multiple photos to a single task
+Show attached photos as thumbnail grid (3-4 per row)
+Each thumbnail shows small X button in corner to remove
+[+ Add Photo] button below grid to add more
+Options when tapping: [Take Photo] [From Album]
+UI Example:
+
+Attach Photos (optional)
+┌─────┬─────┬─────┬─────┐
+│ [+] │ 🖼️  │ 🖼️  │ 🖼️  │
+│     │  X  │  X  │  X  │
+└─────┴─────┴─────┴─────┘
+3 photos attached
+Camera Integration - Quick Task Creation
+When user is in camera mode:
+
+Add "+ Task" button in camera UI (top bar or three-dot menu)
+Tapping opens bottom sheet (NOT modal - use bottom drawer that slides up)
+Bottom sheet fields (minimal):
+
+Task - Text input with placeholder "What needs to be done?"
+Assign to - Dropdown of team members (optional)
+[Create Task] button
+Behavior:
+
+Bottom sheet is ~40% of screen height
+Keyboard auto-opens on task field
+Task automatically associates with current project being photographed
+Swipe down or tap outside to cancel
+On create: Sheet closes, returns to camera immediately
+Smooth slide-up/down animations
+Purpose: Boss spots something needing follow-up while shooting photos, creates task in 5-10 seconds without leaving camera.
+
+Complete Create To-Do Layout
+┌─────────────────────────────────────┐
+│ Create To-Do                    [X] │
+├─────────────────────────────────────┤
+│                                     │
+│ 📷 Add Photo (optional)             │
+│ ┌─────┬─────┬─────┐                │
+│ │ [+] │ 🖼️  │ 🖼️  │                │
+│ │     │  X  │  X  │                │
+│ └─────┴─────┴─────┘                │
+│                                     │
+├─────────────────────────────────────┤
+│ What needs to be done? *            │
+│ ┌─────────────────────────────────┐ │
+│ │ Sweep upstairs                  │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│ Assign to (optional)                │
+│ ┌─────────────────────────────────┐ │
+│ │ Mike Johnson                  ▼ │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│ Due Date (optional)                 │
+│ ┌─────────────────────────────────┐ │
+│ │ Pick a date                  📅 │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│                                     │
+│          [Create To-Do]             │
+│                                     │
+└─────────────────────────────────────┘
+Design Rationale
+Speed and simplicity:
+
+Only 1 required field (title)
+Photo first for visual context
+No description field (title is the detail)
+Smart project auto-assignment when in project context
+Large touch targets (checkbox 44x44pt minimum)
+Primary actions on right side (natural thumb position)
+Jobsite-optimized:
+
+Works with gloves (big checkbox, big buttons)
+Fast task creation (< 10 seconds typical)
+Minimal scrolling
+Clear visual hierarchy
+Native date picker (full width, familiar)
+Goal: Boss can create 5 tasks in under a minute while walking a jobsite. No friction, no unnecessary fields, just fast task assignment.
+
