@@ -2226,6 +2226,18 @@ export function PhotoAnnotationEditor({
                 onClick={() => {
                   console.log("[PhotoEdit] Color selected:", color.name, color.value);
                   setSelectedColor(color.value);
+                  
+                  // If there's a selected annotation, update its color
+                  if (selectedAnnotation) {
+                    const updatedAnnotations = annotations.map(anno => 
+                      anno.id === selectedAnnotation 
+                        ? { ...anno, color: color.value }
+                        : anno
+                    );
+                    setAnnotations(updatedAnnotations);
+                    addToHistory(updatedAnnotations);
+                    redrawCanvas();
+                  }
                 }}
                 className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
                   selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
