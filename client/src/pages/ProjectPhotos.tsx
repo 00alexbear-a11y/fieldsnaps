@@ -65,9 +65,6 @@ export default function ProjectPhotos() {
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [photoSize, setPhotoSize] = useState<'S' | 'M' | 'L'>('M');
-  const [showTaskDialog, setShowTaskDialog] = useState(false);
-  const [taskName, setTaskName] = useState("");
-  const [taskAssignee, setTaskAssignee] = useState("");
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks'>('photos');
   const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
   const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
@@ -104,7 +101,7 @@ export default function ProjectPhotos() {
   // Fetch team members for task assignment
   const { data: teamMembers = [] } = useQuery<any[]>({
     queryKey: ["/api/companies/members"],
-    enabled: showTaskDialog || activeTab === 'tasks',
+    enabled: activeTab === 'tasks',
   });
 
   // Fetch all tasks for this project using the same endpoint as main To-Do page
@@ -280,29 +277,6 @@ export default function ProjectPhotos() {
     onError: (error: any) => {
       toast({ 
         title: "Failed to apply tags", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    },
-  });
-
-  const createTaskMutation = useMutation({
-    mutationFn: async (taskData: { taskName: string; assignedTo: string; projectId: string }) => {
-      return await apiRequest("POST", "/api/tasks", taskData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/todos"] });
-      toast({ 
-        title: "Task created successfully",
-        duration: 1500,
-      });
-      setShowTaskDialog(false);
-      setTaskName("");
-      setTaskAssignee("");
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "Failed to create task", 
         description: error.message,
         variant: "destructive" 
       });
@@ -1651,75 +1625,6 @@ export default function ProjectPhotos() {
               data-testid="button-confirm-move"
             >
               {movePhotosMutation.isPending ? "Moving..." : "Move Photos"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Task Creation Dialog */}
-      <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create Task</DialogTitle>
-            <DialogDescription>
-              Assign a task to a team member for this project.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="task-name">Task Name</Label>
-              <Input
-                id="task-name"
-                placeholder="e.g., Document foundation work"
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                data-testid="input-task-name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="task-assignee">Assign To</Label>
-              <Select value={taskAssignee} onValueChange={setTaskAssignee}>
-                <SelectTrigger id="task-assignee" data-testid="select-task-assignee">
-                  <SelectValue placeholder="Select team member" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teamMembers.map((member: any) => (
-                    <SelectItem key={member.id} value={member.id} data-testid={`option-assignee-${member.id}`}>
-                      {member.firstName && member.lastName 
-                        ? `${member.firstName} ${member.lastName}` 
-                        : member.email}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowTaskDialog(false);
-                setTaskName("");
-                setTaskAssignee("");
-              }}
-              data-testid="button-cancel-task"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (taskName.trim() && taskAssignee && projectId) {
-                  createTaskMutation.mutate({
-                    taskName: taskName.trim(),
-                    assignedTo: taskAssignee,
-                    projectId,
-                  });
-                }
-              }}
-              disabled={!taskName.trim() || !taskAssignee || createTaskMutation.isPending}
-              data-testid="button-create-task"
-            >
-              {createTaskMutation.isPending ? "Creating..." : "Create Task"}
             </Button>
           </DialogFooter>
         </DialogContent>
