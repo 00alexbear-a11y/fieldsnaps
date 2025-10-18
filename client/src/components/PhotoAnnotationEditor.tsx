@@ -151,7 +151,6 @@ export function PhotoAnnotationEditor({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [tool, setTool] = useState<"text" | "arrow" | "line" | "circle" | "pen" | "measurement" | "select" | null>(null);
   const [selectedColor, setSelectedColor] = useState("#3b82f6"); // Default to blue
-  const [colorPickerExpanded, setColorPickerExpanded] = useState(false); // Collapsed by default
   const [strokeWidth, setStrokeWidth] = useState(strokeSizes[1].value);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -2190,8 +2189,29 @@ export function PhotoAnnotationEditor({
 
   return (
     <div className="fixed inset-0 bg-muted/30 pointer-events-none">
-      {/* Canvas - Fill available space above bottom UI */}
-      <div className="absolute inset-x-0 top-0 bottom-24 flex items-center justify-center pointer-events-none">
+      {/* S/M/L Size Selector - Below zoom circle area (top-36 ensures clearance on mobile) */}
+      <div className="fixed top-36 left-0 right-0 z-40 flex justify-center pointer-events-auto px-2">
+        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
+          {strokeSizes.map((size) => (
+            <button
+              key={size.value}
+              onClick={() => setStrokeWidth(size.value)}
+              data-testid={`button-size-${size.name.toLowerCase()}`}
+              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                strokeWidth === size.value 
+                  ? 'bg-white text-black' 
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+              aria-label={`Size ${size.name}`}
+            >
+              {size.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Canvas - Fill available space between top S/M/L and bottom UI */}
+      <div className="absolute inset-x-0 top-48 bottom-32 flex items-center justify-center pointer-events-none px-4">
         <img
           ref={imageRef}
           alt="Photo to annotate"
@@ -2228,60 +2248,35 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Color Picker - Right side, aligned with S/M/L tabs height */}
-      <div className="fixed bottom-20 right-4 z-[60] pb-2">
-        {/* Expanded Color Palette - Floating above toggle button */}
-        {colorPickerExpanded && (
-          <div 
-            className="absolute bottom-14 right-0 flex flex-col gap-2 py-4 max-h-[300px] overflow-y-auto pointer-events-auto"
-            style={{ 
-              scrollbarWidth: 'none', 
-              msOverflowStyle: 'none',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)'
-            }}
-          >
-            {colors.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => {
-                  console.log("[PhotoEdit] Color selected:", color.name, color.value);
-                  setSelectedColor(color.value);
-                  setColorPickerExpanded(false); // Auto-collapse after selection
-                }}
-                className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 shadow-lg ${
-                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50' : 'border-white/40 border-2'
-                }`}
-                style={{ backgroundColor: color.value }}
-                data-testid={`button-color-${color.name.toLowerCase()}`}
-                aria-label={`Color ${color.name}`}
-              />
-            ))}
-          </div>
-        )}
-        
-        {/* Fixed Toggle Button - Same height as S/M/L tabs */}
-        <button
-          onClick={() => {
-            console.log("[PhotoEdit] Color picker toggle clicked, expanded:", colorPickerExpanded);
-            setColorPickerExpanded(!colorPickerExpanded);
+      {/* Horizontal Color Picker - Above Tool Buttons */}
+      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-3 px-2 pointer-events-auto">
+        <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
+          style={{ 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none'
           }}
-          className="w-12 h-12 rounded-full border-2 border-white hover-elevate transition-all flex items-center justify-center relative shadow-lg pointer-events-auto"
-          style={{ backgroundColor: selectedColor }}
-          data-testid="button-toggle-color-picker"
-          aria-label={colorPickerExpanded ? "Collapse color picker" : "Expand color picker"}
         >
-          {colorPickerExpanded ? (
-            <ChevronDown className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-          ) : (
-            <ChevronUp className="w-5 h-5 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }} />
-          )}
-        </button>
+          {colors.map((color) => (
+            <button
+              key={color.value}
+              onClick={() => {
+                console.log("[PhotoEdit] Color selected:", color.name, color.value);
+                setSelectedColor(color.value);
+              }}
+              className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
+              }`}
+              style={{ backgroundColor: color.value }}
+              data-testid={`button-color-${color.name.toLowerCase()}`}
+              aria-label={`Color ${color.name}`}
+            />
+          ))}
+        </div>
       </div>
 
 
-      {/* Fixed Cancel and Save Buttons - Top Corners */}
-      <div className="fixed top-4 left-4 z-50 pointer-events-auto">
+      {/* Cancel and Save Buttons - Bottom Corners */}
+      <div className="fixed bottom-4 left-4 z-50 pointer-events-auto">
         <Button
           variant="ghost"
           size="icon"
@@ -2293,7 +2288,7 @@ export function PhotoAnnotationEditor({
           <X className="w-6 h-6" />
         </Button>
       </div>
-      <div className="fixed top-4 right-4 z-50 pointer-events-auto">
+      <div className="fixed bottom-4 right-4 z-50 pointer-events-auto">
         <Button
           size="icon"
           onClick={handleSave}
@@ -2305,30 +2300,9 @@ export function PhotoAnnotationEditor({
         </Button>
       </div>
 
-      {/* Fixed Size Tabs Above Bottom Toolbar */}
-      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-2 px-2 pointer-events-auto">
-        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
-          {strokeSizes.map((size) => (
-            <button
-              key={size.value}
-              onClick={() => setStrokeWidth(size.value)}
-              data-testid={`button-size-${size.name.toLowerCase()}`}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                strokeWidth === size.value 
-                  ? 'bg-white text-black' 
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
-              aria-label={`Size ${size.name}`}
-            >
-              {size.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Floating Done Button - appears when text annotation is selected */}
       {selectedAnnotation && annotations.find(a => a.id === selectedAnnotation)?.type === "text" && (
-        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 pb-2 pointer-events-auto">
+        <div className="fixed bottom-40 left-1/2 -translate-x-1/2 z-50 pb-2 pointer-events-auto">
           <Button
             onClick={() => setSelectedAnnotation(null)}
             data-testid="button-done-editing-text"
@@ -2340,7 +2314,7 @@ export function PhotoAnnotationEditor({
         </div>
       )}
 
-      {/* Bottom Toolbar - Non-scrollable Tools */}
+      {/* Tool Buttons - Centered Bottom */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2 pointer-events-auto">
         <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
           {/* Tool Buttons */}
