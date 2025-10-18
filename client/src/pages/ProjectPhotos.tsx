@@ -163,11 +163,13 @@ export default function ProjectPhotos() {
   });
 
   const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({ file, width, height }: { file: File; width: number; height: number }) => {
       // Upload photo using multipart/form-data
       const formData = new FormData();
       formData.append('photo', file);
       formData.append('caption', file.name);
+      formData.append('width', width.toString());
+      formData.append('height', height.toString());
       
       const res = await fetch(`/api/projects/${projectId}/photos`, {
         method: 'POST',
@@ -330,8 +332,8 @@ export default function ProjectPhotos() {
     },
   });
 
-  // Helper function to crop uploaded image to 4:3 aspect ratio
-  const cropImageTo43 = async (file: File): Promise<Blob> => {
+  // Helper function to get image dimensions and convert to JPEG
+  const getImageDimensions = async (file: File): Promise<{ width: number; height: number; blob: Blob }> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
@@ -346,43 +348,22 @@ export default function ProjectPhotos() {
           return;
         }
         
-        const imgWidth = img.width;
-        const imgHeight = img.height;
-        const imgAspect = imgWidth / imgHeight;
-        const targetAspect = 4 / 3;
+        // Use full original dimensions without cropping
+        canvas.width = img.width;
+        canvas.height = img.height;
         
-        let sourceX = 0;
-        let sourceY = 0;
-        let sourceWidth = imgWidth;
-        let sourceHeight = imgHeight;
-        
-        // Always crop to exact 4:3 from center
-        if (imgAspect > targetAspect) {
-          // Image is wider than 4:3, crop sides
-          sourceWidth = imgHeight * targetAspect;
-          sourceX = (imgWidth - sourceWidth) / 2;
-        } else if (imgAspect < targetAspect) {
-          // Image is taller than 4:3, crop top/bottom
-          sourceHeight = imgWidth / targetAspect;
-          sourceY = (imgHeight - sourceHeight) / 2;
-        }
-        
-        // Force canvas to exact 4:3 dimensions
-        canvas.width = Math.round(sourceWidth);
-        canvas.height = Math.round(sourceWidth / targetAspect);
-        
-        // Draw the cropped portion
-        ctx.drawImage(
-          img,
-          sourceX, sourceY, sourceWidth, sourceHeight,
-          0, 0, canvas.width, canvas.height
-        );
+        // Draw the full image
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
         // Convert to blob
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              resolve(blob);
+              resolve({
+                width: img.width,
+                height: img.height,
+                blob
+              });
             } else {
               reject(new Error('Failed to create blob from canvas'));
             }
@@ -417,23 +398,23 @@ export default function ProjectPhotos() {
     }
     
     try {
-      // Crop the image to 4:3 before uploading
-      const croppedBlob = await cropImageTo43(file);
+      // Get image dimensions and convert to JPEG without cropping
+      const { width, height, blob } = await getImageDimensions(file);
       
       // Update filename extension to .jpg since we're converting to JPEG
       const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
       const newFilename = `${nameWithoutExt}.jpg`;
       
       // Convert blob to File with JPEG extension
-      const croppedFile = new File([croppedBlob], newFilename, {
+      const processedFile = new File([blob], newFilename, {
         type: 'image/jpeg',
         lastModified: Date.now(),
       });
       
-      // Upload the cropped file
-      uploadMutation.mutate(croppedFile);
+      // Upload the file with dimensions
+      uploadMutation.mutate({ file: processedFile, width, height });
     } catch (error) {
-      console.error('Error cropping image:', error);
+      console.error('Error processing image:', error);
       toast({
         title: 'Failed to process image',
         description: error instanceof Error ? error.message : 'Unknown error',

@@ -483,6 +483,13 @@ class SyncManager {
         }
         // Include mediaType to distinguish photos from videos
         formData.append('mediaType', photo.mediaType);
+        // Include original dimensions
+        if (photo.width) {
+          formData.append('width', photo.width.toString());
+        }
+        if (photo.height) {
+          formData.append('height', photo.height.toString());
+        }
 
         // Get headers (without Content-Type for FormData)
         const headers = this.getSyncHeaders();
