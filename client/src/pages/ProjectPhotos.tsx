@@ -288,8 +288,11 @@ export default function ProjectPhotos() {
       return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "Task completed!" });
+      // Small delay to show completion animation before task disappears from active view
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      }, 800);
     },
     onError: () => {
       toast({ title: "Failed to complete task", variant: "destructive" });

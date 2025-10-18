@@ -42,7 +42,7 @@ type TodoWithDetails = ToDo & {
 };
 
 export default function ToDos() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const [view, setView] = useState<'my-tasks' | 'team-tasks' | 'i-created' | 'calendar'>('my-tasks');
   const [filterProject, setFilterProject] = useState<string>('all');
@@ -104,7 +104,8 @@ export default function ToDos() {
       // Clean URL (remove photoId param)
       window.history.replaceState({}, '', '/todos');
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]); // Re-run when location/URL changes
 
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<TodoWithDetails[]>({
@@ -188,8 +189,11 @@ export default function ToDos() {
       return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "To-do completed!" });
+      // Small delay to show completion animation before task disappears from active view
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      }, 800);
     },
     onError: () => {
       toast({ title: "Failed to complete to-do", variant: "destructive" });
