@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
@@ -36,7 +37,14 @@ import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
 import LazyImage from "@/components/LazyImage";
-import type { Photo as BasePhoto, Project, Tag } from "../../../shared/schema";
+import type { Photo as BasePhoto, Project, Tag, ToDo } from "../../../shared/schema";
+
+type TodoWithDetails = ToDo & {
+  project?: { id: string; name: string };
+  photo?: { id: string; url: string };
+  assignee: { id: string; firstName: string | null; lastName: string | null };
+  creator: { id: string; firstName: string | null; lastName: string | null };
+};
 import { format } from "date-fns";
 
 // Extend Photo to include tags
@@ -61,6 +69,8 @@ export default function ProjectPhotos() {
   const [taskName, setTaskName] = useState("");
   const [taskAssignee, setTaskAssignee] = useState("");
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks'>('photos');
+  const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
+  const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportOptions, setExportOptions] = useState({
     includeName: true,
@@ -97,18 +107,23 @@ export default function ProjectPhotos() {
     enabled: showTaskDialog || activeTab === 'tasks',
   });
 
-  // Fetch all tasks for this project
-  const { data: projectTasks = [], isLoading: isLoadingTasks } = useQuery<any[]>({
-    queryKey: ["/api/projects", projectId, "tasks"],
+  // Fetch all tasks for this project using the same endpoint as main To-Do page
+  const { data: projectTasks = [], isLoading: isLoadingTasks } = useQuery<TodoWithDetails[]>({
+    queryKey: ["/api/todos", taskView, projectId, taskFilterCompleted],
     queryFn: async () => {
-      const response = await fetch(`/api/projects/${projectId}/tasks`, {
+      const params = new URLSearchParams({ view: taskView });
+      if (projectId) params.append('projectId', projectId);
+      if (taskFilterCompleted !== 'all') params.append('completed', taskFilterCompleted === 'completed' ? 'true' : 'false');
+      const response = await fetch(`/api/todos?${params.toString()}`, {
         credentials: "include",
       });
       if (!response.ok) {
         throw new Error("Failed to fetch tasks");
       }
-      return response.json();
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
+    enabled: activeTab === 'tasks',
   });
 
   // Filter photos by selected tags (for use in viewer and display)
@@ -276,7 +291,7 @@ export default function ProjectPhotos() {
       return await apiRequest("POST", "/api/tasks", taskData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/todos"] });
       toast({ 
         title: "Task created successfully",
         duration: 1500,
@@ -291,6 +306,32 @@ export default function ProjectPhotos() {
         description: error.message,
         variant: "destructive" 
       });
+    },
+  });
+
+  const completeTaskMutation = useMutation({
+    mutationFn: async (todoId: string) => {
+      return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      toast({ title: "Task completed!" });
+    },
+    onError: () => {
+      toast({ title: "Failed to complete task", variant: "destructive" });
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (todoId: string) => {
+      return apiRequest('DELETE', `/api/todos/${todoId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      toast({ title: "Task deleted" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete task", variant: "destructive" });
     },
   });
 
@@ -1039,104 +1080,152 @@ export default function ProjectPhotos() {
         </div>
       </div>
 
-      <main className="flex-1 p-4">
+      <main className="flex-1 p-4 overflow-y-auto">
         {activeTab === 'tasks' ? (
-          // Tasks View
-          <div className="space-y-4">
+          // Tasks View with filters matching main To-Do page
+          <div className="max-w-screen-sm mx-auto space-y-4">
+            {/* View Switcher */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {[
+                { value: 'my-tasks' as const, label: 'My Tasks' },
+                { value: 'team-tasks' as const, label: 'Team Tasks' },
+                { value: 'i-created' as const, label: 'I Created' },
+              ].map((view) => (
+                <button
+                  key={view.value}
+                  onClick={() => setTaskView(view.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                    taskView === view.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover-elevate'
+                  }`}
+                  data-testid={`button-task-view-${view.value}`}
+                >
+                  {view.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Completed Filter */}
+            <div className="flex gap-2">
+              {[
+                { value: 'active' as const, label: 'Active' },
+                { value: 'completed' as const, label: 'Completed' },
+                { value: 'all' as const, label: 'All' },
+              ].map((filter) => (
+                <button
+                  key={filter.value}
+                  onClick={() => setTaskFilterCompleted(filter.value)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    taskFilterCompleted === filter.value
+                      ? 'bg-primary/10 text-primary border border-primary'
+                      : 'bg-muted text-muted-foreground hover-elevate'
+                  }`}
+                  data-testid={`button-filter-${filter.value}`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Task List */}
             {isLoadingTasks ? (
-              <div className="text-center py-12">Loading tasks...</div>
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
             ) : projectTasks.length === 0 ? (
               <div className="text-center py-12">
-                <ListTodo className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h2 className="text-xl font-semibold mb-2">No tasks yet</h2>
-                <p className="text-muted-foreground mb-4">Create tasks to organize work for this project</p>
-                <Button
-                  onClick={() => setShowTaskDialog(true)}
-                  data-testid="button-create-first-task"
-                >
-                  Create Task
-                </Button>
+                <CheckSquare className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-xl font-semibold mb-2">No tasks</h2>
+                <p className="text-muted-foreground">
+                  {taskView === 'my-tasks' ? 'You have no assigned tasks for this project' :
+                   taskView === 'team-tasks' ? 'No team tasks for this project' :
+                   'You haven\'t created any tasks for this project'}
+                </p>
               </div>
             ) : (
-              <>
-                {/* Active Tasks */}
-                {projectTasks.filter(t => !t.completed).length > 0 && (
-                  <section>
-                    <h2 className="text-lg font-semibold mb-3">
-                      Active Tasks ({projectTasks.filter(t => !t.completed).length})
-                    </h2>
-                    <div className="space-y-2">
-                      {projectTasks.filter(t => !t.completed).map((task: any) => {
-                        const assignee = teamMembers.find(m => m.id === task.assignedTo);
-                        return (
-                          <div
-                            key={task.id}
-                            className="bg-card border rounded-lg p-4 hover-elevate"
-                            data-testid={`project-task-${task.id}`}
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-medium" data-testid={`task-name-${task.id}`}>
-                                  {task.taskName}
-                                </h3>
-                                <div className="mt-1 flex items-center gap-2">
-                                  {assignee && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {assignee.name}
-                                    </Badge>
-                                  )}
-                                  <span className="text-xs text-muted-foreground">
-                                    {format(new Date(task.createdAt), 'MMM d, yyyy')}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
+              <div className="space-y-3">
+                {projectTasks.map((todo) => {
+                  const getDisplayName = (person: { firstName: string | null; lastName: string | null }) => {
+                    if (person.firstName && person.lastName) {
+                      return `${person.firstName} ${person.lastName}`;
+                    } else if (person.firstName) {
+                      return person.firstName;
+                    } else if (person.lastName) {
+                      return person.lastName;
+                    }
+                    return 'Unknown';
+                  };
 
-                {/* Completed Tasks */}
-                {projectTasks.filter(t => t.completed).length > 0 && (
-                  <section>
-                    <h2 className="text-lg font-semibold mb-3">
-                      Completed ({projectTasks.filter(t => t.completed).length})
-                    </h2>
-                    <div className="space-y-2">
-                      {projectTasks.filter(t => t.completed).map((task: any) => {
-                        const assignee = teamMembers.find(m => m.id === task.assignedTo);
-                        return (
+                  return (
+                    <Card
+                      key={todo.id}
+                      className={`hover-elevate cursor-pointer ${todo.completed ? 'opacity-60' : ''} ${todo.photo ? 'px-2 py-2' : 'px-3 py-1'}`}
+                      data-testid={`card-todo-${todo.id}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {/* Photo thumbnail if available */}
+                        {todo.photo && (
                           <div
-                            key={task.id}
-                            className="bg-card border rounded-lg p-4 opacity-60"
-                            data-testid={`project-task-completed-${task.id}`}
+                            className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted"
+                            data-testid={`img-todo-photo-${todo.id}`}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-medium line-through" data-testid={`task-name-completed-${task.id}`}>
-                                  {task.taskName}
-                                </h3>
-                                <div className="mt-1 flex items-center gap-2">
-                                  {assignee && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {assignee.name}
-                                    </Badge>
-                                  )}
-                                  <span className="text-xs text-muted-foreground">
-                                    Completed {format(new Date(task.completedAt!), 'MMM d, yyyy')}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
+                            <img
+                              src={todo.photo.url}
+                              alt="Task photo"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
-              </>
+                        )}
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className={`font-medium text-sm leading-snug ${todo.completed ? 'line-through' : ''}`}
+                            data-testid={`text-todo-title-${todo.id}`}
+                          >
+                            {todo.title}
+                          </h3>
+                        </div>
+
+                        {/* Three-dot menu */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-12 w-12 flex-shrink-0"
+                              onClick={(e) => e.stopPropagation()}
+                              data-testid={`button-menu-todo-${todo.id}`}
+                            >
+                              <MoreVertical className="w-5 h-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {!todo.completed && (
+                              <DropdownMenuItem
+                                onClick={() => completeTaskMutation.mutate(todo.id)}
+                                disabled={completeTaskMutation.isPending}
+                                data-testid={`menu-complete-todo-${todo.id}`}
+                              >
+                                Mark Complete
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => deleteTaskMutation.mutate(todo.id)}
+                              disabled={deleteTaskMutation.isPending}
+                              className="text-destructive"
+                              data-testid={`menu-delete-todo-${todo.id}`}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
             )}
           </div>
         ) : isLoading ? (
