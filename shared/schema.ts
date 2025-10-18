@@ -173,7 +173,7 @@ export const todos = pgTable("todos", {
   description: text("description"),
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional - can be general todos
   photoId: varchar("photo_id").references(() => photos.id, { onDelete: "set null" }), // Optional - attached photo for context
-  assignedTo: varchar("assigned_to").notNull().references(() => users.id, { onDelete: "cascade" }), // Who needs to do it
+  assignedTo: varchar("assigned_to").references(() => users.id, { onDelete: "cascade" }), // Optional - who needs to do it (defaults to creator if null)
   createdBy: varchar("created_by").notNull().references(() => users.id, { onDelete: "cascade" }), // Who created it
   completed: boolean("completed").default(false).notNull(),
   completedAt: timestamp("completed_at"),
