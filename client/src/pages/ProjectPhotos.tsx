@@ -638,7 +638,6 @@ export default function ProjectPhotos() {
       
       const layout = gridLayouts[photosPerPage];
       const cellWidth = (contentWidth - (layout.cols - 1) * 10) / layout.cols; // 10mm gap between columns
-      const cellHeight = cellWidth * 0.75; // 4:3 aspect ratio
       const detailHeight = 30; // Space reserved for photo details
       
       // Process photos in batches based on photosPerPage
@@ -652,15 +651,14 @@ export default function ProjectPhotos() {
         
         let currentY = startY;
         
+        // Track heights for each row to handle variable aspect ratios
+        const rowHeights: number[] = [];
+        
         // Process each photo in the grid
         for (let i = 0; i < pagePhotos.length; i++) {
           const photo = pagePhotos[i];
           const row = Math.floor(i / layout.cols);
           const col = i % layout.cols;
-          
-          // Calculate position in grid
-          const x = margin + col * (cellWidth + 10);
-          const y = currentY + row * (cellHeight + detailHeight + 15); // 15mm gap between rows
           
           try {
             const response = await fetch(photo.url);
@@ -673,7 +671,7 @@ export default function ProjectPhotos() {
               continue;
             }
             
-            // Load image to check aspect ratio and crop if needed
+            // Load image to get its native aspect ratio
             const img = new Image();
             const dataUrl = await new Promise<string>((resolve, reject) => {
               const reader = new FileReader();
@@ -687,43 +685,32 @@ export default function ProjectPhotos() {
               reader.readAsDataURL(blob);
             });
             
-            // Crop image to 4:3 if not already
-            const imgAspect = img.width / img.height;
-            const targetAspect = 4 / 3;
-            let finalDataUrl = dataUrl;
+            // Calculate cell height based on photo's native aspect ratio
+            const aspectRatio = img.width / img.height;
+            const cellHeight = cellWidth / aspectRatio;
             
-            if (Math.abs(imgAspect - targetAspect) > 0.01) {
-              // Need to crop to 4:3
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              if (!ctx) throw new Error('Failed to get canvas context');
-              
-              let sourceX = 0, sourceY = 0, sourceW = img.width, sourceH = img.height;
-              
-              if (imgAspect > targetAspect) {
-                // Image is wider - crop sides
-                sourceW = img.height * targetAspect;
-                sourceX = (img.width - sourceW) / 2;
-              } else {
-                // Image is taller - crop top/bottom
-                sourceH = img.width / targetAspect;
-                sourceY = (img.height - sourceH) / 2;
-              }
-              
-              canvas.width = sourceW;
-              canvas.height = sourceH;
-              ctx.drawImage(img, sourceX, sourceY, sourceW, sourceH, 0, 0, sourceW, sourceH);
-              
-              finalDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            // Track the maximum height in this row for proper spacing
+            if (!rowHeights[row]) {
+              rowHeights[row] = 0;
             }
+            rowHeights[row] = Math.max(rowHeights[row], cellHeight);
+            
+            // Calculate Y position based on accumulated row heights
+            let y = currentY;
+            for (let r = 0; r < row; r++) {
+              y += rowHeights[r] + detailHeight + 15; // 15mm gap between rows
+            }
+            
+            // Calculate position in grid
+            const x = margin + col * (cellWidth + 10);
             
             // Determine format
             let imageFormat: 'JPEG' | 'PNG' | 'WEBP' = 'JPEG';
             if (blob.type === 'image/png') imageFormat = 'PNG';
             else if (blob.type === 'image/webp') imageFormat = 'WEBP';
             
-            // Add cropped/original image at 4:3 aspect ratio
-            doc.addImage(finalDataUrl, imageFormat, x, y, cellWidth, cellHeight);
+            // Add image at its native aspect ratio
+            doc.addImage(dataUrl, imageFormat, x, y, cellWidth, cellHeight);
             
             // Add details below photo
             let detailY = y + cellHeight + 5;
