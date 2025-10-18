@@ -1348,9 +1348,9 @@ export default function ProjectPhotos() {
             size="icon"
             onClick={() => setLocation("/")}
             data-testid="button-back"
-            className="w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
+            className="w-16 h-16 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-7 h-7" />
           </Button>
 
           {/* Camera Button */}
@@ -1366,11 +1366,11 @@ export default function ProjectPhotos() {
           <button
             onClick={() => document.getElementById('photo-upload-input')?.click()}
             disabled={uploadMutation.isPending}
-            className="flex items-center justify-center w-14 h-14 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center w-16 h-16 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="button-upload-photo"
             aria-label="Upload from library"
           >
-            <Images className="w-6 h-6 text-primary-foreground" />
+            <Images className="w-7 h-7 text-primary-foreground" />
           </button>
           
           {/* Select/Cancel Button */}
@@ -1380,9 +1380,9 @@ export default function ProjectPhotos() {
             data-testid={isSelectMode ? "button-cancel-select" : "button-select-mode"}
             variant="ghost"
             size="icon"
-            className="w-14 h-14 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background disabled:opacity-50"
+            className="w-16 h-16 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg hover:bg-background disabled:opacity-50"
           >
-            {isSelectMode ? <X className="w-6 h-6" /> : <CheckSquare className="w-6 h-6" />}
+            {isSelectMode ? <X className="w-7 h-7" /> : <CheckSquare className="w-7 h-7" />}
           </Button>
         </div>,
         document.body
