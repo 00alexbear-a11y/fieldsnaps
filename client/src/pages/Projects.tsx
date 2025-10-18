@@ -68,14 +68,14 @@ export default function Projects() {
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const { toast } = useToast();
 
-  // Efficient bulk query - gets all projects with photo counts in one request
-  const { data: projectsWithCounts = [], isLoading: projectsLoading } = useQuery<(Project & { photoCount: number })[]>({
+  // Efficient bulk query - gets all projects with photo counts and cover photos in one request
+  const { data: projectsWithCounts = [], isLoading: projectsLoading } = useQuery<(Project & { photoCount: number, coverPhoto?: Photo })[]>({
     queryKey: ["/api/projects/with-counts"],
   });
 
   // For backward compatibility, extract projects
   const projects = useMemo(() => 
-    projectsWithCounts.map(({ photoCount, ...project }) => project),
+    projectsWithCounts.map(({ photoCount, coverPhoto, ...project }) => project),
     [projectsWithCounts]
   );
 
@@ -83,6 +83,12 @@ export default function Projects() {
   const getPhotoCount = (projectId: string): number => {
     const project = projectsWithCounts.find(p => p.id === projectId);
     return project?.photoCount || 0;
+  };
+  
+  // Get cover photo for a project from the bulk query
+  const getCoverPhoto = (projectId: string): Photo | undefined => {
+    const project = projectsWithCounts.find(p => p.id === projectId);
+    return project?.coverPhoto;
   };
 
   // Get pending sync count for a project
@@ -437,12 +443,13 @@ export default function Projects() {
             {filteredProjects.map((project) => {
               const photoCount = getPhotoCount(project.id);
               const pendingSyncCount = getPendingSyncCount(project.id);
+              const coverPhoto = getCoverPhoto(project.id);
               
               return (
                 <SwipeableProjectCard
                   key={project.id}
                   project={project}
-                  coverPhoto={undefined}
+                  coverPhoto={coverPhoto}
                   photoCount={photoCount}
                   pendingSyncCount={pendingSyncCount}
                   onClick={() => setLocation(`/projects/${project.id}`)}

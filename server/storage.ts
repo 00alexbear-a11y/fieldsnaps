@@ -10,6 +10,7 @@ import type {
   InsertSubscription, InsertSubscriptionEvent
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { ObjectStorageService } from "./objectStorage";
 
 export interface IStorage {
@@ -39,7 +40,7 @@ export interface IStorage {
   getProjects(): Promise<Project[]>;
   getProjectsByCompany(companyId: string): Promise<Project[]>;
   getProjectsWithPhotoCounts(): Promise<(Project & { photoCount: number })[]>;
-  getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number })[]>;
+  getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number, coverPhoto?: Photo })[]>;
   getProject(id: string): Promise<Project | undefined>;
   createProject(data: InsertProject): Promise<Project>;
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
@@ -281,7 +282,7 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
-        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN 1 END) AS INTEGER)`,
+        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
       })
       .from(projects)
       .leftJoin(photos, eq(photos.projectId, projects.id))
@@ -292,7 +293,10 @@ export class DbStorage implements IStorage {
     return result;
   }
 
-  async getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number })[]> {
+  async getProjectsByCompanyWithPhotoCounts(companyId: string): Promise<(Project & { photoCount: number, coverPhoto?: Photo })[]> {
+    // Create an alias for cover photo join
+    const coverPhoto = alias(photos, 'cover_photo');
+    
     const result = await db
       .select({
         id: projects.id,
@@ -309,15 +313,31 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
-        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN 1 END) AS INTEGER)`,
+        photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
+        coverPhoto: {
+          id: coverPhoto.id,
+          url: coverPhoto.url,
+          caption: coverPhoto.caption,
+          mediaType: coverPhoto.mediaType,
+          projectId: coverPhoto.projectId,
+          photographerId: coverPhoto.photographerId,
+          photographerName: coverPhoto.photographerName,
+          createdAt: coverPhoto.createdAt,
+          deletedAt: coverPhoto.deletedAt,
+        },
       })
       .from(projects)
       .leftJoin(photos, eq(photos.projectId, projects.id))
+      .leftJoin(coverPhoto, eq(coverPhoto.id, projects.coverPhotoId))
       .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
-      .groupBy(projects.id)
+      .groupBy(projects.id, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
       .orderBy(projects.createdAt);
     
-    return result;
+    // Map to clean up undefined cover photos
+    return result.map(r => ({
+      ...r,
+      coverPhoto: r.coverPhoto?.id ? r.coverPhoto as Photo : undefined,
+    }));
   }
 
   async getProject(id: string): Promise<Project | undefined> {
