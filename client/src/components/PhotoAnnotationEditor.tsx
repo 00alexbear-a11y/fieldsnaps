@@ -2317,7 +2317,7 @@ export function PhotoAnnotationEditor({
       )}
 
       {/* Tool Buttons - Centered Bottom */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pb-safe px-2 pointer-events-auto">
+      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-safe px-2 pointer-events-auto">
         <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
           {/* Tool Buttons */}
           <Button
