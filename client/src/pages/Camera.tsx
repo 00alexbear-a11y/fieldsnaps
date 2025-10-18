@@ -106,6 +106,22 @@ export default function Camera() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
 
+  // Fetch todos to show which photos have tasks attached
+  const { data: todos = [] } = useQuery<Array<{ id: string; photoId: string | null }>>({
+    queryKey: ['/api/todos', 'my-tasks'],
+    queryFn: async () => {
+      const params = new URLSearchParams({ view: 'my-tasks' });
+      const response = await fetch(`/api/todos?${params.toString()}`);
+      if (!response.ok) return [];
+      return await response.json();
+    },
+  });
+
+  // Create a Set of photoIds that have tasks for quick lookup
+  const photoIdsWithTasks = useMemo(() => {
+    return new Set(todos.filter(t => t.photoId).map(t => t.photoId!));
+  }, [todos]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('projectId');
@@ -1392,6 +1408,7 @@ export default function Camera() {
                 };
                 
                 const isVideo = photo.mediaType === 'video';
+                const hasTask = photoIdsWithTasks.has(photo.id);
                 
                 return (
                   <div
@@ -1454,6 +1471,31 @@ export default function Camera() {
                       >
                         +{photoTags.length - 2}
                       </div>
+                    )}
+                    
+                    {/* Task Checkbox Badge - Top Right */}
+                    {hasTask && (
+                      <div 
+                        className="absolute top-1 right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-lg pointer-events-none"
+                        data-testid={`badge-has-task-${photo.id}`}
+                      >
+                        <CheckSquare className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                    
+                    {/* Quick Task Creation Button - Bottom Right (only for photos without tasks) - GLOVE-FRIENDLY 44PT */}
+                    {!isVideo && !hasTask && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Navigate to todos with photo pre-attached
+                          setLocation(`/todos?photoId=${photo.id}`);
+                        }}
+                        className="absolute bottom-0 right-0 w-11 h-11 bg-primary rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        data-testid={`button-create-task-${photo.id}`}
+                      >
+                        <ListTodo className="w-6 h-6 text-white" />
+                      </button>
                     )}
                     
                     <button

@@ -55,53 +55,59 @@ export default function ToDos() {
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle photo attachment return from camera
+  // Handle photo attachment from camera or quick task creation
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const photoId = params.get('photoId');
     
     if (photoId) {
-      // Restore form data from localStorage
+      // Check if this is from camera (has saved form data) or quick task creation
       const savedFormData = localStorage.getItem('todo-form-draft');
-      if (savedFormData) {
-        const formData = JSON.parse(savedFormData);
-        
-        // Restore form fields
-        form.reset({
-          title: formData.title || '',
-          projectId: formData.projectId || '',
-          assignedTo: formData.assignedTo || '',
-          dueDate: formData.dueDate || '',
-        });
-        
-        // Attach the photo - fetch photo details to get the URL
-        setSelectedPhotoId(photoId);
-        
-        // Fetch photo details to get the URL
-        fetch(`/api/photos/${photoId}`)
-          .then(res => {
-            if (!res.ok) throw new Error('Photo not found');
-            return res.json();
-          })
-          .then(photo => {
-            setSelectedPhotoUrl(photo.url);
-            toast({ title: "Photo attached!" });
-          })
-          .catch(err => {
-            console.error('Failed to fetch photo:', err);
-            toast({ 
-              title: "Failed to attach photo", 
-              description: "Photo may still be uploading",
-              variant: "destructive" 
+      
+      // Fetch photo details to get the URL
+      fetch(`/api/photos/${photoId}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Photo not found');
+          return res.json();
+        })
+        .then(photo => {
+          // Attach the photo
+          setSelectedPhotoId(photoId);
+          setSelectedPhotoUrl(photo.url);
+          
+          if (savedFormData) {
+            // Coming from camera with saved form data
+            const formData = JSON.parse(savedFormData);
+            form.reset({
+              title: formData.title || '',
+              projectId: formData.projectId || '',
+              assignedTo: formData.assignedTo || '',
+              dueDate: formData.dueDate || '',
             });
+            localStorage.removeItem('todo-form-draft');
+            toast({ title: "Photo attached!" });
+          } else {
+            // Quick task creation from camera preview - start fresh
+            form.reset({
+              title: "",
+              projectId: photo.projectId || "",
+              assignedTo: "",
+              dueDate: "",
+            });
+            toast({ title: "Create a task for this photo" });
+          }
+          
+          // Open the dialog
+          setShowAddDialog(true);
+        })
+        .catch(err => {
+          console.error('Failed to fetch photo:', err);
+          toast({ 
+            title: "Failed to attach photo", 
+            description: "Photo may still be uploading",
+            variant: "destructive" 
           });
-        
-        // Clean up
-        localStorage.removeItem('todo-form-draft');
-        
-        // Open the dialog
-        setShowAddDialog(true);
-      }
+        });
       
       // Clean URL (remove photoId param)
       window.history.replaceState({}, '', '/todos');
