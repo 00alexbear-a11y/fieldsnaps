@@ -2210,8 +2210,34 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Canvas - Fill available space between top S/M/L and bottom UI */}
-      <div className="absolute inset-x-0 top-48 bottom-32 flex items-center justify-center pointer-events-none px-4">
+      {/* Horizontal Color Picker - Below S/M/L, Above Photo */}
+      <div className="fixed top-52 left-0 right-0 z-40 flex justify-center pb-2 px-2 pointer-events-auto">
+        <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
+          style={{ 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none'
+          }}
+        >
+          {colors.map((color) => (
+            <button
+              key={color.value}
+              onClick={() => {
+                console.log("[PhotoEdit] Color selected:", color.name, color.value);
+                setSelectedColor(color.value);
+              }}
+              className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
+              }`}
+              style={{ backgroundColor: color.value }}
+              data-testid={`button-color-${color.name.toLowerCase()}`}
+              aria-label={`Color ${color.name}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Canvas - Centered between colors and tools */}
+      <div className="absolute inset-x-0 top-68 bottom-20 flex items-center justify-center pointer-events-none px-4">
         <img
           ref={imageRef}
           alt="Photo to annotate"
@@ -2248,32 +2274,6 @@ export function PhotoAnnotationEditor({
         )}
       </div>
 
-      {/* Horizontal Color Picker - Above Tool Buttons */}
-      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center pb-3 px-2 pointer-events-auto">
-        <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
-          style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none'
-          }}
-        >
-          {colors.map((color) => (
-            <button
-              key={color.value}
-              onClick={() => {
-                console.log("[PhotoEdit] Color selected:", color.name, color.value);
-                setSelectedColor(color.value);
-              }}
-              className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
-              }`}
-              style={{ backgroundColor: color.value }}
-              data-testid={`button-color-${color.name.toLowerCase()}`}
-              aria-label={`Color ${color.name}`}
-            />
-          ))}
-        </div>
-      </div>
-
 
       {/* Cancel and Save Buttons - Bottom Corners */}
       <div className="fixed bottom-4 left-4 z-50 pointer-events-auto">
@@ -2302,7 +2302,7 @@ export function PhotoAnnotationEditor({
 
       {/* Floating Done Button - appears when text annotation is selected */}
       {selectedAnnotation && annotations.find(a => a.id === selectedAnnotation)?.type === "text" && (
-        <div className="fixed bottom-40 left-1/2 -translate-x-1/2 z-50 pb-2 pointer-events-auto">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pb-2 pointer-events-auto">
           <Button
             onClick={() => setSelectedAnnotation(null)}
             data-testid="button-done-editing-text"
