@@ -989,15 +989,6 @@ export default function ProjectPhotos() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTaskDialog(true)}
-              className="flex-shrink-0"
-              data-testid="button-add-task"
-            >
-              <ListTodo className="w-4 h-4" />
-            </Button>
             {project && (
               <Button
                 variant={project.completed ? "outline" : "default"}
