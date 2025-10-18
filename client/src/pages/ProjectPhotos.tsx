@@ -312,12 +312,116 @@ export default function ProjectPhotos() {
     },
   });
 
+  // Helper function to crop uploaded image to 4:3 aspect ratio
+  const cropImageTo43 = async (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        const imgWidth = img.width;
+        const imgHeight = img.height;
+        const imgAspect = imgWidth / imgHeight;
+        const targetAspect = 4 / 3;
+        
+        let sourceX = 0;
+        let sourceY = 0;
+        let sourceWidth = imgWidth;
+        let sourceHeight = imgHeight;
+        
+        // Always crop to exact 4:3 from center
+        if (imgAspect > targetAspect) {
+          // Image is wider than 4:3, crop sides
+          sourceWidth = imgHeight * targetAspect;
+          sourceX = (imgWidth - sourceWidth) / 2;
+        } else if (imgAspect < targetAspect) {
+          // Image is taller than 4:3, crop top/bottom
+          sourceHeight = imgWidth / targetAspect;
+          sourceY = (imgHeight - sourceHeight) / 2;
+        }
+        
+        // Force canvas to exact 4:3 dimensions
+        canvas.width = Math.round(sourceWidth);
+        canvas.height = Math.round(sourceWidth / targetAspect);
+        
+        // Draw the cropped portion
+        ctx.drawImage(
+          img,
+          sourceX, sourceY, sourceWidth, sourceHeight,
+          0, 0, canvas.width, canvas.height
+        );
+        
+        // Convert to blob
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to create blob from canvas'));
+            }
+          },
+          'image/jpeg',
+          0.95
+        );
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to load image'));
+      };
+      
+      img.src = url;
+    });
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Upload the file
-    uploadMutation.mutate(file);
+    // Check if it's an image
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please select an image file',
+        variant: 'destructive',
+      });
+      e.target.value = '';
+      return;
+    }
+    
+    try {
+      // Crop the image to 4:3 before uploading
+      const croppedBlob = await cropImageTo43(file);
+      
+      // Update filename extension to .jpg since we're converting to JPEG
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+      const newFilename = `${nameWithoutExt}.jpg`;
+      
+      // Convert blob to File with JPEG extension
+      const croppedFile = new File([croppedBlob], newFilename, {
+        type: 'image/jpeg',
+        lastModified: Date.now(),
+      });
+      
+      // Upload the cropped file
+      uploadMutation.mutate(croppedFile);
+    } catch (error) {
+      console.error('Error cropping image:', error);
+      toast({
+        title: 'Failed to process image',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
     
     // Reset the input so the same file can be uploaded again if needed
     e.target.value = '';
