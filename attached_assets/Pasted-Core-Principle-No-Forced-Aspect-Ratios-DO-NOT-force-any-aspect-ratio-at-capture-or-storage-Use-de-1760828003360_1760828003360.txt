@@ -1,0 +1,328 @@
+Core Principle: No Forced Aspect Ratios
+DO NOT force any aspect ratio at capture or storage:
+
+Use device camera's native configuration (whatever user has set)
+iPhone users shooting 4:3 → Store as 4:3
+Android users shooting 16:9 → Store as 16:9
+Users shooting square 1:1 → Store as 1:1
+No cropping, no reformatting at any stage
+Why:
+
+Preserves full sensor data (maximum quality)
+User sees in viewfinder = what gets saved
+Respects user's camera preferences
+Different phones have different native ratios
+Forcing ratio = cropping = lost documentation context
+Implementation:
+
+Capture photos using native camera API via Capacitor Camera plugin
+Store original aspect ratio in database/cloud storage
+Metadata: Include original dimensions (width x height) with each photo
+No post-processing to change aspect ratio
+Display Handling (Mixed Aspect Ratios)
+Challenge: Project will contain mix of 4:3, 16:9, 1:1, 9:16 photos. UI must handle gracefully.
+
+Thumbnails (Grid/List Views):
+
+Copy.thumbnail {
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 200px; /* Fixed height for grid alignment */
+}
+All thumbnails same size (clean grid)
+Center-crop to fill container (edges may be cropped)
+User taps to see full image
+Full Photo View (Single Photo):
+
+Copy.photo-full-view {
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100vh;
+  background: #000; /* Black background for letterboxing */
+}
+Show ENTIRE photo (no cropping)
+Letterbox/pillarbox with black bars if needed
+Support pinch-to-zoom
+Support pan/drag when zoomed
+Markup/Annotation Mode:
+
+Copy.photo-markup-canvas {
+  object-fit: contain;
+  width: 100%;
+  max-height: 80vh; /* Leave room for tools */
+}
+Show complete photo (user needs to see everything to annotate)
+Maintain aspect ratio
+Markup annotations scale with photo
+Gallery/Slideshow:
+
+Each photo displays at its native aspect ratio
+Transition smoothly between different ratios
+Center-align photos with black background
+PDF Export Challenge & Solution
+Problem: Project has mixed aspect ratios:
+
+Photo 1: 4:3 (4032 x 3024) - Portrait
+Photo 2: 16:9 (1920 x 1080) - Landscape wide
+Photo 3: 1:1 (3000 x 3000) - Square
+Photo 4: 9:16 (1080 x 1920) - Portrait tall
+If we just stack them in PDF, some look HUGE, others tiny, looks unprofessional.
+
+Solution: Normalize to Page Width
+
+PDF Layout Strategy:
+
+Option A: Fit to Page Width (RECOMMENDED)
+
+Each photo takes full page width
+Height adjusts to maintain aspect ratio
+Landscape photos = less vertical space
+Portrait photos = more vertical space
+Consistent width = professional look
+PDF Layout Example:
+
+┌─────────────────────────────────────┐
+│ Page 1                              │
+│ ┌─────────────────────────────────┐ │
+│ │                                 │ │
+│ │    Photo 1 (4:3)                │ │
+│ │                                 │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ Photo details: Date, location, tags│
+├─────────────────────────────────────┤
+│ Page 2                              │
+│ ┌─────────────────────────────────┐ │
+│ │   Photo 2 (16:9 wide)           │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│                                     │ ← Extra space
+│ Photo details: Date, location, tags│
+├─────────────────────────────────────┤
+│ Page 3                              │
+│ ┌─────────────────────────────────┐ │
+│ │                                 │ │
+│ │                                 │ │
+│ │   Photo 3 (9:16 portrait)       │ │
+│ │                                 │ │
+│ │                                 │ │
+│ │                                 │ │
+│ └─────────────────────────────────┘ │
+│ Photo details: Date, location, tags│
+└─────────────────────────────────────┘
+Implementation:
+
+PDF page size: Letter (8.5" x 11") or A4
+Photo width: 100% of printable area (with margins)
+Photo height: Calculated from aspect ratio
+One photo per page (clean, professional)
+Metadata below each photo
+Code Logic:
+
+Copy// Pseudo-code for PDF generation
+for (photo of photos) {
+  const pageWidth = 8.5; // inches
+  const margin = 0.5; // inches
+  const printableWidth = pageWidth - (2 * margin);
+  
+  // Calculate height maintaining aspect ratio
+  const aspectRatio = photo.height / photo.width;
+  const photoHeight = printableWidth * aspectRatio;
+  
+  // Add new page
+  pdf.addPage();
+  
+  // Add photo scaled to fit width
+  pdf.addImage(photo, {
+    x: margin,
+    y: margin,
+    width: printableWidth,
+    height: photoHeight
+  });
+  
+  // Add metadata below photo
+  pdf.text(`Date: ${photo.date}`, margin, margin + photoHeight + 0.5);
+  pdf.text(`Location: ${photo.location}`, margin, margin + photoHeight + 0.7);
+}
+Option B: Fit to Page (Alternative)
+
+Scale each photo to fit entire page (width AND height)
+Landscape photos fill horizontally
+Portrait photos fill vertically
+More space-efficient but less consistent
+When to use:
+
+Option A if user wants detailed documentation (one photo per page, easy to see details)
+Option B if user wants compact report (multiple photos per page, save paper)
+Recommendation: Start with Option A (fit to width, one per page) - more professional for construction documentation.
+
+PDF Export User Options
+Give user control:
+
+Basic Export:
+
+One photo per page
+Fit to page width
+Include metadata (date, location, tags, notes)
+Sort by: Date captured, Custom order
+Advanced Options (V2):
+
+Multiple photos per page (2x2 grid, 3x2 grid)
+Include markup annotations: Yes/No
+Include completed tasks list: Yes/No
+Paper size: Letter, A4, Legal
+Orientation: Auto (best fit), Portrait, Landscape
+PDF Metadata:
+
+Title: "[Project Name] - Photo Documentation"
+Author: Company name
+Created date: Export date
+Embed location data if available
+Technical Implementation
+Capacitor Camera Plugin:
+
+Copyimport { Camera } from '@capacitor/camera';
+
+// Take photo with native settings
+const photo = await Camera.getPhoto({
+  quality: 90,
+  allowEditing: false,
+  resultType: CameraResultType.Uri,
+  // NO width or height specified = uses native camera aspect ratio
+});
+
+// Store with metadata
+await savePhoto({
+  uri: photo.path,
+  width: photo.width,   // Original width
+  height: photo.height, // Original height
+  aspectRatio: photo.width / photo.height,
+  format: photo.format
+});
+CSS Display Patterns:
+
+Copy/* Thumbnails - uniform grid */
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.thumbnail {
+  aspect-ratio: 1 / 1; /* Force square containers */
+  object-fit: cover;   /* Crop to fill */
+  object-position: center;
+}
+
+/* Full view - show complete photo */
+.photo-viewer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  min-height: 100vh;
+}
+
+.photo-viewer img {
+  max-width: 100%;
+  max-height: 100vh;
+  object-fit: contain; /* Show entire photo */
+}
+
+/* Markup canvas */
+.markup-container {
+  position: relative;
+  width: 100%;
+  max-height: 80vh;
+}
+
+.markup-canvas {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+PDF Generation (using jsPDF or similar):
+
+Copyimport jsPDF from 'jspdf';
+
+async function exportProjectToPDF(project) {
+  const pdf = new jsPDF('portrait', 'in', 'letter');
+  const pageWidth = 8.5;
+  const pageHeight = 11;
+  const margin = 0.5;
+  const printableWidth = pageWidth - (2 * margin);
+  const printableHeight = pageHeight - (2 * margin);
+  
+  for (let i = 0; i < project.photos.length; i++) {
+    const photo = project.photos[i];
+    
+    if (i > 0) pdf.addPage();
+    
+    // Calculate scaled dimensions
+    const aspectRatio = photo.height / photo.width;
+    let photoWidth = printableWidth;
+    let photoHeight = photoWidth * aspectRatio;
+    
+    // If photo too tall for page, scale down
+    if (photoHeight > printableHeight - 1) {
+      photoHeight = printableHeight - 1;
+      photoWidth = photoHeight / aspectRatio;
+    }
+    
+    // Center horizontally if photo narrower than page
+    const xPos = margin + (printableWidth - photoWidth) / 2;
+    
+    // Add photo
+    pdf.addImage(photo.dataUrl, 'JPEG', xPos, margin, photoWidth, photoHeight);
+    
+    // Add metadata below photo
+    const metadataY = margin + photoHeight + 0.3;
+    pdf.setFontSize(10);
+    pdf.text(`Date: ${photo.date}`, margin, metadataY);
+    pdf.text(`Tags: ${photo.tags.join(', ')}`, margin, metadataY + 0.2);
+    if (photo.notes) {
+      pdf.text(`Notes: ${photo.notes}`, margin, metadataY + 0.4);
+    }
+    
+    // Add page numbers
+    pdf.setFontSize(8);
+    pdf.text(
+      `Page ${i + 1} of ${project.photos.length}`,
+      pageWidth / 2,
+      pageHeight - 0.3,
+      { align: 'center' }
+    );
+  }
+  
+  pdf.save(`${project.name}_photos.pdf`);
+}
+Summary of Approach
+Capture:
+
+✅ Native aspect ratio (no forcing)
+✅ Maximum quality
+✅ Respect user's camera settings
+Storage:
+
+✅ Store original dimensions
+✅ No reformatting
+✅ Include aspect ratio metadata
+Display:
+
+✅ Thumbnails: Cover (crop edges for uniform grid)
+✅ Full view: Contain (show entire photo)
+✅ Markup: Contain (see everything to annotate)
+PDF Export:
+
+✅ Normalize to page width
+✅ One photo per page (professional)
+✅ Height adjusts per photo's aspect ratio
+✅ Consistent, clean presentation
+✅ Include metadata with each photo
+This approach:
+
+Preserves photo quality and context (no forced cropping)
+Handles mixed aspect ratios gracefully in UI
+Produces professional PDFs despite varied photo sizes
+Gives users what they expect (camera works naturally)
