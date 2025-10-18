@@ -2188,9 +2188,9 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="fixed inset-0 bg-muted/30 pointer-events-none">
-      {/* S/M/L Size Selector - Below zoom circle area (top-36 ensures clearance on mobile) */}
-      <div className="fixed top-36 left-0 right-0 z-40 flex justify-center pointer-events-auto px-2">
+    <div className="fixed inset-0 bg-muted/30 pointer-events-none flex items-center justify-center">
+      {/* S/M/L Size Selector - Top of screen */}
+      <div className="fixed top-4 left-0 right-0 z-40 flex justify-center pointer-events-auto px-2">
         <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
           {strokeSizes.map((size) => (
             <button
@@ -2210,34 +2210,36 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Horizontal Color Picker - Below S/M/L, Above Photo */}
-      <div className="fixed top-52 left-0 right-0 z-40 flex justify-center pb-2 px-2 pointer-events-auto">
-        <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
-          style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none'
-          }}
-        >
-          {colors.map((color) => (
-            <button
-              key={color.value}
-              onClick={() => {
-                console.log("[PhotoEdit] Color selected:", color.name, color.value);
-                setSelectedColor(color.value);
-              }}
-              className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
-              }`}
-              style={{ backgroundColor: color.value }}
-              data-testid={`button-color-${color.name.toLowerCase()}`}
-              aria-label={`Color ${color.name}`}
-            />
-          ))}
+      {/* Canvas Container - Vertically Centered */}
+      <div className="relative w-full max-w-4xl mx-auto pointer-events-none" style={{ marginTop: '-40px' }}>
+        {/* Horizontal Color Picker - Above Photo */}
+        <div className="absolute -top-16 left-0 right-0 z-40 flex justify-center px-2 pointer-events-auto">
+          <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none'
+            }}
+          >
+            {colors.map((color) => (
+              <button
+                key={color.value}
+                onClick={() => {
+                  console.log("[PhotoEdit] Color selected:", color.name, color.value);
+                  setSelectedColor(color.value);
+                }}
+                className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
+                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
+                }`}
+                style={{ backgroundColor: color.value }}
+                data-testid={`button-color-${color.name.toLowerCase()}`}
+                aria-label={`Color ${color.name}`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Canvas - Centered vertically between colors and tools */}
-      <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none px-4" style={{ top: '270px', bottom: '90px' }}>
+        {/* Canvas - Centered */}
+        <div className="relative w-full px-4 pointer-events-none" style={{ aspectRatio: '4/3' }}>
         <img
           ref={imageRef}
           alt="Photo to annotate"
@@ -2272,8 +2274,8 @@ export function PhotoAnnotationEditor({
             mainCanvasRef={canvasRef}
           />
         )}
+        </div>
       </div>
-
 
       {/* Cancel and Save Buttons - Bottom Corners */}
       <div className="fixed bottom-4 left-4 z-50 pointer-events-auto">
