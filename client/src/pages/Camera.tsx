@@ -405,12 +405,10 @@ export default function Camera() {
           deviceId: { exact: currentDeviceId },
           width: { ideal: 1920 },
           height: { ideal: 1440 },
-          aspectRatio: { ideal: 4/3 },
         } : {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
           height: { ideal: 1440 },
-          aspectRatio: { ideal: 4/3 },
         },
       };
       
@@ -430,7 +428,6 @@ export default function Camera() {
             facingMode: cameraFacing,
             width: { ideal: 1920 },
             height: { ideal: 1440 },
-            aspectRatio: { ideal: 4/3 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -585,7 +582,6 @@ export default function Camera() {
           facingMode: cameraFacing,
           width: { ideal: 1920 },
           height: { ideal: 1440 },
-          aspectRatio: { ideal: 4/3 },
           // @ts-ignore
           advanced: [{ zoom: level }]
         },
@@ -602,7 +598,6 @@ export default function Camera() {
             facingMode: cameraFacing,
             width: { ideal: 1920 },
             height: { ideal: 1440 },
-            aspectRatio: { ideal: 4/3 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -894,44 +889,18 @@ export default function Camera() {
     }
   };
 
-  // Helper function to capture video frame at forced 4:3 aspect ratio
-  const captureVideoTo43Canvas = (video: HTMLVideoElement): HTMLCanvasElement => {
+  // Helper function to capture video frame at native aspect ratio
+  const captureVideoFrame = (video: HTMLVideoElement): HTMLCanvasElement => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Failed to get canvas context');
 
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
-    const videoAspect = videoWidth / videoHeight;
-    const targetAspect = 4 / 3;
+    // Use native video dimensions - no cropping
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-    let sourceX = 0;
-    let sourceY = 0;
-    let sourceWidth = videoWidth;
-    let sourceHeight = videoHeight;
-
-    // Always crop to exact 4:3 from center (no threshold check)
-    if (videoAspect > targetAspect) {
-      // Video is wider than 4:3, crop sides
-      sourceWidth = videoHeight * targetAspect;
-      sourceX = (videoWidth - sourceWidth) / 2;
-    } else if (videoAspect < targetAspect) {
-      // Video is taller than 4:3, crop top/bottom
-      sourceHeight = videoWidth / targetAspect;
-      sourceY = (videoHeight - sourceHeight) / 2;
-    }
-
-    // Force canvas to exact 4:3 dimensions
-    // Use sourceWidth as base, calculate exact height
-    canvas.width = Math.round(sourceWidth);
-    canvas.height = Math.round(sourceWidth / targetAspect);
-
-    // Draw the cropped portion
-    ctx.drawImage(
-      video,
-      sourceX, sourceY, sourceWidth, sourceHeight,
-      0, 0, canvas.width, canvas.height
-    );
+    // Draw the full frame
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     return canvas;
   };
@@ -955,7 +924,7 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = captureVideoTo43Canvas(video);
+      const canvas = captureVideoFrame(video);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
@@ -1074,7 +1043,7 @@ export default function Camera() {
         throw new Error('Camera not ready - please wait a moment and try again');
       }
       const video = videoRef.current;
-      const canvas = captureVideoTo43Canvas(video);
+      const canvas = captureVideoFrame(video);
 
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
