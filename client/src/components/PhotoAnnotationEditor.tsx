@@ -2236,8 +2236,8 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Canvas - Centered between colors and tools */}
-      <div className="absolute inset-x-0 top-68 bottom-20 flex items-center justify-center pointer-events-none px-4">
+      {/* Canvas - Centered vertically between colors and tools */}
+      <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none px-4" style={{ top: '270px', bottom: '90px' }}>
         <img
           ref={imageRef}
           alt="Photo to annotate"
