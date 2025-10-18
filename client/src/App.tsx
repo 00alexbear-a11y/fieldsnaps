@@ -37,6 +37,10 @@ function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const showSyncBanner = location === '/' || location === '/settings';
   
+  // Disable swipe back on main pages to prevent blank white screen
+  const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
+  const disableSwipeBack = isMainPage;
+  
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
 
@@ -111,8 +115,8 @@ function AppContent() {
 
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
-      {/* Universal swipe-back gesture */}
-      <SwipeBackGesture />
+      {/* Universal swipe-back gesture (disabled on main pages) */}
+      <SwipeBackGesture disabled={disableSwipeBack} />
       
       {/* Show payment notification for past_due users */}
       <PaymentNotification />

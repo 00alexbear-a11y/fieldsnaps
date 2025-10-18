@@ -1322,14 +1322,6 @@ export default function ProjectPhotos() {
                           alt={photo.caption || "Photo"}
                           className="w-full h-full object-cover"
                         />
-                        {photo.photographerName && !isSelectMode && (
-                          <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-[10px] font-medium">
-                              {photo.photographerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                            </div>
-                            <span className="font-medium">{photo.photographerName.split(' ')[0]}</span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
