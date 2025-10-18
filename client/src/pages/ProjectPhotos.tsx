@@ -375,15 +375,11 @@ export default function ProjectPhotos() {
     }
     
     try {
-      // Create share via API
-      const response = await fetch('/api/shares', {
+      // Create share via API (currently shares entire project, not just selected photos)
+      const response = await fetch(`/api/projects/${projectId}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          projectId,
-          photoIds: Array.from(selectedPhotoIds),
-        }),
       });
 
       if (!response.ok) {
@@ -400,7 +396,7 @@ export default function ProjectPhotos() {
         copiedToClipboard = true;
         toast({
           title: 'Share link created!',
-          description: `Link copied to clipboard. ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'} shared.`,
+          description: 'Link copied to clipboard. All project photos are now shared.',
         });
       } catch (clipboardError) {
         console.log('Clipboard write failed, will show dialog instead');
@@ -1222,7 +1218,7 @@ export default function ProjectPhotos() {
 
       {/* Selection Toolbar */}
       {isSelectMode && (
-        <div className="fixed bottom-32 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
+        <div className="fixed bottom-48 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
           <div className="max-w-screen-sm mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <span className="text-sm font-medium flex-shrink-0">
               {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} selected
