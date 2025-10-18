@@ -575,7 +575,7 @@ export default function ToDos() {
                       )}
                     </div>
 
-                    {/* Completion checkbox - RIGHT side (44x44pt minimum) */}
+                    {/* Completion checkbox - RIGHT side */}
                     <Checkbox
                       checked={todo.completed}
                       onCheckedChange={(checked) => {
@@ -586,7 +586,7 @@ export default function ToDos() {
                         }
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-shrink-0 h-11 w-11"
+                      className="flex-shrink-0 h-8 w-8 transition-all duration-300"
                       data-testid={`checkbox-todo-complete-${todo.id}`}
                     />
 
@@ -696,7 +696,7 @@ export default function ToDos() {
                     </p>
                   </div>
 
-                  {/* Completion checkbox - RIGHT side (44x44pt minimum) */}
+                  {/* Completion checkbox - RIGHT side */}
                   <Checkbox
                     checked={todo.completed}
                     onCheckedChange={(checked) => {
@@ -707,7 +707,7 @@ export default function ToDos() {
                       }
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0 h-11 w-11"
+                    className="flex-shrink-0 h-8 w-8 transition-all duration-300"
                     data-testid={`checkbox-todo-complete-${todo.id}`}
                   />
 
@@ -871,7 +871,7 @@ export default function ToDos() {
             
             {/* 1. PHOTO FIRST - At the very top */}
             <div>
-              <Label>Attach Photo (optional)</Label>
+              <Label>Attach Photo</Label>
               <div className="flex gap-2 mt-2">
                 <Button
                   type="button"
@@ -944,7 +944,7 @@ export default function ToDos() {
 
             {/* 3. ASSIGN TO - Optional */}
             <div>
-              <Label htmlFor="assignedTo">Assign to (optional)</Label>
+              <Label htmlFor="assignedTo">Assign to</Label>
               <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
                 <SelectTrigger id="assignedTo" className="h-12 mt-2" data-testid="select-todo-assignee">
                   <SelectValue placeholder="Select team member" />
@@ -961,7 +961,7 @@ export default function ToDos() {
 
             {/* 4. DUE DATE - Optional, native HTML5 date picker */}
             <div>
-              <Label htmlFor="dueDate">Due Date (optional)</Label>
+              <Label htmlFor="dueDate">Due Date</Label>
               <Input
                 id="dueDate"
                 type="date"
@@ -973,7 +973,7 @@ export default function ToDos() {
 
             {/* Project selector - optional, hidden if in project context */}
             <div>
-              <Label htmlFor="projectId">Project (optional)</Label>
+              <Label htmlFor="projectId">Project</Label>
               <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
                 <SelectTrigger id="projectId" className="h-12 mt-2" data-testid="select-todo-project">
                   <SelectValue placeholder="None" />

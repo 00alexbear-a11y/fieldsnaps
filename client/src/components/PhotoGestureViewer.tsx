@@ -55,7 +55,6 @@ export function PhotoGestureViewer({
 }: PhotoGestureViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showControls, setShowControls] = useState(true);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showCaptionDialog, setShowCaptionDialog] = useState(false);
@@ -73,7 +72,6 @@ export function PhotoGestureViewer({
   });
   
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const controlsTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentPhoto = photos[currentIndex];
   const photoUrl = currentPhoto?.url;
@@ -142,30 +140,7 @@ export function PhotoGestureViewer({
     setShowComments(false);
   }, [currentIndex]);
 
-  // Auto-hide controls with timer
-  const resetControlsTimer = useCallback(() => {
-    setShowControls(true);
-    
-    if (controlsTimerRef.current) {
-      clearTimeout(controlsTimerRef.current);
-    }
-    
-    controlsTimerRef.current = setTimeout(() => {
-      setShowControls(false);
-    }, 3000);
-  }, []);
-
-  useEffect(() => {
-    resetControlsTimer();
-    return () => {
-      if (controlsTimerRef.current) {
-        clearTimeout(controlsTimerRef.current);
-      }
-    };
-  }, [resetControlsTimer]);
-
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    resetControlsTimer();
     
     const state = gestureStateRef.current;
 
@@ -185,7 +160,7 @@ export function PhotoGestureViewer({
         }, 500);
       }
     }
-  }, [onDelete, resetControlsTimer]);
+  }, [onDelete]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const state = gestureStateRef.current;
@@ -284,9 +259,7 @@ export function PhotoGestureViewer({
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* Top Controls - Close and Counter only */}
       <div
-        className={`absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10"
       >
         <div className="flex items-center justify-between max-w-screen-xl mx-auto">
           <Button
@@ -323,7 +296,6 @@ export function PhotoGestureViewer({
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          onClick={() => resetControlsTimer()}
         />
       </div>
 
@@ -356,9 +328,7 @@ export function PhotoGestureViewer({
 
       {/* Bottom Controls and Caption */}
       <div
-        className={`absolute bottom-0 left-0 right-0 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className="absolute bottom-0 left-0 right-0"
       >
         {/* Caption */}
         {currentPhoto.caption && (
