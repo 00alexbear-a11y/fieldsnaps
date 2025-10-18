@@ -761,6 +761,61 @@ class SyncManager {
   }
 
   /**
+   * Upload a photo immediately and wait for completion, returning the server photo ID
+   * Used for attach-to-todo flow where we need the server ID before proceeding
+   */
+  async uploadPhotoAndWait(photoId: string, projectId: string): Promise<string | null> {
+    console.log('[Sync] Uploading photo and waiting:', { photoId, projectId });
+    
+    // If offline, we can't wait for upload
+    if (!navigator.onLine) {
+      console.log('[Sync] Offline - cannot upload immediately');
+      return null;
+    }
+
+    // Add to queue and get the created item
+    await idb.addToSyncQueue({
+      type: 'photo',
+      localId: photoId,
+      projectId,
+      action: 'create',
+      data: {},
+      retryCount: 0,
+    });
+
+    // Get the queue item that was just added
+    const allItems = await idb.getPendingSyncItems();
+    const item = allItems.find(i => i.localId === photoId && i.type === 'photo');
+    
+    if (!item) {
+      console.error('[Sync] Could not find queue item for photo:', photoId);
+      return null;
+    }
+
+    // Sync the photo immediately
+    const success = await this.syncPhoto(item);
+    
+    if (!success) {
+      console.error('[Sync] Photo upload failed');
+      return null;
+    }
+
+    // Remove from queue after successful sync
+    await idb.removeFromSyncQueue(photoId);
+
+    // Get the updated photo with server ID
+    const photo = await idb.getPhoto(photoId);
+    
+    if (photo && photo.serverId) {
+      console.log('[Sync] Photo uploaded successfully, server ID:', photo.serverId);
+      return photo.serverId;
+    }
+
+    console.error('[Sync] Photo uploaded but no server ID found');
+    return null;
+  }
+
+  /**
    * Get sync queue status
    */
   async getSyncStatus(): Promise<{

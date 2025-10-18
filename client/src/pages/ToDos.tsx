@@ -78,21 +78,11 @@ export default function ToDos() {
           dueDate: formData.dueDate || '',
         });
         
-        // Fetch photo details and attach it
-        fetch(`/api/photos/${photoId}`)
-          .then(res => res.json())
-          .then(photo => {
-            setSelectedPhotoId(photo.id);
-            setSelectedPhotoUrl(photo.url);
-            toast({ title: "Photo attached!" });
-          })
-          .catch(err => {
-            console.error('Failed to fetch photo:', err);
-            toast({ 
-              title: "Failed to attach photo", 
-              variant: "destructive" 
-            });
-          });
+        // Attach the photo - now using server photoId directly
+        setSelectedPhotoId(photoId);
+        // Construct the photo URL from the server photoId
+        setSelectedPhotoUrl(`/api/photos/${photoId}/download`);
+        toast({ title: "Photo attached!" });
         
         // Clean up
         localStorage.removeItem('todo-form-draft');
