@@ -2287,6 +2287,98 @@ export function PhotoAnnotationEditor({
           />
         )}
         </div>
+
+        {/* Tool Buttons - Below Photo */}
+        <div className="absolute -bottom-16 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
+          <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
+            {/* Tool Buttons */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTextDialogOpen(true)}
+              data-testid="button-tool-text"
+              className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+              aria-label="Add text"
+            >
+              <Type className="w-5 h-5" />
+            </Button>
+            <Button
+              variant={tool === "arrow" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setTool(tool === "arrow" ? null : "arrow")}
+              data-testid="button-tool-arrow"
+              className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
+              aria-label="Arrow tool"
+            >
+              <ArrowUpRight className="w-5 h-5" />
+            </Button>
+            <Button
+              variant={tool === "line" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setTool(tool === "line" ? null : "line")}
+              data-testid="button-tool-line"
+              className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
+              aria-label="Line tool"
+            >
+              <Minus className="w-5 h-5" />
+            </Button>
+            <Button
+              variant={tool === "circle" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setTool(tool === "circle" ? null : "circle")}
+              data-testid="button-tool-circle"
+              className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
+              aria-label="Circle tool"
+            >
+              <Circle className="w-5 h-5" />
+            </Button>
+            <Button
+              variant={tool === "pen" ? "default" : "ghost"}
+              size="icon"
+              onClick={() => setTool(tool === "pen" ? null : "pen")}
+              data-testid="button-tool-pen"
+              className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
+              aria-label="Pen tool"
+            >
+              <Pen className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMeasurementDialogOpen(true)}
+              data-testid="button-tool-measurement"
+              className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+              aria-label="Tape measure"
+            >
+              <Ruler className="w-5 h-5" />
+            </Button>
+
+            <div className="h-6 w-px bg-white/20 mx-0.5" />
+
+            {/* Actions */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleUndo}
+              disabled={historyIndex === 0}
+              data-testid="button-undo"
+              className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+              aria-label="Undo"
+            >
+              <Undo className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
+              data-testid="button-delete"
+              className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
+              aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Cancel and Save Buttons - Bottom Corners */}
@@ -2327,98 +2419,6 @@ export function PhotoAnnotationEditor({
           </Button>
         </div>
       )}
-
-      {/* Tool Buttons - Centered Bottom */}
-      <div className="fixed bottom-16 left-0 right-0 z-50 flex justify-center pb-safe px-2 pointer-events-auto">
-        <div className="bg-black/80 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-1.5">
-          {/* Tool Buttons */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTextDialogOpen(true)}
-            data-testid="button-tool-text"
-            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Add text"
-          >
-            <Type className="w-5 h-5" />
-          </Button>
-          <Button
-            variant={tool === "arrow" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setTool(tool === "arrow" ? null : "arrow")}
-            data-testid="button-tool-arrow"
-            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
-            aria-label="Arrow tool"
-          >
-            <ArrowUpRight className="w-5 h-5" />
-          </Button>
-          <Button
-            variant={tool === "line" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setTool(tool === "line" ? null : "line")}
-            data-testid="button-tool-line"
-            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
-            aria-label="Line tool"
-          >
-            <Minus className="w-5 h-5" />
-          </Button>
-          <Button
-            variant={tool === "circle" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setTool(tool === "circle" ? null : "circle")}
-            data-testid="button-tool-circle"
-            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
-            aria-label="Circle tool"
-          >
-            <Circle className="w-5 h-5" />
-          </Button>
-          <Button
-            variant={tool === "pen" ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setTool(tool === "pen" ? null : "pen")}
-            data-testid="button-tool-pen"
-            className={`rounded-full w-10 h-10 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
-            aria-label="Pen tool"
-          >
-            <Pen className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMeasurementDialogOpen(true)}
-            data-testid="button-tool-measurement"
-            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Tape measure"
-          >
-            <Ruler className="w-5 h-5" />
-          </Button>
-
-          <div className="h-6 w-px bg-white/20 mx-0.5" />
-
-          {/* Actions */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleUndo}
-            disabled={historyIndex === 0}
-            data-testid="button-undo"
-            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label="Undo"
-          >
-            <Undo className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
-            data-testid="button-delete"
-            className="rounded-full hover-elevate w-10 h-10 text-white flex-shrink-0"
-            aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
 
       {/* Text Input Dialog */}
       <Dialog open={textDialogOpen} onOpenChange={setTextDialogOpen}>
