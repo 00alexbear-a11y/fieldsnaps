@@ -502,14 +502,14 @@ export default function ProjectPhotos() {
       // Add project header if enabled
       if (exportOptions.includeProjectHeader && project) {
         doc.setFontSize(20);
-        doc.setFont(undefined, 'bold');
+        doc.setFont('helvetica', 'bold');
         doc.text(project.name, margin, margin);
         
         let yPos = margin + 8;
         
         if (project.address) {
           doc.setFontSize(10);
-          doc.setFont(undefined, 'normal');
+          doc.setFont('helvetica', 'normal');
           doc.text(project.address, margin, yPos);
           yPos += 6;
         }
@@ -524,21 +524,25 @@ export default function ProjectPhotos() {
       }
 
       let currentY = exportOptions.includeProjectHeader && project ? margin + 40 : margin;
+      let successCount = 0;
+      let failureCount = 0;
+      let needsNewPage = false;
 
       // Process each photo
       for (let i = 0; i < selectedPhotos.length; i++) {
         const photo = selectedPhotos[i];
-        
-        // Add new page if not first photo
-        if (i > 0) {
-          doc.addPage();
-          currentY = margin;
-        }
 
         // Fetch photo as blob
         try {
           const response = await fetch(photo.url);
           const blob = await response.blob();
+          
+          // Skip non-image files (e.g., videos)
+          if (!blob.type.startsWith('image/')) {
+            console.log(`Skipping non-image file: ${photo.id}, type: ${blob.type}`);
+            failureCount++;
+            continue;
+          }
           
           // Convert blob to data URL
           const reader = new FileReader();
@@ -567,78 +571,120 @@ export default function ProjectPhotos() {
             imgWidth = imgHeight * imgAspectRatio;
           }
 
-          // Add image
-          doc.addImage(dataUrl, 'JPEG', margin, currentY, imgWidth, imgHeight);
-          currentY += imgHeight + 10;
+          // Determine image format from blob type
+          let imageFormat: 'JPEG' | 'PNG' | 'WEBP' = 'JPEG';
+          if (blob.type === 'image/png') {
+            imageFormat = 'PNG';
+          } else if (blob.type === 'image/webp') {
+            imageFormat = 'WEBP';
+          }
+          
+          // Test that addImage will work by trying it in a try block
+          // If this succeeds, we know we can safely add a page
+          try {
+            // Add new page if we successfully added a photo previously
+            if (needsNewPage) {
+              doc.addPage();
+              currentY = margin;
+            }
+            
+            // Add image with correct format
+            doc.addImage(dataUrl, imageFormat, margin, currentY, imgWidth, imgHeight);
+            currentY += imgHeight + 10;
+          } catch (addImageError) {
+            // If addImage failed, we may have added a blank page
+            // Since jsPDF doesn't support page removal, track this as a failure
+            console.error(`Failed to add image to PDF for photo ${photo.id}:`, addImageError);
+            throw addImageError; // Re-throw to be caught by outer catch
+          }
 
           // Add photo details
           doc.setFontSize(10);
           
-          if (exportOptions.includeName && photo.name) {
-            doc.setFont(undefined, 'bold');
+          // Generate photo name from createdAt if not available
+          const photoName = `Photo_${format(new Date(photo.createdAt), 'yyyy-MM-dd_HHmmss')}`;
+          
+          if (exportOptions.includeName) {
+            doc.setFont('helvetica', 'bold');
             doc.text(`Name: `, margin, currentY);
-            doc.setFont(undefined, 'normal');
-            doc.text(photo.name, margin + 15, currentY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(photoName, margin + 15, currentY);
             currentY += 6;
           }
 
           if (exportOptions.includeDate) {
-            doc.setFont(undefined, 'bold');
+            doc.setFont('helvetica', 'bold');
             doc.text(`Date: `, margin, currentY);
-            doc.setFont(undefined, 'normal');
+            doc.setFont('helvetica', 'normal');
             doc.text(format(new Date(photo.createdAt), 'MMMM d, yyyy'), margin + 15, currentY);
             currentY += 6;
           }
 
           if (exportOptions.includeTimestamp) {
-            doc.setFont(undefined, 'bold');
+            doc.setFont('helvetica', 'bold');
             doc.text(`Time: `, margin, currentY);
-            doc.setFont(undefined, 'normal');
+            doc.setFont('helvetica', 'normal');
             doc.text(format(new Date(photo.createdAt), 'h:mm a'), margin + 15, currentY);
             currentY += 6;
           }
 
           if (exportOptions.includeTags && photo.tags && photo.tags.length > 0) {
-            doc.setFont(undefined, 'bold');
+            doc.setFont('helvetica', 'bold');
             doc.text(`Tags: `, margin, currentY);
-            doc.setFont(undefined, 'normal');
+            doc.setFont('helvetica', 'normal');
             const tagNames = photo.tags.map(t => t.name).join(', ');
             doc.text(tagNames, margin + 15, currentY);
             currentY += 6;
           }
 
           if (exportOptions.includeComments && photo.caption) {
-            doc.setFont(undefined, 'bold');
+            doc.setFont('helvetica', 'bold');
             doc.text(`Comment:`, margin, currentY);
             currentY += 6;
-            doc.setFont(undefined, 'normal');
+            doc.setFont('helvetica', 'normal');
             
             // Word wrap comment text
             const lines = doc.splitTextToSize(photo.caption, contentWidth);
             doc.text(lines, margin, currentY);
             currentY += lines.length * 5;
           }
+          
+          successCount++;
+          needsNewPage = true; // Next successful photo will need a new page
         } catch (error) {
           console.error(`Failed to add photo ${photo.id} to PDF:`, error);
+          failureCount++;
           // Continue with next photo
         }
       }
 
-      // Save PDF
-      const fileName = project 
-        ? `${project.name.replace(/[^a-z0-9]/gi, '_')}_photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`
-        : `photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
-      
-      doc.save(fileName);
+      // Only save PDF if at least one photo was successfully added
+      if (successCount > 0) {
+        const fileName = project 
+          ? `${project.name.replace(/[^a-z0-9]/gi, '_')}_photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`
+          : `photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+        
+        doc.save(fileName);
 
-      toast({
-        title: 'PDF exported successfully',
-        description: `${selectedPhotos.length} photo${selectedPhotos.length === 1 ? '' : 's'} exported`,
-      });
-
-      // Exit select mode
-      setIsSelectMode(false);
-      setSelectedPhotoIds(new Set());
+        if (failureCount > 0) {
+          toast({
+            title: 'PDF exported with warnings',
+            description: `${successCount} photo${successCount === 1 ? '' : 's'} exported successfully, ${failureCount} failed`,
+            variant: 'default',
+          });
+        } else {
+          toast({
+            title: 'PDF exported successfully',
+            description: `${successCount} photo${successCount === 1 ? '' : 's'} exported`,
+          });
+        }
+      } else {
+        toast({
+          title: 'PDF export failed',
+          description: 'No photos could be added to the PDF',
+          variant: 'destructive',
+        });
+      }
     } catch (error) {
       console.error('PDF export error:', error);
       toast({
@@ -646,6 +692,10 @@ export default function ProjectPhotos() {
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: 'destructive',
       });
+    } finally {
+      // Always exit select mode and clear selection, even if export fails
+      setIsSelectMode(false);
+      setSelectedPhotoIds(new Set());
     }
   };
 
