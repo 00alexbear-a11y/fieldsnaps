@@ -299,18 +299,18 @@ export function PhotoGestureViewer({
         />
       </div>
 
-      {/* Navigation Arrows - Bottom positioned - LARGER AND PERSISTENT */}
+      {/* Navigation Arrows - Centered vertically on sides */}
       {photos.length > 1 && (
-        <div className="absolute bottom-24 left-0 right-0 flex justify-between px-4">
+        <>
           <Button
             variant="ghost"
             size="icon"
             onClick={navigatePrev}
             disabled={currentIndex === 0}
-            className="text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-14 h-14 shadow-lg"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-16 h-16 shadow-lg z-10"
             data-testid="button-prev-photo"
           >
-            <ChevronLeft className="w-9 h-9" />
+            <ChevronLeft className="w-10 h-10" />
           </Button>
 
           <Button
@@ -318,12 +318,12 @@ export function PhotoGestureViewer({
             size="icon"
             onClick={navigateNext}
             disabled={currentIndex === photos.length - 1}
-            className="text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-14 h-14 shadow-lg"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-16 h-16 shadow-lg z-10"
             data-testid="button-next-photo"
           >
-            <ChevronRight className="w-9 h-9" />
+            <ChevronRight className="w-10 h-10" />
           </Button>
-        </div>
+        </>
       )}
 
       {/* Bottom Controls and Caption */}
@@ -339,94 +339,101 @@ export function PhotoGestureViewer({
           </div>
         )}
         
-        {/* Control Bar */}
+        {/* Control Bar - 2 Rows */}
         <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3">
-          <div className="flex items-center justify-center gap-1 max-w-screen-xl mx-auto">
-            {onAnnotate && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onAnnotate(currentPhoto)}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-                data-testid="button-annotate"
-              >
-                <Brush className="w-5 h-5" />
-                <span className="text-[10px]">Edit</span>
-              </Button>
-            )}
-            {onTag && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onTag(currentPhoto)}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-                data-testid="button-tag-photo"
-              >
-                <Tag className="w-5 h-5" />
-                <span className="text-[10px]">Tag</span>
-              </Button>
-            )}
-            {onShare && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleShare}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-                data-testid="button-share"
-              >
-                <Share2 className="w-5 h-5" />
-                <span className="text-[10px]">Share</span>
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowComments(!showComments)}
-              className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1 relative"
-              data-testid="button-comments"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-[10px]">Comment</span>
-              {comments.length > 0 && (
-                <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[9px]">
-                  {comments.length}
-                </span>
+          <div className="max-w-screen-xl mx-auto space-y-2">
+            {/* Row 1: Primary actions */}
+            <div className="flex items-center justify-center gap-1">
+              {onAnnotate && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onAnnotate(currentPhoto)}
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  data-testid="button-annotate"
+                >
+                  <Brush className="w-6 h-6" />
+                  <span className="text-[11px] font-medium">Edit</span>
+                </Button>
               )}
-            </Button>
-            {onDelete && (
+              {onTag && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onTag(currentPhoto)}
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  data-testid="button-tag-photo"
+                >
+                  <Tag className="w-6 h-6" />
+                  <span className="text-[11px] font-medium">Tag</span>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setShowDeleteDialog(true)}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-                data-testid="button-delete"
+                onClick={() => setShowComments(!showComments)}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1 relative"
+                data-testid="button-comments"
               >
-                <Trash2 className="w-5 h-5" />
-                <span className="text-[10px]">Delete</span>
+                <MessageSquare className="w-6 h-6" />
+                <span className="text-[11px] font-medium">Comment</span>
+                {comments.length > 0 && (
+                  <span className="absolute top-1 right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-semibold">
+                    {comments.length}
+                  </span>
+                )}
               </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleEditCaption}
-              className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-              data-testid="button-edit-caption"
-            >
-              <Pencil className="w-5 h-5" />
-              <span className="text-[10px]">Rename</span>
-            </Button>
-            {onSetCoverPhoto && (
+              {onShare && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleShare}
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  data-testid="button-share"
+                >
+                  <Share2 className="w-6 h-6" />
+                  <span className="text-[11px] font-medium">Share</span>
+                </Button>
+              )}
+            </div>
+
+            {/* Row 2: Management actions */}
+            <div className="flex items-center justify-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleSetCoverPhoto}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-3 gap-1"
-                data-testid="button-set-cover-photo"
+                onClick={handleEditCaption}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                data-testid="button-edit-caption"
               >
-                <Image className="w-5 h-5" />
-                <span className="text-[10px]">Use as Icon</span>
+                <Pencil className="w-6 h-6" />
+                <span className="text-[11px] font-medium">Rename</span>
               </Button>
-            )}
+              {onSetCoverPhoto && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSetCoverPhoto}
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  data-testid="button-set-cover-photo"
+                >
+                  <Image className="w-6 h-6" />
+                  <span className="text-[11px] font-medium">Use as Icon</span>
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  data-testid="button-delete"
+                >
+                  <Trash2 className="w-6 h-6" />
+                  <span className="text-[11px] font-medium">Delete</span>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

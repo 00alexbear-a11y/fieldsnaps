@@ -2288,74 +2288,69 @@ export function PhotoAnnotationEditor({
         )}
         </div>
 
-        {/* Tool Buttons - Below Photo - 2 ROWS WITH BIGGER ICONS */}
-        <div className="absolute -bottom-28 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
+        {/* Tool Buttons - Below Photo - Single Row */}
+        <div className="absolute -bottom-20 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
           <div className="bg-black/80 backdrop-blur-md rounded-3xl px-4 py-3 shadow-lg">
-            {/* ROW 1: Main drawing tools */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setTextDialogOpen(true)}
                 data-testid="button-tool-text"
-                className="rounded-full hover-elevate w-14 h-14 text-white flex-shrink-0"
+                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
                 aria-label="Add text"
               >
-                <Type className="w-7 h-7" />
+                <Type className="w-5 h-5" />
               </Button>
               <Button
                 variant={tool === "arrow" ? "default" : "ghost"}
                 size="icon"
                 onClick={() => setTool(tool === "arrow" ? null : "arrow")}
                 data-testid="button-tool-arrow"
-                className={`rounded-full w-14 h-14 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
+                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
                 aria-label="Arrow tool"
               >
-                <ArrowUpRight className="w-7 h-7" />
+                <ArrowUpRight className="w-5 h-5" />
               </Button>
               <Button
                 variant={tool === "line" ? "default" : "ghost"}
                 size="icon"
                 onClick={() => setTool(tool === "line" ? null : "line")}
                 data-testid="button-tool-line"
-                className={`rounded-full w-14 h-14 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
+                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
                 aria-label="Line tool"
               >
-                <Minus className="w-7 h-7" />
+                <Minus className="w-5 h-5" />
               </Button>
               <Button
                 variant={tool === "circle" ? "default" : "ghost"}
                 size="icon"
                 onClick={() => setTool(tool === "circle" ? null : "circle")}
                 data-testid="button-tool-circle"
-                className={`rounded-full w-14 h-14 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
+                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
                 aria-label="Circle tool"
               >
-                <Circle className="w-7 h-7" />
+                <Circle className="w-5 h-5" />
               </Button>
-            </div>
-            
-            {/* ROW 2: Additional tools and actions */}
-            <div className="flex items-center gap-2">
               <Button
                 variant={tool === "pen" ? "default" : "ghost"}
                 size="icon"
                 onClick={() => setTool(tool === "pen" ? null : "pen")}
                 data-testid="button-tool-pen"
-                className={`rounded-full w-14 h-14 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
+                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
                 aria-label="Pen tool"
               >
-                <Pen className="w-7 h-7" />
+                <Pen className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setMeasurementDialogOpen(true)}
                 data-testid="button-tool-measurement"
-                className="rounded-full hover-elevate w-14 h-14 text-white flex-shrink-0"
+                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
                 aria-label="Tape measure"
               >
-                <Ruler className="w-7 h-7" />
+                <Ruler className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
@@ -2363,20 +2358,20 @@ export function PhotoAnnotationEditor({
                 onClick={handleUndo}
                 disabled={historyIndex === 0}
                 data-testid="button-undo"
-                className="rounded-full hover-elevate w-14 h-14 text-white flex-shrink-0"
+                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
                 aria-label="Undo"
               >
-                <Undo className="w-7 h-7" />
+                <Undo className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
                 data-testid="button-delete"
-                className="rounded-full hover-elevate w-14 h-14 text-white flex-shrink-0"
+                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
                 aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
               >
-                <Trash2 className="w-7 h-7" />
+                <Trash2 className="w-5 h-5" />
               </Button>
             </div>
           </div>
