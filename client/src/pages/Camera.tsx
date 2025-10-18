@@ -977,16 +977,6 @@ export default function Camera() {
         duration: 1500,
       });
 
-      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
-        console.error('[Camera] Sync queue error:', err);
-        toast({
-          title: 'Sync queue failed',
-          description: 'Photo saved locally but not queued for upload. Try manual sync.',
-          variant: 'destructive',
-          duration: 3000,
-        });
-      });
-
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
       
@@ -997,10 +987,37 @@ export default function Camera() {
 
       // Navigate back to todos if in Photo Attachment Mode
       if (isAttachMode) {
-        console.log('[Camera] Quick capture in attach mode, navigating to todos with photoId:', savedPhoto.id);
-        setLocation(`/todos?photoId=${savedPhoto.id}`);
+        console.log('[Camera] Quick capture in attach mode, uploading and waiting for server ID');
+        
+        // Upload immediately and wait for server photo ID
+        const serverPhotoId = await syncManager.uploadPhotoAndWait(savedPhoto.id, selectedProject);
+        
+        if (serverPhotoId) {
+          console.log('[Camera] Photo uploaded, navigating to todos with server photoId:', serverPhotoId);
+          setLocation(`/todos?photoId=${serverPhotoId}`);
+        } else {
+          // Upload failed or offline - navigate without photoId
+          console.log('[Camera] Photo upload failed, navigating to todos without photoId');
+          toast({
+            title: 'Photo saved locally',
+            description: 'Will upload when online',
+            duration: 2000,
+          });
+          setLocation('/todos');
+        }
         return; // Early return to prevent button animation
       }
+
+      // For normal mode (not attach), queue for background sync
+      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+        console.error('[Camera] Sync queue error:', err);
+        toast({
+          title: 'Sync queue failed',
+          description: 'Photo saved locally but not queued for upload. Try manual sync.',
+          variant: 'destructive',
+          duration: 3000,
+        });
+      });
 
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
       if (quickButton) {
