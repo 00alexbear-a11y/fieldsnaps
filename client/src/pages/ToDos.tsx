@@ -382,7 +382,7 @@ export default function ToDos() {
                 setEditingTodo(null);
                 form.reset({
                   title: "",
-                  projectId: "",
+                  projectId: filterProject !== "all" ? filterProject : "",
                   assignedTo: "",
                   dueDate: "",
                 });
