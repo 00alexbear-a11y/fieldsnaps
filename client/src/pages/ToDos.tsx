@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, FolderOpen } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -25,9 +24,8 @@ import type { ToDo, Project } from "@shared/schema";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
   projectId: z.string().optional(),
-  assignedTo: z.string().min(1, "Assignee is required"),
+  assignedTo: z.string().optional(), // Optional - defaults to creator
   dueDate: z.string().optional(),
   photoId: z.string().optional(),
 });
@@ -37,7 +35,7 @@ type CreateTodoForm = z.infer<typeof createTodoSchema>;
 type TodoWithDetails = ToDo & {
   project?: { id: string; name: string };
   photo?: { id: string; url: string };
-  assignee: { id: string; firstName: string | null; lastName: string | null };
+  assignee?: { id: string; firstName: string | null; lastName: string | null };
   creator: { id: string; firstName: string | null; lastName: string | null };
 };
 
@@ -53,7 +51,6 @@ export default function ToDos() {
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,7 +69,6 @@ export default function ToDos() {
         // Restore form fields
         form.reset({
           title: formData.title || '',
-          description: formData.description || '',
           projectId: formData.projectId || '',
           assignedTo: formData.assignedTo || '',
           dueDate: formData.dueDate || '',
@@ -230,6 +226,8 @@ export default function ToDos() {
       toast({ title: "To-do created!" });
       setShowAddDialog(false);
       form.reset();
+      setSelectedPhotoId(null);
+      setSelectedPhotoUrl(null);
     },
     onError: () => {
       toast({ title: "Failed to create to-do", variant: "destructive" });
@@ -247,6 +245,8 @@ export default function ToDos() {
       setShowEditDialog(false);
       setEditingTodo(null);
       form.reset();
+      setSelectedPhotoId(null);
+      setSelectedPhotoUrl(null);
     },
     onError: () => {
       toast({ title: "Failed to update to-do", variant: "destructive" });
@@ -262,7 +262,7 @@ export default function ToDos() {
       
       const endpoint = projectId 
         ? `/api/projects/${projectId}/photos`
-        : '/api/photos/standalone'; // Will need to create this endpoint
+        : '/api/photos/standalone';
       
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -295,7 +295,6 @@ export default function ToDos() {
     resolver: zodResolver(createTodoSchema),
     defaultValues: {
       title: "",
-      description: "",
       projectId: "",
       assignedTo: "",
       dueDate: "",
@@ -306,13 +305,12 @@ export default function ToDos() {
     // Remove empty optional fields
     const payload: any = {
       title: data.title,
-      assignedTo: data.assignedTo,
     };
     
-    if (data.description) payload.description = data.description;
     if (data.projectId) payload.projectId = data.projectId;
-    if (data.dueDate) payload.dueDate = data.dueDate; // Backend will coerce string to Date
+    if (data.dueDate) payload.dueDate = data.dueDate;
     if (selectedPhotoId) payload.photoId = selectedPhotoId;
+    if (data.assignedTo) payload.assignedTo = data.assignedTo;
     
     if (editingTodo) {
       updateMutation.mutate({ id: editingTodo.id, data: payload });
@@ -333,7 +331,6 @@ export default function ToDos() {
     // Save current form data to localStorage before navigating
     const formData = {
       title: form.watch('title'),
-      description: form.watch('description'),
       projectId: form.watch('projectId'),
       assignedTo: form.watch('assignedTo'),
       dueDate: form.watch('dueDate'),
@@ -349,9 +346,8 @@ export default function ToDos() {
     setEditingTodo(todo);
     form.reset({
       title: todo.title,
-      description: todo.description || "",
       projectId: todo.projectId || "",
-      assignedTo: todo.assignedTo,
+      assignedTo: todo.assignedTo || "",
       dueDate: todo.dueDate ? (typeof todo.dueDate === 'string' ? todo.dueDate : todo.dueDate.toISOString().split('T')[0]) : "",
     });
     if (todo.photo) {
@@ -378,14 +374,14 @@ export default function ToDos() {
             <Button
               onClick={() => {
                 setEditingTodo(null);
-                setDatePickerOpen(false);
                 form.reset({
                   title: "",
-                  description: "",
                   projectId: "",
                   assignedTo: "",
                   dueDate: "",
                 });
+                setSelectedPhotoId(null);
+                setSelectedPhotoUrl(null);
                 setShowAddDialog(true);
               }}
               className="h-12"
@@ -538,27 +534,14 @@ export default function ToDos() {
                   data-testid={`card-todo-${todo.id}`}
                 >
                   <div className="flex items-center gap-2">
-                    {/* Completion checkbox */}
-                    <Checkbox
-                      checked={todo.completed}
-                      onCheckedChange={(checked) => {
-                        if (!checked && todo.completed) {
-                          // Uncompleting - would need an API endpoint for this
-                          toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
-                        } else if (checked && !todo.completed) {
-                          completeMutation.mutate(todo.id);
-                        }
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex-shrink-0"
-                      data-testid={`checkbox-todo-complete-${todo.id}`}
-                    />
-
                     {/* Photo thumbnail if available - 60px square */}
                     {todo.photo && (
                       <div
                         className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
-                        onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLocation(`/photo/${todo.photoId}/view`);
+                        }}
                         data-testid={`img-todo-photo-${todo.id}`}
                       >
                         <img
@@ -586,6 +569,21 @@ export default function ToDos() {
                       )}
                     </div>
 
+                    {/* Completion checkbox - RIGHT side (44x44pt minimum) */}
+                    <Checkbox
+                      checked={todo.completed}
+                      onCheckedChange={(checked) => {
+                        if (!checked && todo.completed) {
+                          toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                        } else if (checked && !todo.completed) {
+                          completeMutation.mutate(todo.id);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-shrink-0 h-11 w-11"
+                      data-testid={`checkbox-todo-complete-${todo.id}`}
+                    />
+
                     {/* Three-dot menu */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -600,12 +598,12 @@ export default function ToDos() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }} data-testid={`menu-edit-todo-${todo.id}`}>
                           Edit
                         </DropdownMenuItem>
                         {!todo.completed && (
                           <DropdownMenuItem
-                            onClick={() => completeMutation.mutate(todo.id)}
+                            onClick={(e) => { e.stopPropagation(); completeMutation.mutate(todo.id); }}
                             disabled={completeMutation.isPending}
                             data-testid={`menu-complete-todo-${todo.id}`}
                           >
@@ -613,7 +611,7 @@ export default function ToDos() {
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
-                          onClick={() => deleteMutation.mutate(todo.id)}
+                          onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(todo.id); }}
                           disabled={deleteMutation.isPending}
                           className="text-destructive"
                           data-testid={`menu-delete-todo-${todo.id}`}
@@ -653,27 +651,14 @@ export default function ToDos() {
                 data-testid={`card-todo-${todo.id}`}
               >
                 <div className="flex items-center gap-2">
-                  {/* Completion checkbox */}
-                  <Checkbox
-                    checked={todo.completed}
-                    onCheckedChange={(checked) => {
-                      if (!checked && todo.completed) {
-                        // Uncompleting - would need an API endpoint for this
-                        toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
-                      } else if (checked && !todo.completed) {
-                        completeMutation.mutate(todo.id);
-                      }
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0"
-                    data-testid={`checkbox-todo-complete-${todo.id}`}
-                  />
-
                   {/* Photo thumbnail if available - 60px square */}
                   {todo.photo && (
                     <div
                       className="flex-shrink-0 w-[60px] h-[60px] rounded-md overflow-hidden bg-muted cursor-pointer"
-                      onClick={() => setLocation(`/photo/${todo.photoId}/view`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLocation(`/photo/${todo.photoId}/view`);
+                      }}
                       data-testid={`img-todo-photo-${todo.id}`}
                     >
                       <img
@@ -693,13 +678,32 @@ export default function ToDos() {
                       {todo.title}
                     </h3>
                     
-                    {/* Only show project if viewing all projects */}
-                    {filterProject === 'all' && todo.project && (
-                      <p className="text-xs text-muted-foreground leading-none mt-0.5" data-testid={`text-todo-project-${todo.id}`}>
-                        {todo.project.name}
-                      </p>
-                    )}
+                    {/* Secondary info - assignee and due date */}
+                    <p className="text-xs text-muted-foreground leading-none mt-0.5">
+                      {todo.assignee && (
+                        <span>Assigned to: {getDisplayName(todo.assignee)}</span>
+                      )}
+                      {todo.assignee && todo.dueDate && <span> • </span>}
+                      {todo.dueDate && (
+                        <span>Due: {format(new Date(todo.dueDate), 'MMM d')}</span>
+                      )}
+                    </p>
                   </div>
+
+                  {/* Completion checkbox - RIGHT side (44x44pt minimum) */}
+                  <Checkbox
+                    checked={todo.completed}
+                    onCheckedChange={(checked) => {
+                      if (!checked && todo.completed) {
+                        toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                      } else if (checked && !todo.completed) {
+                        completeMutation.mutate(todo.id);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0 h-11 w-11"
+                    data-testid={`checkbox-todo-complete-${todo.id}`}
+                  />
 
                   {/* Three-dot menu */}
                   <DropdownMenu>
@@ -715,12 +719,12 @@ export default function ToDos() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEditTodo(todo)} data-testid={`menu-edit-todo-${todo.id}`}>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }} data-testid={`menu-edit-todo-${todo.id}`}>
                         Edit
                       </DropdownMenuItem>
                       {!todo.completed && (
                         <DropdownMenuItem
-                          onClick={() => completeMutation.mutate(todo.id)}
+                          onClick={(e) => { e.stopPropagation(); completeMutation.mutate(todo.id); }}
                           disabled={completeMutation.isPending}
                           data-testid={`menu-complete-todo-${todo.id}`}
                         >
@@ -728,7 +732,7 @@ export default function ToDos() {
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        onClick={() => deleteMutation.mutate(todo.id)}
+                        onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(todo.id); }}
                         disabled={deleteMutation.isPending}
                         className="text-destructive"
                         data-testid={`menu-delete-todo-${todo.id}`}
@@ -777,13 +781,6 @@ export default function ToDos() {
               {selectedTodoForDetails?.title}
             </h2>
             
-            {/* Description - secondary color */}
-            {selectedTodoForDetails?.description && (
-              <p className="text-muted-foreground" data-testid="text-task-detail-description">
-                {selectedTodoForDetails.description}
-              </p>
-            )}
-            
             {/* Metadata with icons */}
             <div className="space-y-3 pt-2">
               {selectedTodoForDetails?.dueDate && (
@@ -802,15 +799,28 @@ export default function ToDos() {
               
               {selectedTodoForDetails?.project && (
                 <div className="flex items-center gap-3">
-                  <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                  <Home className="w-5 h-5 text-muted-foreground" />
                   <span>Project: {selectedTodoForDetails.project.name}</span>
                 </div>
               )}
             </div>
           </div>
           
-          {/* Action buttons at bottom */}
+          {/* Action buttons at bottom - Edit LEFT, Complete RIGHT */}
           <SheetFooter className="flex-row gap-3 sm:gap-3">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => {
+                if (selectedTodoForDetails) {
+                  handleEditTodo(selectedTodoForDetails);
+                  setShowDetailsDrawer(false);
+                }
+              }}
+              data-testid="button-edit-task"
+            >
+              Edit
+            </Button>
             {!selectedTodoForDetails?.completed && (
               <Button 
                 className="flex-1" 
@@ -826,24 +836,11 @@ export default function ToDos() {
                 Complete
               </Button>
             )}
-            <Button 
-              variant="outline" 
-              className="flex-1"
-              onClick={() => {
-                if (selectedTodoForDetails) {
-                  handleEditTodo(selectedTodoForDetails);
-                  setShowDetailsDrawer(false);
-                }
-              }}
-              data-testid="button-edit-task"
-            >
-              Edit
-            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
 
-      {/* Add/Edit Todo Dialog */}
+      {/* Add/Edit Todo Dialog - SIMPLIFIED FORM */}
       <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
         if (!open) {
           setShowAddDialog(false);
@@ -851,10 +848,8 @@ export default function ToDos() {
           setEditingTodo(null);
           setSelectedPhotoId(null);
           setSelectedPhotoUrl(null);
-          setDatePickerOpen(false);
           form.reset({
             title: "",
-            description: "",
             projectId: "",
             assignedTo: "",
             dueDate: "",
@@ -867,114 +862,8 @@ export default function ToDos() {
           </DialogHeader>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-            <div>
-              <Label htmlFor="title">Title *</Label>
-              <Input
-                id="title"
-                {...form.register("title")}
-                placeholder="What needs to be done?"
-                data-testid="input-todo-title"
-              />
-              {form.formState.errors.title && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.title.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                {...form.register("description")}
-                placeholder="Add details..."
-                rows={3}
-                data-testid="input-todo-description"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="projectId">Project (optional)</Label>
-              <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
-                <SelectTrigger id="projectId" data-testid="select-todo-project">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="assignedTo">Assign to *</Label>
-              <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo")}>
-                <SelectTrigger id="assignedTo" data-testid="select-todo-assignee">
-                  <SelectValue placeholder="Select team member" />
-                </SelectTrigger>
-                <SelectContent>
-                  {members.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.assignedTo && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.assignedTo.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label>Due Date (optional)</Label>
-              <div className="flex gap-2 mt-2">
-                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex-1 justify-start text-left font-normal h-12"
-                      data-testid="button-date-picker"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {form.watch("dueDate") ? (
-                        format(new Date(form.watch("dueDate")!), "PPP")
-                      ) : (
-                        <span className="text-muted-foreground">Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={form.watch("dueDate") ? new Date(form.watch("dueDate")!) : undefined}
-                      onSelect={(date) => {
-                        if (date) {
-                          form.setValue("dueDate", format(date, "yyyy-MM-dd"));
-                          setDatePickerOpen(false);
-                        }
-                      }}
-                      initialFocus
-                      data-testid="calendar-date-picker"
-                    />
-                  </PopoverContent>
-                </Popover>
-                
-                {form.watch("dueDate") && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="h-12 w-12 flex-shrink-0"
-                    onClick={() => form.setValue("dueDate", "")}
-                    data-testid="button-clear-date"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
+            
+            {/* 1. PHOTO FIRST - At the very top */}
             <div>
               <Label>Attach Photo (optional)</Label>
               <div className="flex gap-2 mt-2">
@@ -982,7 +871,7 @@ export default function ToDos() {
                   type="button"
                   variant="outline"
                   onClick={handleCameraClick}
-                  className="flex-1"
+                  className="flex-1 h-12"
                   data-testid="button-camera"
                 >
                   <Camera className="w-4 h-4 mr-2" />
@@ -992,7 +881,7 @@ export default function ToDos() {
                   type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1"
+                  className="flex-1 h-12"
                   data-testid="button-album"
                 >
                   <Upload className="w-4 h-4 mr-2" />
@@ -1031,6 +920,68 @@ export default function ToDos() {
                 </div>
               )}
             </div>
+
+            {/* 2. TITLE - Only required field */}
+            <div>
+              <Label htmlFor="title">What needs to be done? *</Label>
+              <Input
+                id="title"
+                {...form.register("title")}
+                placeholder="Sweep upstairs"
+                className="h-12 mt-2"
+                data-testid="input-todo-title"
+              />
+              {form.formState.errors.title && (
+                <p className="text-sm text-destructive mt-1">{form.formState.errors.title.message}</p>
+              )}
+            </div>
+
+            {/* 3. ASSIGN TO - Optional */}
+            <div>
+              <Label htmlFor="assignedTo">Assign to (optional)</Label>
+              <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
+                <SelectTrigger id="assignedTo" className="h-12 mt-2" data-testid="select-todo-assignee">
+                  <SelectValue placeholder="Select team member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 4. DUE DATE - Optional, native HTML5 date picker */}
+            <div>
+              <Label htmlFor="dueDate">Due Date (optional)</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                {...form.register("dueDate")}
+                className="h-12 mt-2 w-full"
+                data-testid="input-due-date"
+              />
+            </div>
+
+            {/* Project selector - optional, hidden if in project context */}
+            <div>
+              <Label htmlFor="projectId">Project (optional)</Label>
+              <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
+                <SelectTrigger id="projectId" className="h-12 mt-2" data-testid="select-todo-project">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             </div>
 
             <DialogFooter className="flex-shrink-0">
@@ -1038,19 +989,19 @@ export default function ToDos() {
                 setShowAddDialog(false);
                 setShowEditDialog(false);
                 setEditingTodo(null);
-                setDatePickerOpen(false);
-              }}>
+              }} className="h-12">
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                disabled={createMutation.isPending || updateMutation.isPending} 
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="h-12"
                 data-testid="button-submit-todo"
               >
-                {editingTodo 
-                  ? (updateMutation.isPending ? "Updating..." : "Update")
-                  : (createMutation.isPending ? "Creating..." : "Create")
-                }
+                {createMutation.isPending || updateMutation.isPending ? (
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                ) : null}
+                {editingTodo ? "Update To-Do" : "Create To-Do"}
               </Button>
             </DialogFooter>
           </form>

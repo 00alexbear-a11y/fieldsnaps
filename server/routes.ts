@@ -1547,9 +1547,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
 
+      // Default assignedTo to creator if not provided
+      const assignedTo = req.body.assignedTo || user.id;
+
       // Verify assignee is in same company (allow self-assignment)
-      if (req.body.assignedTo !== user.id) {
-        const assignee = await storage.getUser(req.body.assignedTo);
+      if (assignedTo !== user.id) {
+        const assignee = await storage.getUser(assignedTo);
         if (!assignee) {
           return handleError(res, errors.validation("Assignee user not found"));
         }
@@ -1565,6 +1568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validated = insertTodoSchema.parse({
         ...req.body,
+        assignedTo, // Use computed assignedTo (defaults to creator)
         createdBy: user.id,
       });
       
