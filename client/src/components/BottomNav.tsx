@@ -44,11 +44,14 @@ export default function BottomNav() {
   const isOnSharePage = location.startsWith('/share/');
   const shouldHideNav = isOnCamera || isOnProjectDetail || isOnPhotoEdit || isOnSharePage;
 
+  // Don't render at all if should be hidden
+  if (shouldHideNav) {
+    return null;
+  }
+
   return (
     <nav
-      className={`fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-inset-bottom transition-transform duration-300 ease-in-out ${
-        shouldHideNav ? 'translate-y-full' : 'translate-y-0'
-      }`}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-inset-bottom"
       data-testid="nav-bottom"
     >
       <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe">
