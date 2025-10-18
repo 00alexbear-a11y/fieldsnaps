@@ -1129,6 +1129,22 @@ export default function ProjectPhotos() {
                       data-testid={`card-todo-${todo.id}`}
                     >
                       <div className="flex items-center gap-2">
+                        {/* Completion checkbox */}
+                        <Checkbox
+                          checked={todo.completed}
+                          onCheckedChange={(checked) => {
+                            if (!checked && todo.completed) {
+                              // Uncompleting - would need an API endpoint for this
+                              toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                            } else if (checked && !todo.completed) {
+                              completeTaskMutation.mutate(todo.id);
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex-shrink-0"
+                          data-testid={`checkbox-todo-complete-${todo.id}`}
+                        />
+
                         {/* Photo thumbnail if available */}
                         {todo.photo && (
                           <div
