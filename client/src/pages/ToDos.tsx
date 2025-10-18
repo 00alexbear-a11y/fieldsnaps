@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -527,6 +528,22 @@ export default function ToDos() {
                   data-testid={`card-todo-${todo.id}`}
                 >
                   <div className="flex items-center gap-2">
+                    {/* Completion checkbox */}
+                    <Checkbox
+                      checked={todo.completed}
+                      onCheckedChange={(checked) => {
+                        if (!checked && todo.completed) {
+                          // Uncompleting - would need an API endpoint for this
+                          toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                        } else if (checked && !todo.completed) {
+                          completeMutation.mutate(todo.id);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-shrink-0"
+                      data-testid={`checkbox-todo-complete-${todo.id}`}
+                    />
+
                     {/* Photo thumbnail if available - 60px square */}
                     {todo.photo && (
                       <div
@@ -626,6 +643,22 @@ export default function ToDos() {
                 data-testid={`card-todo-${todo.id}`}
               >
                 <div className="flex items-center gap-2">
+                  {/* Completion checkbox */}
+                  <Checkbox
+                    checked={todo.completed}
+                    onCheckedChange={(checked) => {
+                      if (!checked && todo.completed) {
+                        // Uncompleting - would need an API endpoint for this
+                        toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                      } else if (checked && !todo.completed) {
+                        completeMutation.mutate(todo.id);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0"
+                    data-testid={`checkbox-todo-complete-${todo.id}`}
+                  />
+
                   {/* Photo thumbnail if available - 60px square */}
                   {todo.photo && (
                     <div
