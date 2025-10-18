@@ -127,16 +127,16 @@ export default function SyncBanner() {
   if (isSyncing) {
     return (
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
-        <div className="h-1 bg-blue-200 dark:bg-blue-900 relative">
+        <div className="h-1 bg-primary/20 relative">
           <div 
-            className="absolute top-0 left-0 h-full bg-blue-600 animate-[slide-progress_1.5s_ease-in-out_infinite]" 
+            className="absolute top-0 left-0 h-full bg-primary animate-[slide-progress_1.5s_ease-in-out_infinite]" 
             style={{ width: '40%' }}
           />
         </div>
         <div className="px-4 py-1.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-            <span className="text-sm font-medium text-blue-600">
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            <span className="text-sm font-medium text-primary">
               Syncing {syncStatus.photos} photo{syncStatus.photos === 1 ? '' : 's'}...
             </span>
           </div>

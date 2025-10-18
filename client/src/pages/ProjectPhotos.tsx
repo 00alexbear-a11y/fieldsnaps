@@ -1660,7 +1660,7 @@ export default function ProjectPhotos() {
                 const tagColorMap: Record<string, string> = {
                   red: "bg-red-500",
                   yellow: "bg-yellow-500",
-                  blue: "bg-blue-500",
+                  blue: "bg-primary",
                   orange: "bg-orange-500",
                   gray: "bg-gray-500",
                 };
