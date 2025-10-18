@@ -1135,6 +1135,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         url: objectPath,
         mediaType: req.body.mediaType || 'photo', // Default to 'photo' if not provided
         caption: req.body.caption || req.file.originalname,
+        width: req.body.width ? parseInt(req.body.width) : undefined,
+        height: req.body.height ? parseInt(req.body.height) : undefined,
         photographerId,
         photographerName,
       });

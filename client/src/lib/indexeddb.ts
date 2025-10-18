@@ -12,6 +12,8 @@ export interface LocalPhoto {
   mediaType: 'photo' | 'video'; // Distinguish between photos and videos
   // url is NOT stored - create on-demand from blob using createPhotoUrl()
   caption?: string;
+  width?: number; // Original photo width in pixels
+  height?: number; // Original photo height in pixels
   quality: 'standard' | 'detailed' | 'quick';
   timestamp: number;
   location?: {
