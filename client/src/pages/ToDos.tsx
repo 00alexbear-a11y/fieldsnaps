@@ -78,11 +78,27 @@ export default function ToDos() {
           dueDate: formData.dueDate || '',
         });
         
-        // Attach the photo - now using server photoId directly
+        // Attach the photo - fetch photo details to get the URL
         setSelectedPhotoId(photoId);
-        // Construct the photo URL from the server photoId
-        setSelectedPhotoUrl(`/api/photos/${photoId}/download`);
-        toast({ title: "Photo attached!" });
+        
+        // Fetch photo details to get the URL
+        fetch(`/api/photos/${photoId}`)
+          .then(res => {
+            if (!res.ok) throw new Error('Photo not found');
+            return res.json();
+          })
+          .then(photo => {
+            setSelectedPhotoUrl(photo.url);
+            toast({ title: "Photo attached!" });
+          })
+          .catch(err => {
+            console.error('Failed to fetch photo:', err);
+            toast({ 
+              title: "Failed to attach photo", 
+              description: "Photo may still be uploading",
+              variant: "destructive" 
+            });
+          });
         
         // Clean up
         localStorage.removeItem('todo-form-draft');
