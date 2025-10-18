@@ -103,6 +103,8 @@ export const photos = pgTable("photos", {
   url: text("url").notNull(),
   mediaType: varchar("media_type", { length: 10 }).default('photo').notNull(), // 'photo' or 'video'
   caption: text("caption"),
+  width: integer("width"), // Original photo width in pixels
+  height: integer("height"), // Original photo height in pixels
   photographerId: varchar("photographer_id").references(() => users.id), // Who took the photo
   photographerName: varchar("photographer_name"), // Cached name for offline display
   createdAt: timestamp("created_at").defaultNow().notNull(),
