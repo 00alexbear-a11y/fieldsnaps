@@ -457,4 +457,9 @@
   [data-radix-select-viewport] {
     z-index: 100 !important;
   }
+
+  /* Smooth transitions for photo grid pinch-to-zoom */
+  .photo-grid-container {
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
