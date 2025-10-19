@@ -2134,11 +2134,11 @@ export function PhotoAnnotationEditor({
 
       {/* Upper Controls Row - Annotation Tools (matches camera zoom/tag controls) */}
       <div className="flex-shrink-0 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10 pointer-events-auto relative" style={{ zIndex: 1000 }}>
-        <div ref={controlsScrollRef} className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide pointer-events-auto">
+        <div ref={controlsScrollRef} className="flex items-center justify-center gap-4 overflow-x-auto overflow-y-visible scrollbar-hide pointer-events-auto">
           {/* Collapsible Color Picker */}
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {colorPickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg z-50 pointer-events-auto">
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg pointer-events-auto" style={{ zIndex: 2000 }}>
                 <div className="flex flex-col gap-2">
                   {colors.map((color) => (
                     <button
@@ -2185,9 +2185,9 @@ export function PhotoAnnotationEditor({
           </div>
 
           {/* Collapsible Size Selector */}
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {sizePickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg z-50 pointer-events-auto">
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg pointer-events-auto" style={{ zIndex: 2000 }}>
                 <div className="flex flex-col gap-1">
                   {strokeSizes.map((size) => (
                     <button
