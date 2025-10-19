@@ -2138,12 +2138,14 @@ export function PhotoAnnotationEditor({
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {colorPickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg pointer-events-auto" style={{ zIndex: 2000 }}>
+              <div className="fixed left-4 bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ bottom: '100px', zIndex: 9999 }}>
                 <div className="flex flex-col gap-2">
                   {colors.map((color) => (
                     <button
                       key={color.value}
+                      type="button"
                       onClick={() => {
+                        console.log('Color selected:', color.name);
                         setSelectedColor(color.value);
                         setColorPickerExpanded(false);
                         if (selectedAnnotation) {
@@ -2187,12 +2189,14 @@ export function PhotoAnnotationEditor({
           {/* Collapsible Size Selector */}
           <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {sizePickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg pointer-events-auto" style={{ zIndex: 2000 }}>
-                <div className="flex flex-col gap-1">
+              <div className="fixed left-20 bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ bottom: '100px', zIndex: 9999 }}>
+                <div className="flex flex-col gap-2">
                   {strokeSizes.map((size) => (
                     <button
                       key={size.value}
+                      type="button"
                       onClick={() => {
+                        console.log('Size selected:', size.name);
                         setStrokeWidth(size.value);
                         setSizePickerExpanded(false);
                       }}
