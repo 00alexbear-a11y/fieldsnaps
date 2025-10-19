@@ -1298,6 +1298,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.caption = req.body.caption;
       }
       
+      // Handle projectId (for moving photos between projects)
+      if (req.body.projectId !== undefined) {
+        updateData.projectId = req.body.projectId;
+      }
+      
       const validated = insertPhotoSchema.partial().parse(updateData);
       const updated = await storage.updatePhoto(req.params.id, validated);
       if (!updated) {
