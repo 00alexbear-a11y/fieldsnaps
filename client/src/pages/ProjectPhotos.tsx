@@ -1012,7 +1012,11 @@ export default function ProjectPhotos() {
 
   useEffect(() => {
     const gridElement = document.getElementById('photo-grid');
-    if (!gridElement) return;
+    if (!gridElement) {
+      console.log('[Pinch] Grid element not found');
+      return;
+    }
+    console.log('[Pinch] Attaching gesture listeners to photo-grid');
 
     const getTouchDistance = (touch1: Touch, touch2: Touch): number => {
       const dx = touch1.clientX - touch2.clientX;
@@ -1020,8 +1024,10 @@ export default function ProjectPhotos() {
       return Math.sqrt(dx * dx + dy * dy);
     };
 
+    // Touch-based pinch gestures (mobile)
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 2) {
+        console.log('[Pinch] Touch pinch started');
         e.preventDefault(); // Prevent native pinch zoom immediately
         const distance = getTouchDistance(e.touches[0], e.touches[1]);
         touchStartDistanceRef.current = distance;
@@ -1040,26 +1046,54 @@ export default function ProjectPhotos() {
         const newColumnCount = Math.max(1, Math.min(10, initialColumnCountRef.current - columnChange));
         
         if (newColumnCount !== columnCount) {
+          console.log(`[Pinch] Touch pinch: ${columnCount} -> ${newColumnCount} columns`);
           setColumnCount(newColumnCount);
         }
       }
     };
 
     const handleTouchEnd = () => {
+      if (touchStartDistanceRef.current !== null) {
+        console.log('[Pinch] Touch pinch ended');
+      }
       touchStartDistanceRef.current = null;
       initialColumnCountRef.current = null;
+    };
+
+    // Trackpad/desktop pinch gestures (Ctrl+wheel)
+    const handleWheel = (e: WheelEvent) => {
+      // Check if it's a pinch gesture (Ctrl key + wheel)
+      if (e.ctrlKey) {
+        e.preventDefault();
+        console.log('[Pinch] Desktop pinch detected, deltaY:', e.deltaY);
+        
+        // deltaY < 0 means pinch out (zoom in) -> fewer columns (larger photos)
+        // deltaY > 0 means pinch in (zoom out) -> more columns (smaller photos)
+        const delta = -e.deltaY;
+        
+        // Scale factor: ~100 deltaY = 1 column change
+        const columnChange = Math.round(delta / 100);
+        const newColumnCount = Math.max(1, Math.min(10, columnCount + columnChange));
+        
+        if (newColumnCount !== columnCount) {
+          console.log(`[Pinch] Desktop pinch: ${columnCount} -> ${newColumnCount} columns`);
+          setColumnCount(newColumnCount);
+        }
+      }
     };
 
     gridElement.addEventListener('touchstart', handleTouchStart, { passive: false });
     gridElement.addEventListener('touchmove', handleTouchMove, { passive: false });
     gridElement.addEventListener('touchend', handleTouchEnd);
+    gridElement.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
       gridElement.removeEventListener('touchstart', handleTouchStart);
       gridElement.removeEventListener('touchmove', handleTouchMove);
       gridElement.removeEventListener('touchend', handleTouchEnd);
+      gridElement.removeEventListener('wheel', handleWheel);
     };
-  }, [columnCount]);
+  }, [columnCount, photos.length]); // Re-run when photos load
 
   // Get grid style based on column count
   const getGridStyle = (): React.CSSProperties => {
@@ -1516,7 +1550,7 @@ export default function ProjectPhotos() {
               </div>
             )}
             
-            <div className="space-y-8">
+            <div id="photo-grid" className="space-y-8">
             {photosByDate.map(({ date, photos: datePhotos }) => (
               <div key={date} data-testid={`date-group-${date}`}>
                 {/* Date Header with Checkbox */}
@@ -1535,7 +1569,7 @@ export default function ProjectPhotos() {
                 </div>
                 
                 {/* Photos Grid */}
-                <div id="photo-grid" style={getGridStyle()}>
+                <div className="photo-grid-container" style={getGridStyle()}>
                   {datePhotos.map((photo) => {
                     const photoIndex = filteredPhotos.findIndex(p => p.id === photo.id);
                     const isSelected = selectedPhotoIds.has(photo.id);
