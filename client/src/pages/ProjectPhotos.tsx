@@ -65,7 +65,7 @@ export default function ProjectPhotos() {
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [photoSize, setPhotoSize] = useState<'S' | 'M' | 'L'>('M');
-  const [activeTab, setActiveTab] = useState<'photos' | 'tasks'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'tasks' | 'pdfs'>('photos');
   const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
   const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -82,6 +82,10 @@ export default function ProjectPhotos() {
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/projects", projectId],
+  });
+
+  const { data: company } = useQuery<any>({
+    queryKey: ["/api/companies/me"],
   });
 
   const { data: allProjects = [] } = useQuery<Project[]>({
@@ -122,6 +126,28 @@ export default function ProjectPhotos() {
     },
     enabled: activeTab === 'tasks',
   });
+
+  // Fetch PDFs for this project
+  const { data: pdfs = [] } = useQuery<any[]>({
+    queryKey: ["/api/projects", projectId, "pdfs"],
+    enabled: activeTab === 'pdfs',
+  });
+
+  // Initialize export options from company PDF settings
+  useEffect(() => {
+    if (company) {
+      setExportOptions(prev => ({
+        ...prev,
+        photosPerPage: (company.pdfDefaultGridLayout || 2) as 1 | 2 | 3 | 4,
+        includeTimestamp: company.pdfIncludeTimestamp ?? prev.includeTimestamp,
+        includeTags: company.pdfIncludeTags ?? prev.includeTags,
+        includeComments: prev.includeComments, // Keep existing for comments
+        includeName: prev.includeName,
+        includeDate: prev.includeDate,
+        includeProjectHeader: prev.includeProjectHeader,
+      }));
+    }
+  }, [company]);
 
   // Filter photos by selected tags (for use in viewer and display)
   const filteredPhotos = useMemo(() => {
@@ -227,6 +253,22 @@ export default function ProjectPhotos() {
       toast({ 
         title: "Failed to update project icon", 
         description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deletePdfMutation = useMutation({
+    mutationFn: async (pdfId: string) => {
+      await apiRequest("DELETE", `/api/pdfs/${pdfId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "pdfs"] });
+      toast({ title: "PDF deleted successfully" });
+    },
+    onError: () => {
+      toast({ 
+        title: "Failed to delete PDF", 
         variant: "destructive" 
       });
     },
@@ -782,7 +824,41 @@ export default function ProjectPhotos() {
           ? `${project.name.replace(/[^a-z0-9]/gi, '_')}_photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`
           : `photos_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
         
+        // Get PDF as blob for uploading to Object Storage
+        const pdfBlob = doc.output('blob');
+        
+        // Download to user's device
         doc.save(fileName);
+
+        // Upload to Object Storage and create DB record
+        try {
+          const formData = new FormData();
+          formData.append('pdf', pdfBlob, fileName);
+          formData.append('photoCount', successCount.toString());
+          formData.append('gridLayout', exportOptions.photosPerPage.toString());
+          formData.append('settings', JSON.stringify({
+            includeProjectHeader: exportOptions.includeProjectHeader,
+            includeName: exportOptions.includeName,
+            includeDate: exportOptions.includeDate,
+            includeTimestamp: exportOptions.includeTimestamp,
+            includeTags: exportOptions.includeTags,
+            includeComments: exportOptions.includeComments,
+          }));
+          
+          const uploadRes = await fetch(`/api/projects/${projectId}/pdfs`, {
+            method: 'POST',
+            credentials: 'include',
+            body: formData,
+          });
+          
+          if (uploadRes.ok) {
+            // Invalidate PDFs query to show the new PDF in the PDFs tab
+            queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "pdfs"] });
+          }
+        } catch (uploadError) {
+          console.error('Failed to upload PDF to storage:', uploadError);
+          // Don't show error to user since local download still worked
+        }
 
         if (failureCount > 0) {
           toast({
@@ -1021,26 +1097,31 @@ export default function ProjectPhotos() {
             >
               Tasks ({projectTasks.length})
             </button>
+            <button
+              onClick={() => setActiveTab('pdfs')}
+              className={`py-3 px-1 border-b-2 transition-colors ${
+                activeTab === 'pdfs'
+                  ? 'border-primary text-primary font-medium'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+              data-testid="tab-pdfs"
+            >
+              PDFs ({pdfs.length})
+            </button>
           </div>
           
           {/* Photo size selector - only show on Photos tab */}
           {activeTab === 'photos' && (
-            <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted" data-testid="photo-size-selector">
-              {(['S', 'M', 'L'] as const).map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setPhotoSize(size)}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                    photoSize === size
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover-elevate'
-                  }`}
-                  data-testid={`button-size-${size}`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
+            <Select value={photoSize} onValueChange={(value: 'S' | 'M' | 'L') => setPhotoSize(value)}>
+              <SelectTrigger className="w-28" data-testid="select-photo-size">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="S">Small</SelectItem>
+                <SelectItem value="M">Medium</SelectItem>
+                <SelectItem value="L">Large</SelectItem>
+              </SelectContent>
+            </Select>
           )}
         </div>
       </div>
@@ -1206,6 +1287,56 @@ export default function ProjectPhotos() {
                     </Card>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'pdfs' ? (
+          // PDFs View
+          <div className="max-w-screen-lg mx-auto space-y-4">
+            {pdfs.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h2 className="text-xl font-semibold mb-2">No PDFs generated yet</h2>
+                <p className="text-muted-foreground">Export photos to PDF using the Photos tab</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pdfs.map((pdf: any) => (
+                  <Card key={pdf.id} className="p-4 hover-elevate" data-testid={`pdf-item-${pdf.id}`}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center">
+                        <FileText className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium truncate" data-testid={`pdf-filename-${pdf.id}`}>{pdf.filename}</h3>
+                        <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                          <span>{pdf.photoCount} photos</span>
+                          <span>•</span>
+                          <span>{format(new Date(pdf.createdAt), 'MMM d, yyyy')}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(pdf.storageUrl, '_blank')}
+                          data-testid={`button-download-pdf-${pdf.id}`}
+                        >
+                          Download
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deletePdfMutation.mutate(pdf.id)}
+                          disabled={deletePdfMutation.isPending}
+                          data-testid={`button-delete-pdf-${pdf.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             )}
           </div>
