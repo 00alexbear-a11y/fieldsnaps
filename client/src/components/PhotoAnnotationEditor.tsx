@@ -2133,8 +2133,8 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Upper Controls Row - Annotation Tools (matches camera zoom/tag controls) */}
-      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10 pointer-events-auto">
-        <div ref={controlsScrollRef} className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide">
+      <div className="flex-shrink-0 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10 pointer-events-auto relative" style={{ zIndex: 1000 }}>
+        <div ref={controlsScrollRef} className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide pointer-events-auto">
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0">
             {colorPickerExpanded && (
@@ -2172,12 +2172,13 @@ export function PhotoAnnotationEditor({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 console.log('Color picker clicked, current state:', colorPickerExpanded);
                 setColorPickerExpanded(!colorPickerExpanded);
                 setSizePickerExpanded(false);
               }}
-              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10 transition-all flex-shrink-0"
-              style={{ backgroundColor: selectedColor }}
+              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10 transition-all flex-shrink-0 pointer-events-auto cursor-pointer"
+              style={{ backgroundColor: selectedColor, zIndex: 1001 }}
               data-testid="button-color-picker"
               aria-label="Color picker"
             />
@@ -2213,17 +2214,19 @@ export function PhotoAnnotationEditor({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 console.log('Size picker clicked, current state:', sizePickerExpanded);
                 setSizePickerExpanded(!sizePickerExpanded);
                 setColorPickerExpanded(false);
               }}
-              className={`h-10 w-10 rounded-full text-xs font-semibold transition-all flex-shrink-0 ${
+              className={`h-10 w-10 rounded-full text-xs font-semibold transition-all flex-shrink-0 pointer-events-auto cursor-pointer ${
                 strokeWidth === strokeSizes[0].value
                   ? 'bg-white text-black'
                   : strokeWidth === strokeSizes[1].value
                   ? 'bg-white text-black'
                   : 'bg-white text-black'
               }`}
+              style={{ zIndex: 1001 }}
               data-testid="button-size-picker"
             >
               {strokeSizes.find(s => s.value === strokeWidth)?.name || 'M'}
