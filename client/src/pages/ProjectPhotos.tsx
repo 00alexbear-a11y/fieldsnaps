@@ -1228,6 +1228,36 @@ export default function ProjectPhotos() {
               PDFs ({pdfs.length})
             </button>
           </div>
+          {activeTab === 'photos' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" data-testid="button-grid-size">
+                  <Grid3x3 className="w-4 h-4 mr-2" />
+                  Grid Size
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => changeGridSize(10)}
+                  data-testid="menu-grid-small"
+                >
+                  Small (10 columns)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => changeGridSize(5)}
+                  data-testid="menu-grid-medium"
+                >
+                  Medium (5 columns)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => changeGridSize(3)}
+                  data-testid="menu-grid-large"
+                >
+                  Large (3 columns)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -1678,34 +1708,6 @@ export default function ProjectPhotos() {
                 <FileText className="w-4 h-4 mr-2" />
                 Export PDF
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" data-testid="button-grid-size">
-                    <Grid3x3 className="w-4 h-4 mr-2" />
-                    Grid Size
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => changeGridSize(10)}
-                    data-testid="menu-grid-small"
-                  >
-                    Small (10 columns)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => changeGridSize(5)}
-                    data-testid="menu-grid-medium"
-                  >
-                    Medium (5 columns)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => changeGridSize(3)}
-                    data-testid="menu-grid-large"
-                  >
-                    Large (3 columns)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         </div>
