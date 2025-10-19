@@ -2124,9 +2124,9 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Bottom Toolbar - Matches Camera View */}
-      <div className="flex-shrink-0 z-50 bg-black/50 backdrop-blur-md px-4 py-3 border-t border-white/10 pointer-events-auto">
-        <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide">
+      {/* Upper Controls Row - Annotation Tools (matches camera zoom/tag controls) */}
+      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10 pointer-events-auto">
+        <div className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide">
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0">
             {colorPickerExpanded && (
@@ -2167,7 +2167,7 @@ export function PhotoAnnotationEditor({
                 setColorPickerExpanded(!colorPickerExpanded);
                 setSizePickerExpanded(false);
               }}
-              className="h-10 w-10 rounded-full border-2 border-white/40 hover-elevate"
+              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10"
               style={{ backgroundColor: selectedColor }}
               data-testid="button-color-picker"
               aria-label="Color picker"
@@ -2187,7 +2187,7 @@ export function PhotoAnnotationEditor({
                         setSizePickerExpanded(false);
                       }}
                       data-testid={`button-size-${size.name.toLowerCase()}`}
-                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
                         strokeWidth === size.value 
                           ? 'bg-white text-black' 
                           : 'text-white/80 hover:text-white hover:bg-white/10'
@@ -2202,12 +2202,12 @@ export function PhotoAnnotationEditor({
             )}
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => {
                 setSizePickerExpanded(!sizePickerExpanded);
                 setColorPickerExpanded(false);
               }}
-              className={`h-10 px-4 text-xs font-semibold ${
+              className={`h-10 w-10 rounded-full text-xs font-semibold ${
                 strokeWidth === strokeSizes[0].value
                   ? 'bg-white text-black'
                   : strokeWidth === strokeSizes[1].value
@@ -2305,28 +2305,28 @@ export function PhotoAnnotationEditor({
         </div>
       </div>
 
-      {/* Cancel and Save Buttons - Bottom Corners */}
-      <div className="fixed bottom-4 left-4 z-50 pointer-events-auto">
+      {/* Bottom Action Rail - Cancel and Save (matches camera Back/Video/Camera/Edit buttons) */}
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10 pointer-events-auto">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleCancel}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
           data-testid="button-cancel"
-          className="rounded-full hover-elevate w-12 h-12 bg-black/80 backdrop-blur-md text-white"
-          aria-label="Cancel"
         >
           <X className="w-6 h-6" />
+          <span className="text-[10px]">Cancel</span>
         </Button>
-      </div>
-      <div className="fixed bottom-4 right-4 z-50 pointer-events-auto">
+        
         <Button
+          variant="ghost"
           size="icon"
           onClick={handleSave}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
           data-testid="button-save-annotations"
-          className="rounded-full hover-elevate w-12 h-12 bg-primary text-primary-foreground shadow-lg"
-          aria-label="Save"
         >
           <Check className="w-6 h-6" />
+          <span className="text-[10px]">Save</span>
         </Button>
       </div>
 
