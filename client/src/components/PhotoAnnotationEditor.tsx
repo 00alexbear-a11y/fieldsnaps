@@ -169,6 +169,8 @@ export function PhotoAnnotationEditor({
   const [tempAnnotation, setTempAnnotation] = useState<Annotation | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [zoomCirclePos, setZoomCirclePos] = useState<{ x: number; y: number } | null>(null);
+  const [colorPickerExpanded, setColorPickerExpanded] = useState(false);
+  const [sizePickerExpanded, setSizePickerExpanded] = useState(false);
   
   // Multi-touch gesture state
   const [isMultiTouch, setIsMultiTouch] = useState(false);
@@ -2069,49 +2071,11 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="fixed inset-0 bg-muted/30 pointer-events-none flex items-center justify-center">
-      {/* Canvas Container - Vertically Centered */}
-      <div className="relative w-full max-w-4xl mx-auto pointer-events-none" style={{ marginTop: '-40px' }}>
-        {/* Horizontal Color Picker - Above Photo */}
-        <div className="absolute -top-16 left-0 right-0 z-40 flex justify-center px-2 pointer-events-auto">
-          <div className="bg-black/60 backdrop-blur-md rounded-full px-3 py-2 shadow-lg flex items-center gap-2 max-w-full overflow-x-auto"
-            style={{ 
-              scrollbarWidth: 'none', 
-              msOverflowStyle: 'none'
-            }}
-          >
-            {colors.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => {
-                  console.log("[PhotoEdit] Color selected:", color.name, color.value);
-                  setSelectedColor(color.value);
-                  
-                  // If there's a selected annotation, update its color
-                  if (selectedAnnotation) {
-                    const updatedAnnotations = annotations.map(anno => 
-                      anno.id === selectedAnnotation 
-                        ? { ...anno, color: color.value }
-                        : anno
-                    );
-                    setAnnotations(updatedAnnotations);
-                    addToHistory(updatedAnnotations);
-                    redrawCanvas();
-                  }
-                }}
-                className={`w-10 h-10 rounded-full border hover-elevate transition-all flex-shrink-0 ${
-                  selectedColor === color.value ? 'border-white border-2 ring-2 ring-white/50 scale-110' : 'border-white/40 border-2'
-                }`}
-                style={{ backgroundColor: color.value }}
-                data-testid={`button-color-${color.name.toLowerCase()}`}
-                aria-label={`Color ${color.name}`}
-              />
-            ))}
-          </div>
-        </div>
-
+    <div className="fixed inset-0 bg-black flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
+      {/* Canvas Container - Takes up available space */}
+      <div className="relative flex-1 min-h-0 w-full flex items-center justify-center pointer-events-none">
         {/* Canvas - Centered */}
-        <div className="relative w-full px-4 pointer-events-none flex items-center justify-center" style={{ maxHeight: '70vh' }}>
+        <div className="relative w-full px-4 pointer-events-none flex items-center justify-center" style={{ maxHeight: '100%' }}>
         <img
           ref={imageRef}
           alt="Photo to annotate"
@@ -2147,120 +2111,186 @@ export function PhotoAnnotationEditor({
           />
         )}
         </div>
+      </div>
 
-        {/* Tool Buttons - Below Photo - Single Row */}
-        <div className="absolute -bottom-20 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
-          <div className="bg-black/80 backdrop-blur-md rounded-3xl px-3 py-2 shadow-lg max-w-full overflow-x-auto"
-            style={{ 
-              scrollbarWidth: 'none', 
-              msOverflowStyle: 'none'
-            }}
+      {/* Bottom Toolbar - Matches Camera View */}
+      <div className="flex-shrink-0 z-50 bg-black/50 backdrop-blur-md px-4 py-3 border-t border-white/10 pointer-events-auto">
+        <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide">
+          {/* Collapsible Color Picker */}
+          <div className="relative flex-shrink-0">
+            {colorPickerExpanded && (
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg">
+                <div className="flex flex-col gap-2">
+                  {colors.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => {
+                        setSelectedColor(color.value);
+                        setColorPickerExpanded(false);
+                        if (selectedAnnotation) {
+                          const updatedAnnotations = annotations.map(anno => 
+                            anno.id === selectedAnnotation 
+                              ? { ...anno, color: color.value }
+                              : anno
+                          );
+                          setAnnotations(updatedAnnotations);
+                          addToHistory(updatedAnnotations);
+                          redrawCanvas();
+                        }
+                      }}
+                      className={`w-10 h-10 rounded-full border-2 hover-elevate transition-all ${
+                        selectedColor === color.value ? 'border-white ring-2 ring-white/50' : 'border-white/40'
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                      data-testid={`button-color-${color.name.toLowerCase()}`}
+                      aria-label={`Color ${color.name}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setColorPickerExpanded(!colorPickerExpanded);
+                setSizePickerExpanded(false);
+              }}
+              className="h-10 w-10 rounded-full border-2 border-white/40 hover-elevate"
+              style={{ backgroundColor: selectedColor }}
+              data-testid="button-color-picker"
+              aria-label="Color picker"
+            />
+          </div>
+
+          {/* Collapsible Size Selector */}
+          <div className="relative flex-shrink-0">
+            {sizePickerExpanded && (
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg">
+                <div className="flex flex-col gap-1">
+                  {strokeSizes.map((size) => (
+                    <button
+                      key={size.value}
+                      onClick={() => {
+                        setStrokeWidth(size.value);
+                        setSizePickerExpanded(false);
+                      }}
+                      data-testid={`button-size-${size.name.toLowerCase()}`}
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                        strokeWidth === size.value 
+                          ? 'bg-white text-black' 
+                          : 'text-white/80 hover:text-white hover:bg-white/10'
+                      }`}
+                      aria-label={`Size ${size.name}`}
+                    >
+                      {size.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSizePickerExpanded(!sizePickerExpanded);
+                setColorPickerExpanded(false);
+              }}
+              className={`h-10 px-4 text-xs font-semibold ${
+                strokeWidth === strokeSizes[0].value
+                  ? 'bg-white text-black'
+                  : strokeWidth === strokeSizes[1].value
+                  ? 'bg-white text-black'
+                  : 'bg-white text-black'
+              }`}
+              data-testid="button-size-picker"
+            >
+              {strokeSizes.find(s => s.value === strokeWidth)?.name || 'M'}
+            </Button>
+          </div>
+
+          {/* Tool Buttons */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTextDialogOpen(true)}
+            data-testid="button-tool-text"
+            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+            aria-label="Add text"
           >
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTextDialogOpen(true)}
-                data-testid="button-tool-text"
-                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
-                aria-label="Add text"
-              >
-                <Type className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={tool === "arrow" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setTool(tool === "arrow" ? null : "arrow")}
-                data-testid="button-tool-arrow"
-                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "arrow" ? "hover-elevate" : "text-white hover-elevate"}`}
-                aria-label="Arrow tool"
-              >
-                <ArrowUpRight className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={tool === "line" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setTool(tool === "line" ? null : "line")}
-                data-testid="button-tool-line"
-                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "line" ? "hover-elevate" : "text-white hover-elevate"}`}
-                aria-label="Line tool"
-              >
-                <Minus className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={tool === "circle" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setTool(tool === "circle" ? null : "circle")}
-                data-testid="button-tool-circle"
-                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "circle" ? "hover-elevate" : "text-white hover-elevate"}`}
-                aria-label="Circle tool"
-              >
-                <Circle className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={tool === "pen" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setTool(tool === "pen" ? null : "pen")}
-                data-testid="button-tool-pen"
-                className={`rounded-full w-12 h-12 flex-shrink-0 ${tool === "pen" ? "hover-elevate" : "text-white hover-elevate"}`}
-                aria-label="Pen tool"
-              >
-                <Pen className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMeasurementDialogOpen(true)}
-                data-testid="button-tool-measurement"
-                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
-                aria-label="Tape measure"
-              >
-                <Ruler className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleUndo}
-                disabled={historyIndex === 0}
-                data-testid="button-undo"
-                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
-                aria-label="Undo"
-              >
-                <Undo className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
-                data-testid="button-delete"
-                className="rounded-full hover-elevate w-12 h-12 text-white flex-shrink-0"
-                aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* S/M/L Size Selector - Below Tool Buttons */}
-        <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
-          <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
-            {strokeSizes.map((size) => (
-              <button
-                key={size.value}
-                onClick={() => setStrokeWidth(size.value)}
-                data-testid={`button-size-${size.name.toLowerCase()}`}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                  strokeWidth === size.value 
-                    ? 'bg-white text-black' 
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-                aria-label={`Size ${size.name}`}
-              >
-                {size.name}
-              </button>
-            ))}
-          </div>
+            <Type className="w-5 h-5" />
+          </Button>
+          <Button
+            variant={tool === "arrow" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setTool(tool === "arrow" ? null : "arrow")}
+            data-testid="button-tool-arrow"
+            className={`h-10 w-10 flex-shrink-0 ${tool === "arrow" ? "" : "text-white hover:bg-white/10"}`}
+            aria-label="Arrow tool"
+          >
+            <ArrowUpRight className="w-5 h-5" />
+          </Button>
+          <Button
+            variant={tool === "line" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setTool(tool === "line" ? null : "line")}
+            data-testid="button-tool-line"
+            className={`h-10 w-10 flex-shrink-0 ${tool === "line" ? "" : "text-white hover:bg-white/10"}`}
+            aria-label="Line tool"
+          >
+            <Minus className="w-5 h-5" />
+          </Button>
+          <Button
+            variant={tool === "circle" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setTool(tool === "circle" ? null : "circle")}
+            data-testid="button-tool-circle"
+            className={`h-10 w-10 flex-shrink-0 ${tool === "circle" ? "" : "text-white hover:bg-white/10"}`}
+            aria-label="Circle tool"
+          >
+            <Circle className="w-5 h-5" />
+          </Button>
+          <Button
+            variant={tool === "pen" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setTool(tool === "pen" ? null : "pen")}
+            data-testid="button-tool-pen"
+            className={`h-10 w-10 flex-shrink-0 ${tool === "pen" ? "" : "text-white hover:bg-white/10"}`}
+            aria-label="Pen tool"
+          >
+            <Pen className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMeasurementDialogOpen(true)}
+            data-testid="button-tool-measurement"
+            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+            aria-label="Tape measure"
+          >
+            <Ruler className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleUndo}
+            disabled={historyIndex === 0}
+            data-testid="button-undo"
+            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0 disabled:opacity-30"
+            aria-label="Undo"
+          >
+            <Undo className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
+            data-testid="button-delete"
+            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+            aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
+          >
+            <Trash2 className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 
