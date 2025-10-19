@@ -1658,7 +1658,7 @@ export default function ProjectPhotos() {
 
       {/* Selection Toolbar */}
       {isSelectMode && (
-        <div className="fixed bottom-48 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
+        <div className="fixed bottom-20 left-0 right-0 z-30 bg-card/95 backdrop-blur-md border-t border-border p-4 safe-area-inset-bottom animate-in slide-in-from-bottom">
           <div className="max-w-screen-sm mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <span className="text-sm font-medium flex-shrink-0">
               {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} selected
