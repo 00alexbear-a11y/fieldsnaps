@@ -447,8 +447,8 @@ export default function Settings() {
           >
             <div className="flex-1">
               <div className="font-medium">Quick (S)</div>
-              <div className="text-sm text-muted-foreground">~200 KB per photo</div>
-              <div className="text-xs text-muted-foreground mt-1">Fast upload, good for previews</div>
+              <div className="text-sm text-muted-foreground">~200 KB • 1280x960 pixels</div>
+              <div className="text-xs text-muted-foreground mt-1">Fast upload, good for progress photos and daily documentation</div>
             </div>
             <input
               type="radio"
@@ -468,8 +468,8 @@ export default function Settings() {
           >
             <div className="flex-1">
               <div className="font-medium">Standard (M)</div>
-              <div className="text-sm text-muted-foreground">~500 KB per photo</div>
-              <div className="text-xs text-muted-foreground mt-1">Balanced quality and size</div>
+              <div className="text-sm text-muted-foreground">~500 KB • 1920x1440 pixels</div>
+              <div className="text-xs text-muted-foreground mt-1">Balanced quality and file size for general use and client sharing</div>
             </div>
             <input
               type="radio"
@@ -489,8 +489,8 @@ export default function Settings() {
           >
             <div className="flex-1">
               <div className="font-medium">Detailed (L)</div>
-              <div className="text-sm text-muted-foreground">~1 MB per photo</div>
-              <div className="text-xs text-muted-foreground mt-1">High quality for important shots</div>
+              <div className="text-sm text-muted-foreground">~1 MB • 2560x1920 pixels</div>
+              <div className="text-xs text-muted-foreground mt-1">Maximum quality for defect documentation and project closeout</div>
             </div>
             <input
               type="radio"

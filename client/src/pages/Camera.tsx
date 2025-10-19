@@ -44,6 +44,16 @@ interface Project {
   completed?: boolean;
 }
 
+interface Photo {
+  id: string;
+  url: string;
+}
+
+interface ProjectWithCounts extends Project {
+  photoCount: number;
+  coverPhoto?: Photo;
+}
+
 interface CameraDevice {
   deviceId: string;
   label: string;
@@ -146,13 +156,13 @@ export default function Camera() {
     }
   }, [location]);
 
-  const { data: allProjects = [] } = useQuery<Project[]>({
-    queryKey: ['/api/projects'],
+  const { data: allProjectsWithCounts = [] } = useQuery<ProjectWithCounts[]>({
+    queryKey: ['/api/projects/with-counts'],
   });
 
   const projects = useMemo(() => 
-    allProjects.filter(project => !project.completed),
-    [allProjects]
+    allProjectsWithCounts.filter(project => !project.completed),
+    [allProjectsWithCounts]
   );
 
   const { data: tags = [] } = useQuery<Tag[]>({
@@ -1162,7 +1172,7 @@ export default function Camera() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pt-6 pb-24">
-          <div className="max-w-2xl mx-auto grid grid-cols-1 gap-3">
+          <div className="max-w-2xl mx-auto space-y-2">
             {filteredProjects.map((project) => (
               <button
                 key={project.id}
@@ -1170,17 +1180,37 @@ export default function Camera() {
                   setSelectedProject(project.id);
                   setShowProjectSelection(false);
                 }}
-                className="group w-full p-5 rounded-2xl bg-card border border-border hover-elevate active-elevate-2 transition-all"
+                className="group w-full flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-card border border-border hover-elevate active-elevate-2 transition-all"
                 data-testid={`button-select-project-${project.id}`}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <CameraIcon className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <h3 className="text-lg font-medium text-foreground">
+                {/* Cover Photo - matches SwipeableProjectCard */}
+                <div className="flex-shrink-0">
+                  {project.coverPhoto ? (
+                    <img
+                      src={project.coverPhoto.url}
+                      alt={project.name}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover"
+                      data-testid={`img-cover-${project.id}`}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-muted/50 backdrop-blur-sm flex items-center justify-center border border-border/30">
+                      <Home className="w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground/70" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Project Info - matches SwipeableProjectCard layout */}
+                <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold truncate text-left" data-testid={`text-project-name-${project.id}`}>
                       {project.name}
                     </h3>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground text-left">
+                      <CameraIcon className="w-3.5 h-3.5" />
+                      <span data-testid={`text-photo-count-${project.id}`}>
+                        {project.photoCount || 0} {project.photoCount === 1 ? 'photo' : 'photos'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </button>
