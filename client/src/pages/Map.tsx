@@ -62,12 +62,22 @@ export default function Map() {
     script.async = true;
     script.defer = true;
     
-    window.initMap = () => {
-      setIsMapLoaded(true);
-    };
-
     script.onload = () => {
-      setIsMapLoaded(true);
+      // Wait for google.maps.Map to actually be available
+      const checkMapReady = setInterval(() => {
+        if (window.google?.maps?.Map) {
+          setIsMapLoaded(true);
+          clearInterval(checkMapReady);
+        }
+      }, 50);
+      
+      // Fallback timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkMapReady);
+        if (!window.google?.maps?.Map) {
+          console.error('Google Maps API failed to load within timeout');
+        }
+      }, 10000);
     };
 
     document.head.appendChild(script);
@@ -85,24 +95,34 @@ export default function Map() {
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current || googleMapRef.current) return;
 
-    const defaultCenter = { lat: 37.7749, lng: -122.4194 }; // San Francisco
-    
-    googleMapRef.current = new window.google.maps.Map(mapRef.current, {
-      center: defaultCenter,
-      zoom: 12,
-      gestureHandling: 'greedy', // Enable one-finger panning on mobile
-      mapTypeControl: true,
-      streetViewControl: false,
-      fullscreenControl: false,
-      zoomControl: true,
-      styles: [
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }],
-        },
-      ],
-    });
+    // Double-check that Google Maps API is actually available
+    if (!window.google?.maps?.Map) {
+      console.error('Google Maps API not ready yet');
+      return;
+    }
+
+    try {
+      const defaultCenter = { lat: 37.7749, lng: -122.4194 }; // San Francisco
+      
+      googleMapRef.current = new window.google.maps.Map(mapRef.current, {
+        center: defaultCenter,
+        zoom: 12,
+        gestureHandling: 'greedy', // Enable one-finger panning on mobile
+        mapTypeControl: true,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: true,
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }],
+          },
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to initialize Google Maps:', error);
+    }
   }, [isMapLoaded]);
 
   // Add markers for projects

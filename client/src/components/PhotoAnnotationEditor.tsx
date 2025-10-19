@@ -345,20 +345,7 @@ export function PhotoAnnotationEditor({
             
             ctx.restore();
             
-            // Draw handles (outside transformation)
-            if (isSelected) {
-              ctx.save();
-              ctx.translate(annotation.position.x, annotation.position.y);
-              ctx.rotate((rotation * Math.PI) / 180);
-              ctx.scale(scale, scale);
-              
-              // Scale handle (right side)
-              drawHandle(ctx, textWidth, 0, "#3b82f6");
-              // Rotation handle (top center)
-              drawHandle(ctx, textWidth / 2, -textHeight / 2 - 20, "#22c55e");
-              
-              ctx.restore();
-            }
+            // No handles drawn - use gesture controls (1-finger drag, 2-finger pinch/rotate)
           }
           break;
         case "arrow":
@@ -599,20 +586,7 @@ export function PhotoAnnotationEditor({
             
             ctx.restore();
             
-            // Draw handles if selected (outside transformation)
-            if (isSelected) {
-              ctx.save();
-              ctx.translate(annotation.position.x, annotation.position.y);
-              ctx.rotate((rotation * Math.PI) / 180);
-              ctx.scale(scale, scale);
-              
-              // Scale handle (right side)
-              drawHandle(ctx, lineLength / 2, 0, "#3b82f6");
-              // Rotation handle (top center)
-              drawHandle(ctx, 0, -capHeight - fontSize / 2 - 30, "#22c55e");
-              
-              ctx.restore();
-            }
+            // No handles drawn - use gesture controls (1-finger drag, 2-finger pinch/rotate)
           }
           break;
       }
@@ -715,104 +689,10 @@ export function PhotoAnnotationEditor({
     
     switch (anno.type) {
       case "text":
-        if (anno.content) {
-          const canvas = canvasRef.current;
-          const ctx = canvas?.getContext("2d");
-          if (ctx) {
-            const fontSize = anno.fontSize || 20;
-            const rotation = anno.rotation || 0;
-            const scale = anno.scale || 1;
-            
-            ctx.font = `${fontSize}px Arial`;
-            const textMetrics = ctx.measureText(anno.content);
-            const textWidth = textMetrics.width;
-            const textHeight = fontSize;
-            
-            // Transform point to text's local coordinate system
-            const dx = x - anno.position.x;
-            const dy = y - anno.position.y;
-            const rad = (-rotation * Math.PI) / 180;
-            const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
-            const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
-            
-            // Check rotation handle (top center)
-            const rotateHandleX = textWidth / 2;
-            const rotateHandleY = -textHeight / 2 - 20;
-            const distanceToRotate = Math.sqrt(
-              Math.pow(localX - rotateHandleX, 2) + Math.pow(localY - rotateHandleY, 2)
-            );
-            if (distanceToRotate <= handleSize / 2) {
-              return "rotate";
-            }
-            
-            // Check scale handle (right side)
-            const scaleHandleX = textWidth;
-            const scaleHandleY = 0;
-            const distanceToScale = Math.sqrt(
-              Math.pow(localX - scaleHandleX, 2) + Math.pow(localY - scaleHandleY, 2)
-            );
-            if (distanceToScale <= handleSize / 2) {
-              return "corner";
-            }
-          }
-        }
-        break;
       case "measurement":
-        if (anno.feet !== undefined && anno.inches !== undefined) {
-          const canvas = canvasRef.current;
-          const ctx = canvas?.getContext("2d");
-          if (ctx) {
-            const fontSize = anno.fontSize || 20;
-            const rotation = anno.rotation || 0;
-            const scale = anno.scale || 1;
-            
-            // Create measurement text
-            let measurementText = "";
-            if (anno.feet > 0) {
-              measurementText = `${anno.feet}'`;
-            }
-            if (anno.inches > 0) {
-              measurementText += `${anno.inches}"`;
-            }
-            if (!measurementText) {
-              measurementText = "0\"";
-            }
-            
-            ctx.font = `bold ${fontSize}px Arial`;
-            const textMetrics = ctx.measureText(measurementText);
-            const textWidth = textMetrics.width;
-            const lineLength = Math.max(textWidth + 80, 200);
-            const capHeight = 20;
-            
-            // Transform point to measurement's local coordinate system
-            const dx = x - anno.position.x;
-            const dy = y - anno.position.y;
-            const rad = (-rotation * Math.PI) / 180;
-            const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / scale;
-            const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
-            
-            // Check rotation handle (top center, above text)
-            const rotateHandleX = 0;
-            const rotateHandleY = -capHeight - fontSize / 2 - 30;
-            const distanceToRotate = Math.sqrt(
-              Math.pow(localX - rotateHandleX, 2) + Math.pow(localY - rotateHandleY, 2)
-            );
-            if (distanceToRotate <= handleSize / 2) {
-              return "rotate";
-            }
-            
-            // Check scale handle (right side of line)
-            const scaleHandleX = lineLength / 2;
-            const scaleHandleY = 0;
-            const distanceToScale = Math.sqrt(
-              Math.pow(localX - scaleHandleX, 2) + Math.pow(localY - scaleHandleY, 2)
-            );
-            if (distanceToScale <= handleSize / 2) {
-              return "corner";
-            }
-          }
-        }
-        break;
+        // No handles for text/measurement - use gesture controls instead
+        // 1-finger drag to move, 2-finger pinch to scale, 2-finger rotate to rotate
+        return null;
       case "arrow":
       case "line":
         if (anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
@@ -925,7 +805,7 @@ export function PhotoAnnotationEditor({
               const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / scale;
               
               // Check if click is within measurement bounds (line + text area)
-              const padding = 15;
+              const padding = 40; // Increased for glove-friendly selection
               if (
                 localX >= -lineLength / 2 - padding &&
                 localX <= lineLength / 2 + padding &&
@@ -940,7 +820,7 @@ export function PhotoAnnotationEditor({
         case "arrow":
         case "line":
           if (anno.position.x2 !== undefined && anno.position.y2 !== undefined) {
-            const tolerance = 10;
+            const tolerance = 30; // Increased for glove-friendly selection
             const distance = distanceToLineSegment(
               x, y,
               anno.position.x, anno.position.y,
@@ -989,7 +869,7 @@ export function PhotoAnnotationEditor({
             const distance = Math.sqrt(
               Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
             );
-            const tolerance = 10;
+            const tolerance = 30; // Increased for glove-friendly selection
             if (Math.abs(distance - anno.position.width) < tolerance) {
               return anno;
             }
@@ -997,7 +877,7 @@ export function PhotoAnnotationEditor({
           break;
         case "pen":
           if (anno.position.points && anno.position.points.length > 0) {
-            const tolerance = 10;
+            const tolerance = 30; // Increased for glove-friendly selection
             for (let i = 0; i < anno.position.points.length - 1; i++) {
               const distance = distanceToLineSegment(
                 x, y,
@@ -1404,7 +1284,7 @@ export function PhotoAnnotationEditor({
       setIsDrawing(false);
       setStartPos(null);
       setZoomCirclePos(null);
-      setTool(null); // Auto-deselect tool after creating annotation
+      // Tool persistence: Keep tool selected for multiple placements
     }
   };
 
@@ -1415,8 +1295,8 @@ export function PhotoAnnotationEditor({
     // Detect multi-touch gestures (2 fingers)
     if (e.touches.length === 2 && selectedAnnotation) {
       const anno = annotations.find(a => a.id === selectedAnnotation);
-      // Only enable multi-touch for text annotations
-      if (anno && anno.type === "text") {
+      // Enable multi-touch for text and measurement annotations
+      if (anno && (anno.type === "text" || anno.type === "measurement")) {
         setIsMultiTouch(true);
         
         // Calculate initial distance between fingers
@@ -1530,9 +1410,10 @@ export function PhotoAnnotationEditor({
       while (newRotation > 180) newRotation -= 360;
       while (newRotation < -180) newRotation += 360;
       
-      // Apply transformations
+      // Apply transformations to both text and measurement annotations
       const updatedAnnotations = annotations.map(a => {
-        if (a.id !== selectedAnnotation || a.type !== "text") return a;
+        if (a.id !== selectedAnnotation) return a;
+        if (a.type !== "text" && a.type !== "measurement") return a;
         
         return {
           ...a,
@@ -1800,7 +1681,7 @@ export function PhotoAnnotationEditor({
       setIsDrawing(false);
       setStartPos(null);
       setZoomCirclePos(null);
-      setTool(null); // Auto-deselect tool after creating annotation
+      // Tool persistence: Keep tool selected for multiple placements
     }
   };
 
@@ -2290,7 +2171,12 @@ export function PhotoAnnotationEditor({
 
         {/* Tool Buttons - Below Photo - Single Row */}
         <div className="absolute -bottom-20 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
-          <div className="bg-black/80 backdrop-blur-md rounded-3xl px-4 py-3 shadow-lg">
+          <div className="bg-black/80 backdrop-blur-md rounded-3xl px-3 py-2 shadow-lg max-w-full overflow-x-auto"
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none'
+            }}
+          >
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
