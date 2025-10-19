@@ -5,7 +5,8 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertTaskSchema, insertTodoSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema } from "../shared/schema";
+import { z } from "zod";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
@@ -605,6 +606,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDF Settings Routes
+  const pdfSettingsSchema = z.object({
+    pdfCompanyName: z.string().max(255).optional(),
+    pdfCompanyAddress: z.string().optional(),
+    pdfCompanyPhone: z.string().max(50).optional(),
+    pdfHeaderText: z.string().optional(),
+    pdfFooterText: z.string().optional(),
+    pdfFontFamily: z.enum(['Arial', 'Helvetica', 'Times']).optional(),
+    pdfFontSizeTitle: z.number().int().min(12).max(48).optional(),
+    pdfFontSizeHeader: z.number().int().min(10).max(32).optional(),
+    pdfFontSizeBody: z.number().int().min(8).max(24).optional(),
+    pdfFontSizeCaption: z.number().int().min(6).max(16).optional(),
+    pdfDefaultGridLayout: z.number().int().min(1).max(4).optional(),
+    pdfIncludeTimestamp: z.boolean().optional(),
+    pdfIncludeTags: z.boolean().optional(),
+    pdfIncludeAnnotations: z.boolean().optional(),
+    pdfIncludeSignatureLine: z.boolean().optional(),
+  });
+
+  app.put("/api/companies/pdf-settings", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only the owner can update PDF settings
+      const company = await storage.getCompany(user.companyId);
+      if (!company || company.ownerId !== userId) {
+        return res.status(403).json({ error: "Only the billing owner can update PDF settings" });
+      }
+
+      // Validate PDF settings with Zod
+      const validated = pdfSettingsSchema.parse(req.body);
+
+      await storage.updateCompany(company.id, validated);
+      const updatedCompany = await storage.getCompany(company.id);
+
+      res.json(updatedCompany);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.post("/api/companies/pdf-logo", isAuthenticated, upload.single('logo'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only the owner can upload logo
+      const company = await storage.getCompany(user.companyId);
+      if (!company || company.ownerId !== userId) {
+        return res.status(403).json({ error: "Only the billing owner can upload logo" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No logo file provided" });
+      }
+
+      // Validate it's an image
+      if (!req.file.mimetype.startsWith('image/')) {
+        return res.status(400).json({ error: "Logo must be an image file" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+
+      // Get presigned upload URL
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+
+      // Upload to object storage
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: req.file.buffer,
+        headers: {
+          'Content-Type': req.file.mimetype,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+      }
+
+      // Set ACL policy - logo should be public so it can be included in PDFs
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        uploadURL,
+        {
+          owner: userId,
+          visibility: "public",
+        }
+      );
+
+      // Update company with logo URL
+      await storage.updateCompany(company.id, { pdfLogoUrl: objectPath });
+
+      res.json({ logoUrl: objectPath });
+    } catch (error: any) {
+      console.error('Logo upload error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Object Storage routes - Referenced from blueprint:javascript_object_storage
   // Endpoint for serving private objects (photos) with ACL checks
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
@@ -998,6 +1106,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({ token: share.token });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // PDF Routes
+  app.get("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const pdfsForProject = await storage.getProjectPdfs(req.params.projectId);
+      res.json(pdfsForProject);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Validate with insertPdfSchema, adding projectId and createdBy
+      const validated = insertPdfSchema.parse({
+        ...req.body,
+        projectId: req.params.projectId,
+        createdBy: userId,
+      });
+
+      const pdf = await storage.createPdf(validated);
+
+      res.status(201).json(pdf);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.delete("/api/pdfs/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      const pdf = await storage.getPdf(req.params.id);
+      if (!pdf) {
+        return res.status(404).json({ error: "PDF not found" });
+      }
+
+      // Verify PDF's project belongs to user's company
+      const project = await storage.getProject(pdf.projectId);
+      if (!project || project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Delete from object storage
+      try {
+        const objectStorageService = new ObjectStorageService();
+        await objectStorageService.deleteObjectEntity(pdf.storageUrl);
+      } catch (error) {
+        console.error('Failed to delete PDF from object storage:', error);
+        // Continue with database deletion even if object storage deletion fails
+      }
+
+      const deleted = await storage.deletePdf(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "PDF not found" });
+      }
+
+      res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -65,6 +65,27 @@ export default function Settings() {
   // Team management state
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const [showCancellationWarning, setShowCancellationWarning] = useState(false);
+
+  // PDF settings state
+  const [pdfSettings, setPdfSettings] = useState({
+    pdfCompanyName: '',
+    pdfCompanyAddress: '',
+    pdfCompanyPhone: '',
+    pdfHeaderText: '',
+    pdfFooterText: '',
+    pdfFontFamily: 'Arial' as 'Arial' | 'Helvetica' | 'Times',
+    pdfFontSizeTitle: 24,
+    pdfFontSizeHeader: 16,
+    pdfFontSizeBody: 12,
+    pdfFontSizeCaption: 10,
+    pdfDefaultGridLayout: 2,
+    pdfIncludeTimestamp: true,
+    pdfIncludeTags: true,
+    pdfIncludeAnnotations: true,
+    pdfIncludeSignatureLine: false,
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   // Company data
   const { data: company } = useQuery<Company>({
