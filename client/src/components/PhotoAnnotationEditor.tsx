@@ -2168,14 +2168,15 @@ export function PhotoAnnotationEditor({
                 </div>
               </div>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Color picker clicked, current state:', colorPickerExpanded);
                 setColorPickerExpanded(!colorPickerExpanded);
                 setSizePickerExpanded(false);
               }}
-              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10"
+              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10 transition-all flex-shrink-0"
               style={{ backgroundColor: selectedColor }}
               data-testid="button-color-picker"
               aria-label="Color picker"
@@ -2208,14 +2209,15 @@ export function PhotoAnnotationEditor({
                 </div>
               </div>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Size picker clicked, current state:', sizePickerExpanded);
                 setSizePickerExpanded(!sizePickerExpanded);
                 setColorPickerExpanded(false);
               }}
-              className={`h-10 w-10 rounded-full text-xs font-semibold ${
+              className={`h-10 w-10 rounded-full text-xs font-semibold transition-all flex-shrink-0 ${
                 strokeWidth === strokeSizes[0].value
                   ? 'bg-white text-black'
                   : strokeWidth === strokeSizes[1].value
@@ -2225,7 +2227,7 @@ export function PhotoAnnotationEditor({
               data-testid="button-size-picker"
             >
               {strokeSizes.find(s => s.value === strokeWidth)?.name || 'M'}
-            </Button>
+            </button>
           </div>
 
           {/* Tool Buttons */}
