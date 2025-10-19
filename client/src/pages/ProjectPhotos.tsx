@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -1006,108 +1006,16 @@ export default function ProjectPhotos() {
     }
   };
 
-  // Pinch gesture refs for synchronous access during touch events
-  const touchStartDistanceRef = useRef<number | null>(null);
-  const initialColumnCountRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const gridElement = document.getElementById('photo-grid');
-    if (!gridElement) {
-      console.log('[Pinch] Grid element not found');
-      return;
+  // Helper function to change grid size with smooth transitions
+  const changeGridSize = (newColumnCount: number) => {
+    if ('startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        setColumnCount(newColumnCount);
+      });
+    } else {
+      setColumnCount(newColumnCount);
     }
-    console.log('[Pinch] Attaching gesture listeners to photo-grid');
-
-    const getTouchDistance = (touch1: Touch, touch2: Touch): number => {
-      const dx = touch1.clientX - touch2.clientX;
-      const dy = touch1.clientY - touch2.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    // Touch-based pinch gestures (mobile)
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        console.log('[Pinch] Touch pinch started');
-        e.preventDefault(); // Prevent native pinch zoom immediately
-        const distance = getTouchDistance(e.touches[0], e.touches[1]);
-        touchStartDistanceRef.current = distance;
-        initialColumnCountRef.current = columnCount;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2 && touchStartDistanceRef.current !== null && initialColumnCountRef.current !== null) {
-        e.preventDefault(); // Continue preventing default pinch zoom
-        const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-        const distanceChange = currentDistance - touchStartDistanceRef.current;
-        
-        // Scale factor: ~150px distance change = 1 column change
-        const columnChange = Math.round(distanceChange / 150);
-        const newColumnCount = Math.max(1, Math.min(10, initialColumnCountRef.current - columnChange));
-        
-        if (newColumnCount !== columnCount) {
-          console.log(`[Pinch] Touch pinch: ${columnCount} -> ${newColumnCount} columns`);
-          // Use View Transitions API for smooth animations
-          if ('startViewTransition' in document) {
-            (document as any).startViewTransition(() => {
-              setColumnCount(newColumnCount);
-            });
-          } else {
-            setColumnCount(newColumnCount);
-          }
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (touchStartDistanceRef.current !== null) {
-        console.log('[Pinch] Touch pinch ended');
-      }
-      touchStartDistanceRef.current = null;
-      initialColumnCountRef.current = null;
-    };
-
-    // Trackpad/desktop pinch gestures (Ctrl+wheel)
-    const handleWheel = (e: WheelEvent) => {
-      // Check if it's a pinch gesture (Ctrl key + wheel)
-      if (e.ctrlKey) {
-        e.preventDefault();
-        console.log('[Pinch] Desktop pinch detected, deltaY:', e.deltaY);
-        
-        // deltaY < 0 means pinch out (zoom in) -> fewer columns (larger photos)
-        // deltaY > 0 means pinch in (zoom out) -> more columns (smaller photos)
-        const delta = -e.deltaY;
-        
-        // Scale factor: ~100 deltaY = 1 column change
-        const columnChange = Math.round(delta / 100);
-        const newColumnCount = Math.max(1, Math.min(10, columnCount + columnChange));
-        
-        if (newColumnCount !== columnCount) {
-          console.log(`[Pinch] Desktop pinch: ${columnCount} -> ${newColumnCount} columns`);
-          // Use View Transitions API for smooth animations
-          if ('startViewTransition' in document) {
-            (document as any).startViewTransition(() => {
-              setColumnCount(newColumnCount);
-            });
-          } else {
-            setColumnCount(newColumnCount);
-          }
-        }
-      }
-    };
-
-    gridElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-    gridElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-    gridElement.addEventListener('touchend', handleTouchEnd);
-    gridElement.addEventListener('wheel', handleWheel, { passive: false });
-
-    return () => {
-      gridElement.removeEventListener('touchstart', handleTouchStart);
-      gridElement.removeEventListener('touchmove', handleTouchMove);
-      gridElement.removeEventListener('touchend', handleTouchEnd);
-      gridElement.removeEventListener('wheel', handleWheel);
-    };
-  }, [columnCount, photos.length]); // Re-run when photos load
+  };
 
   // Get grid style based on column count
   const getGridStyle = (): React.CSSProperties => {
@@ -1590,10 +1498,14 @@ export default function ProjectPhotos() {
                     return (
                       <div
                         key={photo.id}
+                        ref={(el) => {
+                          if (el) {
+                            el.style.setProperty('view-transition-name', `photo-${photo.id}`);
+                          }
+                        }}
                         className={`photo-grid-item relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
                           isSelectMode && isSelected ? 'ring-4 ring-primary' : ''
                         }`}
-                        style={{ viewTransitionName: `photo-${photo.id}` } as React.CSSProperties}
                         onClick={() => {
                           if (isSelectMode) {
                             togglePhotoSelection(photo.id);
@@ -1766,6 +1678,34 @@ export default function ProjectPhotos() {
                 <FileText className="w-4 h-4 mr-2" />
                 Export PDF
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" data-testid="button-grid-size">
+                    <Grid3x3 className="w-4 h-4 mr-2" />
+                    Grid Size
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => changeGridSize(10)}
+                    data-testid="menu-grid-small"
+                  >
+                    Small (10 columns)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => changeGridSize(5)}
+                    data-testid="menu-grid-medium"
+                  >
+                    Medium (5 columns)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => changeGridSize(3)}
+                    data-testid="menu-grid-large"
+                  >
+                    Large (3 columns)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
