@@ -184,52 +184,30 @@ export default function Camera() {
     }
   }, [tags]);
 
+  // Clear session photos on mount for fresh camera session
+  useEffect(() => {
+    sessionPhotosRef.current = [];
+    setSessionPhotos([]);
+    
+    // Clean up all camera session data from localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('camera-session-')) {
+        localStorage.removeItem(key);
+      }
+    });
+  }, []);
+
   const previousProjectRef = useRef<string>('');
   const currentProjectRef = useRef<string>('');
   useEffect(() => {
-    const sessionKey = selectedProject ? `camera-session-${selectedProject}` : null;
     currentProjectRef.current = selectedProject;
     
-    if (sessionKey) {
-      const saved = localStorage.getItem(sessionKey);
-      if (saved) {
-        try {
-          const photoIds = JSON.parse(saved) as string[];
-          const restoreForProject = selectedProject;
-          
-          Promise.all(photoIds.map(id => idb.getPhoto(id).catch(() => undefined)))
-            .then(photos => {
-              if (currentProjectRef.current === restoreForProject) {
-                const validPhotos = photos.filter(p => p !== undefined) as LocalPhoto[];
-                sessionPhotosRef.current = validPhotos;
-                setSessionPhotos(validPhotos);
-              }
-            })
-            .catch(e => {
-              console.error('[Camera] Failed to restore session:', e);
-            });
-        } catch (e) {
-          console.error('[Camera] Failed to restore session:', e);
-        }
-      }
-    }
-    
+    // Always start with fresh session - no restoration from localStorage
     if (previousProjectRef.current && previousProjectRef.current !== selectedProject) {
-      const oldKey = `camera-session-${previousProjectRef.current}`;
-      localStorage.removeItem(oldKey);
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
     }
     previousProjectRef.current = selectedProject;
-    
-    return () => {
-      if (!window.location.pathname.includes('/photo/') && !window.location.pathname.includes('/photo-edit')) {
-        if (sessionKey) {
-          localStorage.removeItem(sessionKey);
-        }
-        sessionPhotosRef.current = [];
-      }
-    };
   }, [selectedProject]);
 
   useEffect(() => {
@@ -831,11 +809,6 @@ export default function Camera() {
         
         sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
         setSessionPhotos([...sessionPhotosRef.current]);
-        
-        if (selectedProject) {
-          const photoIds = sessionPhotosRef.current.map(p => p.id);
-          localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
-        }
 
         // Navigate back to todos if in Photo Attachment Mode
         if (isAttachMode) {
@@ -966,11 +939,6 @@ export default function Camera() {
 
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
-      
-      if (selectedProject) {
-        const photoIds = sessionPhotosRef.current.map(p => p.id);
-        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
-      }
 
       // Navigate back to todos if in Photo Attachment Mode
       if (isAttachMode) {
@@ -1092,11 +1060,6 @@ export default function Camera() {
 
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
-      
-      if (selectedProject) {
-        const photoIds = sessionPhotosRef.current.map(p => p.id);
-        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
-      }
 
       URL.revokeObjectURL(compressionResult.url);
 
@@ -1130,11 +1093,6 @@ export default function Camera() {
       
       sessionPhotosRef.current = sessionPhotosRef.current.filter(p => p.id !== photoId);
       setSessionPhotos([...sessionPhotosRef.current]);
-      
-      if (selectedProject) {
-        const photoIds = sessionPhotosRef.current.map(p => p.id);
-        localStorage.setItem(`camera-session-${selectedProject}`, JSON.stringify(photoIds));
-      }
 
       toast({
         title: 'Photo deleted',
