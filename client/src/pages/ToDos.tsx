@@ -196,6 +196,35 @@ export default function ToDos() {
     mutationFn: async (todoId: string) => {
       return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
     },
+    onMutate: async (todoId: string) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['/api/todos'] });
+      
+      // Capture previous state for all todo queries before updating
+      const previousQueries: Array<{ queryKey: any; data: TodoWithDetails[] }> = [];
+      queryClient.getQueryCache().findAll({ queryKey: ['/api/todos'] }).forEach((query) => {
+        const data = query.state.data as TodoWithDetails[] | undefined;
+        if (data) {
+          previousQueries.push({ queryKey: query.queryKey, data });
+        }
+      });
+      
+      // Optimistically update all todo queries (including filtered views)
+      queryClient.setQueriesData<TodoWithDetails[]>(
+        { queryKey: ['/api/todos'] },
+        (old) => {
+          if (!old) return old;
+          return old.map(todo => 
+            todo.id === todoId 
+              ? { ...todo, completed: true, completedAt: new Date() }
+              : todo
+          );
+        }
+      );
+      
+      // Return context for potential rollback
+      return { previousQueries };
+    },
     onSuccess: () => {
       toast({ title: "To-do completed!" });
       // Small delay to show completion animation before task disappears from active view
@@ -203,7 +232,13 @@ export default function ToDos() {
         queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       }, 800);
     },
-    onError: () => {
+    onError: (error, variables, context) => {
+      // Rollback by restoring previous state for all todo queries
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
       toast({ title: "Failed to complete to-do", variant: "destructive" });
     },
   });
