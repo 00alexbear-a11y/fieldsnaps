@@ -234,11 +234,40 @@ export default function ProjectPhotos() {
 
   const movePhotosMutation = useMutation({
     mutationFn: async ({ photoIds, targetProjectId }: { photoIds: string[]; targetProjectId: string }) => {
-      // Move each photo to the target project
+      // Move each photo to the target project, preserving annotations and edited blobs
       await Promise.all(
-        photoIds.map(photoId => 
-          apiRequest("PATCH", `/api/photos/${photoId}`, { projectId: targetProjectId })
-        )
+        photoIds.map(async photoId => {
+          // Check if photo has annotations/edited blob in IndexedDB
+          const localPhoto = await idb.getPhoto(photoId);
+          
+          if (localPhoto && (localPhoto.blob || localPhoto.annotations)) {
+            // Photo has annotations or edited blob - send as FormData
+            const formData = new FormData();
+            formData.append('projectId', targetProjectId);
+            
+            if (localPhoto.blob) {
+              formData.append('photo', localPhoto.blob, `photo-${photoId}.jpg`);
+            }
+            
+            if (localPhoto.annotations) {
+              formData.append('annotations', localPhoto.annotations);
+            }
+            
+            // Send PATCH request with FormData
+            const response = await fetch(`/api/photos/${photoId}`, {
+              method: 'PATCH',
+              credentials: 'include',
+              body: formData,
+            });
+            
+            if (!response.ok) {
+              throw new Error(`Failed to move photo ${photoId}`);
+            }
+          } else {
+            // No annotations/blob - just update projectId
+            await apiRequest("PATCH", `/api/photos/${photoId}`, { projectId: targetProjectId });
+          }
+        })
       );
     },
     onSuccess: (_, variables) => {
