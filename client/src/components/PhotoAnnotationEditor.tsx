@@ -2243,7 +2243,7 @@ export function PhotoAnnotationEditor({
         </div>
 
         {/* S/M/L Size Selector - Below Tool Buttons */}
-        <div className="absolute -bottom-28 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
+        <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
           <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
             {strokeSizes.map((size) => (
               <button
