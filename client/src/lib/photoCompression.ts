@@ -32,9 +32,9 @@ export const QUALITY_PRESETS = {
     description: 'Standard - Best for most documentation',
   },
   detailed: {
-    targetSize: 1024 * 1024, // 1MB
+    targetSize: 1536 * 1024, // 1.5MB
     maxDimension: 2560,
-    quality: 0.92,
+    quality: 0.95,
     description: 'Detailed - High quality for important captures',
   },
   quick: {
