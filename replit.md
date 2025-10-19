@@ -1,7 +1,7 @@
 # FieldSnaps - Construction Photo PWA
 
 ## Overview
-FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide effortless, offline-reliable photo and video documentation to enhance efficiency and reduce disputes in construction projects. Key capabilities include instant media capture, smart compression, auto-timestamping, efficient project organization, and a mission-driven SaaS model that donates 20% of proceeds to missionaries. The project aims for full offline functionality and touch optimization, aspiring to become a commercial SaaS product.
+FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing offline-reliable photo and video documentation. Its core purpose is to enhance efficiency and reduce disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. It aims for full offline functionality and touch optimization, aspiring to be a commercial SaaS product with a mission-driven model donating 20% of proceeds to missionaries.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -18,48 +18,56 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 ## System Architecture
 
 ### UI/UX Decisions
-The design adheres to an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, subtle depth, and typography excellence, all based on an 8px grid. The color palette includes iOS Blue, Warm Gray, Success Green, Warning Orange, Pure White, and Light Gray. Interaction design incorporates fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar utilizing SF Symbols-inspired icons. The branding prominently features the FieldSnaps logo. The bottom navigation includes "Map," "Projects," "To-Do," and "Camera" tabs, with Settings accessible from the Projects page header.
+The design follows an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and an 8px grid. The color palette includes iOS Blue, Warm Gray, Success Green, Warning Orange, Pure White, and Light Gray. Interaction design incorporates fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar utilizing SF Symbols-inspired icons. The branding features the FieldSnaps logo. The bottom navigation includes "Map," "Projects," "To-Do," and "Camera" tabs, with Settings accessible from the Projects page header.
 
 ### Technical Implementations
-FieldSnaps is an offline-first PWA leveraging Service Workers for caching and IndexedDB for local photo and video storage. The Background Sync API manages queued uploads. Performance is optimized through lazy loading, Web Workers for image compression, and strict URL lifecycle management. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and **native aspect ratio preservation**. **All photos preserve their original aspect ratios** from all sources: (1) camera captures use device native resolution without aspect ratio constraints, and (2) manual file uploads preserve original dimensions without cropping, both converted to JPEG before storage. Each photo's width and height are stored in the database for accurate rendering. Photos and videos are stored in Replit Object Storage, using presigned URLs for upload and server-side ACL policies, with a `mediaType` field to distinguish between photos and videos. Camera functionality includes auto-start, instant capture workflows (Quick Capture, Capture & Edit), project-specific pre-selection, full-screen viewfinders, video recording with real-time annotation, and native HTML5 playback. **PDF export** supports flexible grid layouts (1, 2, 3, or 4 photos per page) with customizable detail options (project header, name, date, timestamp, tags, comments); all images preserve their native aspect ratios in PDFs without cropping or stretching, ensuring maximum context and quality for construction documentation. A Stripe-integrated subscription system includes a 7-day free trial, soft block enforcement, and a mission-focused billing success page. Project completion tracking allows marking projects as complete/incomplete. Photo sharing supports multi-photo selection, date-grouped timeline views, and public read-only share pages. Authentication uses Replit Auth with OpenID Connect and supports biometric login.
+FieldSnaps is an offline-first PWA utilizing Service Workers for caching and IndexedDB for local storage. The Background Sync API manages uploads. Performance is optimized via lazy loading and Web Workers for image compression. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and preserves native aspect ratios from all sources. Photos and videos are stored in Replit Object Storage, using presigned URLs and server-side ACL policies. Camera functionality includes auto-start, instant capture workflows, project-specific pre-selection, full-screen viewfinders, video recording with real-time annotation, and native HTML5 playback. PDF export supports flexible grid layouts (1, 2, 3, or 4 photos per page) with customizable detail options, ensuring images retain native aspect ratios. A Stripe-integrated subscription system includes a 7-day free trial and soft block enforcement. Project completion tracking and multi-photo sharing with date-grouped timeline views and public read-only pages are supported. Authentication uses Replit Auth with OpenID Connect and biometric login.
 
 ### Feature Specifications
-The application features a bottom navigation with "Map," "Projects," "To-Do," and "Camera" tabs. The camera interface uses a three-zone layout (≥75% viewfinder height): (1) compact header with project selector and flip camera button only; (2) dominant viewfinder (flex-1, displayed in 16:9 aspect ratio via CSS) with video stream, annotation canvas for recording, and horizontal session photo preview strip overlaid at bottom (last 5 photos with rounded thumbnails, video play icons, tag indicators); (3) controls row with quality toggle buttons (S/M/L), zoom controls (1x/2x/5x based on device), and auto-tag dropdown; (4) bottom action rail with four buttons in order: Back (navigates to previous page), Video (toggles recording state), Camera (instant photo capture), To-Do (capture → annotate → create assigned task), and Edit Mode (photo → annotation editor). Photos are captured at full original resolution without any cropping, while the viewfinder displays in 16:9 aspect ratio for optimal screen space usage. 
-
-The To-Do system enables team task management with photo attachments. Users can create tasks from captured photos (camera → annotate → assign), view tasks in three contexts (My Tasks: assigned to me, Team Tasks: all company tasks, I Created: tasks I created), filter by status (Active/Completed), and complete/delete tasks. Tasks include title, description, optional project/photo linking, assignment to team members, and completion tracking. The workflow integrates seamlessly: capture issue with camera, annotate on photo, create assigned to-do.
-
-Project organization is card-based with photo counts, search, and address buttons, and the ability to filter and mark projects as complete. Photo management offers grid and timeline views, swipe actions, batch selection, and controls for editing, sharing, commenting, deleting, and renaming. The Photo Annotation Editor features a centered visual island layout that adapts to photos of any aspect ratio: S/M/L size selector at top (top-36, below zoom circle), horizontal color picker above tool buttons showing all 10 colors (bottom-20), tool buttons centered at bottom (text, arrow, line, circle, pen, tape measure, undo, delete), and Cancel/Save buttons in bottom corners. Text annotations support scaling and rotation. The tape measure annotation tool renders measurements as horizontal lines with end caps displaying feet'inches" format above (e.g., "5'9"", "10'0"", "0'6""), and supports drag-to-move, rotation, and scaling like text annotations. Photo auto-naming follows the format `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view for geocoded projects, a 30-day trash bin for soft-deleted items, and bulk photo move functionality.
+The application features a bottom navigation. The camera interface uses a three-zone layout with a compact header, dominant 16:9 viewfinder, and controls for quality, zoom, and auto-tagging, plus an action rail for capture and task creation. Photos are captured at full original resolution. The To-Do system enables team task management with photo attachments, viewable in "My Tasks," "Team Tasks," and "I Created" contexts, with filtering by status. Project organization is card-based with photo counts, search, address buttons, and completion marking. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout adapting to any aspect ratio, with size, color, and tool selectors (text, arrow, line, circle, pen, tape measure). Text annotations support scaling and rotation. The tape measure tool renders measurements in feet'inches". Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
 
 ### System Design Choices
-The build philosophy emphasizes simplicity and invisible interface design. The PWA infrastructure relies on a Service Worker for hourly updates and offline caching. The storage strategy uses IndexedDB for Blob storage, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query optimization, sync queue optimization (batch processing, smart prioritization, exponential backoff), and database indexing.
+The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage uses IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing.
 
 ## External Dependencies
 
 ### Frontend
-- **React**: JavaScript library for building user interfaces.
-- **TypeScript**: Superset of JavaScript that adds static typing.
-- **Vite**: Next-generation frontend tooling.
+- **React**: UI library.
+- **TypeScript**: Typed JavaScript.
+- **Vite**: Frontend tooling.
 - **Tailwind CSS**: Utility-first CSS framework.
-- **shadcn/ui**: Component library for React.
-- **Wouter**: A tiny routing library for React.
-- **TanStack Query**: Asynchronous state management library.
+- **shadcn/ui**: React component library.
+- **Wouter**: Routing library.
+- **TanStack Query**: Asynchronous state management.
 
 ### Backend
-- **Express.js**: Web application framework for Node.js.
+- **Express.js**: Node.js web framework.
 - **PostgreSQL**: Relational database (Replit built-in).
-- **Drizzle ORM**: TypeScript ORM for relational databases.
-- **Replit Object Storage**: Cloud object storage for persistent photo storage.
+- **Drizzle ORM**: TypeScript ORM.
+- **Replit Object Storage**: Cloud object storage.
 
 ### PWA Technologies
-- **Service Worker API**: For offline caching and background processes.
-- **Web Manifest**: For PWA installation and metadata.
-- **IndexedDB**: Client-side storage for structured data and Blobs.
-- **Background Sync API**: For deferring network operations.
+- **Service Worker API**: Offline caching and background processes.
+- **Web Manifest**: PWA installation and metadata.
+- **IndexedDB**: Client-side structured data storage.
+- **Background Sync API**: Deferring network operations.
 
 ### Authentication
-- **Replit Auth**: For user authentication.
-- **SimpleWebAuthn**: Library for WebAuthn/FIDO2 biometric authentication.
+- **Replit Auth**: User authentication.
+- **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication.
+
+### Native Platform & OTA Updates
+- **Capacitor 6**: Native wrapper for iOS/Android.
+- **Capgo**: Encrypted over-the-air (OTA) updates.
+
+### Capacitor Plugins
+- **@capacitor/core**: Core functionality.
+- **@capacitor/app**: App lifecycle management.
+- **@capacitor/device**: Device information.
+- **@capacitor/preferences**: Native storage for app preferences.
+- **@capacitor/filesystem**: Native file system access.
+- **@capacitor/camera**: Native camera integration (currently using `getUserMedia`).
 
 ### Third-Party APIs
-- **Google Geocoding API**: For converting addresses to latitude/longitude coordinates.
-- **Stripe**: For subscription management and payment processing.
+- **Google Geocoding API**: Address to coordinates conversion.
+- **Stripe**: Subscription management and payment processing.

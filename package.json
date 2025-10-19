@@ -11,6 +11,16 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/camera": "^7.0.2",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/device": "^7.0.2",
+    "@capacitor/filesystem": "^7.1.4",
+    "@capacitor/ios": "^7.4.3",
+    "@capacitor/preferences": "^7.0.2",
+    "@capgo/capacitor-updater": "^7.22.0",
+    "@capgo/cli": "^7.17.6",
     "@google-cloud/storage": "^7.17.2",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
