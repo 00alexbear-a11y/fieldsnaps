@@ -2070,27 +2070,6 @@ export function PhotoAnnotationEditor({
 
   return (
     <div className="fixed inset-0 bg-muted/30 pointer-events-none flex items-center justify-center">
-      {/* S/M/L Size Selector - Top of screen */}
-      <div className="fixed top-4 left-0 right-0 z-40 flex justify-center pointer-events-auto px-2">
-        <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
-          {strokeSizes.map((size) => (
-            <button
-              key={size.value}
-              onClick={() => setStrokeWidth(size.value)}
-              data-testid={`button-size-${size.name.toLowerCase()}`}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                strokeWidth === size.value 
-                  ? 'bg-white text-black' 
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`}
-              aria-label={`Size ${size.name}`}
-            >
-              {size.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Canvas Container - Vertically Centered */}
       <div className="relative w-full max-w-4xl mx-auto pointer-events-none" style={{ marginTop: '-40px' }}>
         {/* Horizontal Color Picker - Above Photo */}
@@ -2260,6 +2239,27 @@ export function PhotoAnnotationEditor({
                 <Trash2 className="w-5 h-5" />
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* S/M/L Size Selector - Below Tool Buttons */}
+        <div className="absolute -bottom-36 left-0 right-0 z-50 flex justify-center px-2 pointer-events-auto">
+          <div className="bg-black/60 backdrop-blur-md rounded-full px-2 py-1.5 shadow-lg flex items-center gap-1">
+            {strokeSizes.map((size) => (
+              <button
+                key={size.value}
+                onClick={() => setStrokeWidth(size.value)}
+                data-testid={`button-size-${size.name.toLowerCase()}`}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                  strokeWidth === size.value 
+                    ? 'bg-white text-black' 
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                aria-label={`Size ${size.name}`}
+              >
+                {size.name}
+              </button>
+            ))}
           </div>
         </div>
       </div>
