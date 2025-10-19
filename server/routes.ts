@@ -29,6 +29,8 @@ const ALLOWED_FILE_TYPES = [
   'video/quicktime', // .mov files
   'video/x-msvideo', // .avi files  
   'video/webm',
+  // PDFs
+  'application/pdf',
 ];
 
 const upload = multer({
@@ -1138,7 +1140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), upload.single('pdf'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1157,10 +1159,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
 
-      // Validate with insertPdfSchema, adding projectId and createdBy
+      if (!req.file) {
+        return res.status(400).json({ error: "PDF file is required" });
+      }
+
+      // Upload PDF to Object Storage
+      const filename = req.file.originalname || `pdf_${Date.now()}.pdf`;
+      const objectKey = `pdfs/${project.id}/${Date.now()}_${filename}`;
+      
+      let storageUrl: string;
+      try {
+        storageUrl = await objectStorageService.uploadFile(
+          objectKey,
+          req.file.buffer,
+          req.file.mimetype || 'application/pdf'
+        );
+      } catch (uploadError: any) {
+        console.error('Object storage upload failed:', uploadError);
+        return res.status(500).json({ error: 'Failed to upload PDF to storage' });
+      }
+
+      // Create database record
       const validated = insertPdfSchema.parse({
-        ...req.body,
         projectId: req.params.projectId,
+        filename,
+        storageUrl,
+        photoCount: parseInt(req.body.photoCount) || 0,
+        gridLayout: parseInt(req.body.gridLayout) || 2,
+        settings: req.body.settings ? JSON.parse(req.body.settings) : null,
         createdBy: userId,
       });
 

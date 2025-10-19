@@ -186,6 +186,55 @@ export default function Settings() {
     },
   });
 
+  // PDF settings mutations
+  const savePdfSettingsMutation = useMutation({
+    mutationFn: async (settings: typeof pdfSettings) => {
+      const res = await apiRequest('PUT', '/api/companies/pdf-settings', settings);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      toast({
+        title: 'PDF settings saved',
+        description: 'Your PDF export preferences have been updated',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to save PDF settings',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const uploadLogoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('logo', file);
+      const res = await apiRequest('POST', '/api/companies/pdf-logo', formData, {
+        headers: {},
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      setLogoFile(null);
+      setLogoPreview(null);
+      toast({
+        title: 'Logo uploaded',
+        description: 'Company logo has been updated',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to upload logo',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   const copyInviteLink = () => {
     if (company?.inviteLinkToken) {
       const inviteUrl = `${window.location.origin}/api/companies/invite/${company.inviteLinkToken}`;
@@ -198,6 +247,34 @@ export default function Settings() {
         duration: 2000,
       });
     }
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'Invalid file type',
+          description: 'Please upload an image file',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setLogoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogoUpload = () => {
+    if (logoFile) {
+      uploadLogoMutation.mutate(logoFile);
+    }
+  };
+
+  const handleSavePdfSettings = () => {
+    savePdfSettingsMutation.mutate(pdfSettings);
   };
 
   useEffect(() => {
@@ -220,6 +297,32 @@ export default function Settings() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Load PDF settings from company
+  useEffect(() => {
+    if (company) {
+      setPdfSettings({
+        pdfCompanyName: company.pdfCompanyName || '',
+        pdfCompanyAddress: company.pdfCompanyAddress || '',
+        pdfCompanyPhone: company.pdfCompanyPhone || '',
+        pdfHeaderText: company.pdfHeaderText || '',
+        pdfFooterText: company.pdfFooterText || '',
+        pdfFontFamily: (company.pdfFontFamily as 'Arial' | 'Helvetica' | 'Times') || 'Arial',
+        pdfFontSizeTitle: company.pdfFontSizeTitle || 24,
+        pdfFontSizeHeader: company.pdfFontSizeHeader || 16,
+        pdfFontSizeBody: company.pdfFontSizeBody || 12,
+        pdfFontSizeCaption: company.pdfFontSizeCaption || 10,
+        pdfDefaultGridLayout: company.pdfDefaultGridLayout || 2,
+        pdfIncludeTimestamp: company.pdfIncludeTimestamp ?? true,
+        pdfIncludeTags: company.pdfIncludeTags ?? true,
+        pdfIncludeAnnotations: company.pdfIncludeAnnotations ?? true,
+        pdfIncludeSignatureLine: company.pdfIncludeSignatureLine ?? false,
+      });
+      if (company.pdfLogoUrl) {
+        setLogoPreview(company.pdfLogoUrl);
+      }
+    }
+  }, [company]);
 
   const loadSyncStatus = async () => {
     const status = await syncManager.getSyncStatus();
@@ -795,6 +898,228 @@ export default function Settings() {
           )}
         </div>
       </Card>
+
+      {/* PDF Export Settings */}
+      {user?.companyId && company?.ownerId === user.id && (
+        <div data-testid="section-pdf-settings">
+          <div className="flex items-center gap-3 mb-4">
+            <FileText className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-semibold">PDF Export Settings</h2>
+          </div>
+          
+          <Card className="p-6 space-y-6" data-testid="card-pdf-settings">
+            {/* Logo Upload */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Company Logo</Label>
+              <p className="text-sm text-muted-foreground">Upload a logo to appear on exported PDFs</p>
+              <div className="flex items-center gap-4">
+                {logoPreview && (
+                  <div className="w-32 h-32 border rounded-md overflow-hidden flex items-center justify-center bg-muted">
+                    <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                    id="logo-upload"
+                    data-testid="input-logo-file"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('logo-upload')?.click()}
+                    data-testid="button-choose-logo"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose Image
+                  </Button>
+                  {logoFile && (
+                    <Button
+                      size="sm"
+                      onClick={handleLogoUpload}
+                      disabled={uploadLogoMutation.isPending}
+                      data-testid="button-upload-logo"
+                    >
+                      {uploadLogoMutation.isPending ? 'Uploading...' : 'Upload Logo'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Company Information */}
+            <div className="space-y-4">
+              <Label className="text-base font-medium">Company Information</Label>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="pdf-company-name">Company Name</Label>
+                  <input
+                    id="pdf-company-name"
+                    type="text"
+                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
+                    value={pdfSettings.pdfCompanyName}
+                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyName: e.target.value })}
+                    placeholder="Enter company name"
+                    data-testid="input-pdf-company-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pdf-company-address">Company Address</Label>
+                  <textarea
+                    id="pdf-company-address"
+                    className="mt-1.5 w-full px-3 py-2 border rounded-md resize-none"
+                    rows={2}
+                    value={pdfSettings.pdfCompanyAddress}
+                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyAddress: e.target.value })}
+                    placeholder="Enter company address"
+                    data-testid="input-pdf-company-address"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pdf-company-phone">Company Phone</Label>
+                  <input
+                    id="pdf-company-phone"
+                    type="tel"
+                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
+                    value={pdfSettings.pdfCompanyPhone}
+                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyPhone: e.target.value })}
+                    placeholder="Enter phone number"
+                    data-testid="input-pdf-company-phone"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Header/Footer Text */}
+            <div className="space-y-4">
+              <Label className="text-base font-medium">Default Header & Footer</Label>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="pdf-header-text">Header Text</Label>
+                  <input
+                    id="pdf-header-text"
+                    type="text"
+                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
+                    value={pdfSettings.pdfHeaderText}
+                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfHeaderText: e.target.value })}
+                    placeholder="Optional header text"
+                    data-testid="input-pdf-header-text"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pdf-footer-text">Footer Text</Label>
+                  <input
+                    id="pdf-footer-text"
+                    type="text"
+                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
+                    value={pdfSettings.pdfFooterText}
+                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfFooterText: e.target.value })}
+                    placeholder="Optional footer text"
+                    data-testid="input-pdf-footer-text"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Font Settings */}
+            <div className="space-y-4">
+              <Label className="text-base font-medium">Font Settings</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="pdf-font-family">Font Family</Label>
+                  <Select
+                    value={pdfSettings.pdfFontFamily}
+                    onValueChange={(value: 'Arial' | 'Helvetica' | 'Times') => setPdfSettings({ ...pdfSettings, pdfFontFamily: value })}
+                  >
+                    <SelectTrigger id="pdf-font-family" className="mt-1.5" data-testid="select-pdf-font-family">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Helvetica">Helvetica</SelectItem>
+                      <SelectItem value="Times">Times</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="pdf-default-grid">Default Grid Layout</Label>
+                  <Select
+                    value={pdfSettings.pdfDefaultGridLayout.toString()}
+                    onValueChange={(value) => setPdfSettings({ ...pdfSettings, pdfDefaultGridLayout: parseInt(value) })}
+                  >
+                    <SelectTrigger id="pdf-default-grid" className="mt-1.5" data-testid="select-pdf-default-grid">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 photo per page</SelectItem>
+                      <SelectItem value="2">2 photos per page</SelectItem>
+                      <SelectItem value="3">3 photos per page</SelectItem>
+                      <SelectItem value="4">4 photos per page</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Photo Caption Options */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Photo Captions</Label>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="pdf-include-timestamp" className="font-normal">Include timestamp</Label>
+                  <Switch
+                    id="pdf-include-timestamp"
+                    checked={pdfSettings.pdfIncludeTimestamp}
+                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTimestamp: checked })}
+                    data-testid="switch-pdf-include-timestamp"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="pdf-include-tags" className="font-normal">Include tags</Label>
+                  <Switch
+                    id="pdf-include-tags"
+                    checked={pdfSettings.pdfIncludeTags}
+                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTags: checked })}
+                    data-testid="switch-pdf-include-tags"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="pdf-include-annotations" className="font-normal">Include annotations</Label>
+                  <Switch
+                    id="pdf-include-annotations"
+                    checked={pdfSettings.pdfIncludeAnnotations}
+                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeAnnotations: checked })}
+                    data-testid="switch-pdf-include-annotations"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="pdf-include-signature" className="font-normal">Include signature line</Label>
+                  <Switch
+                    id="pdf-include-signature"
+                    checked={pdfSettings.pdfIncludeSignatureLine}
+                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeSignatureLine: checked })}
+                    data-testid="switch-pdf-include-signature"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-2">
+              <Button
+                onClick={handleSavePdfSettings}
+                disabled={savePdfSettingsMutation.isPending}
+                data-testid="button-save-pdf-settings"
+              >
+                {savePdfSettingsMutation.isPending ? 'Saving...' : 'Save PDF Settings'}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Team Management */}
       {user?.companyId && (
