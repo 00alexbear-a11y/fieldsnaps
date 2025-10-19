@@ -2309,16 +2309,18 @@ export function PhotoAnnotationEditor({
           >
             <Undo className="w-5 h-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={selectedAnnotation ? handleDeleteSelected : onDelete}
-            data-testid="button-delete"
-            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
-            aria-label={selectedAnnotation ? "Delete annotation" : "Delete photo"}
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          {selectedAnnotation && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDeleteSelected}
+              data-testid="button-delete-annotation"
+              className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+              aria-label="Delete annotation"
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -2328,7 +2330,7 @@ export function PhotoAnnotationEditor({
           variant="ghost"
           size="icon"
           onClick={handleCancel}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 text-white"
           data-testid="button-cancel"
         >
           <X className="w-6 h-6" />
