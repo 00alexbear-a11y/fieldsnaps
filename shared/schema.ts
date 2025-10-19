@@ -19,18 +19,31 @@ export const companies = pgTable("companies", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }).notNull(),
   ownerId: varchar("owner_id").notNull(), // Original creator who pays (FK enforced at app level to avoid circular ref)
+  
+  // Multi-platform subscription support
+  subscriptionSource: varchar("subscription_source").default("stripe"), // stripe | apple | google | none
+  platformSubscriptionId: text("platform_subscription_id"), // Apple receipt or Google purchase token
+  
+  // Stripe-specific fields (backwards compatible)
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),
+  
+  // Unified subscription fields
   subscriptionQuantity: integer("subscription_quantity").default(1).notNull(), // Number of users owner pays for
-  subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled
+  subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled, none
+  trialEndsAt: timestamp("trial_ends_at"), // When trial expires (7 days from creation)
+  
+  // Team invite system
   inviteLinkToken: varchar("invite_link_token", { length: 32 }).unique(), // Current invite link token
   inviteLinkUses: integer("invite_link_uses").default(0).notNull(), // How many joined via current link
   inviteLinkMaxUses: integer("invite_link_max_uses").default(5).notNull(), // Max uses before expiry
   inviteLinkExpiresAt: timestamp("invite_link_expires_at"), // 7 days from generation
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_companies_owner_id").on(table.ownerId),
   index("idx_companies_invite_token").on(table.inviteLinkToken),
+  index("idx_companies_subscription_source").on(table.subscriptionSource),
 ]);
 
 // Users table (for authentication)

@@ -2326,6 +2326,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Apple IAP receipt verification endpoint
+  // NOT IMPLEMENTED - Placeholder for future StoreKit integration
+  app.post("/api/billing/apple/verify-receipt", isAuthenticated, async (req: any, res) => {
+    // SECURITY: This endpoint is disabled until proper receipt verification is implemented
+    // Enabling this without Apple server validation would allow users to grant themselves
+    // paid subscriptions without actually paying
+    
+    return res.status(501).json({ 
+      error: "Apple In-App Purchase not yet implemented",
+      message: "This endpoint requires StoreKit SDK integration and Apple receipt verification. Please use web signup at fieldsnaps.com for now.",
+      requiredSteps: [
+        "1. Configure products in App Store Connect",
+        "2. Implement server-to-server receipt validation with Apple",
+        "3. Handle subscription expiration and renewal",
+        "4. Test with sandbox environment"
+      ]
+    });
+    
+    // TODO: Implement when ready:
+    // 1. Extract receiptData and productId from request
+    // 2. Send receiptData to Apple's verifyReceipt endpoint
+    // 3. Validate response signature and subscription status
+    // 4. Check expiration date and auto-renewal status
+    // 5. Store receipt for future verification
+    // 6. Update company.subscriptionSource = 'apple'
+    // 7. Update company.subscriptionStatus based on Apple response
+    // 8. Prevent duplicate subscriptions across platforms
+  });
+
+  // Google Play purchase verification endpoint
+  // NOT IMPLEMENTED - Placeholder for future Play Billing integration
+  app.post("/api/billing/google/verify-purchase", isAuthenticated, async (req: any, res) => {
+    // SECURITY: This endpoint is disabled until proper purchase token verification is implemented
+    // Enabling this without Google API validation would allow users to grant themselves
+    // paid subscriptions without actually paying
+    
+    return res.status(501).json({ 
+      error: "Google Play Billing not yet implemented",
+      message: "This endpoint requires Play Billing Library integration and Google API verification. Please use web signup at fieldsnaps.com for now.",
+      requiredSteps: [
+        "1. Configure products in Google Play Console",
+        "2. Implement server-to-server purchase verification with Google Play Developer API",
+        "3. Enroll in External Offers Program",
+        "4. Handle subscription expiration and renewal",
+        "5. Report external transactions to Google",
+        "6. Test with test accounts"
+      ]
+    });
+    
+    // TODO: Implement when ready:
+    // 1. Extract purchaseToken, productId, packageName from request
+    // 2. Call Google Play Developer API to verify purchase token
+    // 3. Validate subscription status and expiration
+    // 4. Check acknowledgement status
+    // 5. Store purchase token for future verification
+    // 6. Update company.subscriptionSource = 'google'
+    // 7. Update company.subscriptionStatus based on Google response
+    // 8. Prevent duplicate subscriptions across platforms
+    // 9. Report transaction to Google External Offers if applicable
+  });
+
+  // Get unified subscription status (works for all payment sources)
+  app.get("/api/billing/subscription/unified-status", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(400).json({ error: "User must belong to a company" });
+      }
+
+      const company = await storage.getCompany(user.companyId);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      // Import the validation service
+      const { subscriptionValidationService } = await import('./subscriptionValidation');
+      
+      // Validate subscription from any source
+      const status = await subscriptionValidationService.validateCompanySubscription(company);
+      
+      // Get display info for UI
+      const displayInfo = subscriptionValidationService.getSubscriptionDisplayInfo(company);
+
+      res.json({
+        ...status,
+        displayInfo,
+        teamSize: company.subscriptionQuantity
+      });
+    } catch (error: any) {
+      console.error("[Billing] Error getting unified status:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
