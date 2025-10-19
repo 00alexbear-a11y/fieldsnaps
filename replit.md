@@ -71,3 +71,24 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 ### Third-Party APIs
 - **Google Geocoding API**: Address to coordinates conversion.
 - **Stripe**: Subscription management and payment processing.
+
+### Apple App Store Compliance Status
+**Last Updated:** October 19, 2025
+
+**Critical Issue Identified:**
+- 🚨 **Payment System Non-Compliance**: Current Stripe external checkout violates Apple App Store guidelines for digital goods
+- **Required Action**: Must implement Apple In-App Purchase (IAP) for App Store submission
+- **Impact**: Apple takes 30% Year 1, 15% Year 2+ (vs Stripe 2.9%)
+- **See**: `APPLE_COMPLIANCE_REPORT.md` for full analysis and implementation plan
+
+**Compliant Areas:**
+- ✅ Privacy Manifest (`PrivacyInfo.xcprivacy`) complete with all required APIs
+- ✅ Privacy Policy comprehensive and detailed
+- ✅ Capacitor 6 iOS integration configured
+- ✅ Camera/Location permission descriptions documented
+- ✅ Capgo OTA update system with AES-256 encryption
+
+**Pending Verification:**
+- ⚠️ Info.plist permissions must be added during iOS build
+- ⚠️ Third-party SDK privacy manifests need verification
+- ⚠️ iOS 18 SDK requirement (enforced April 2025)
