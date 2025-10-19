@@ -1047,7 +1047,14 @@ export default function ProjectPhotos() {
         
         if (newColumnCount !== columnCount) {
           console.log(`[Pinch] Touch pinch: ${columnCount} -> ${newColumnCount} columns`);
-          setColumnCount(newColumnCount);
+          // Use View Transitions API for smooth animations
+          if ('startViewTransition' in document) {
+            (document as any).startViewTransition(() => {
+              setColumnCount(newColumnCount);
+            });
+          } else {
+            setColumnCount(newColumnCount);
+          }
         }
       }
     };
@@ -1077,7 +1084,14 @@ export default function ProjectPhotos() {
         
         if (newColumnCount !== columnCount) {
           console.log(`[Pinch] Desktop pinch: ${columnCount} -> ${newColumnCount} columns`);
-          setColumnCount(newColumnCount);
+          // Use View Transitions API for smooth animations
+          if ('startViewTransition' in document) {
+            (document as any).startViewTransition(() => {
+              setColumnCount(newColumnCount);
+            });
+          } else {
+            setColumnCount(newColumnCount);
+          }
         }
       }
     };
@@ -1576,9 +1590,10 @@ export default function ProjectPhotos() {
                     return (
                       <div
                         key={photo.id}
-                        className={`relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
+                        className={`photo-grid-item relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
                           isSelectMode && isSelected ? 'ring-4 ring-primary' : ''
                         }`}
+                        style={{ viewTransitionName: `photo-${photo.id}` } as React.CSSProperties}
                         onClick={() => {
                           if (isSelectMode) {
                             togglePhotoSelection(photo.id);

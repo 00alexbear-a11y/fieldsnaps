@@ -462,4 +462,23 @@
   .photo-grid-container {
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* View Transitions API configuration for smooth photo grid animations */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Smooth morphing for all elements during view transitions */
+  ::view-transition-group(*) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    mix-blend-mode: normal;
+    animation-duration: 350ms;
+  }
 }
