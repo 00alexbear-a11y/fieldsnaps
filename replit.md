@@ -6,7 +6,7 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 ## Recent Changes
 **October 19, 2025**: Replaced pinch gestures with Grid Size dropdown for photo grid control
 - Grid Size dropdown button with 3 clear options: Small (10 columns), Medium (5 columns), Large (3 columns)
-- Button positioned next to PDF export for easy access
+- Button positioned in top tab navigation bar next to Photos/Tasks/PDFs tabs (only visible on Photos tab)
 - **View Transitions API integration**: Each photo has unique view-transition-name set via ref callback for smooth individual morphing
 - Photos smoothly slide and scale to new positions during grid changes (350ms cubic-bezier easing)
 - Direct DOM manipulation via ref callback ensures reliable view-transition-name application
