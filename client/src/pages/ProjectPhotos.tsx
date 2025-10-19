@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
@@ -64,7 +64,7 @@ export default function ProjectPhotos() {
   const [targetProjectId, setTargetProjectId] = useState<string>("");
   const [tagPickerPhotoId, setTagPickerPhotoId] = useState<string | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
-  const [photoSize, setPhotoSize] = useState<'S' | 'M' | 'L'>('M');
+  const [columnCount, setColumnCount] = useState(5); // 1-10 columns, default 5
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks' | 'pdfs'>('photos');
   const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
   const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
@@ -1006,18 +1006,68 @@ export default function ProjectPhotos() {
     }
   };
 
-  // Get grid classes based on photo size
-  const getGridClasses = () => {
-    switch (photoSize) {
-      case 'S':
-        return 'grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
-      case 'M':
-        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
-      case 'L':
-        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-      default:
-        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
-    }
+  // Pinch gesture refs for synchronous access during touch events
+  const touchStartDistanceRef = useRef<number | null>(null);
+  const initialColumnCountRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const gridElement = document.getElementById('photo-grid');
+    if (!gridElement) return;
+
+    const getTouchDistance = (touch1: Touch, touch2: Touch): number => {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault(); // Prevent native pinch zoom immediately
+        const distance = getTouchDistance(e.touches[0], e.touches[1]);
+        touchStartDistanceRef.current = distance;
+        initialColumnCountRef.current = columnCount;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchStartDistanceRef.current !== null && initialColumnCountRef.current !== null) {
+        e.preventDefault(); // Continue preventing default pinch zoom
+        const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        const distanceChange = currentDistance - touchStartDistanceRef.current;
+        
+        // Scale factor: ~150px distance change = 1 column change
+        const columnChange = Math.round(distanceChange / 150);
+        const newColumnCount = Math.max(1, Math.min(10, initialColumnCountRef.current - columnChange));
+        
+        if (newColumnCount !== columnCount) {
+          setColumnCount(newColumnCount);
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      touchStartDistanceRef.current = null;
+      initialColumnCountRef.current = null;
+    };
+
+    gridElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    gridElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    gridElement.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      gridElement.removeEventListener('touchstart', handleTouchStart);
+      gridElement.removeEventListener('touchmove', handleTouchMove);
+      gridElement.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [columnCount]);
+
+  // Get grid style based on column count
+  const getGridStyle = (): React.CSSProperties => {
+    return {
+      display: 'grid',
+      gridTemplateColumns: `repeat(${columnCount}, 1fr)`,
+      gap: '2px', // Minimal gap like Apple Photos
+    };
   };
 
   const handleSaveAnnotations = async (annotations: any[], annotatedBlob: Blob) => {
@@ -1222,20 +1272,6 @@ export default function ProjectPhotos() {
               PDFs ({pdfs.length})
             </button>
           </div>
-          
-          {/* Photo size selector - only show on Photos tab */}
-          {activeTab === 'photos' && (
-            <Select value={photoSize} onValueChange={(value: 'S' | 'M' | 'L') => setPhotoSize(value)}>
-              <SelectTrigger className="w-28" data-testid="select-photo-size">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="S">Small</SelectItem>
-                <SelectItem value="M">Medium</SelectItem>
-                <SelectItem value="L">Large</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
         </div>
       </div>
 
@@ -1499,7 +1535,7 @@ export default function ProjectPhotos() {
                 </div>
                 
                 {/* Photos Grid */}
-                <div className={`grid ${getGridClasses()} gap-4`}>
+                <div id="photo-grid" style={getGridStyle()}>
                   {datePhotos.map((photo) => {
                     const photoIndex = filteredPhotos.findIndex(p => p.id === photo.id);
                     const isSelected = selectedPhotoIds.has(photo.id);
