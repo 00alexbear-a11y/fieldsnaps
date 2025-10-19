@@ -1075,6 +1075,7 @@ export default function Camera() {
         syncStatus: 'pending',
         retryCount: 0,
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
+        isForTodo: mode === 'todo',
       });
 
       console.log('[Camera] Photo saved for edit:', savedPhoto.id);
@@ -1381,7 +1382,7 @@ export default function Camera() {
                 };
                 
                 const isVideo = photo.mediaType === 'video';
-                const hasTask = photoIdsWithTasks.has(photo.id);
+                const isForTodo = photo.isForTodo;
                 
                 return (
                   <div
@@ -1446,29 +1447,14 @@ export default function Camera() {
                       </div>
                     )}
                     
-                    {/* Task Checkbox Badge - Top Right */}
-                    {hasTask && (
+                    {/* To-Do Badge - Top Right (only for photos captured via To-Do button) */}
+                    {isForTodo && (
                       <div 
                         className="absolute top-1 right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-lg pointer-events-none"
-                        data-testid={`badge-has-task-${photo.id}`}
+                        data-testid={`badge-for-todo-${photo.id}`}
                       >
                         <CheckSquare className="w-4 h-4 text-white" />
                       </div>
-                    )}
-                    
-                    {/* Quick Task Creation Button - Bottom Right (only for photos without tasks) - GLOVE-FRIENDLY 44PT */}
-                    {!isVideo && !hasTask && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Navigate to todos with photo pre-attached
-                          setLocation(`/todos?photoId=${photo.id}`);
-                        }}
-                        className="absolute bottom-0 right-0 w-11 h-11 bg-primary rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                        data-testid={`button-create-task-${photo.id}`}
-                      >
-                        <ListTodo className="w-6 h-6 text-white" />
-                      </button>
                     )}
                     
                     <button
