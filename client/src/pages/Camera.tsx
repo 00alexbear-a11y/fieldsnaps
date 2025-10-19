@@ -33,7 +33,7 @@ import { useMutation } from '@tanstack/react-query';
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
   { value: 'quick', label: 'S', description: '200KB - Fast upload' },
   { value: 'standard', label: 'M', description: '500KB - Balanced' },
-  { value: 'detailed', label: 'L', description: '1MB - High quality' },
+  { value: 'detailed', label: 'L', description: '1.5MB - High quality' },
 ];
 
 interface Project {

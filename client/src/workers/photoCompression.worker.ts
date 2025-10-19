@@ -59,9 +59,9 @@ const QUALITY_PRESETS = {
     quality: 0.85,
   },
   detailed: {
-    targetSize: 1024 * 1024, // 1MB
+    targetSize: 1536 * 1024, // 1.5MB
     maxDimension: 2560,
-    quality: 0.92,
+    quality: 0.95,
   },
   quick: {
     targetSize: 200 * 1024, // 200KB
