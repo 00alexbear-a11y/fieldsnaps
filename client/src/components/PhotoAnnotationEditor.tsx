@@ -146,6 +146,7 @@ export function PhotoAnnotationEditor({
   const imageUrl = photoUrl; // Use photoUrl directly
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const controlsScrollRef = useRef<HTMLDivElement>(null);
   const [annotations, setAnnotations] = useState<Annotation[]>(existingAnnotations);
   const [history, setHistory] = useState<Annotation[][]>([existingAnnotations]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -265,6 +266,13 @@ export function PhotoAnnotationEditor({
   useEffect(() => {
     redrawCanvas();
   }, [annotations, selectedAnnotation, tempAnnotation]);
+
+  // Scroll controls to the left on mount
+  useEffect(() => {
+    if (controlsScrollRef.current) {
+      controlsScrollRef.current.scrollLeft = 0;
+    }
+  }, []);
 
   const addToHistory = (newAnnotations: Annotation[]) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -2126,11 +2134,11 @@ export function PhotoAnnotationEditor({
 
       {/* Upper Controls Row - Annotation Tools (matches camera zoom/tag controls) */}
       <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10 pointer-events-auto">
-        <div className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide">
+        <div ref={controlsScrollRef} className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide">
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0">
             {colorPickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg">
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg z-50 pointer-events-auto">
                 <div className="flex flex-col gap-2">
                   {colors.map((color) => (
                     <button
@@ -2177,7 +2185,7 @@ export function PhotoAnnotationEditor({
           {/* Collapsible Size Selector */}
           <div className="relative flex-shrink-0">
             {sizePickerExpanded && (
-              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg">
+              <div className="absolute bottom-full left-0 mb-2 bg-black/80 backdrop-blur-md rounded-2xl p-2 shadow-lg z-50 pointer-events-auto">
                 <div className="flex flex-col gap-1">
                   {strokeSizes.map((size) => (
                     <button
