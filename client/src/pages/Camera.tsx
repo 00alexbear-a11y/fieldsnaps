@@ -403,12 +403,12 @@ export default function Camera() {
       const constraints: MediaStreamConstraints = {
         video: (currentDeviceId && currentDeviceId.trim()) ? {
           deviceId: { exact: currentDeviceId },
-          width: { ideal: 1920 },
-          height: { ideal: 1440 },
+          width: { ideal: 3840, max: 3840 },
+          height: { ideal: 2160, max: 2160 },
         } : {
           facingMode: cameraFacing,
-          width: { ideal: 1920 },
-          height: { ideal: 1440 },
+          width: { ideal: 3840, max: 3840 },
+          height: { ideal: 2160, max: 2160 },
         },
       };
       
@@ -426,8 +426,8 @@ export default function Camera() {
         const fallbackConstraints: MediaStreamConstraints = {
           video: {
             facingMode: cameraFacing,
-            width: { ideal: 1920 },
-            height: { ideal: 1440 },
+            width: { ideal: 3840, max: 3840 },
+            height: { ideal: 2160, max: 2160 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
@@ -580,8 +580,8 @@ export default function Camera() {
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode: cameraFacing,
-          width: { ideal: 1920 },
-          height: { ideal: 1440 },
+          width: { ideal: 3840, max: 3840 },
+          height: { ideal: 2160, max: 2160 },
           // @ts-ignore
           advanced: [{ zoom: level }]
         },
@@ -596,8 +596,8 @@ export default function Camera() {
         const fallbackConstraints: MediaStreamConstraints = {
           video: {
             facingMode: cameraFacing,
-            width: { ideal: 1920 },
-            height: { ideal: 1440 },
+            width: { ideal: 3840, max: 3840 },
+            height: { ideal: 2160, max: 2160 },
           },
         };
         stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
