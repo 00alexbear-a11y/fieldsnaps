@@ -39,6 +39,24 @@ export const companies = pgTable("companies", {
   inviteLinkMaxUses: integer("invite_link_max_uses").default(5).notNull(), // Max uses before expiry
   inviteLinkExpiresAt: timestamp("invite_link_expires_at"), // 7 days from generation
   
+  // PDF export settings
+  pdfLogoUrl: text("pdf_logo_url"), // Logo URL in Object Storage
+  pdfCompanyName: varchar("pdf_company_name", { length: 255 }),
+  pdfCompanyAddress: text("pdf_company_address"),
+  pdfCompanyPhone: varchar("pdf_company_phone", { length: 50 }),
+  pdfHeaderText: text("pdf_header_text"),
+  pdfFooterText: text("pdf_footer_text"),
+  pdfFontFamily: varchar("pdf_font_family", { length: 50 }).default("Arial"), // Arial, Helvetica, Times
+  pdfFontSizeTitle: integer("pdf_font_size_title").default(24),
+  pdfFontSizeHeader: integer("pdf_font_size_header").default(16),
+  pdfFontSizeBody: integer("pdf_font_size_body").default(12),
+  pdfFontSizeCaption: integer("pdf_font_size_caption").default(10),
+  pdfDefaultGridLayout: integer("pdf_default_grid_layout").default(2), // 1, 2, 3, or 4 photos per page
+  pdfIncludeTimestamp: boolean("pdf_include_timestamp").default(true),
+  pdfIncludeTags: boolean("pdf_include_tags").default(true),
+  pdfIncludeAnnotations: boolean("pdf_include_annotations").default(true),
+  pdfIncludeSignatureLine: boolean("pdf_include_signature_line").default(false),
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_companies_owner_id").on(table.ownerId),
@@ -237,6 +255,23 @@ export const photoTags = pgTable("photo_tags", {
   index("idx_photo_tags_tag_id").on(table.tagId),
 ]);
 
+// PDFs table - track generated PDF exports
+export const pdfs = pgTable("pdfs", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  storageUrl: text("storage_url").notNull(), // URL in Object Storage
+  photoCount: integer("photo_count").notNull().default(0),
+  gridLayout: integer("grid_layout").notNull().default(2), // 1, 2, 3, or 4 photos per page
+  settings: jsonb("settings"), // Snapshot of PDF settings at generation time
+  createdBy: varchar("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_pdfs_project_id").on(table.projectId),
+  index("idx_pdfs_created_by").on(table.createdBy),
+  index("idx_pdfs_created_at").on(table.createdAt.desc()),
+]);
+
 // Subscriptions table - company-based subscriptions (owner pays for whole team)
 export const subscriptions = pgTable("subscriptions", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -290,6 +325,7 @@ export const insertCredentialSchema = createInsertSchema(credentials).omit({ id:
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
 export const insertPhotoTagSchema = createInsertSchema(photoTags).omit({ id: true, createdAt: true });
+export const insertPdfSchema = createInsertSchema(pdfs).omit({ id: true, createdAt: true });
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEvents).omit({ id: true, createdAt: true });
 
@@ -308,6 +344,7 @@ export type ToDo = typeof todos.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type PhotoTag = typeof photoTags.$inferSelect;
+export type Pdf = typeof pdfs.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type SubscriptionEvent = typeof subscriptionEvents.$inferSelect;
 
@@ -321,6 +358,7 @@ export type InsertToDo = z.infer<typeof insertTodoSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
+export type InsertPdf = z.infer<typeof insertPdfSchema>;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type InsertSubscriptionEvent = z.infer<typeof insertSubscriptionEventSchema>;
 

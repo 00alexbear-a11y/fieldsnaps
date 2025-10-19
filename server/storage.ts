@@ -1,12 +1,12 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Task, ToDo,
+  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Pdf, Task, ToDo,
   Subscription, SubscriptionEvent,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertTask, InsertToDo,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
   InsertSubscription, InsertSubscriptionEvent
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
@@ -91,6 +91,12 @@ export interface IStorage {
   getPhotoTags(photoId: string): Promise<(PhotoTag & { tag: Tag })[]>;
   addPhotoTag(data: InsertPhotoTag): Promise<PhotoTag>;
   removePhotoTag(photoId: string, tagId: string): Promise<boolean>;
+  
+  // PDFs
+  getPdf(id: string): Promise<Pdf | undefined>;
+  getProjectPdfs(projectId: string): Promise<Pdf[]>;
+  createPdf(data: InsertPdf): Promise<Pdf>;
+  deletePdf(id: string): Promise<boolean>;
   
   // Tasks
   getTask(id: string): Promise<Task | undefined>;
@@ -717,6 +723,28 @@ export class DbStorage implements IStorage {
     const result = await db.delete(photoTags)
       .where(and(eq(photoTags.photoId, photoId), eq(photoTags.tagId, tagId)))
       .returning();
+    return result.length > 0;
+  }
+
+  // PDFs
+  async getPdf(id: string): Promise<Pdf | undefined> {
+    const result = await db.select().from(pdfs).where(eq(pdfs.id, id));
+    return result[0];
+  }
+
+  async getProjectPdfs(projectId: string): Promise<Pdf[]> {
+    return await db.select().from(pdfs)
+      .where(eq(pdfs.projectId, projectId))
+      .orderBy(pdfs.createdAt.desc());
+  }
+
+  async createPdf(data: InsertPdf): Promise<Pdf> {
+    const result = await db.insert(pdfs).values(data).returning();
+    return result[0];
+  }
+
+  async deletePdf(id: string): Promise<boolean> {
+    const result = await db.delete(pdfs).where(eq(pdfs.id, id)).returning();
     return result.length > 0;
   }
 
