@@ -670,31 +670,130 @@ export default function ProjectPhotos() {
       const margin = 20;
       const contentWidth = pageWidth - 2 * margin;
 
-      // Add project header if enabled
-      if (exportOptions.includeProjectHeader && project) {
-        doc.setFontSize(20);
-        doc.setFont('helvetica', 'bold');
-        doc.text(project.name, margin, margin);
-        
-        let yPos = margin + 8;
-        
-        if (project.address) {
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'normal');
-          doc.text(project.address, margin, yPos);
+      // Map font family from settings to jsPDF font names
+      const fontFamilyMap: Record<string, string> = {
+        'Arial': 'helvetica',
+        'Helvetica': 'helvetica',
+        'Times': 'times',
+        'Courier': 'courier',
+      };
+      const fontFamily = company?.pdfFontFamily ? fontFamilyMap[company.pdfFontFamily] || 'helvetica' : 'helvetica';
+
+      // Function to add header to each page
+      const addHeader = async (isFirstPage: boolean) => {
+        let yPos = margin;
+
+        // Add company logo if available
+        if (company?.pdfLogoUrl && isFirstPage) {
+          try {
+            const logoResponse = await fetch(company.pdfLogoUrl);
+            const logoBlob = await logoResponse.blob();
+            const logoDataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(logoBlob);
+            });
+            
+            // Add logo (max 40mm wide, proportional height)
+            const logoImg = new Image();
+            await new Promise<void>((resolve, reject) => {
+              logoImg.onload = () => resolve();
+              logoImg.onerror = reject;
+              logoImg.src = logoDataUrl;
+            });
+            const logoMaxWidth = 40;
+            const logoAspect = logoImg.width / logoImg.height;
+            const logoWidth = Math.min(logoMaxWidth, logoImg.width / 5); // Rough mm conversion
+            const logoHeight = logoWidth / logoAspect;
+            doc.addImage(logoDataUrl, 'PNG', margin, yPos, logoWidth, logoHeight);
+            yPos += logoHeight + 5;
+          } catch (error) {
+            console.error('Failed to load logo:', error);
+          }
+        }
+
+        // Add company name and contact info
+        if (company?.pdfCompanyName) {
+          doc.setFontSize(company.pdfFontSizeHeader || 16);
+          doc.setFont(fontFamily, 'bold');
+          doc.text(company.pdfCompanyName, margin, yPos);
           yPos += 6;
         }
-        
-        doc.setFontSize(10);
-        doc.text(`Exported: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, margin, yPos);
-        yPos += 10;
+
+        if (company?.pdfCompanyAddress) {
+          doc.setFontSize(company.pdfFontSizeBody || 12);
+          doc.setFont(fontFamily, 'normal');
+          doc.text(company.pdfCompanyAddress, margin, yPos);
+          yPos += 5;
+        }
+
+        if (company?.pdfCompanyPhone) {
+          doc.setFontSize(company.pdfFontSizeBody || 12);
+          doc.text(company.pdfCompanyPhone, margin, yPos);
+          yPos += 5;
+        }
+
+        // Add custom header text if provided
+        if (company?.pdfHeaderText) {
+          doc.setFontSize(company.pdfFontSizeBody || 12);
+          doc.setFont(fontFamily, 'italic');
+          const headerLines = doc.splitTextToSize(company.pdfHeaderText, contentWidth);
+          doc.text(headerLines, margin, yPos);
+          yPos += headerLines.length * 5;
+        }
+
+        // Add project info if enabled
+        if (exportOptions.includeProjectHeader && project) {
+          yPos += 5;
+          doc.setFontSize(company?.pdfFontSizeTitle || 24);
+          doc.setFont(fontFamily, 'bold');
+          doc.text(project.name, margin, yPos);
+          yPos += 8;
+          
+          if (project.address) {
+            doc.setFontSize(company?.pdfFontSizeBody || 12);
+            doc.setFont(fontFamily, 'normal');
+            doc.text(project.address, margin, yPos);
+            yPos += 6;
+          }
+          
+          doc.setFontSize(company?.pdfFontSizeBody || 12);
+          doc.text(`Exported: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, margin, yPos);
+          yPos += 10;
+        }
         
         doc.setLineWidth(0.5);
         doc.line(margin, yPos, pageWidth - margin, yPos);
         yPos += 10;
-      }
 
-      const startY = exportOptions.includeProjectHeader && project ? margin + 40 : margin;
+        return yPos;
+      };
+
+      // Function to add footer to each page
+      const addFooter = () => {
+        const footerY = pageHeight - margin + 5;
+        
+        if (company?.pdfFooterText) {
+          doc.setFontSize(company.pdfFontSizeCaption || 10);
+          doc.setFont(fontFamily, 'italic');
+          const footerLines = doc.splitTextToSize(company.pdfFooterText, contentWidth);
+          doc.text(footerLines, margin, footerY);
+        }
+
+        // Add signature line if enabled
+        if (company?.pdfIncludeSignatureLine) {
+          const signatureY = pageHeight - margin - 10;
+          doc.setLineWidth(0.3);
+          doc.line(margin, signatureY, margin + 80, signatureY);
+          doc.setFontSize(company.pdfFontSizeCaption || 10);
+          doc.setFont(fontFamily, 'normal');
+          doc.text('Signature:', margin, signatureY - 2);
+          doc.text('Date:', margin + 90, signatureY - 2);
+          doc.line(margin + 105, signatureY, margin + 150, signatureY);
+        }
+      };
+
       let successCount = 0;
       let failureCount = 0;
       
@@ -719,6 +818,10 @@ export default function ProjectPhotos() {
         if (pageStart > 0) {
           doc.addPage();
         }
+        
+        // Add header to this page
+        const isFirstPage = pageStart === 0;
+        const startY = await addHeader(isFirstPage);
         
         let currentY = startY;
         
@@ -785,26 +888,33 @@ export default function ProjectPhotos() {
             
             // Add details below photo
             let detailY = y + cellHeight + 5;
-            doc.setFontSize(8);
+            const captionFontSize = company?.pdfFontSizeCaption || 10;
+            doc.setFontSize(captionFontSize);
             
             const photoName = photo.caption || `Photo_${format(new Date(photo.createdAt), 'yyyy-MM-dd_HHmmss')}`;
             
             if (exportOptions.includeName) {
-              doc.setFont('helvetica', 'bold');
+              doc.setFont(fontFamily, 'bold');
               const nameText = doc.splitTextToSize(photoName, cellWidth);
               doc.text(nameText, x, detailY);
-              detailY += nameText.length * 4;
+              detailY += nameText.length * (captionFontSize * 0.4);
             }
             
             if (exportOptions.includeDate || exportOptions.includeTimestamp) {
-              doc.setFont('helvetica', 'normal');
+              doc.setFont(fontFamily, 'normal');
               const dateTimeText = `${format(new Date(photo.createdAt), 'MMM d, yyyy')}${exportOptions.includeTimestamp ? ` ${format(new Date(photo.createdAt), 'h:mm a')}` : ''}`;
               doc.text(dateTimeText, x, detailY);
-              detailY += 4;
+              detailY += (captionFontSize * 0.4);
+            }
+            
+            if (project && exportOptions.includeProjectHeader) {
+              doc.setFont(fontFamily, 'italic');
+              doc.text(`Project: ${project.name}`, x, detailY);
+              detailY += (captionFontSize * 0.4);
             }
             
             if (exportOptions.includeTags && photo.tags && photo.tags.length > 0) {
-              doc.setFont('helvetica', 'italic');
+              doc.setFont(fontFamily, 'italic');
               const tagText = photo.tags.map(t => t.name).join(', ');
               const tagLines = doc.splitTextToSize(tagText, cellWidth);
               doc.text(tagLines, x, detailY);
@@ -816,6 +926,9 @@ export default function ProjectPhotos() {
             failureCount++;
           }
         }
+        
+        // Add footer after all photos on this page are rendered
+        addFooter();
       }
 
       // Only save PDF if at least one photo was successfully added
