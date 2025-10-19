@@ -1798,6 +1798,17 @@ export function PhotoAnnotationEditor({
     
     if (!canvas || !image) return;
     
+    // Ensure image is properly loaded before drawing
+    if (!image.complete || image.naturalWidth === 0) {
+      console.error("[PhotoEdit] Image not loaded or broken, cannot save");
+      toast({
+        title: "Image not ready",
+        description: "Please wait for the image to load before saving",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
