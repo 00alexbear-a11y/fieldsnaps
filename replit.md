@@ -4,11 +4,12 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing offline-reliable photo and video documentation. Its core purpose is to enhance efficiency and reduce disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. It aims for full offline functionality and touch optimization, aspiring to be a commercial SaaS product with a mission-driven model donating 20% of proceeds to missionaries.
 
 ## Recent Changes
-**October 19, 2025**: Replaced pinch gestures with Grid Size dropdown for photo grid control
-- Grid Size dropdown button with 3 clear options: Small (10 columns), Medium (5 columns), Large (3 columns)
-- Button positioned in top tab navigation bar next to Photos/Tasks/PDFs tabs (only visible on Photos tab)
+**October 19, 2025**: Photo selection and grid sizing improvements
+- **Grid Size dropdown**: Added button in tab navigation bar with 3 options: Small (10 columns), Medium (5 columns), Large (3 columns) - only visible on Photos tab
+- **Selection toolbar repositioned**: Moved from mid-screen (blocking photos) to bottom position just above bottom navigation buttons
 - **View Transitions API integration**: Each photo has unique view-transition-name set via ref callback for smooth individual morphing
 - Photos smoothly slide and scale to new positions during grid changes (350ms cubic-bezier easing)
+- Removed pinch gesture controls in favor of simple dropdown button
 - Direct DOM manipulation via ref callback ensures reliable view-transition-name application
 - Graceful fallback for browsers without View Transitions API support
 - Minimal 2px gaps between photos for Apple Photos-like appearance
