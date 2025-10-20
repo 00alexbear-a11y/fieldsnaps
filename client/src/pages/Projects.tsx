@@ -305,7 +305,7 @@ export default function Projects() {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
-      <div className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-xl">
+      <div className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white dark:bg-black">
         <img 
           src={logoPath} 
           alt="FieldSnaps" 
@@ -465,7 +465,7 @@ export default function Projects() {
       </div>
 
       {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
-      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 z-40">
+      <div className="fixed bottom-16 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40">
         <div className="relative max-w-screen-sm mx-auto space-y-2">
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -475,12 +475,12 @@ export default function Projects() {
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-9"
                 data-testid="input-search-projects"
               />
             </div>
             <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-              <SelectTrigger className="w-[140px]" data-testid="select-sort">
+              <SelectTrigger className="w-[140px] h-9" data-testid="select-sort">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
