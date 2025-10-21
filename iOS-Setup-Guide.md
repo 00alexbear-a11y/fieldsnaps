@@ -54,8 +54,11 @@ When using `capacitor.config.dev.ts`:
 
 ## 📝 Important Notes
 
-- **Production builds**: Use the regular `capacitor.config.ts` (no server URL)
-- **Before deploying**: Set `ENABLE_DEV_LOGIN_IN_NATIVE = false` in `client/src/config/devMode.ts`
+- **Production builds**: 
+  - Use the regular `capacitor.config.ts` (no server URL)
+  - Update `SERVER_URL` constant in `client/src/lib/nativeNavigation.ts` to your production URL
+  - Set `ENABLE_DEV_LOGIN_IN_NATIVE = false` in `client/src/config/devMode.ts`
+- **Server URL configuration**: The `SERVER_URL` in `client/src/lib/nativeNavigation.ts` must match the server URL in your Capacitor config
 - **Testing changes**: After code changes, rebuild and sync again
 - **Network required**: Your Mac and Replit must both have internet access
 
