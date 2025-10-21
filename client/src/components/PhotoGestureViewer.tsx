@@ -384,133 +384,126 @@ export function PhotoGestureViewer({
         </>
       )}
 
-      {/* Bottom Controls */}
-      <div
-        className="absolute bottom-0 left-0 right-0"
-      >
-        {/* Control Bar */}
-        <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          <div className="max-w-screen-xl mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-            {/* Back button - Bottom left */}
-            <div className="justify-self-start">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
-                data-testid="button-close-viewer"
-                aria-label="Close photo viewer"
-              >
-                <ChevronLeft className="w-6 h-6" />
-                <span className="text-xs font-medium hidden sm:inline">Back</span>
-              </Button>
-            </div>
+      {/* Bottom Controls - Matches Camera Mode Style */}
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10 absolute bottom-0 left-0 right-0" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        {/* Back */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+          data-testid="button-close-viewer"
+          aria-label="Close photo viewer"
+        >
+          <ChevronLeft className="w-6 h-6" />
+          <span className="text-[10px]">Back</span>
+        </Button>
 
-            {/* Centered action buttons */}
-            <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
-              {onAnnotate && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onAnnotate(currentPhoto)}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
-                  data-testid="button-annotate"
-                  aria-label="Annotate photo"
-                >
-                  <Brush className="w-6 h-6" />
-                  <span className="text-xs font-medium hidden sm:inline">Annotate</span>
-                </Button>
-              )}
-              
-              {/* Edit menu - contains Tag, Rename, Comment */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5 relative"
-                    data-testid="button-edit-menu"
-                    aria-label="Edit photo options"
-                    aria-haspopup="menu"
-                  >
-                    <Pencil className="w-6 h-6" />
-                    <span className="text-xs font-medium hidden sm:inline">Edit</span>
-                    {comments.length > 0 && (
-                      <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-semibold">
-                        {comments.length}
-                      </span>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="bg-card">
-                  {onTag && (
-                    <DropdownMenuItem 
-                      onClick={() => onTag(currentPhoto)}
-                      data-testid="menu-item-tag"
-                    >
-                      <Tag className="w-4 h-4 mr-2" />
-                      Tag
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem 
-                    onClick={handleEditCaption}
-                    data-testid="menu-item-rename"
-                  >
-                    <Pencil className="w-4 h-4 mr-2" />
-                    Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setShowComments(!showComments)}
-                    data-testid="menu-item-comment"
-                  >
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Comment {comments.length > 0 && `(${comments.length})`}
-                  </DropdownMenuItem>
-                  {onSetCoverPhoto && (
-                    <DropdownMenuItem 
-                      onClick={handleSetCoverPhoto}
-                      data-testid="menu-item-use-as-icon"
-                    >
-                      <Image className="w-4 h-4 mr-2" />
-                      Use as Icon
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+        {/* Annotate */}
+        {onAnnotate && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onAnnotate(currentPhoto)}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            data-testid="button-annotate"
+            aria-label="Annotate photo"
+          >
+            <Brush className="w-6 h-6" />
+            <span className="text-[10px]">Annotate</span>
+          </Button>
+        )}
 
-              {onShare && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleShare}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
-                  data-testid="button-share"
-                  aria-label="Share photo"
-                >
-                  <Share2 className="w-6 h-6" />
-                  <span className="text-xs font-medium hidden sm:inline">Share</span>
-                </Button>
-              )}
-              
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDeleteClick}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
-                  data-testid="button-delete"
-                  aria-label="Delete photo"
-                >
-                  <Trash2 className="w-6 h-6" />
-                  <span className="text-xs font-medium hidden sm:inline">Delete</span>
-                </Button>
-              )}
-            </div>
+        {/* Tag */}
+        {onTag && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onTag(currentPhoto)}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            data-testid="button-tag"
+            aria-label="Tag photo"
+          >
+            <Tag className="w-6 h-6" />
+            <span className="text-[10px]">Tag</span>
+          </Button>
+        )}
 
-            {/* Empty right column for grid symmetry */}
-            <div />
-          </div>
-        </div>
+        {/* Rename */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEditCaption}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+          data-testid="button-rename"
+          aria-label="Rename photo"
+        >
+          <Pencil className="w-6 h-6" />
+          <span className="text-[10px]">Rename</span>
+        </Button>
+
+        {/* Comment */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowComments(!showComments)}
+          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white relative"
+          data-testid="button-comment"
+          aria-label="Comment on photo"
+        >
+          <MessageSquare className="w-6 h-6" />
+          <span className="text-[10px]">Comment</span>
+          {comments.length > 0 && (
+            <span className="absolute top-0 right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center text-[9px] font-semibold">
+              {comments.length}
+            </span>
+          )}
+        </Button>
+
+        {/* Share */}
+        {onShare && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleShare}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            data-testid="button-share"
+            aria-label="Share photo"
+          >
+            <Share2 className="w-6 h-6" />
+            <span className="text-[10px]">Share</span>
+          </Button>
+        )}
+
+        {/* Delete */}
+        {onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDeleteClick}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            data-testid="button-delete"
+            aria-label="Delete photo"
+          >
+            <Trash2 className="w-6 h-6" />
+            <span className="text-[10px]">Delete</span>
+          </Button>
+        )}
+
+        {/* Use as Icon */}
+        {onSetCoverPhoto && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSetCoverPhoto}
+            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            data-testid="button-set-cover"
+            aria-label="Use as project icon"
+          >
+            <Image className="w-6 h-6" />
+            <span className="text-[10px]">Icon</span>
+          </Button>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
