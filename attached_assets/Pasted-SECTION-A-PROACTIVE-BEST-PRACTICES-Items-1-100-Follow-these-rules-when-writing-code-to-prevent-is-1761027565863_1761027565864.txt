@@ -1,0 +1,3153 @@
+SECTION A: PROACTIVE BEST PRACTICES (Items 1-100)
+Follow these rules when writing code to prevent issues
+
+🚀 CATEGORY 1: PERFORMANCE OPTIMIZATION (Items 1-25)
+Code Splitting & Lazy Loading (Items 1-5)
+#1 - Route-Based Code Splitting 🔴 CRITICAL
+
+Rule: Split code by route using React.lazy()
+Why: Reduces initial bundle size from 500KB to <200KB
+How:
+Copy// ✅ DO THIS:
+const Camera = React.lazy(() => import('./pages/Camera'));
+const Gallery = React.lazy(() => import('./pages/Gallery'));
+
+<Suspense fallback={<Loading />}>
+  <Routes>
+    <Route path="/camera" element={<Camera />} />
+    <Route path="/gallery" element={<Gallery />} />
+  </Routes>
+</Suspense>
+
+// ❌ DON'T DO THIS:
+import Camera from './pages/Camera'; // Loads immediately
+#2 - Lazy Load Heavy Components 🟡 HIGH
+
+Rule: Image editor, charts, maps load on-demand only
+Why: Components >50KB hurt initial load time
+How:
+Copy// ✅ DO THIS:
+const ImageEditor = React.lazy(() => import('./components/ImageEditor'));
+
+// Render only when needed
+{showEditor && <ImageEditor />}
+
+// ❌ DON'T DO THIS:
+import ImageEditor from './components/ImageEditor'; // Always loaded
+#3 - Dynamic Imports for Features 🟡 HIGH
+
+Rule: Import heavy libraries only when user accesses the feature
+Why: Reduces main bundle by 30-40%
+How:
+Copy// ✅ DO THIS:
+async function exportToPDF() {
+  const jsPDF = await import('jspdf');
+  const doc = new jsPDF.default();
+  // Use it
+}
+
+// ❌ DON'T DO THIS:
+import jsPDF from 'jspdf'; // Loaded even if never used
+#4 - Preload Critical Routes 🟡 HIGH
+
+Rule: Preload Camera and Gallery routes after app loads
+Why: Instant navigation when user taps buttons
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  // Preload after 2 seconds of idle
+  setTimeout(() => {
+    import('./pages/Camera');
+    import('./pages/Gallery');
+  }, 2000);
+}, []);
+#5 - Lazy Load with Retry Logic 🟡 HIGH
+
+Rule: Implement retry mechanism for failed chunk loads
+Why: Network failures shouldn't break app
+How:
+Copy// ✅ DO THIS:
+const lazyWithRetry = (importFunc: () => Promise<any>) => {
+  return React.lazy(() => 
+    importFunc().catch(() => {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(importFunc()), 1000);
+      });
+    })
+  );
+};
+
+const Camera = lazyWithRetry(() => import('./pages/Camera'));
+React Performance Patterns (Items 6-15)
+#6 - Memoize Expensive Computations 🔴 CRITICAL
+
+Rule: Use useMemo for filtering, sorting, calculations
+Why: Prevents re-computing on every render (60fps → 30fps drop)
+How:
+Copy// ✅ DO THIS:
+const filteredPhotos = useMemo(() => {
+  return photos.filter(p => p.tags.includes(selectedTag));
+}, [photos, selectedTag]); // Only recompute when these change
+
+// ❌ DON'T DO THIS:
+const filteredPhotos = photos.filter(p => p.tags.includes(selectedTag)); 
+// Runs on EVERY render
+#7 - Memoize Callback Functions 🔴 CRITICAL
+
+Rule: Use useCallback for functions passed to child components
+Why: Prevents child re-renders (critical for lists)
+How:
+Copy// ✅ DO THIS:
+const handlePhotoClick = useCallback((id: string) => {
+  setSelectedPhoto(id);
+}, []); // Function identity stable
+
+<PhotoList onPhotoClick={handlePhotoClick} />
+
+// ❌ DON'T DO THIS:
+<PhotoList onPhotoClick={(id) => setSelectedPhoto(id)} />
+// New function every render → PhotoList re-renders
+#8 - Wrap Pure Components in React.memo 🟡 HIGH
+
+Rule: Memoize components that render the same output for same props
+Why: Skip re-renders when props haven't changed
+How:
+Copy// ✅ DO THIS:
+const PhotoCard = React.memo(({ photo, onSelect }) => {
+  return <div onClick={() => onSelect(photo.id)}>{photo.title}</div>;
+});
+
+// Only re-renders if photo or onSelect changes
+#9 - Avoid Inline Function Definitions 🟡 HIGH
+
+Rule: Don't create functions inside JSX
+Why: Creates new function every render → breaks memoization
+How:
+Copy// ✅ DO THIS:
+const handleDelete = useCallback((id: string) => {
+  deletePhoto(id);
+}, []);
+
+<Button onClick={handleDelete} />
+
+// ❌ DON'T DO THIS:
+<Button onClick={() => deletePhoto(photo.id)} />
+// New function every render
+#10 - Use Key Prop Correctly 🔴 CRITICAL
+
+Rule: Keys must be stable and unique (database IDs, not array index)
+Why: Array index causes wrong items to update/animate
+How:
+Copy// ✅ DO THIS:
+{photos.map(photo => (
+  <PhotoCard key={photo.id} photo={photo} />
+))}
+
+// ❌ DON'T DO THIS:
+{photos.map((photo, index) => (
+  <PhotoCard key={index} photo={photo} />
+))}
+// Breaks when array reorders
+#11 - Virtualize Long Lists 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Use react-window for photo galleries with >50 items
+Why: Rendering 500 photos = 5000ms, virtualized = 50ms
+How:
+Copy// ✅ DO THIS:
+import { FixedSizeGrid } from 'react-window';
+
+<FixedSizeGrid
+  columnCount={3}
+  rowCount={Math.ceil(photos.length / 3)}
+  columnWidth={100}
+  rowHeight={100}
+  height={600}
+  width={300}
+>
+  {({ columnIndex, rowIndex, style }) => {
+    const index = rowIndex * 3 + columnIndex;
+    return <PhotoCard style={style} photo={photos[index]} />;
+  }}
+</FixedSizeGrid>
+
+// ❌ DON'T DO THIS:
+{photos.map(photo => <PhotoCard photo={photo} />)}
+// Renders ALL photos at once
+#12 - Implement Infinite Scroll 🟡 HIGH (FieldSnaps Priority)
+
+Rule: Load photos in batches of 20-50
+Why: Loading 500 photos at once = 3-5 second freeze
+How:
+Copy// ✅ DO THIS:
+const [page, setPage] = useState(1);
+const [photos, setPhotos] = useState([]);
+
+const loadMore = useCallback(async () => {
+  const newPhotos = await fetchPhotos(page, 20);
+  setPhotos(prev => [...prev, ...newPhotos]);
+  setPage(prev => prev + 1);
+}, [page]);
+
+// Trigger on scroll
+useEffect(() => {
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) loadMore();
+  });
+  observer.observe(bottomRef.current);
+}, [loadMore]);
+#13 - Debounce Search Inputs 🟡 HIGH
+
+Rule: Wait 300ms after typing before filtering/searching
+Why: Prevents re-rendering on every keystroke
+How:
+Copy// ✅ DO THIS:
+const [searchTerm, setSearchTerm] = useState('');
+const debouncedSearch = useMemo(
+  () => debounce((term: string) => performSearch(term), 300),
+  []
+);
+
+<input onChange={(e) => debouncedSearch(e.target.value)} />
+
+// ❌ DON'T DO THIS:
+<input onChange={(e) => performSearch(e.target.value)} />
+// Searches on EVERY keystroke
+#14 - Throttle Scroll Events 🟡 HIGH
+
+Rule: Limit scroll handlers to 16ms (60fps)
+Why: Scroll fires 100+ times/second, causes jank
+How:
+Copy// ✅ DO THIS:
+const handleScroll = useCallback(
+  throttle(() => {
+    // Handle scroll
+  }, 16), // 60fps
+  []
+);
+
+window.addEventListener('scroll', handleScroll);
+#15 - Use CSS Transforms for Animations 🟡 HIGH
+
+Rule: Animate with transform/opacity, NOT top/left/width/height
+Why: Transform uses GPU, layout properties trigger reflow
+How:
+Copy/* ✅ DO THIS: */
+.photo-card {
+  transition: transform 0.3s;
+}
+.photo-card:hover {
+  transform: scale(1.05);
+}
+
+/* ❌ DON'T DO THIS: */
+.photo-card {
+  transition: width 0.3s;
+}
+.photo-card:hover {
+  width: 110%; /* Triggers layout reflow */
+}
+Image & Media Optimization (Items 16-20)
+#16 - Compress Images Before Upload 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Max 1920px width, 85% JPEG quality
+Why: 4K photos are 8-12MB each, compressed = 500KB-1MB
+How:
+Copy// ✅ DO THIS:
+import { Capacitor } from '@capacitor/core';
+import imageCompression from 'browser-image-compression';
+
+async function compressPhoto(file: File) {
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  };
+  
+  const compressed = await imageCompression(file, options);
+  return compressed;
+}
+
+// ❌ DON'T DO THIS:
+// Upload original 4K photos without compression
+#17 - Generate Thumbnails 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Create 200x200px thumbnails for gallery view
+Why: Loading full-res images in gallery = 10x slower
+How:
+Copy// ✅ DO THIS:
+async function generateThumbnail(file: File) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const img = await createImageBitmap(file);
+  
+  canvas.width = 200;
+  canvas.height = 200;
+  ctx.drawImage(img, 0, 0, 200, 200);
+  
+  return canvas.toBlob({ type: 'image/jpeg', quality: 0.8 });
+}
+
+// Store both full-res and thumbnail
+const photo = {
+  fullUrl: '/photos/original.jpg',
+  thumbnailUrl: '/photos/thumb.jpg', // Use this in gallery
+};
+#18 - Lazy Load Images 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Load images only when they enter viewport
+Why: Loading 100 images at once = 5-10 second delay
+How:
+Copy// ✅ DO THIS:
+const LazyImage = ({ src, alt }) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    });
+    
+    if (imgRef.current) observer.observe(imgRef.current);
+    return () => observer.disconnect();
+  }, []);
+  
+  return (
+    <img 
+      ref={imgRef}
+      src={isVisible ? src : '/placeholder.jpg'} 
+      alt={alt}
+    />
+  );
+};
+#19 - Use WebP Format Where Possible 🟡 HIGH
+
+Rule: Convert JPEG/PNG to WebP (30% smaller)
+Why: Faster loading, less bandwidth
+How:
+Copy// ✅ DO THIS:
+<picture>
+  <source srcSet="/photo.webp" type="image/webp" />
+  <img src="/photo.jpg" alt="Fallback for old browsers" />
+</picture>
+
+// Server-side: convert on upload
+// iOS Safari supports WebP since iOS 14
+#20 - Progressive Image Loading 🟡 HIGH (FieldSnaps Priority)
+
+Rule: Show blur placeholder → thumbnail → full-res
+Why: Perceived performance improvement
+How:
+Copy// ✅ DO THIS:
+const [imgSrc, setImgSrc] = useState(photo.blurHash); // Tiny blur
+
+useEffect(() => {
+  // Load thumbnail first
+  const thumb = new Image();
+  thumb.src = photo.thumbnailUrl;
+  thumb.onload = () => setImgSrc(photo.thumbnailUrl);
+  
+  // Then load full-res
+  const full = new Image();
+  full.src = photo.fullUrl;
+  full.onload = () => setImgSrc(photo.fullUrl);
+}, [photo]);
+
+<img src={imgSrc} style={{ filter: imgSrc === photo.blurHash ? 'blur(10px)' : 'none' }} />
+Bundle Size Management (Items 21-25)
+#21 - Keep Main Bundle Under 200KB 🔴 CRITICAL
+
+Rule: Monitor bundle with webpack-bundle-analyzer
+Why: >200KB = slow initial load on 3G
+How:
+Copy# ✅ DO THIS:
+npm install --save-dev webpack-bundle-analyzer
+
+# Add to vite.config.ts:
+import { visualizer } from 'rollup-plugin-visualizer';
+
+export default {
+  plugins: [
+    visualizer({ open: true })
+  ]
+}
+
+# Check after every build
+npm run build
+# Review bundle size in stats.html
+#22 - Tree-Shake Unused Code 🟡 HIGH
+
+Rule: Enable sideEffects: false in package.json
+Why: Removes unused exports from bundle
+How:
+Copy// ✅ DO THIS in package.json:
+{
+  "sideEffects": false
+}
+
+// Import only what you need:
+import { format } from 'date-fns'; // ✅ Only imports format()
+
+// ❌ DON'T DO THIS:
+import * as dateFns from 'date-fns'; // Imports everything
+#23 - Use date-fns Instead of moment.js 🟡 HIGH
+
+Rule: Replace moment.js with date-fns
+Why: moment = 72KB, date-fns = 5KB per function
+How:
+Copy// ✅ DO THIS:
+import { format, parseISO } from 'date-fns';
+const date = format(new Date(), 'yyyy-MM-dd');
+
+// ❌ DON'T DO THIS:
+import moment from 'moment';
+const date = moment().format('YYYY-MM-DD');
+#24 - Minimize Dependencies 🟡 HIGH
+
+Rule: Audit and remove unused packages monthly
+Why: Each dependency adds 10-50KB
+How:
+Copy# ✅ DO THIS:
+npm ls --all  # Check dependency tree
+npx depcheck  # Find unused dependencies
+npm uninstall <unused-package>
+
+# Before adding new package, ask:
+# 1. Do I really need this?
+# 2. Can I write this in 50 lines instead?
+# 3. Is there a lighter alternative?
+#25 - Always Use Production Builds 🔴 CRITICAL
+
+Rule: Build with NODE_ENV=production
+Why: Development build is 3-5x larger
+How:
+Copy# ✅ DO THIS:
+npm run build  # Uses production mode
+
+# Verify in code:
+if (process.env.NODE_ENV === 'production') {
+  // Remove console.logs, debuggers
+}
+
+# ❌ DON'T DO THIS:
+# Never deploy development builds
+🧠 CATEGORY 2: MEMORY MANAGEMENT (Items 26-45)
+WKWebView Memory Best Practices (Items 26-30)
+#26 - Limit DOM Size to 1500 Nodes Max 🔴 CRITICAL
+
+Rule: Never render >1500 DOM elements at once
+Why: WKWebView crashes on older iPhones with large DOM
+How:
+Copy// ✅ DO THIS:
+// Use virtualization (see #11)
+// Or pagination: show 50 photos per page
+
+// Check DOM size in development:
+console.log('DOM nodes:', document.querySelectorAll('*').length);
+// If > 1500, implement virtualization immediately
+
+// ❌ DON'T DO THIS:
+{photos.map(p => <PhotoCard />)} // 500 photos = 5000+ nodes
+#27 - Remove Event Listeners on Unmount 🔴 CRITICAL
+
+Rule: Always cleanup event listeners in useEffect return
+Why: Memory leaks accumulate with navigation
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const handleResize = () => { /* ... */ };
+  window.addEventListener('resize', handleResize);
+  
+  return () => {
+    window.removeEventListener('resize', handleResize); // Cleanup
+  };
+}, []);
+
+// ❌ DON'T DO THIS:
+useEffect(() => {
+  window.addEventListener('resize', handleResize);
+  // No cleanup = memory leak
+}, []);
+#28 - Dispose of Heavy Objects Promptly 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Clear large arrays, images, canvases when done
+Why: Holding references prevents garbage collection
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const largeImageData = await loadImage();
+  processImage(largeImageData);
+  
+  return () => {
+    largeImageData = null; // Allow GC
+  };
+}, []);
+
+// After processing photos:
+canvas.width = 0;
+canvas.height = 0;
+canvas = null;
+#29 - Use WeakMap for Caching 🟡 HIGH
+
+Rule: Cache computed values in WeakMap, not Map
+Why: WeakMap allows garbage collection when keys deleted
+How:
+Copy// ✅ DO THIS:
+const imageCache = new WeakMap<HTMLImageElement, ProcessedData>();
+
+function processImage(img: HTMLImageElement) {
+  if (imageCache.has(img)) return imageCache.get(img);
+  
+  const processed = expensiveOperation(img);
+  imageCache.set(img, processed);
+  return processed;
+}
+// When img is deleted, cache entry is GC'd automatically
+
+// ❌ DON'T DO THIS:
+const imageCache = new Map(); // Holds references forever
+#30 - Avoid Memory Leaks in Closures 🟡 HIGH
+
+Rule: Don't capture large objects in closures unnecessarily
+Why: Closures keep references alive indefinitely
+How:
+Copy// ✅ DO THIS:
+function PhotoViewer({ photoId }: Props) {
+  const handleClick = useCallback(() => {
+    fetchPhoto(photoId); // Only capture ID, not full photo object
+  }, [photoId]);
+}
+
+// ❌ DON'T DO THIS:
+function PhotoViewer({ photo }: Props) { // 5MB object
+  const handleClick = () => {
+    console.log(photo.id); // Captures entire 5MB object
+  };
+  return <button onClick={handleClick} />;
+}
+Component Lifecycle Management (Items 31-35)
+#31 - Cancel Pending Requests on Unmount 🔴 CRITICAL
+
+Rule: Use AbortController for all fetch calls
+Why: Prevents "Cannot update unmounted component" errors
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const abortController = new AbortController();
+  
+  async function fetchData() {
+    try {
+      const response = await fetch('/api/photos', {
+        signal: abortController.signal
+      });
+      const data = await response.json();
+      setPhotos(data);
+    } catch (err) {
+      if (err.name === 'AbortError') return; // Ignore abort
+      console.error(err);
+    }
+  }
+  
+  fetchData();
+  
+  return () => {
+    abortController.abort(); // Cancel on unmount
+  };
+}, []);
+#32 - Clear Intervals and Timeouts 🔴 CRITICAL
+
+Rule: Always clearInterval/clearTimeout in cleanup
+Why: Timers continue running after unmount = memory leak
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const intervalId = setInterval(() => {
+    checkForUpdates();
+  }, 5000);
+  
+  return () => {
+    clearInterval(intervalId); // Stop timer on unmount
+  };
+}, []);
+
+// ❌ DON'T DO THIS:
+useEffect(() => {
+  setInterval(() => checkForUpdates(), 5000);
+  // No cleanup = timer runs forever
+}, []);
+#33 - Unsubscribe from Observables 🟡 HIGH
+
+Rule: Unsubscribe from RxJS, event emitters, websockets
+Why: Active subscriptions prevent garbage collection
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const subscription = photoStream$.subscribe(photo => {
+    addPhoto(photo);
+  });
+  
+  return () => {
+    subscription.unsubscribe(); // Stop listening
+  };
+}, []);
+#34 - Dispose of Canvas Contexts 🟡 HIGH (FieldSnaps Priority)
+
+Rule: Clear canvas and set to null when done
+Why: Canvas holds large pixel buffers in memory
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  
+  // Use canvas for image editing
+  
+  return () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = 0;
+    canvas.height = 0;
+    // Canvas memory released
+  };
+}, []);
+#35 - Release Camera Resources 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Stop all camera tracks when leaving camera view
+Why: Camera continues running = battery drain + memory leak
+How:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  let stream: MediaStream | null = null;
+  
+  async function startCamera() {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoRef.current.srcObject = stream;
+  }
+  
+  startCamera();
+  
+  return () => {
+    // Stop all tracks on unmount
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+  };
+}, []);
+
+// ❌ DON'T DO THIS:
+// Leaving camera running when user navigates away
+Data Management (Items 36-40)
+#36 - Use Pagination for Large Datasets 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Load 20-50 items per page/batch
+Why: Loading 500+ items at once freezes UI for 3-5 seconds
+How:
+Copy// ✅ DO THIS:
+async function fetchPhotos(page: number, limit: number = 20) {
+  const offset = (page - 1) * limit;
+  const response = await fetch(`/api/photos?limit=${limit}&offset=${offset}`);
+  return response.json();
+}
+
+// Load more on scroll (see #12)
+#37 - Implement Data Expiration 🟡 HIGH
+
+Rule: Clear cached data older than 24 hours
+Why: Old cached data accumulates, wastes memory
+How:
+Copy// ✅ DO THIS:
+interface CachedItem {
+  data: any;
+  timestamp: number;
+}
+
+function getCachedData(key: string) {
+  const cached = localStorage.getItem(key);
+  if (!cached) return null;
+  
+  const item: CachedItem = JSON.parse(cached);
+  const age = Date.now() - item.timestamp;
+  
+  if (age > 24 * 60 * 60 * 1000) { // 24 hours
+    localStorage.removeItem(key);
+    return null;
+  }
+  
+  return item.data;
+}
+#38 - Normalize State Structure 🟡 HIGH
+
+Rule: Store entities by ID in flat objects, not nested arrays
+Why: Faster lookups, easier updates, prevents deep copies
+How:
+Copy// ✅ DO THIS:
+interface State {
+  photos: {
+    byId: { [id: string]: Photo };
+    allIds: string[];
+  };
+}
+
+// Update single photo:
+state.photos.byId[photoId] = updatedPhoto; // O(1)
+
+// ❌ DON'T DO THIS:
+interface State {
+  photos: Photo[]; // Nested array
+}
+
+// Update single photo:
+const index = photos.findIndex(p => p.id === photoId); // O(n)
+photos[index] = updatedPhoto;
+#39 - Limit localStorage Usage 🟡 HIGH
+
+Rule: Max 5MB in localStorage, use IndexedDB for more
+Why: localStorage blocks main thread, has size limits
+How:
+Copy// ✅ DO THIS:
+// Small data: localStorage
+localStorage.setItem('settings', JSON.stringify(settings)); // <100KB
+
+// Large data: IndexedDB
+import { openDB } from 'idb';
+
+const db = await openDB('FieldSnaps', 1, {
+  upgrade(db) {
+    db.createObjectStore('photos');
+  }
+});
+
+await db.put('photos', photoData, photoId); // Any size
+
+// ❌ DON'T DO THIS:
+localStorage.setItem('allPhotos', JSON.stringify(photos)); // 10MB = crash
+#40 - Clear Temporary Data 🟡 HIGH (FieldSnaps Priority)
+
+Rule: Remove preview images, temp files after use
+Why: Temp data accumulates over time
+How:
+Copy// ✅ DO THIS:
+async function capturePhoto() {
+  const photo = await Camera.getPhoto();
+  const preview = photo.webPath; // Temporary blob URL
+  
+  // Show preview
+  setPreviewUrl(preview);
+  
+  // After user confirms/cancels:
+  if (preview.startsWith('blob:')) {
+    URL.revokeObjectURL(preview); // Free memory
+  }
+}
+Resource Cleanup (Items 41-45)
+#41 - Revoke Object URLs 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Call URL.revokeObjectURL() after creating blob URLs
+Why: Each blob URL holds memory until revoked
+How:
+Copy// ✅ DO THIS:
+const blob = new Blob([imageData]);
+const url = URL.createObjectURL(blob);
+
+imgElement.src = url;
+
+// After image loads or component unmounts:
+imgElement.onload = () => {
+  URL.revokeObjectURL(url); // Free memory
+};
+
+// ❌ DON'T DO THIS:
+const url = URL.createObjectURL(blob);
+imgElement.src = url;
+// Memory leaks until page refresh
+#42 - Clear IndexedDB Periodically 🟡 HIGH
+
+Rule: Delete entries older than 30 days
+Why: Old data accumulates, slows down queries
+How:
+Copy// ✅ DO THIS:
+async function cleanupOldPhotos() {
+  const db = await openDB('FieldSnaps', 1);
+  const tx = db.transaction('photos', 'readwrite');
+  const store = tx.objectStore('photos');
+  
+  const cutoffDate = Date.now() - (30 * 24 * 60 * 60 * 1000);
+  
+  let cursor = await store.openCursor();
+  while (cursor) {
+    if (cursor.value.timestamp < cutoffDate) {
+      await cursor.delete();
+    }
+    cursor = await cursor.continue();
+  }
+}
+
+// Run on app start
+useEffect(() => {
+  cleanupOldPhotos();
+}, []);
+#43 - Reset State on Logout 🔴 CRITICAL
+
+Rule: Clear all user data from memory and storage
+Why: Security risk + memory leak if not cleared
+How:
+Copy// ✅ DO THIS:
+async function logout() {
+  // Clear React state
+  setUser(null);
+  setPhotos([]);
+  setSettings(null);
+  
+  // Clear storage
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Clear IndexedDB
+  const db = await openDB('FieldSnaps', 1);
+  await db.clear('photos');
+  await db.clear('cache');
+  
+  // Navigate to login
+  navigate('/login');
+}
+#44 - Implement Memory Pressure Handlers 🟡 HIGH
+
+Rule: Reduce quality/cache when device memory is low
+Why: Prevents crashes on older devices
+How:
+Copy// ✅ DO THIS:
+if ('deviceMemory' in navigator) {
+  const memory = (navigator as any).deviceMemory; // GB
+  
+  if (memory < 4) {
+    // Low memory device: reduce quality
+    compressionQuality = 0.7; // Instead of 0.85
+    thumbnailSize = 150; // Instead of 200
+    maxCacheSize = 50; // Instead of 100
+  }
+}
+#45 - Monitor Memory Usage in Development 🟡 HIGH
+
+Rule: Use Chrome DevTools Memory profiler regularly
+Why: Catch memory leaks before production
+How:
+Copy// ✅ DO THIS:
+// In development mode only:
+if (process.env.NODE_ENV === 'development') {
+  setInterval(() => {
+    if (performance.memory) {
+      console.log('Heap used:', 
+        Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB'
+      );
+      
+      // Alert if > 100MB
+      if (performance.memory.usedJSHeapSize > 100 * 1048576) {
+        console.warn('High memory usage detected!');
+      }
+    }
+  }, 10000); // Check every 10 seconds
+}
+⚡ CATEGORY 3: REACT & TYPESCRIPT BEST PRACTICES (Items 46-65)
+TypeScript Usage (Items 46-50)
+#46 - Enable Strict Mode 🔴 CRITICAL
+
+Rule: Set "strict": true in tsconfig.json
+Why: Catches type errors at compile time, not runtime
+How:
+Copy// ✅ DO THIS in tsconfig.json:
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true
+  }
+}
+#47 - Define Explicit Return Types 🟡 HIGH
+
+Rule: All functions must declare return type
+Why: Prevents accidental type changes, better documentation
+How:
+Copy// ✅ DO THIS:
+function fetchPhotos(userId: string): Promise<Photo[]> {
+  return fetch(`/api/users/${userId}/photos`)
+    .then(res => res.json());
+}
+
+// ❌ DON'T DO THIS:
+function fetchPhotos(userId: string) { // Return type inferred
+  return fetch(`/api/users/${userId}/photos`)
+    .then(res => res.json());
+}
+#48 - Use Interface Over Type 🟡 HIGH
+
+Rule: Prefer interface for object shapes, type for unions/intersections
+Why: Interfaces are more performant for type checking
+How:
+Copy// ✅ DO THIS:
+interface Photo {
+  id: string;
+  url: string;
+  timestamp: number;
+}
+
+// Use type for unions:
+type Status = 'loading' | 'success' | 'error';
+
+// ❌ DON'T DO THIS:
+type Photo = { // Should be interface
+  id: string;
+  url: string;
+  timestamp: number;
+};
+#49 - Avoid 'any' Type 🔴 CRITICAL
+
+Rule: Use 'unknown' and type guards instead of 'any'
+Why: 'any' disables type checking completely
+How:
+Copy// ✅ DO THIS:
+function processData(data: unknown) {
+  if (typeof data === 'string') {
+    return data.toUpperCase();
+  }
+  if (typeof data === 'number') {
+    return data * 2;
+  }
+  throw new Error('Invalid data type');
+}
+
+// ❌ DON'T DO THIS:
+function processData(data: any) { // Disables all type checking
+  return data.toUpperCase(); // No error if data is number
+}
+#50 - Create Type Guards for API Data 🔴 CRITICAL
+
+Rule: Validate external data with type predicates
+Why: API responses might not match expected types
+How:
+Copy// ✅ DO THIS:
+interface Photo {
+  id: string;
+  url: string;
+  timestamp: number;
+}
+
+function isPhoto(obj: unknown): obj is Photo {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'url' in obj &&
+    'timestamp' in obj &&
+    typeof obj.id === 'string' &&
+    typeof obj.url === 'string' &&
+    typeof obj.timestamp === 'number'
+  );
+}
+
+async function fetchPhoto(id: string): Promise<Photo> {
+  const response = await fetch(`/api/photos/${id}`);
+  const data = await response.json();
+  
+  if (!isPhoto(data)) {
+    throw new Error('Invalid photo data from API');
+  }
+  
+  return data; // Type-safe
+}
+State Management (Items 51-55)
+#51 - Use Immutable Updates 🔴 CRITICAL
+
+Rule: Never mutate state directly, always create new objects
+Why: React detects changes by reference, mutations are invisible
+How:
+Copy// ✅ DO THIS:
+const [photos, setPhotos] = useState<Photo[]>([]);
+
+// Add photo:
+setPhotos(prevPhotos => [...prevPhotos, newPhoto]);
+
+// Update photo:
+setPhotos(prevPhotos => 
+  prevPhotos.map(p => p.id === photoId ? { ...p, liked: true } : p)
+);
+
+// ❌ DON'T DO THIS:
+photos.push(newPhoto); // Mutation
+setPhotos(photos); // React won't detect change
+#52 - Keep State Flat 🟡 HIGH
+
+Rule: Avoid deeply nested state (max 2 levels)
+Why: Deep updates require complex spread operations
+How:
+Copy// ✅ DO THIS:
+interface State {
+  photos: { [id: string]: Photo };
+  photoOrder: string[];
+  selectedPhotoId: string | null;
+}
+
+// ❌ DON'T DO THIS:
+interface State {
+  user: {
+    profile: {
+      photos: {
+        items: Photo[];
+        selected: Photo | null;
+      };
+    };
+  };
+}
+// Updating nested state is complex and error-prone
+#53 - Lift State Appropriately 🟡 HIGH
+
+Rule: Lift state to nearest common ancestor, not always to top
+Why: Reduces unnecessary re-renders
+How:
+Copy// ✅ DO THIS:
+function PhotoGallery() {
+  // Only this component and children need this state
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  
+  return (
+    <>
+      <PhotoGrid onSelect={setSelectedPhoto} />
+      <PhotoViewer photoId={selectedPhoto} />
+    </>
+  );
+}
+
+// ❌ DON'T DO THIS:
+// Putting selectedPhoto in global state when only gallery needs it
+#54 - Use useReducer for Complex State 🟡 HIGH
+
+Rule: If state has >3 related values, use useReducer
+Why: Centralizes update logic, easier to test
+How:
+Copy// ✅ DO THIS:
+interface PhotoState {
+  photos: Photo[];
+  loading: boolean;
+  error: string | null;
+  selectedId: string | null;
+}
+
+type Action =
+  | { type: 'FETCH_START' }
+  | { type: 'FETCH_SUCCESS'; payload: Photo[] }
+  | { type: 'FETCH_ERROR'; payload: string }
+  | { type: 'SELECT_PHOTO'; payload: string };
+
+function photoReducer(state: PhotoState, action: Action): PhotoState {
+  switch (action.type) {
+    case 'FETCH_START':
+      return { ...state, loading: true, error: null };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, photos: action.payload };
+    case 'FETCH_ERROR':
+      return { ...state, loading: false, error: action.payload };
+    case 'SELECT_PHOTO':
+      return { ...state, selectedId: action.payload };
+    default:
+      return state;
+  }
+}
+
+const [state, dispatch] = useReducer(photoReducer, initialState);
+
+// ❌ DON'T DO THIS:
+const [photos, setPhotos] = useState([]);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
+const [selectedId, setSelectedId] = useState(null);
+// Too many related useState calls
+#55 - Implement Optimistic Updates 🟡 HIGH
+
+Rule: Update UI immediately, rollback on error
+Why: Feels instant to user, better UX
+How:
+Copy// ✅ DO THIS:
+async function likePhoto(photoId: string) {
+  // 1. Update UI immediately (optimistic)
+  setPhotos(prev => 
+    prev.map(p => p.id === photoId ? { ...p, liked: true } : p)
+  );
+  
+  try {
+    // 2. Send request to server
+    await fetch(`/api/photos/${photoId}/like`, { method: 'POST' });
+  } catch (error) {
+    // 3. Rollback on error
+    setPhotos(prev => 
+      prev.map(p => p.id === photoId ? { ...p, liked: false } : p)
+    );
+    showError('Failed to like photo');
+  }
+}
+Component Architecture (Items 56-60)
+#56 - Follow Single Responsibility 🟡 HIGH
+
+Rule: Each component does one thing well
+Why: Easier to test, reuse, maintain
+How:
+Copy// ✅ DO THIS:
+function PhotoCard({ photo }) { /* Display photo */ }
+function PhotoActions({ photoId, onLike, onShare }) { /* Action buttons */ }
+function PhotoMetadata({ photo }) { /* Show date, location */ }
+
+function PhotoListItem({ photo }) {
+  return (
+    <div>
+      <PhotoCard photo={photo} />
+      <PhotoActions photoId={photo.id} onLike={handleLike} onShare={handleShare} />
+      <PhotoMetadata photo={photo} />
+    </div>
+  );
+}
+
+// ❌ DON'T DO THIS:
+function PhotoListItem({ photo }) {
+  // 300 lines: display, actions, metadata, editing, sharing all in one
+}
+#57 - Extract Custom Hooks 🟡 HIGH
+
+Rule: Reusable logic should be in custom hooks
+Why: Reduces duplication, easier to test
+How:
+Copy// ✅ DO THIS:
+function usePhotoUpload() {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
+  const upload = useCallback(async (file: File) => {
+    setUploading(true);
+    // Upload logic with progress
+    setUploading(false);
+  }, []);
+  
+  return { uploading, progress, upload };
+}
+
+// Use in multiple components:
+function CameraView() {
+  const { upload, uploading } = usePhotoUpload();
+  // ...
+}
+
+function GalleryUpload() {
+  const { upload, progress } = usePhotoUpload();
+  // ...
+}
+#58 - Use Composition Over Inheritance 🟡 HIGH
+
+Rule: Build complex components from simple ones
+Why: More flexible than class inheritance
+How:
+Copy// ✅ DO THIS:
+function Card({ children }) { /* Card wrapper */ }
+function CardHeader({ children }) { /* Header */ }
+function CardBody({ children }) { /* Body */ }
+
+function PhotoCard({ photo }) {
+  return (
+    <Card>
+      <CardHeader>{photo.title}</CardHeader>
+      <CardBody><img src={photo.url} /></CardBody>
+    </Card>
+  );
+}
+
+// ❌ DON'T DO THIS:
+class BaseCard extends React.Component { /* ... */ }
+class PhotoCard extends BaseCard { /* ... */ }
+// Inheritance is rigid and hard to change
+#59 - Keep Components Under 250 Lines 🟡 HIGH
+
+Rule: If component exceeds 250 lines, extract sub-components
+Why: Large components are hard to understand and test
+How:
+Copy// ✅ DO THIS:
+// PhotoGallery.tsx (150 lines)
+function PhotoGallery() {
+  return (
+    <>
+      <GalleryHeader />  {/* Separate file */}
+      <GalleryGrid />    {/* Separate file */}
+      <GalleryFooter />  {/* Separate file */}
+    </>
+  );
+}
+
+// ❌ DON'T DO THIS:
+// PhotoGallery.tsx (800 lines)
+function PhotoGallery() {
+  // Everything in one massive component
+}
+#60 - Separate Container and Presentational 🟡 HIGH
+
+Rule: Logic components (containers) vs UI components (presentational)
+Why: Easier to test, style, reuse
+How:
+Copy// ✅ DO THIS:
+
+// Container (logic):
+function PhotoGalleryContainer() {
+  const { photos, loading, error } = usePhotos();
+  const handleSelect = (id: string) => { /* logic */ };
+  
+  return (
+    <PhotoGalleryPresentation 
+      photos={photos}
+      loading={loading}
+      onSelect={handleSelect}
+    />
+  );
+}
+
+// Presentational (UI only):
+interface Props {
+  photos: Photo[];
+  loading: boolean;
+  onSelect: (id: string) => void;
+}
+
+function PhotoGalleryPresentation({ photos, loading, onSelect }: Props) {
+  if (loading) return <Spinner />;
+  return <div>{photos.map(p => <PhotoCard key={p.id} photo={p} onSelect={onSelect} />)}</div>;
+}
+Code Quality (Items 61-65)
+#61 - Use ESLint with React Rules 🟡 HIGH
+
+Rule: Enforce consistent code style with ESLint
+Why: Catches bugs, maintains consistency
+How:
+Copy# ✅ DO THIS:
+npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-react-hooks
+
+# .eslintrc.json:
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "rules": {
+    "react-hooks/exhaustive-deps": "error",
+    "react/prop-types": "off" // Using TypeScript
+  }
+}
+
+# Run on every commit:
+npm run lint
+#62 - Enable Prettier Formatting 🟡 HIGH
+
+Rule: Auto-format code on save
+Why: Consistent style, no formatting debates
+How:
+Copy# ✅ DO THIS:
+npm install --save-dev prettier
+
+# .prettierrc:
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5"
+}
+
+# Format on save in VSCode
+#63 - Document Component APIs 🟡 HIGH
+
+Rule: Use TypeScript interfaces to document props
+Why: Self-documenting code, better IntelliSense
+How:
+Copy// ✅ DO THIS:
+interface PhotoCardProps {
+  /** The photo to display */
+  photo: Photo;
+  
+  /** Whether the photo is selected */
+  selected?: boolean;
+  
+  /** Called when photo is clicked */
+  onSelect: (photoId: string) => void;
+  
+  /** Optional CSS class name */
+  className?: string;
+}
+
+function PhotoCard({ photo, selected = false, onSelect, className }: PhotoCardProps) {
+  // Implementation
+}
+#64 - Use Async/Await Over Promises 🟡 HIGH
+
+Rule: Prefer async/await for asynchronous code
+Why: More readable, easier error handling
+How:
+Copy// ✅ DO THIS:
+async function fetchPhotos() {
+  try {
+    const response = await fetch('/api/photos');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch photos:', error);
+    throw error;
+  }
+}
+
+// ❌ DON'T DO THIS:
+function fetchPhotos() {
+  return fetch('/api/photos')
+    .then(response => response.json())
+    .then(data => data)
+    .catch(error => {
+      console.error('Failed to fetch photos:', error);
+      throw error;
+    });
+}
+#65 - Implement Error Boundaries 🔴 CRITICAL
+
+Rule: Wrap major sections in error boundaries
+Why: Prevents entire app crash from one component error
+How:
+Copy// ✅ DO THIS:
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+    // Send to error tracking service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback />;
+    }
+    return this.props.children;
+  }
+}
+
+// Wrap major sections:
+<ErrorBoundary>
+  <CameraView />
+</ErrorBoundary>
+
+<ErrorBoundary>
+  <PhotoGallery />
+</ErrorBoundary>
+🔒 CATEGORY 4: SECURITY & PRIVACY (Items 66-75)
+Data Protection (Items 66-70)
+#66 - Never Store Tokens in localStorage 🔴 CRITICAL
+
+Rule: Use HTTP-only cookies or Capacitor SecureStorage
+Why: localStorage is accessible via XSS attacks
+How:
+Copy// ✅ DO THIS:
+import { SecureStoragePlugin } from '@capacitor-community/secure-storage';
+
+// Store sensitive data:
+await SecureStoragePlugin.set({
+  key: 'authToken',
+  value: token
+});
+
+// Retrieve:
+const { value } = await SecureStoragePlugin.get({ key: 'authToken' });
+
+// ❌ DON'T DO THIS:
+localStorage.setItem('authToken', token); // Vulnerable to XSS
+#67 - Encrypt Sensitive Data 🔴 CRITICAL
+
+Rule: Use @capacitor-community/privacy-screen to hide sensitive content
+Why: Protects data in app switcher, screenshots
+How:
+Copy// ✅ DO THIS:
+import { PrivacyScreen } from '@capacitor-community/privacy-screen';
+
+// Enable when showing sensitive data:
+await PrivacyScreen.enable();
+
+// Disable when done:
+await PrivacyScreen.disable();
+
+// Also add to capacitor.config:
+{
+  plugins: {
+    PrivacyScreen: {
+      enable: true
+    }
+  }
+}
+#68 - Implement Biometric Auth 🟡 HIGH (FieldSnaps Priority)
+
+Rule: Use @capacitor/biometric for sensitive actions
+Why: Adds security layer for field workers
+How:
+Copy// ✅ DO THIS:
+import { BiometricAuth } from '@capacitor-community/biometric-auth';
+
+async function deletePhoto(photoId: string) {
+  try {
+    // Require biometric before deletion:
+    await BiometricAuth.authenticate({
+      reason: 'Authenticate to delete photo',
+      cancelTitle: 'Cancel',
+      allowDeviceCredential: true
+    });
+    
+    // Proceed with deletion
+    await deletePhotoAPI(photoId);
+  } catch (error) {
+    console.log('Authentication failed');
+  }
+}
+#69 - Clear Clipboard After Timeout 🟡 HIGH
+
+Rule: Auto-clear clipboard after 60 seconds
+Why: Sensitive data shouldn't linger in clipboard
+How:
+Copy// ✅ DO THIS:
+import { Clipboard } from '@capacitor/clipboard';
+
+async function copyToClipboard(text: string) {
+  await Clipboard.write({ string: text });
+  
+  // Clear after 60 seconds:
+  setTimeout(async () => {
+    await Clipboard.write({ string: '' });
+  }, 60000);
+  
+  showToast('Copied! Will clear in 60 seconds');
+}
+#70 - Validate All User Inputs 🔴 CRITICAL
+
+Rule: Sanitize and validate before processing
+Why: Prevents injection attacks
+How:
+Copy// ✅ DO THIS:
+function sanitizeFilename(filename: string): string {
+  // Remove special characters:
+  return filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+function validatePhotoTitle(title: string): boolean {
+  // Max 100 chars, no HTML:
+  if (title.length > 100) return false;
+  if (/<[^>]*>/.test(title)) return false; // Contains HTML tags
+  return true;
+}
+
+// Before saving:
+const sanitized = sanitizeFilename(userInput);
+if (!validatePhotoTitle(sanitized)) {
+  throw new Error('Invalid title');
+}
+
+// ❌ DON'T DO THIS:
+// Using user input directly without validation
+API Security (Items 71-75)
+#71 - Use HTTPS Only 🔴 CRITICAL
+
+Rule: Never use http:// in production
+Why: Unencrypted traffic can be intercepted
+How:
+Copy// ✅ DO THIS:
+const API_BASE = 'https://fieldsnaps.com/api';
+
+// In capacitor.config:
+{
+  server: {
+    cleartext: false // Block HTTP in production
+  }
+}
+
+// ❌ DON'T DO THIS:
+const API_BASE = 'http://fieldsnaps.com/api'; // Never in production
+#72 - Implement Request Signing 🟡 HIGH
+
+Rule: Sign API requests with HMAC
+Why: Prevents request tampering
+How:
+Copy// ✅ DO THIS:
+import CryptoJS from 'crypto-js';
+
+async function signedFetch(url: string, options: RequestInit = {}) {
+  const timestamp = Date.now().toString();
+  const secret = await getAPISecret(); // From secure storage
+  
+  const signature = CryptoJS.HmacSHA256(
+    `${options.method || 'GET'}:${url}:${timestamp}`,
+    secret
+  ).toString();
+  
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      'X-Timestamp': timestamp,
+      'X-Signature': signature
+    }
+  });
+}
+#73 - Add Rate Limiting 🟡 HIGH
+
+Rule: Limit requests to prevent abuse
+Why: Protects backend from spam/attacks
+How:
+Copy// ✅ DO THIS:
+class RateLimiter {
+  private requests: Map<string, number[]> = new Map();
+  
+  canMakeRequest(endpoint: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
+    const now = Date.now();
+    const timestamps = this.requests.get(endpoint) || [];
+    
+    // Remove old timestamps:
+    const recent = timestamps.filter(ts => now - ts < windowMs);
+    
+    if (recent.length >= maxRequests) {
+      return false; // Rate limited
+    }
+    
+    recent.push(now);
+    this.requests.set(endpoint, recent);
+    return true;
+  }
+}
+
+const limiter = new RateLimiter();
+
+async function uploadPhoto(photo: File) {
+  if (!limiter.canMakeRequest('/api/upload', 5, 60000)) {
+    throw new Error('Too many uploads. Please wait.');
+  }
+  
+  // Proceed with upload
+}
+#74 - Validate SSL Certificates 🔴 CRITICAL
+
+Rule: Never disable certificate validation
+Why: Enables man-in-the-middle attacks
+How:
+Copy// ✅ DO THIS:
+// Use default fetch (validates certificates automatically)
+await fetch('https://api.fieldsnaps.com/photos');
+
+// ❌ DON'T DO THIS:
+// Never disable SSL validation in production:
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+#75 - Use API Key Rotation 🟡 HIGH
+
+Rule: Implement automatic key refresh
+Why: Limits damage if key is compromised
+How:
+Copy// ✅ DO THIS:
+async function getAPIKey(): Promise<string> {
+  const stored = await SecureStoragePlugin.get({ key: 'apiKey' });
+  const keyData = JSON.parse(stored.value);
+  
+  // Refresh if older than 7 days:
+  if (Date.now() - keyData.timestamp > 7 * 24 * 60 * 60 * 1000) {
+    const newKey = await refreshAPIKey();
+    await SecureStoragePlugin.set({
+      key: 'apiKey',
+      value: JSON.stringify({ key: newKey, timestamp: Date.now() })
+    });
+    return newKey;
+  }
+  
+  return keyData.key;
+}
+🎯 CATEGORY 5: iOS-SPECIFIC OPTIMIZATION (Items 76-85)
+WKWebView Configuration (Items 76-80)
+#76 - Enable viewport-fit=cover 🔴 CRITICAL
+
+Rule: Add viewport-fit=cover to meta viewport
+Why: Full screen support for notched devices (iPhone X+)
+How:
+Copy<!-- ✅ DO THIS in index.html: -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+<!-- Then use safe area insets in CSS: -->
+<style>
+  .app-header {
+    padding-top: env(safe-area-inset-top);
+  }
+  .app-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+</style>
+#77 - Disable User Selection 🟡 HIGH
+
+Rule: Use -webkit-user-select: none for app-like feel
+Why: Prevents text selection in UI elements
+How:
+Copy/* ✅ DO THIS: */
+button, .nav-button, .toolbar {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow selection in content areas: */
+.photo-description, .comment-text {
+  -webkit-user-select: text;
+  user-select: text;
+}
+#78 - Prevent Bounce Scrolling 🟡 HIGH
+
+Rule: Set overscroll-behavior: none on body
+Why: Prevents rubber-band effect (looks more native)
+How:
+Copy/* ✅ DO THIS: */
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Allow bounce in specific scrollable areas: */
+.photo-gallery {
+  overscroll-behavior: auto;
+}
+#79 - Disable Callouts 🟡 HIGH
+
+Rule: Use -webkit-touch-callout: none
+Why: Prevents long-press menu on images/links
+How:
+Copy/* ✅ DO THIS: */
+img, a, button {
+  -webkit-touch-callout: none;
+}
+
+/* Allow callouts on actual content text: */
+.article-text {
+  -webkit-touch-callout: default;
+}
+#80 - Set Proper Viewport Meta 🔴 CRITICAL
+
+Rule: Complete viewport configuration
+Why: Ensures proper rendering on all iOS devices
+How:
+Copy<!-- ✅ DO THIS in index.html: -->
+<meta 
+  name="viewport" 
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+/>
+
+<!-- Also add iOS-specific meta: -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+Native Integration (Items 81-85)
+#81 - Use Capacitor Plugins Over Web APIs 🔴 CRITICAL
+
+Rule: Prefer native plugins when available
+Why: More reliable, better performance, native UI
+How:
+Copy// ✅ DO THIS:
+import { Camera } from '@capacitor/camera';
+
+const photo = await Camera.getPhoto({
+  quality: 90,
+  allowEditing: false,
+  resultType: CameraResultType.Uri
+});
+
+// ❌ DON'T DO THIS:
+navigator.mediaDevices.getUserMedia({ video: true });
+// Web API is less reliable on iOS
+#82 - Implement Haptic Feedback 🟡 HIGH (FieldSnaps Priority - Phase 1)
+
+Rule: Use @capacitor/haptics for button presses
+Why: Native feel, better UX
+How:
+Copy// ✅ DO THIS:
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
+async function handleButtonPress() {
+  await Haptics.impact({ style: ImpactStyle.Light });
+  // Then perform action
+}
+
+async function handleError() {
+  await Haptics.notification({ type: NotificationType.Error });
+}
+
+async function handleSuccess() {
+  await Haptics.notification({ type: NotificationType.Success });
+}
+
+// ❌ DON'T DO THIS:
+navigator.vibrate(100); // Not supported on iOS, doesn't work
+#83 - Handle App Lifecycle Events 🔴 CRITICAL
+
+Rule: Listen to App.addListener('appStateChange')
+Why: Save state, pause tasks when app backgrounds
+How:
+Copy// ✅ DO THIS:
+import { App } from '@capacitor/app';
+
+useEffect(() => {
+  const listener = App.addListener('appStateChange', ({ isActive }) => {
+    if (isActive) {
+      // App came to foreground:
+      resumeTasks();
+      refreshData();
+    } else {
+      // App went to background:
+      pauseTasks();
+      saveState();
+      
+      // Stop camera if running:
+      if (cameraActive) {
+        stopCamera();
+      }
+    }
+  });
+  
+  return () => {
+    listener.remove();
+  };
+}, []);
+#84 - Respect iOS Dark Mode 🟡 HIGH
+
+Rule: Use prefers-color-scheme media query
+Why: Respects user system preference
+How:
+Copy/* ✅ DO THIS: */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+Copy// Or detect in JavaScript:
+const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+// Listen for changes:
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  const darkMode = e.matches;
+  updateTheme(darkMode);
+});
+#85 - Handle Safe Area Insets 🔴 CRITICAL
+
+Rule: Use env(safe-area-inset-*) in CSS
+Why: Prevents content from being cut off by notch/home indicator
+How:
+Copy/* ✅ DO THIS: */
+.app-container {
+  /* Add safe area padding: */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* For full-screen elements like camera: */
+.camera-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  /* Controls respect safe areas: */
+  .camera-controls {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+}
+📦 CATEGORY 6: BUILD & DEPLOYMENT (Items 86-100)
+Build Configuration (Items 86-90)
+#86 - Use Environment Variables 🔴 CRITICAL
+
+Rule: Separate dev/staging/prod configs
+Why: Different API endpoints, keys per environment
+How:
+Copy// ✅ DO THIS:
+
+// .env.development:
+VITE_API_URL=http://localhost:3000
+VITE_ENVIRONMENT=development
+
+// .env.production:
+VITE_API_URL=https://api.fieldsnaps.com
+VITE_ENVIRONMENT=production
+
+// Use in code:
+const API_URL = import.meta.env.VITE_API_URL;
+
+// ❌ DON'T DO THIS:
+const API_URL = 'https://api.fieldsnaps.com'; // Hardcoded
+#87 - Enable Source Maps for Debugging 🟡 HIGH
+
+Rule: Generate source maps in dev, exclude in prod
+Why: Debug production issues without exposing code
+How:
+Copy// ✅ DO THIS in vite.config.ts:
+export default defineConfig({
+  build: {
+    sourcemap: process.env.NODE_ENV !== 'production' ? 'inline' : false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.logs in production
+      }
+    }
+  }
+});
+#88 - Minify and Compress Assets 🟡 HIGH
+
+Rule: Enable compression in build process
+Why: Smaller bundle = faster load
+How:
+Copy// ✅ DO THIS in vite.config.ts:
+import viteCompression from 'vite-plugin-compression';
+
+export default defineConfig({
+  plugins: [
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz'
+    })
+  ],
+  build: {
+    minify: 'terser',
+    cssMinify: true
+  }
+});
+#89 - Generate Proper Icons 🔴 CRITICAL
+
+Rule: Use cordova-res for all icon sizes
+Why: App Store requires specific sizes
+How:
+Copy# ✅ DO THIS:
+npm install -g cordova-res
+
+# Place 1024x1024 icon in resources/icon.png
+# Place 2732x2732 splash in resources/splash.png
+
+# Generate all sizes:
+cordova-res ios --type icon
+cordova-res ios --type splash
+
+# Verifies in ios/App/App/Assets.xcassets/
+#90 - Configure Splash Screens 🟡 HIGH
+
+Rule: Proper splash for all device sizes
+Why: Professional first impression
+How:
+Copy// ✅ DO THIS in capacitor.config.ts:
+{
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      backgroundColor: '#ffffff',
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
+      showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true
+    }
+  }
+}
+
+// Hide splash manually when ready:
+import { SplashScreen } from '@capacitor/splash-screen';
+
+useEffect(() => {
+  async function hideSplash() {
+    await dataLoaded();
+    await SplashScreen.hide();
+  }
+  hideSplash();
+}, []);
+Testing & Quality Assurance (Items 91-95)
+#91 - Test on Real Devices 🔴 CRITICAL
+
+Rule: Always test on physical iPhone before release
+Why: Simulator doesn't catch all issues (camera, performance, etc.)
+How:
+Copy# ✅ DO THIS:
+# Build and run on connected iPhone:
+npm run build
+npx cap sync
+npx cap open ios
+
+# In Xcode:
+# 1. Select your iPhone from device list
+# 2. Click Play button
+# 3. Test all features thoroughly
+#92 - Test on iOS 15, 16, 17, 18 🟡 HIGH
+
+Rule: Support last 4 iOS versions minimum
+Why: Many users don't update immediately
+How:
+Copy# ✅ DO THIS:
+# In Xcode, download simulators:
+# Xcode → Settings → Platforms → Download iOS 15, 16, 17, 18
+
+# Test on each version:
+# 1. Select iOS 15 simulator
+# 2. Run app, test features
+# 3. Repeat for iOS 16, 17, 18
+#93 - Test on Various Screen Sizes 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Test on iPhone SE, 14 Pro, 14 Pro Max, iPad
+Why: Layout breaks on small/large screens
+How:
+Copy// ✅ DO THIS:
+// Use responsive breakpoints:
+@media (max-width: 375px) { /* iPhone SE */ }
+@media (min-width: 376px) and (max-width: 428px) { /* iPhone 14 Pro Max */ }
+@media (min-width: 768px) { /* iPad */ }
+
+// Test camera viewfinder on all sizes:
+// - iPhone SE: Small screen, no notch
+// - iPhone 14 Pro: Medium, Dynamic Island
+// - iPhone 14 Pro Max: Large screen
+// - iPad: Tablet layout
+#94 - Implement Crash Reporting 🔴 CRITICAL
+
+Rule: Use Sentry or similar service
+Why: Catch production crashes you can't reproduce
+How:
+Copy# ✅ DO THIS:
+npm install @sentry/capacitor @sentry/react
+
+# Initialize in App.tsx:
+import * as Sentry from '@sentry/capacitor';
+import * as SentryReact from '@sentry/react';
+
+Sentry.init({
+  dsn: 'YOUR_SENTRY_DSN',
+  environment: import.meta.env.VITE_ENVIRONMENT,
+  tracesSampleRate: 1.0
+}, SentryReact.init);
+
+// Errors are automatically reported
+#95 - Monitor Performance Metrics 🟡 HIGH
+
+Rule: Track load time, FPS, memory usage
+Why: Catch performance regressions
+How:
+Copy// ✅ DO THIS:
+// Measure initial load time:
+window.addEventListener('load', () => {
+  const loadTime = performance.now();
+  console.log('App loaded in:', loadTime, 'ms');
+  
+  // Send to analytics:
+  analytics.track('app_load_time', { duration: loadTime });
+});
+
+// Monitor FPS:
+let lastTime = performance.now();
+let frames = 0;
+
+function measureFPS() {
+  frames++;
+  const now = performance.now();
+  
+  if (now >= lastTime + 1000) {
+    const fps = Math.round((frames * 1000) / (now - lastTime));
+    console.log('FPS:', fps);
+    
+    if (fps < 30) {
+      console.warn('Low FPS detected!');
+    }
+    
+    frames = 0;
+    lastTime = now;
+  }
+  
+  requestAnimationFrame(measureFPS);
+}
+
+measureFPS();
+App Store Preparation (Items 96-100)
+#96 - Follow App Store Guidelines 🔴 CRITICAL
+
+Rule: Review guidelines before submission
+Why: Rejection delays launch by weeks
+How:
+# ✅ DO THIS:
+# Review Apple's App Store Guidelines:
+# https://developer.apple.com/app-store/review/guidelines/
+
+# Common rejection reasons to avoid:
+# 1. Crashes or bugs
+# 2. Incomplete app information
+# 3. Privacy policy missing
+# 4. Permissions not explained
+# 5. Misleading app description
+# 6. Using private APIs
+# 7. App not optimized for latest iOS
+#97 - Implement Proper Permissions 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: Request camera/location with clear explanations
+Why: App Store requires justification for permissions
+How:
+Copy<!-- ✅ DO THIS in ios/App/App/Info.plist: -->
+<key>NSCameraUsageDescription</key>
+<string>FieldSnaps needs camera access to capture photos of your field work for documentation.</string>
+
+<key>NSPhotoLibraryUsageDescription</key>
+<string>FieldSnaps needs photo library access to save and retrieve your field documentation photos.</string>
+
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>FieldSnaps uses your location to tag photos with GPS coordinates for accurate field records.</string>
+Copy// Request at appropriate time (not on app launch):
+async function openCamera() {
+  // Explain first:
+  showDialog({
+    title: 'Camera Permission',
+    message: 'FieldSnaps needs camera access to capture field photos.',
+    onConfirm: async () => {
+      const photo = await Camera.getPhoto({ /* ... */ });
+    }
+  });
+}
+#98 - Add Privacy Policy 🔴 CRITICAL
+
+Rule: Required for App Store submission
+Why: Apple mandates privacy policy for data collection
+How:
+# ✅ DO THIS:
+# 1. Create privacy policy page:
+#    - What data you collect
+#    - How you use it
+#    - How you store it
+#    - User rights
+#    - Contact information
+
+# 2. Host at: https://fieldsnaps.com/privacy
+
+# 3. Link from app:
+#    - Settings → Privacy Policy
+#    - Login screen footer
+
+# 4. Add to App Store Connect:
+#    - App Information → Privacy Policy URL
+#99 - Test Offline Functionality 🔴 CRITICAL (FieldSnaps Priority)
+
+Rule: App should handle no network gracefully
+Why: Field workers often have poor connectivity
+How:
+Copy// ✅ DO THIS:
+// Detect offline:
+const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+useEffect(() => {
+  const handleOnline = () => setIsOnline(true);
+  const handleOffline = () => setIsOnline(false);
+  
+  window.addEventListener('online', handleOnline);
+  window.addEventListener('offline', handleOffline);
+  
+  return () => {
+    window.removeEventListener('online', handleOnline);
+    window.removeEventListener('offline', handleOffline);
+  };
+}, []);
+
+// Queue actions when offline:
+async function savePhoto(photo: Photo) {
+  if (isOnline) {
+    await uploadToServer(photo);
+  } else {
+    // Queue for later:
+    await queueOffline(photo);
+    showToast('Photo saved. Will sync when online.');
+  }
+}
+
+// Sync when back online:
+useEffect(() => {
+  if (isOnline) {
+    syncOfflineQueue();
+  }
+}, [isOnline]);
+#100 - Prepare App Store Assets 🔴 CRITICAL
+
+Rule: Screenshots, description, keywords ready
+Why: Required for submission
+How:
+# ✅ DO THIS:
+# Required assets:
+# 1. App Icon (1024x1024 PNG)
+# 2. Screenshots (multiple sizes):
+#    - 6.7" (iPhone 14 Pro Max): 1290 x 2796
+#    - 6.5" (iPhone 11 Pro Max): 1284 x 2778
+#    - 5.5" (iPhone 8 Plus): 1242 x 2208
+# 3. App Description (max 4000 characters)
+# 4. Keywords (max 100 characters)
+# 5. Support URL
+# 6. Marketing URL (optional)
+# 7. Privacy Policy URL
+
+# Screenshot tips for FieldSnaps:
+# - Show camera interface capturing field photo
+# - Show photo gallery with annotations
+# - Show location tagging feature
+# - Show offline capability
+# - Use real field photos, not stock images
+SECTION B: COMMON ISSUES & SOLUTIONS (Items 101-155)
+Check these when debugging - find your symptom, apply the fix
+
+🔴 CATEGORY 7: CRITICAL ISSUES (Items 101-115)
+#101 - Camera Permission Denied 🔴 CRITICAL (FieldSnaps Priority)
+
+Symptom: Camera.getPhoto() throws "Permission denied"
+Cause: Missing NSCameraUsageDescription in Info.plist
+Fix:
+Copy<!-- Add to ios/App/App/Info.plist: -->
+<key>NSCameraUsageDescription</key>
+<string>FieldSnaps needs camera access to capture field documentation photos.</string>
+
+<!-- Then rebuild: -->
+<!-- npx cap sync ios -->
+#102 - App Crashes on Older iPhones 🔴 CRITICAL
+
+Symptom: Works on simulator, crashes on iPhone 7/8
+Cause: Memory pressure from large DOM or images
+Fix: See #26 (limit DOM), #28 (cleanup), #16-20 (image optimization)
+#103 - White Screen on Launch 🔴 CRITICAL
+
+Symptom: App shows white screen, nothing loads
+Cause: JavaScript error before React renders
+Fix:
+Copy// 1. Check browser console in Safari Web Inspector
+// 2. Add error boundary at root:
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
+);
+
+// 3. Check capacitor.config.ts is valid JSON
+// 4. Verify all imports resolve correctly
+#104 - OAuth Redirects Not Working 🔴 CRITICAL
+
+Symptom: OAuth login works on web, fails in iOS app
+Cause: Custom URL scheme not configured
+Fix:
+Copy<!-- Add to ios/App/App/Info.plist: -->
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>fieldsnaps</string>
+    </array>
+  </dict>
+</array>
+
+<!-- Use capacitor://localhost in OAuth callback URL -->
+#105 - Status Bar Overlaps Content 🔴 CRITICAL
+
+Symptom: Content hidden behind status bar
+Cause: Not using safe area insets
+Fix: See #76 and #85 (viewport-fit, safe-area-inset)
+#106 - Keyboard Doesn't Dismiss 🔴 CRITICAL
+
+Symptom: Keyboard stays open after submit
+Cause: Need to call Keyboard.hide()
+Fix:
+Copyimport { Keyboard } from '@capacitor/keyboard';
+
+async function handleSubmit() {
+  await Keyboard.hide();
+  // Then process form
+}
+
+// Or blur input:
+inputRef.current?.blur();
+#107 - Photos Not Saving 🔴 CRITICAL (FieldSnaps Priority)
+
+Symptom: Camera captures photo, but doesn't save
+Cause: Missing photo library permission
+Fix:
+Copy<!-- Add to Info.plist: -->
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>FieldSnaps needs permission to save photos to your library.</string>
+
+<!-- Also check saveToGallery option: -->
+const photo = await Camera.getPhoto({
+  saveToGallery: true // Enable this
+});
+#108 - Build Fails: CocoaPods Error 🔴 CRITICAL
+
+Symptom: pod install fails with dependency errors
+Cause: Outdated CocoaPods or pod cache
+Fix:
+Copy# Clean and reinstall:
+cd ios/App
+pod deintegrate
+pod cache clean --all
+rm -rf Pods
+rm Podfile.lock
+
+# Update CocoaPods:
+sudo gem install cocoapods
+
+# Reinstall:
+pod install
+
+# If still fails, update Podfile platform version:
+# platform :ios, '13.0'  # Change to match deployment target
+#109 - App Rejected: Private API Usage 🔴 CRITICAL
+
+Symptom: App Store rejection for private APIs
+Cause: Using undocumented iOS APIs
+Fix:
+Copy# Find private API usage:
+cd ios/App
+grep -r "UIWebView" .  # UIWebView is banned
+grep -r "advertisingIdentifier" .  # Needs declaration
+
+# Remove or replace with public APIs
+# Update all Capacitor plugins to latest versions
+npm update @capacitor/core @capacitor/ios
+npx cap sync ios
+#110 - Network Requests Fail in App 🔴 CRITICAL
+
+Symptom: API calls work on web, fail in iOS app
+Cause: App Transport Security (ATS) blocking HTTP
+Fix:
+Copy<!-- Only for development - remove for production: -->
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
+
+<!-- For production, use HTTPS or whitelist specific domains: -->
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <key>fieldsnaps.com</key>
+    <dict>
+      <key>NSIncludesSubdomains</key>
+      <true/>
+      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+      <true/>
+    </dict>
+  </dict>
+</dict>
+#111 - Push Notifications Not Appearing 🔴 CRITICAL
+
+Symptom: Notifications sent but not received
+Cause: Missing push notification capability
+Fix:
+Copy# 1. In Xcode: App target → Signing & Capabilities
+# 2. Click "+ Capability" → Push Notifications
+# 3. Add Remote notifications background mode
+# 4. Generate APNs certificate in Apple Developer portal
+# 5. Configure in capacitor.config.ts:
+{
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
+    }
+  }
+}
+#112 - GPS Location Not Working 🔴 CRITICAL (FieldSnaps Priority)
+
+Symptom: Geolocation.getCurrentPosition() fails
+Cause: Missing location permission in Info.plist
+Fix:
+Copy<!-- Add to Info.plist: -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>FieldSnaps uses your location to tag photos with GPS coordinates.</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>FieldSnaps uses your location to tag photos even when app is in background.</string>
+
+<!-- Then request permission: -->
+Copyimport { Geolocation } from '@capacitor/geolocation';
+
+const position = await Geolocation.getCurrentPosition({
+  enableHighAccuracy: true,
+  timeout: 10000
+});
+#113 - File Upload Fails 🔴 CRITICAL (FieldSnaps Priority)
+
+Symptom: Photo upload returns 400/500 error
+Cause: File too large or wrong format
+Fix: See #16 (compress images), also:
+Copyasync function uploadPhoto(photo: Photo) {
+  // 1. Check file size:
+  const file = await fetch(photo.webPath).then(r => r.blob());
+  if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    // Compress (see #16)
+    const compressed = await compressImage(file);
+    // Upload compressed
+  }
+  
+  // 2. Use FormData:
+  const formData = new FormData();
+  formData.append('photo', file, 'photo.jpg');
+  
+  // 3. Set correct headers:
+  await fetch('/api/upload', {
+    method: 'POST',
+    body: formData
+    // Don't set Content-Type header, browser sets it with boundary
+  });
+}
+#114 - App Freezes When Taking Photo 🔴 CRITICAL (FieldSnaps Priority)
+
+Symptom: UI freezes after Camera.getPhoto()
+Cause: Processing large image on main thread
+Fix:
+Copy// ✅ DO THIS:
+async function capturePhoto() {
+  setLoading(true); // Show loading indicator
+  
+  const photo = await Camera.getPhoto({
+    quality: 85, // Don't use 100, too large
+    width: 1920, // Resize on capture
+    resultType: CameraResultType.Uri
+  });
+  
+  // Process in background:
+  setTimeout(async () => {
+    await processPhoto(photo);
+    setLoading(false);
+  }, 0);
+}
+
+// ❌ DON'T DO THIS:
+const photo = await Camera.getPhoto({ quality: 100 }); // 12MB image
+processPhoto(photo); // Blocks UI thread
+#115 - Xcode Signing Error 🔴 CRITICAL
+
+Symptom: "Code signing error" when building
+Cause: Missing or expired provisioning profile
+Fix:
+Copy# 1. In Xcode: Select project → Signing & Capabilities
+# 2. Check "Automatically manage signing"
+# 3. Select your Team
+# 4. Change Bundle Identifier if conflict:
+#    com.yourname.fieldsnaps
+
+# If still fails:
+# 1. Xcode → Preferences → Accounts
+# 2. Select Apple ID → Download Manual Profiles
+# 3. Clean build folder: Cmd+Shift+K
+# 4. Rebuild
+🟡 CATEGORY 8: HIGH PRIORITY ISSUES (Items 116-135)
+#116 - Images Load Slowly 🟡 HIGH (FieldSnaps Priority)
+
+Symptom: Gallery takes 5-10 seconds to load
+Cause: Loading full-resolution images
+Fix: See #17 (thumbnails), #18 (lazy loading), #20 (progressive loading)
+#117 - App Uses Too Much Battery 🟡 HIGH
+
+Symptom: Battery drains quickly when app is open
+Cause: Camera/GPS running continuously, or excessive re-renders
+Fix: See #35 (release camera), #83 (app lifecycle), #13-14 (debounce/throttle)
+#118 - Pull-to-Refresh Not Working 🟡 HIGH
+
+Symptom: Pull gesture doesn't trigger refresh
+Cause: Need to disable iOS native pull-to-refresh
+Fix:
+Copy// Disable native iOS pull-to-refresh:
+useEffect(() => {
+  document.body.style.overscrollBehavior = 'none';
+}, []);
+
+// Implement custom pull-to-refresh with library:
+import PullToRefresh from 'react-simple-pull-to-refresh';
+
+<PullToRefresh onRefresh={handleRefresh}>
+  <PhotoGallery />
+</PullToRefresh>
+#119 - Back Button Doesn't Work 🟡 HIGH
+
+Symptom: Hardware back button (if exists) doesn't navigate
+Cause: Need to handle App.addListener('backButton')
+Fix:
+Copyimport { App } from '@capacitor/app';
+
+useEffect(() => {
+  const listener = App.addListener('backButton', ({ canGoBack }) => {
+    if (canGoBack) {
+      window.history.back();
+    } else {
+      App.exitApp(); // Or show "Press again to exit" toast
+    }
+  });
+  
+  return () => listener.remove();
+}, []);
+#120 - Videos Won't Play 🟡 HIGH
+
+Symptom: Video element shows black screen
+Cause: Wrong video format or codec
+Fix:
+Copy// Use formats supported by iOS:
+// - MP4 with H.264 codec
+// - MOV with H.264 codec
+
+<video controls playsInline webkit-playsinline>
+  <source src="video.mp4" type="video/mp4" />
+  Your browser doesn't support video.
+</video>
+
+// playsInline prevents fullscreen on iOS
+#121 - Form Inputs Autocomplete Not Working 🟡 HIGH
+
+Symptom: Autocomplete suggestions don't appear
+Cause: Missing autocomplete attributes
+Fix:
+Copy<!-- ✅ DO THIS: -->
+<input type="email" name="email" autocomplete="email" />
+<input type="tel" name="phone" autocomplete="tel" />
+<input type="text" name="name" autocomplete="name" />
+
+<!-- iOS recognizes these and provides autofill -->
+#122 - Date Picker Looks Wrong 🟡 HIGH
+
+Symptom: Date picker doesn't show iOS native picker
+Cause: Not using correct input type
+Fix:
+Copy<!-- ✅ DO THIS: -->
+<input type="date" />  <!-- iOS native date picker -->
+<input type="time" />  <!-- iOS native time picker -->
+<input type="datetime-local" />  <!-- Date + time picker -->
+
+<!-- Style to match app: -->
+<style>
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* For dark mode */
+}
+</style>
+#123 - Text Input Zooms In When Focused 🟡 HIGH
+
+Symptom: Page zooms when tapping input field
+Cause: Font size too small (<16px)
+Fix:
+Copy/* ✅ DO THIS: */
+input, textarea, select {
+  font-size: 16px; /* Minimum 16px to prevent zoom */
+}
+
+/* Or disable zoom entirely (not recommended): */
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+#124 - Bottom Navigation Hidden by Keyboard 🟡 HIGH
+
+Symptom: Bottom nav disappears when keyboard opens
+Cause: iOS resizes viewport when keyboard shows
+Fix:
+Copyimport { Keyboard } from '@capacitor/keyboard';
+
+const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+useEffect(() => {
+  const showListener = Keyboard.addListener('keyboardWillShow', () => {
+    setKeyboardOpen(true);
+  });
+  
+  const hideListener = Keyboard.addListener('keyboardWillHide', () => {
+    setKeyboardOpen(false);
+  });
+  
+  return () => {
+    showListener.remove();
+    hideListener.remove();
+  };
+}, []);
+
+// Hide bottom nav when keyboard open:
+<BottomNav style={{ display: keyboardOpen ? 'none' : 'flex' }} />
+#125 - Splash Screen Stuck 🟡 HIGH
+
+Symptom: Splash screen doesn't disappear
+Cause: SplashScreen.hide() not called
+Fix:
+Copyimport { SplashScreen } from '@capacitor/splash-screen';
+
+useEffect(() => {
+  async function init() {
+    // Wait for critical data to load:
+    await loadUserData();
+    await loadSettings();
+    
+    // Then hide splash:
+    await SplashScreen.hide();
+  }
+  
+  init();
+}, []);
+
+// Set timeout as fallback:
+setTimeout(() => {
+  SplashScreen.hide();
+}, 5000); // Hide after 5 seconds max
+#126 - Dark Mode Flickers on Launch 🟡 HIGH
+
+Symptom: Light theme shows briefly before switching to dark
+Cause: Theme applied after React renders
+Fix:
+Copy<!-- Add to index.html before any JS loads: -->
+<script>
+  // Apply theme before React loads:
+  const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (darkMode) {
+    document.documentElement.classList.add('dark');
+  }
+</script>
+
+<!-- Then in CSS: -->
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #000000;
+  }
+  
+  html.dark {
+    --bg: #000000;
+    --text: #ffffff;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+</style>
+#127 - Share Sheet Not Showing 🟡 HIGH (FieldSnaps Priority - Phase 1)
+
+Symptom: Share.share() does nothing
+Cause: Missing configuration or wrong parameters
+Fix:
+Copyimport { Share } from '@capacitor/share';
+
+async function sharePhoto(photo: Photo) {
+  try {
+    await Share.share({
+      title: 'Check out this field photo',
+      text: photo.description,
+      url: photo.url, // Must be accessible URL
+      dialogTitle: 'Share Photo'
+    });
+  } catch (error) {
+    console.error('Share failed:', error);
+    // Fallback: copy link to clipboard
+  }
+}
+
+// To share files, use files parameter:
+await Share.share({
+  files: [photo.localPath],
+  dialogTitle: 'Share Photo'
+});
+#128 - Haptics Not Working 🟡 HIGH (FieldSnaps Priority - Phase 1)
+
+Symptom: Haptics.impact() does nothing
+Cause: Not testing on real device (simulator has no haptics)
+Fix:
+Copyimport { Haptics } from '@capacitor/haptics';
+
+// Must test on real iPhone:
+async function vibrate() {
+  // Check if haptics available:
+  try {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+  } catch (error) {
+    console.log('Haptics not available (simulator or old device)');
+  }
+}
+
+// Haptics don't work in iOS simulator - always test on device
+#129 - Status Bar Wrong Color 🟡 HIGH (FieldSnaps Priority - Phase 1)
+
+Symptom: Status bar doesn't match app theme
+Cause: StatusBar plugin not configured
+Fix:
+Copyimport { StatusBar, Style } from '@capacitor/status-bar';
+
+// Set status bar style:
+useEffect(() => {
+  async function setStatusBar() {
+    // Light content (white text) for dark backgrounds:
+    await StatusBar.setStyle({ style: Style.Dark });
+    
+    // Dark content (black text) for light backgrounds:
+    await StatusBar.setStyle({ style: Style.Light });
+    
+    // Set background color:
+    await StatusBar.setBackgroundColor({ color: '#000000' });
+  }
+  
+  setStatusBar();
+}, []);
+
+// For camera view, hide status bar:
+await StatusBar.hide();
+// Show again when leaving camera:
+await StatusBar.show();
+#130 - Photos Appear Rotated 🟡 HIGH (FieldSnaps Priority)
+
+Symptom: Photos display sideways or upside down
+Cause: EXIF orientation not applied
+Fix:
+Copy// Use correctOrientation option:
+const photo = await Camera.getPhoto({
+  correctOrientation: true, // Applies EXIF rotation
+  quality: 85,
+  resultType: CameraResultType.Uri
+});
+
+// Or manually read EXIF and rotate with canvas
+#131 - Infinite Scroll Triggers Too Early 🟡 HIGH (FieldSnaps Priority)
+
+Symptom: Loads next page before reaching bottom
+Cause: Intersection Observer threshold too high
+Fix:
+Copy// ✅ DO THIS:
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && !loading) {
+        loadMore();
+      }
+    },
+    {
+      threshold: 1.0, // Trigger only when fully visible
+      rootMargin: '0px' // No margin
+    }
+  );
+  
+  if (bottomRef.current) {
+    observer.observe(bottomRef.current);
+  }
+  
+  return () => observer.disconnect();
+}, [loading]);
+
+// Place trigger element at very bottom:
+<div ref={bottomRef} style={{ height: '1px' }} />
+#132 - Search Results Flicker 🟡 HIGH
+
+Symptom: Search results flash/flicker while typing
+Cause: Not debouncing search input
+Fix: See #13 (debounce search)
+#133 - Modal Scrolls Page Behind It 🟡 HIGH
+
+Symptom: When modal is open, background page scrolls
+Cause: Body scroll not disabled
+Fix:
+Copy// Disable body scroll when modal opens:
+useEffect(() => {
+  if (modalOpen) {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  }
+  
+  return () => {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  };
+}, [modalOpen]);
+#134 - Long Press Selects Text 🟡 HIGH
+
+Symptom: Long press on UI elements selects text
+Cause: Need to disable text selection
+Fix: See #77 (disable user-select)
+#135 - Swipe Gesture Conflicts with Navigation 🟡 HIGH
+
+Symptom: Swipe to delete also triggers navigation
+Cause: Need to prevent default swipe navigation
+Fix:
+Copy// Disable iOS swipe back navigation:
+useEffect(() => {
+  const preventSwipe = (e: TouchEvent) => {
+    // If swiping from left edge:
+    if (e.touches[0].clientX < 20) {
+      e.preventDefault();
+    }
+  };
+  
+  document.addEventListener('touchstart', preventSwipe, { passive: false });
+  
+  return () => {
+    document.removeEventListener('touchstart', preventSwipe);
+  };
+}, []);
+🟢 CATEGORY 9: MEDIUM PRIORITY ISSUES (Items 136-155)
+#136 - Custom Fonts Not Loading 🟢 MEDIUM
+
+Symptom: Fonts show default system font
+Cause: Font files not in public folder or wrong @font-face
+Fix:
+Copy/* Place fonts in public/fonts/ */
+
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('/fonts/MyFont.woff2') format('woff2'),
+       url('/fonts/MyFont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Show fallback while loading */
+}
+
+body {
+  font-family: 'MyCustomFont', -apple-system, sans-serif;
+}
+#137 - Animations Janky 🟢 MEDIUM
+
+Symptom: Animations stutter or drop frames
+Cause: Animating expensive properties
+Fix: See #15 (use CSS transforms)
+#138 - Icons Blurry 🟢 MEDIUM
+
+Symptom: Icons look pixelated or fuzzy
+Cause: Not providing @2x and @3x versions
+Fix:
+Copy// Use SVG icons (scales perfectly):
+import { ReactComponent as CameraIcon } from './icons/camera.svg';
+
+<CameraIcon />
+
+// Or provide multiple resolutions:
+<img 
+  src="/icons/camera.png"
+  srcSet="/icons/camera@2x.png 2x, /icons/camera@3x.png 3x"
+  alt="Camera"
+/>
+#139 - Toast Messages Too Fast 🟢 MEDIUM
+
+Symptom: Toast disappears before user reads it
+Cause: Duration too short
+Fix:
+Copyimport { Toast } from '@capacitor/toast';
+
+await Toast.show({
+  text: 'Photo saved successfully',
+  duration: 'long', // 3.5 seconds
+  position: 'bottom'
+});
+
+// Or use custom toast with configurable duration
+#140 - Loading Spinner Not Centered 🟢 MEDIUM
+
+Symptom: Loading indicator in wrong position
+Cause: Missing centering CSS
+Fix:
+Copy.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+#141 - Empty State Not Showing 🟢 MEDIUM (FieldSnaps Priority)
+
+Symptom: Blank screen when no photos exist
+Cause: Not handling empty array case
+Fix:
+Copyfunction PhotoGallery({ photos }: Props) {
+  if (photos.length === 0) {
+    return (
+      <EmptyState
+        icon={<CameraIcon />}
+        title="No photos yet"
+        message="Tap the camera button to capture your first field photo"
+        actionLabel="Open Camera"
+        onAction={() => navigate('/camera')}
+      />
+    );
+  }
+  
+  return <PhotoGrid photos={photos} />;
+}
+#142 - Time Zone Issues 🟢 MEDIUM
+
+Symptom: Photo timestamps show wrong time
+Cause: Not handling time zones correctly
+Fix:
+Copy// Store timestamps in UTC:
+const timestamp = new Date().toISOString();
+
+// Display in user's local time:
+import { format } from 'date-fns';
+
+const displayTime = format(new Date(timestamp), 'MMM d, yyyy h:mm a');
+
+// Or use Intl.DateTimeFormat:
+const formatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium',
+  timeStyle: 'short'
+});
+
+const displayTime = formatter.format(new Date(timestamp));
+#143 - Search Not Case-Insensitive 🟢 MEDIUM
+
+Symptom: Search only finds exact case matches
+Cause: Using === instead of toLowerCase()
+Fix:
+Copy// ✅ DO THIS:
+const filtered = photos.filter(photo =>
+  photo.title.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+// ❌ DON'T DO THIS:
+const filtered = photos.filter(photo =>
+  photo.title.includes(searchTerm) // Case-sensitive
+);
+#144 - Button Tap Delay 🟢 MEDIUM
+
+Symptom: Buttons feel unresponsive (300ms delay)
+Cause: iOS touch delay for double-tap detection
+Fix:
+Copy/* ✅ DO THIS: */
+button, a, .clickable {
+  touch-action: manipulation; /* Removes 300ms delay */
+}
+
+/* Or disable double-tap zoom entirely: */
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#145 - Image Alt Text Not Read by VoiceOver 🟢 MEDIUM
+
+Symptom: Accessibility issues, VoiceOver doesn't describe images
+Cause: Missing or generic alt text
+Fix:
+Copy<!-- ✅ DO THIS: -->
+<img src="/photo.jpg" alt="Construction site progress photo taken on north side, showing foundation work completed" />
+
+<!-- ❌ DON'T DO THIS: -->
+<img src="/photo.jpg" alt="image" />
+<img src="/photo.jpg" alt="" />  <!-- Only if decorative -->
+#146 - Download Progress Not Showing 🟢 MEDIUM
+
+Symptom: Large file downloads appear frozen
+Cause: Not tracking upload/download progress
+Fix:
+Copyasync function uploadWithProgress(file: File) {
+  const xhr = new XMLHttpRequest();
+  
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const percent = (e.loaded / e.total) * 100;
+      setProgress(percent);
+    }
+  });
+  
+  xhr.addEventListener('load', () => {
+    if (xhr.status === 200) {
+      console.log('Upload complete');
+    }
+  });
+  
+  xhr.open('POST', '/api/upload');
+  const formData = new FormData();
+  formData.append('file', file);
+  xhr.send(formData);
+}
+#147 - Map Markers Not Clickable 🟢 MEDIUM
+
+Symptom: Can't tap markers on map (if using map)
+Cause: Z-index or touch-action issues
+Fix:
+Copy.map-marker {
+  z-index: 100;
+  touch-action: auto;
+  pointer-events: auto;
+  cursor: pointer;
+}
+#148 - Dropdown Menu Off-Screen 🟢 MEDIUM
+
+Symptom: Dropdown extends beyond screen edge
+Cause: Not calculating position relative to viewport
+Fix:
+Copyfunction positionDropdown(buttonRect: DOMRect) {
+  const dropdown = dropdownRef.current;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  let left = buttonRect.left;
+  let top = buttonRect.bottom;
+  
+  // If would extend beyond right edge:
+  if (left + dropdown.offsetWidth > viewportWidth) {
+    left = viewportWidth - dropdown.offsetWidth - 10;
+  }
+  
+  // If would extend beyond bottom:
+  if (top + dropdown.offsetHeight > viewportHeight) {
+    top = buttonRect.top - dropdown.offsetHeight;
+  }
+  
+  dropdown.style.left = left + 'px';
+  dropdown.style.top = top + 'px';
+}
+#149 - Badge Count Not Updating 🟢 MEDIUM
+
+Symptom: App icon badge shows wrong number
+Cause: Not updating badge with Capacitor plugin
+Fix:
+Copyimport { Badge } from '@capawesome/capacitor-badge';
+
+// Set badge count:
+await Badge.set({ count: unreadCount });
+
+// Clear badge:
+await Badge.clear();
+
+// Get current badge:
+const { count } = await Badge.get();
+#150 - Copy/Paste Not Working 🟢 MEDIUM
+
+Symptom: Can't paste into input fields
+Cause: autocomplete="off" blocks paste on iOS
+Fix:
+Copy<!-- ✅ DO THIS: -->
+<input type="text" autocomplete="on" />  <!-- or remove attribute -->
+
+<!-- ❌ DON'T DO THIS: -->
+<input type="text" autocomplete="off" />  <!-- Blocks paste on iOS -->
+#151 - PDF Viewer Not Working 🟢 MEDIUM
+
+Symptom: Can't view PDF in app
+Cause: Need to open in native viewer
+Fix:
+Copyimport { FileOpener } from '@capacitor-community/file-opener';
+
+async function openPDF(pdfPath: string) {
+  await FileOpener.open({
+    filePath: pdfPath,
+    contentType: 'application/pdf'
+  });
+  // Opens in native iOS PDF viewer
+}
+#152 - QR Code Scanner Not Working 🟢 MEDIUM
+
+Symptom: QR scanner doesn't detect codes
+Cause: Wrong plugin or camera settings
+Fix:
+Copyimport { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+
+async function scanQR() {
+  // Request permission:
+  const status = await BarcodeScanner.checkPermission({ force: true });
+  
+  if (status.granted) {
+    // Make background transparent:
+    document.body.style.background = 'transparent';
+    
+    // Start scanning:
+    const result = await BarcodeScanner.startScan();
+    
+    if (result.hasContent) {
+      console.log('QR code:', result.content);
+    }
+  }
+}
+
+// Stop scanning:
+BarcodeScanner.stopScan();
+document.body.style.background = '';
+#153 - Audio Not Playing 🟢 MEDIUM
+
+Symptom: Sound effects or audio feedback not working
+Cause: Audio session not configured
+Fix:
+Copy// Preload audio:
+const audio = new Audio('/sounds/camera-shutter.mp3');
+
+// Play on user interaction:
+async function playShutterSound() {
+  try {
+    await audio.play();
+  } catch (error) {
+    console.log('Audio play failed:', error);
+  }
+}
+
+// iOS requires user gesture to play audio first time
+#154 - Calendar Integration Not Working 🟢 MEDIUM
+
+Symptom: Can't add events to iOS calendar
+Cause: Missing calendar permission
+Fix:
+Copy<!-- Add to Info.plist: -->
+<key>NSCalendarsUsageDescription</key>
+<string>FieldSnaps would like to add field visit appointments to your calendar.</string>
+
+Copyimport { Calendar } from '@capacitor-community/calendar';
+
+async function addToCalendar(title: string, date: Date) {
+  await Calendar.createEvent({
+    title,
+    startDate: date.getTime(),
+    endDate: date.getTime() + (60 * 60 * 1000) // +1 hour
+  });
+}
+#155 - App Update Notification Not Showing 🟢 MEDIUM
+
+Symptom: Users don't know new version is available
+Cause: No update check implemented
+Fix:
+Copyimport { AppUpdate } from '@capawesome/capacitor-app-update';
+
+useEffect(() => {
+  async function checkForUpdates() {
+    const result = await AppUpdate.getAppUpdateInfo();
+    
+    if (result.updateAvailability === UpdateAvailability.UPDATE_AVAILABLE) {
+      showUpdateDialog({
+        title: 'Update Available',
+        message: 'A new version of FieldSnaps is available.',
+        onUpdate: () => {
+          AppUpdate.openAppStore();
+        }
+      });
+    }
+  }
+  
+  checkForUpdates();
+}, []);
+🎯 QUICK REFERENCE FOR REPLIT AI
+Before Writing ANY Code:
+1. Performance Checklist:
+
+ Will this create >1500 DOM nodes? Use virtualization (#11, #26)
+ Am I loading images? Compress (#16), use thumbnails (#17), lazy load (#18)
+ Does this use useMemo/useCallback? (#6, #7)
+ Will this block the main thread? Use async/setTimeout (#114)
+2. Memory Checklist:
+
+ Do I cleanup event listeners? (#27)
+ Do I abort fetch on unmount? (#31)
+ Do I revoke blob URLs? (#41)
+ Do I stop camera when done? (#35)
+3. iOS Compatibility Checklist:
+
+ Did I add permission to Info.plist? (#101, #107, #112)
+ Do I use safe-area-insets? (#85)
+ Do I use Capacitor plugins, not web APIs? (#81)
+ Does this work offline? (#99)
+4. Code Quality Checklist:
+
+ Are types explicit? (#46-50)
+ Is state immutable? (#51)
+ Is component <250 lines? (#59)
+ Did I add error boundary? (#65)
+Common FieldSnaps Patterns:
+Photo Capture Flow:
+
+Copy// 1. Request permission (once)
+// 2. Open camera with Capacitor plugin (#81)
+// 3. Compress image immediately (#16)
+// 4. Generate thumbnail (#17)
+// 5. Add haptic feedback (#82)
+// 6. Save with GPS tag (#112)
+// 7. Upload with progress (#146)
+// 8. Cleanup resources (#28, #41)
+Photo Gallery Flow:
+
+Copy// 1. Use virtualization for >50 photos (#11)
+// 2. Load thumbnails first (#17)
+// 3. Implement infinite scroll (#12)
+// 4. Lazy load images (#18)
+// 5. Handle offline mode (#99)
+// 6. Add pull-to-refresh (#118)
+Critical FieldSnaps Issues (Check First):
+
+#101: Camera permission
+#107: Photo library permission
+#112: GPS permission
+#114: Photo capture freezing
+#116: Slow image loading
+#130: Rotated photos
+When You See These Errors:
+Error Message	Check Item #
+"Permission denied"	#101, #107, #112
+White screen on launch	#103
+Memory warning/crash	#26, #28, #35
+OAuth redirect fails	#104
+Network request fails	#110
+CocoaPods error	#108
+Code signing error	#115
+Images load slowly	#116
+App freezes	#114
+FIELDSNAPS-SPECIFIC PRIORITIES:
+Phase 1 (Implement Now):
+
+✅ #82: Haptics for button feedback
+✅ #127: Native share sheet
+✅ #129: Status bar control (hide in camera)
+Always Remember (Core to FieldSnaps):
+
+#16-20: Image optimization (you're a photo app!)
+#26: Limit DOM nodes (photo galleries get huge)
+#35: Stop camera on unmount (battery drain)
+#99: Offline functionality (field = poor signal)
+#101, #107, #112: Camera, photo, GPS permissions
+INTEGRATION WITH REPLIT:
+Paste this at top of your Replit AI chat:
+
+I'm building FieldSnaps, a Capacitor iOS photo documentation app with React + TypeScript + Vite.
+
+CRITICAL RULES:
+1. Always compress images before upload (Item #16)
+2. Generate thumbnails for gallery (Item #17)
+3. Virtualize photo lists if >50 items (Item #11)
+4. Use useMemo/useCallback for performance (Items #6, #7)
+5. Clean up resources on unmount (Items #27, #31, #35, #41)
+6. Use Capacitor plugins, not web APIs (Item #81)
+7. Add iOS permissions to Info.plist (Items #101, #107, #112)
+8. Handle offline mode gracefully (Item #99)
+9. Keep bundles under 200KB (Item #21)
+10. Limit DOM to 1500 nodes (Item #26)
+
+Before writing code, check:
+- Performance (Items 1-25)
+- Memory (Items 26-45)
+- iOS compatibility (Items 76-85)
+- Security (Items 66-75)
+
+If errors occur, check Items 101-155 for solutions.
+
+Full guide: [paste URL to this document once saved]
+This guide covers 155 items total:
+
+Items 1-100: Proactive best practices (write good code)
+Items 101-155: Reactive troubleshooting (fix issues)
