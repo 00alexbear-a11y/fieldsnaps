@@ -5,12 +5,13 @@ import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = isDevModeEnabled();
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricSupported);
