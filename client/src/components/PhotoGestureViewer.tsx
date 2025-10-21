@@ -319,26 +319,14 @@ export function PhotoGestureViewer({
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
-      {/* Top Controls - Close and Counter only */}
+      {/* Top Controls - Counter only */}
       <div
         className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10"
       >
-        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-white hover:bg-white/20"
-            data-testid="button-close-viewer"
-          >
-            <X className="w-6 h-6" />
-          </Button>
-
+        <div className="flex items-center justify-center max-w-screen-xl mx-auto">
           <div className="text-white text-sm">
             {currentIndex + 1} / {photos.length}
           </div>
-
-          <div className="w-10" />
         </div>
       </div>
 
@@ -388,22 +376,25 @@ export function PhotoGestureViewer({
         </>
       )}
 
-      {/* Bottom Controls and Caption */}
+      {/* Bottom Controls */}
       <div
         className="absolute bottom-0 left-0 right-0"
       >
-        {/* Caption */}
-        {currentPhoto.caption && (
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-white text-center text-sm max-w-screen-xl mx-auto">
-              {currentPhoto.caption}
-            </p>
-          </div>
-        )}
-        
         {/* Control Bar - 2 Rows */}
-        <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3">
-          <div className="max-w-screen-xl mx-auto space-y-2">
+        <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+          <div className="max-w-screen-xl mx-auto space-y-2 relative pl-20">
+            {/* Back button - Bottom left */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="absolute left-4 bottom-2 text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+              data-testid="button-close-viewer"
+            >
+              <ChevronLeft className="w-6 h-6" />
+              <span className="text-[11px] font-medium">Back</span>
+            </Button>
+
             {/* Row 1: Primary actions */}
             <div className="flex items-center justify-center gap-1">
               {onAnnotate && (
