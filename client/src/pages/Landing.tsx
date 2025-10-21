@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, MapPin, Share2, Cloud, Smartphone, Edit3, ArrowRight, Heart } from 'lucide-react';
+import { Camera, MapPin, Share2, Cloud, Smartphone, Edit3, ArrowRight, Heart, LogIn } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const isDevelopment = import.meta.env.DEV;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -21,7 +22,7 @@ export default function Landing() {
               />
               <span className="text-xl font-semibold">FieldSnaps</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-4">
               <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
                 Features
               </a>
@@ -31,8 +32,19 @@ export default function Landing() {
               <a href="#impact" className="text-muted-foreground hover:text-foreground transition-colors" onClick={(e) => { e.preventDefault(); setLocation('/impact'); }}>
                 Impact
               </a>
+              {isDevelopment && (
+                <Button 
+                  variant="default"
+                  className="bg-orange-600 hover:bg-orange-700"
+                  onClick={() => window.location.href = '/api/dev-login'}
+                  data-testid="button-dev-login-header"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Dev Login
+                </Button>
+              )}
               <Button 
-                variant="ghost" 
+                variant={isDevelopment ? "outline" : "ghost"}
                 onClick={() => setLocation('/login')}
                 data-testid="button-signin-header"
               >
