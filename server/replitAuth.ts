@@ -282,9 +282,21 @@ export async function setupAuth(app: Express) {
       }
       
       if (dbUser && !dbUser.companyId) {
-        // Redirect to company setup
-        console.log('[Dev Login] Redirecting to company setup');
-        return res.redirect("/onboarding/company-setup");
+        // Auto-create a dev company for testing
+        console.log('[Dev Login] Creating dev company for user');
+        
+        const devCompany = await storage.createCompany({
+          name: 'Dev Company',
+          ownerId: dbUser.id,
+        });
+        
+        // Update user with company
+        await storage.updateUser(dbUser.id, {
+          companyId: devCompany.id,
+          role: 'owner',
+        });
+        
+        console.log('[Dev Login] Dev company created successfully');
       }
 
       // Redirect to app
