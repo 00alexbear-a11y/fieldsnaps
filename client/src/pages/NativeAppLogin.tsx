@@ -4,6 +4,7 @@ import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { isDevModeEnabled } from '@/config/devMode';
+import { navigateToAuthEndpoint } from '@/lib/nativeNavigation';
 
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
@@ -65,7 +66,7 @@ export default function NativeAppLogin() {
             variant="default"
             size="default"
             className="w-full bg-orange-600 hover:bg-orange-700"
-            onClick={() => window.location.href = '/api/dev-login'}
+            onClick={() => navigateToAuthEndpoint('/api/dev-login')}
             data-testid="button-dev-login"
           >
             <LogIn className="w-4 h-4 mr-2" />
@@ -91,7 +92,7 @@ export default function NativeAppLogin() {
           variant={(biometricSupported || isDevelopment) ? "outline" : "default"}
           size="default"
           className="w-full"
-          onClick={() => window.location.href = '/api/login'}
+          onClick={() => navigateToAuthEndpoint('/api/login')}
           data-testid="button-login"
         >
           <LogIn className="w-4 h-4 mr-2" />
@@ -100,7 +101,7 @@ export default function NativeAppLogin() {
 
         <div className="text-center pt-2">
           <button
-            onClick={() => window.location.href = '/api/login'}
+            onClick={() => navigateToAuthEndpoint('/api/login')}
             className="text-sm text-primary font-medium inline-flex items-center gap-1 hover-elevate active-elevate-2"
             data-testid="link-try-now"
           >
