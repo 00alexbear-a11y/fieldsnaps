@@ -1779,10 +1779,6 @@ export function PhotoAnnotationEditor({
       setAnnotations(newAnnotations);
       addToHistory(newAnnotations);
       setSelectedAnnotation(null);
-      toast({
-        title: "Annotation deleted",
-        description: "The selected annotation has been removed",
-      });
     } else {
       console.log("[PhotoEdit] Delete clicked but no annotation selected");
     }
