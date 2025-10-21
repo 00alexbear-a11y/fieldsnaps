@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { Capacitor } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { nativeSplashScreen } from './lib/nativeSplashScreen';
 import App from "./App";
 import "./index.css";
 import { registerServiceWorker } from "./lib/registerServiceWorker";
@@ -74,7 +75,21 @@ const initializeApp = async () => {
 // Initialize and render app
 initializeApp().then(() => {
   createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Hide splash screen after app renders
+  if (Capacitor.isNativePlatform()) {
+    setTimeout(() => {
+      nativeSplashScreen.hide();
+    }, 300); // Small delay to ensure UI is ready
+  }
 }).catch((error) => {
   console.error('[App] Initialization failed:', error);
   createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Hide splash screen even on initialization error
+  if (Capacitor.isNativePlatform()) {
+    setTimeout(() => {
+      nativeSplashScreen.hide();
+    }, 300);
+  }
 });
