@@ -19,6 +19,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { useLocation } from "wouter";
 import type { ToDo, Project } from "@shared/schema";
 
@@ -42,6 +43,10 @@ type TodoWithDetails = ToDo & {
 export default function ToDos() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Enable keyboard management for form inputs
+  useKeyboardManager();
+  
   const [view, setView] = useState<'my-tasks' | 'team-tasks' | 'i-created' | 'calendar'>('my-tasks');
   const [filterProject, setFilterProject] = useState<string>('all');
   const [filterCompleted, setFilterCompleted] = useState<string>('active');

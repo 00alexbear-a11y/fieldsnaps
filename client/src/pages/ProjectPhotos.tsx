@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
 import { nativeClipboard } from "@/lib/nativeClipboard";
@@ -56,6 +57,10 @@ type Photo = BasePhoto & { tags?: Tag[] };
 export default function ProjectPhotos() {
   const { id: projectId } = useParams();
   const [, setLocation] = useLocation();
+  
+  // Enable keyboard management for form inputs
+  useKeyboardManager();
+  
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
