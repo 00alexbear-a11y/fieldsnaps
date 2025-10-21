@@ -26,7 +26,22 @@ export function useOfflineFirstPhotos(projectId: string) {
   // Use ref to track blob URLs created during async load
   const blobUrlsRef = useRef<Map<string, string>>(new Map());
 
-  // Load from IndexedDB immediately
+  // Fetch from server in background
+  const {
+    data: serverPhotos = [],
+    isLoading: isLoadingServer,
+    error: serverError,
+    dataUpdatedAt,
+  } = useQuery<Photo[]>({
+    queryKey: ['/api/projects', projectId, 'photos'],
+    staleTime: 0,
+    retry: false, // Don't retry if offline
+    meta: {
+      skipErrorToast: true, // Handle errors gracefully
+    },
+  });
+
+  // Load from IndexedDB immediately and whenever photos are added
   useEffect(() => {
     const loadLocalPhotos = async () => {
       try {
@@ -73,26 +88,24 @@ export function useOfflineFirstPhotos(projectId: string) {
 
     loadLocalPhotos();
 
-    // Cleanup: revoke blob URLs when component unmounts or projectId changes
+    // Listen for custom event when photos are added
+    const handlePhotoAdded = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail.projectId === projectId) {
+        console.log('[Offline] Photo added event received, reloading from IndexedDB');
+        loadLocalPhotos();
+      }
+    };
+
+    window.addEventListener('photoAdded', handlePhotoAdded);
+
+    // Cleanup: revoke blob URLs and remove event listener
     return () => {
       blobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
       blobUrlsRef.current.clear();
+      window.removeEventListener('photoAdded', handlePhotoAdded);
     };
-  }, [projectId]);
-
-  // Fetch from server in background
-  const {
-    data: serverPhotos = [],
-    isLoading: isLoadingServer,
-    error: serverError,
-  } = useQuery<Photo[]>({
-    queryKey: ['/api/projects', projectId, 'photos'],
-    staleTime: 0,
-    retry: false, // Don't retry if offline
-    meta: {
-      skipErrorToast: true, // Handle errors gracefully
-    },
-  });
+  }, [projectId]); // Only reload when projectId changes
 
   // Note: Server photos have URLs (not blobs), so true offline caching
   // would require downloading and storing the actual image data.
