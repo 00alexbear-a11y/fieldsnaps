@@ -89,6 +89,38 @@ async function upsertUser(
   }
 }
 
+/**
+ * Validate redirect URI to prevent open redirect attacks.
+ * Only allows the native app scheme or same-origin URLs.
+ * 
+ * @param redirectUri - The redirect URI to validate
+ * @param requestOrigin - The origin of the incoming request
+ * @returns true if valid, false otherwise
+ */
+function isValidRedirectUri(redirectUri: string, requestOrigin: string): boolean {
+  // Allow the native app custom URL scheme
+  const NATIVE_APP_SCHEME = 'com.fieldsnaps.app://callback';
+  if (redirectUri === NATIVE_APP_SCHEME) {
+    return true;
+  }
+
+  // For web URLs, only allow same-origin redirects
+  try {
+    const redirectUrl = new URL(redirectUri);
+    const requestUrl = new URL(requestOrigin);
+    
+    // Must be same protocol, host, and port
+    return (
+      redirectUrl.protocol === requestUrl.protocol &&
+      redirectUrl.hostname === requestUrl.hostname &&
+      redirectUrl.port === requestUrl.port
+    );
+  } catch (error) {
+    // Invalid URL format
+    return false;
+  }
+}
+
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
   app.use(getSession());
@@ -138,6 +170,21 @@ export async function setupAuth(app: Express) {
     if (inviteToken) {
       // Store invite token in session for use after auth
       (req.session as any).inviteToken = inviteToken;
+    }
+    
+    // Check for custom redirect_uri (for native apps using deep linking)
+    const redirectUri = req.query.redirect_uri as string;
+    if (redirectUri) {
+      // Validate redirect URI to prevent open redirect attacks
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
+      if (!isValidRedirectUri(redirectUri, requestOrigin)) {
+        console.error('[Auth] Invalid redirect_uri rejected:', redirectUri);
+        return res.status(400).json({ error: 'Invalid redirect_uri parameter' });
+      }
+      
+      // Store validated custom redirect URI in session for use after auth callback
+      (req.session as any).customRedirectUri = redirectUri;
+      console.log('[Auth] Stored custom redirect URI:', redirectUri);
     }
     
     // Strip port from hostname for strategy lookup
@@ -192,6 +239,14 @@ export async function setupAuth(app: Express) {
               // Clear invite token from session
               delete (req.session as any).inviteToken;
 
+              // Check for custom redirect URI (native app deep link)
+              const customRedirectUri = (req.session as any).customRedirectUri;
+              if (customRedirectUri) {
+                delete (req.session as any).customRedirectUri;
+                console.log('[Auth] Redirecting native app to:', customRedirectUri);
+                return res.redirect(customRedirectUri);
+              }
+
               // Redirect to app
               return res.redirect("/");
             }
@@ -202,7 +257,23 @@ export async function setupAuth(app: Express) {
         
         if (dbUser && !dbUser.companyId) {
           // New user without company and no invite - redirect to company setup
+          // For native apps, include this in the deep link
+          const customRedirectUri = (req.session as any).customRedirectUri;
+          if (customRedirectUri) {
+            delete (req.session as any).customRedirectUri;
+            const redirectUrl = `${customRedirectUri}?needs_company_setup=true`;
+            console.log('[Auth] New user needs company setup, redirecting to:', redirectUrl);
+            return res.redirect(redirectUrl);
+          }
           return res.redirect("/onboarding/company-setup");
+        }
+
+        // Check for custom redirect URI (native app deep link)
+        const customRedirectUri = (req.session as any).customRedirectUri;
+        if (customRedirectUri) {
+          delete (req.session as any).customRedirectUri;
+          console.log('[Auth] Redirecting native app to:', customRedirectUri);
+          return res.redirect(customRedirectUri);
         }
 
         // User has company - redirect to app
@@ -217,6 +288,19 @@ export async function setupAuth(app: Express) {
     
     if (!isDevelopment) {
       return res.status(403).json({ error: "Dev login only available in development" });
+    }
+
+    // Get custom redirect URI from query params (for native app deep linking)
+    let customRedirectUri = req.query.redirect_uri as string;
+    
+    // Validate redirect URI if provided
+    if (customRedirectUri) {
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
+      if (!isValidRedirectUri(customRedirectUri, requestOrigin)) {
+        console.error('[Dev Login] Invalid redirect_uri rejected:', customRedirectUri);
+        return res.status(400).json({ error: 'Invalid redirect_uri parameter' });
+      }
+      console.log('[Dev Login] Using custom redirect URI:', customRedirectUri);
     }
 
     // Create mock user data
@@ -274,6 +358,12 @@ export async function setupAuth(app: Express) {
             delete (req.session as any).inviteToken;
 
             console.log('[Dev Login] Auto-joined company via invite token');
+            
+            // Redirect to custom URI if provided (native app)
+            if (customRedirectUri) {
+              console.log('[Dev Login] Redirecting native app to:', customRedirectUri);
+              return res.redirect(customRedirectUri);
+            }
             return res.redirect("/");
           }
         } catch (error) {
@@ -299,8 +389,12 @@ export async function setupAuth(app: Express) {
         console.log('[Dev Login] Dev company created successfully');
       }
 
-      // Redirect to app
+      // Redirect to custom URI if provided (native app deep link)
       console.log('[Dev Login] Dev user logged in successfully');
+      if (customRedirectUri) {
+        console.log('[Dev Login] Redirecting native app to:', customRedirectUri);
+        return res.redirect(customRedirectUri);
+      }
       return res.redirect("/");
     });
   });
