@@ -9,6 +9,8 @@ import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
 import { indexedDB as idb, type LocalPhoto, createPhotoUrl } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
+import { haptics } from '@/lib/nativeHaptics';
+import { nativeStatusBar } from '@/lib/nativeStatusBar';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import {
   Select,
@@ -277,6 +279,8 @@ export default function Camera() {
         clearTimeout(startCameraTimeoutRef.current);
       }
       stopCamera();
+      // Ensure status bar is shown when component unmounts
+      nativeStatusBar.show();
     };
   }, []);
 
@@ -484,6 +488,9 @@ export default function Camera() {
         setIsCameraLoading(false);
         console.log('[Camera] isActive set to true, loading overlay should hide');
         
+        // Hide status bar for immersive full-screen camera experience
+        nativeStatusBar.hide();
+        
         await detectAvailableCameras();
       }
     } catch (error) {
@@ -517,6 +524,9 @@ export default function Camera() {
       videoRef.current.srcObject = null;
     }
     setIsActive(false);
+    
+    // Show status bar when leaving camera
+    nativeStatusBar.show();
   };
 
   const switchCamera = async () => {
@@ -817,6 +827,7 @@ export default function Camera() {
           pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
         });
         
+        haptics.success();
         toast({
           title: '✓ Video Saved',
           description: 'Video recorded successfully',
@@ -856,6 +867,7 @@ export default function Camera() {
       
       renderFrame();
       
+      haptics.medium();
       toast({
         title: '● Recording',
         description: 'Tap annotations to draw',
@@ -864,6 +876,7 @@ export default function Camera() {
       
     } catch (error) {
       console.error('Recording start error:', error);
+      haptics.error();
       toast({
         title: 'Recording Failed',
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -874,6 +887,7 @@ export default function Camera() {
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
+      haptics.medium();
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current = null;
       isRecordingRef.current = false;
@@ -918,6 +932,7 @@ export default function Camera() {
       return;
     }
 
+    haptics.light();
     setIsCapturing(true);
 
     try {
@@ -963,6 +978,7 @@ export default function Camera() {
 
       URL.revokeObjectURL(compressionResult.url);
 
+      haptics.success();
       toast({
         title: '✓ Captured',
         description: `${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
@@ -1025,6 +1041,7 @@ export default function Camera() {
 
     } catch (error) {
       console.error('Quick capture error:', error);
+      haptics.error();
       const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
         title: 'Photo Capture Failed',
@@ -1045,6 +1062,7 @@ export default function Camera() {
       return;
     }
 
+    haptics.light();
     setIsCapturing(true);
 
     try {

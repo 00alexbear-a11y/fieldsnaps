@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, Wifi, Signal } from 'lucide-react';
+import { nativeNetwork } from '@/lib/nativeNetwork';
+import type { NetworkStatus } from '@/lib/nativeNetwork';
 
 export function OfflineIndicator() {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({ 
+    connected: navigator.onLine, 
+    connectionType: 'unknown' 
+  });
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    nativeNetwork.getStatus().then(setNetworkStatus);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    const cleanup = nativeNetwork.addListener(setNetworkStatus);
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
+    return cleanup;
   }, []);
 
-  if (isOnline) return null;
+  if (networkStatus.connected) return null;
 
   return (
     <div 

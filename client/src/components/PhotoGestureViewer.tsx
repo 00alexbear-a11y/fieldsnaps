@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { haptics } from "@/lib/nativeHaptics";
+import { nativeShare, type ShareResult } from "@/lib/nativeShare";
+import { nativeClipboard } from "@/lib/nativeClipboard";
 import type { Comment } from "../../../shared/schema";
 import {
   AlertDialog,
@@ -154,7 +157,7 @@ export function PhotoGestureViewer({
       if (onDelete) {
         longPressTimerRef.current = setTimeout(() => {
           if (state.moveDistance < 10) {
-            navigator.vibrate?.(50);
+            haptics.medium();
             setShowDeleteDialog(true);
           }
         }, 500);
@@ -238,20 +241,46 @@ export function PhotoGestureViewer({
     if (!currentPhoto || !onShare) return;
 
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: currentPhoto.caption || "Construction Photo",
-          text: currentPhoto.caption || "Check out this photo",
-          url: currentPhoto.url,
-        });
-      } else if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(currentPhoto.url);
+      haptics.light();
+      const result: ShareResult = await nativeShare.share({
+        title: currentPhoto.caption || "Construction Photo",
+        text: currentPhoto.caption || "Check out this photo",
+        url: currentPhoto.url,
+        files: [currentPhoto.url],
+        dialogTitle: "Share Photo",
+      });
+
+      if (result.shared) {
         onShare(currentPhoto);
-      } else {
-        onShare(currentPhoto);
+        if (result.method === 'native') {
+          haptics.success();
+          toast({ 
+            title: "Photo shared",
+            description: "Shared via AirDrop/native sharing",
+            duration: 1500,
+          });
+        } else if (result.method === 'web-share') {
+          toast({ 
+            title: "Photo shared",
+            duration: 1500,
+          });
+        } else if (result.method === 'clipboard') {
+          toast({ 
+            title: "Photo URL copied",
+            description: "Link copied to clipboard",
+            duration: 1500,
+          });
+        }
       }
+      // If share was cancelled (shared: false), do nothing - respect user's choice
     } catch (error) {
       console.error("Share failed:", error);
+      haptics.error();
+      toast({ 
+        title: "Share failed",
+        description: "Could not share photo",
+        variant: "destructive",
+      });
     }
   };
 

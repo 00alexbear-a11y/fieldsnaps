@@ -34,6 +34,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
+import { nativeClipboard } from "@/lib/nativeClipboard";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
@@ -564,11 +565,9 @@ export default function ProjectPhotos() {
       const share = await response.json();
       const shareUrl = `${window.location.origin}/share/${share.token}`;
 
-      // Try to copy to clipboard (may fail in some browsers)
-      let copiedToClipboard = false;
+      // Try to copy to clipboard
       try {
-        await navigator.clipboard.writeText(shareUrl);
-        copiedToClipboard = true;
+        await nativeClipboard.write(shareUrl);
         toast({
           title: 'Share link created!',
           description: 'Link copied to clipboard. All project photos are now shared.',
@@ -1764,16 +1763,8 @@ export default function ProjectPhotos() {
             setViewerPhotoIndex(null);
             setTagPickerPhotoId(photo.id);
           }}
-          onShare={(photo) => {
-            if (navigator.clipboard && window.isSecureContext) {
-              toast({ title: "Photo URL copied to clipboard" });
-            } else if (!navigator.share) {
-              toast({ 
-                title: "Sharing not available",
-                description: "Please use a secure connection (HTTPS) to share photos",
-                variant: "destructive"
-              });
-            }
+          onShare={() => {
+            // Share is handled by PhotoGestureViewer's native share
           }}
           onSetCoverPhoto={(photoId) => setCoverPhotoMutation.mutate(photoId)}
         />
