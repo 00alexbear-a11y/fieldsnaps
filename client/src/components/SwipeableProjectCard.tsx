@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { actionSheet } from "@/lib/nativeActionSheet";
 import type { Project, Photo } from "../../../shared/schema";
 
 interface SwipeableProjectCardProps {
@@ -157,6 +158,51 @@ export default function SwipeableProjectCard({
     onDelete();
   };
 
+  const handleMenuClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // On iOS, show native action sheet
+    if (actionSheet.isSupported()) {
+      const buttons = [];
+      
+      if (project.address) {
+        buttons.push({
+          title: 'Go to Map',
+          handler: () => {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+          },
+        });
+      }
+      
+      buttons.push({
+        title: project.completed ? 'Mark as Incomplete' : 'Mark as Complete',
+        handler: onToggleComplete,
+      });
+      
+      buttons.push({
+        title: 'Share Project',
+        handler: onShare,
+      });
+      
+      buttons.push({
+        title: 'Delete Project',
+        style: 'destructive' as const,
+        handler: onDelete,
+      });
+      
+      buttons.push({
+        title: 'Cancel',
+        style: 'cancel' as const,
+      });
+      
+      await actionSheet.show({
+        title: project.name,
+        buttons,
+      });
+    }
+    // On web, dropdown menu will handle it
+  };
+
   return (
     <div className="relative mx-3 my-2 overflow-hidden rounded-2xl" data-testid={`swipeable-wrapper-${project.id}`}>
       {/* Delete button - appears behind card */}
@@ -273,75 +319,88 @@ export default function SwipeableProjectCard({
               <Camera className="w-5 h-5" />
             </Button>
             
-            {/* Menu Button */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-11 h-11"
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid={`button-menu-${project.id}`}
-                  aria-label="Project options"
-                >
-                  <MoreVertical className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {project.address && (
+            {/* Menu Button - Native action sheet on iOS, dropdown on web */}
+            {actionSheet.isSupported() ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-11 h-11"
+                onClick={handleMenuClick}
+                data-testid={`button-menu-${project.id}`}
+                aria-label="Project options"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-11 h-11"
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid={`button-menu-${project.id}`}
+                    aria-label="Project options"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {project.address && (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                      }}
+                      data-testid={`menu-open-map-${project.id}`}
+                    >
+                      <MapPin className="w-4 h-4 mr-2" />
+                      Go to Map
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+                      onToggleComplete();
                     }}
-                    data-testid={`menu-open-map-${project.id}`}
+                    data-testid={`menu-toggle-complete-${project.id}`}
                   >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    Go to Map
+                    {project.completed ? (
+                      <>
+                        <Circle className="w-4 h-4 mr-2" />
+                        Mark as Incomplete
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Mark as Complete
+                      </>
+                    )}
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleComplete();
-                  }}
-                  data-testid={`menu-toggle-complete-${project.id}`}
-                >
-                  {project.completed ? (
-                    <>
-                      <Circle className="w-4 h-4 mr-2" />
-                      Mark as Incomplete
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Mark as Complete
-                    </>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onShare();
-                  }}
-                  data-testid={`menu-share-${project.id}`}
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share Project
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                  className="text-destructive focus:text-destructive"
-                  data-testid={`menu-delete-${project.id}`}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Project
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onShare();
+                    }}
+                    data-testid={`menu-share-${project.id}`}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share Project
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete();
+                    }}
+                    className="text-destructive focus:text-destructive"
+                    data-testid={`menu-delete-${project.id}`}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Project
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
