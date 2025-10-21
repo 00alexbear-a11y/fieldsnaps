@@ -30,6 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Photo {
   id: string;
@@ -359,6 +365,7 @@ export function PhotoGestureViewer({
             disabled={currentIndex === 0}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-16 h-16 shadow-lg z-10"
             data-testid="button-prev-photo"
+            aria-label="Previous photo"
           >
             <ChevronLeft className="w-10 h-10" />
           </Button>
@@ -370,6 +377,7 @@ export function PhotoGestureViewer({
             disabled={currentIndex === photos.length - 1}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 disabled:opacity-30 bg-black/50 backdrop-blur-md w-16 h-16 shadow-lg z-10"
             data-testid="button-next-photo"
+            aria-label="Next photo"
           >
             <ChevronRight className="w-10 h-10" />
           </Button>
@@ -380,113 +388,127 @@ export function PhotoGestureViewer({
       <div
         className="absolute bottom-0 left-0 right-0"
       >
-        {/* Control Bar - 2 Rows */}
+        {/* Control Bar */}
         <div className="bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-sm px-4 py-3" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          <div className="max-w-screen-xl mx-auto space-y-2 relative pl-20">
+          <div className="max-w-screen-xl mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             {/* Back button - Bottom left */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="absolute left-4 bottom-2 text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
-              data-testid="button-close-viewer"
-            >
-              <ChevronLeft className="w-6 h-6" />
-              <span className="text-[11px] font-medium">Back</span>
-            </Button>
+            <div className="justify-self-start">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
+                data-testid="button-close-viewer"
+                aria-label="Close photo viewer"
+              >
+                <ChevronLeft className="w-6 h-6" />
+                <span className="text-xs font-medium hidden sm:inline">Back</span>
+              </Button>
+            </div>
 
-            {/* Row 1: Primary actions */}
-            <div className="flex items-center justify-center gap-1">
+            {/* Centered action buttons */}
+            <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
               {onAnnotate && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => onAnnotate(currentPhoto)}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
                   data-testid="button-annotate"
+                  aria-label="Annotate photo"
                 >
                   <Brush className="w-6 h-6" />
-                  <span className="text-[11px] font-medium">Edit</span>
+                  <span className="text-xs font-medium hidden sm:inline">Annotate</span>
                 </Button>
               )}
-              {onTag && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onTag(currentPhoto)}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
-                  data-testid="button-tag-photo"
-                >
-                  <Tag className="w-6 h-6" />
-                  <span className="text-[11px] font-medium">Tag</span>
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowComments(!showComments)}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1 relative"
-                data-testid="button-comments"
-              >
-                <MessageSquare className="w-6 h-6" />
-                <span className="text-[11px] font-medium">Comment</span>
-                {comments.length > 0 && (
-                  <span className="absolute top-1 right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-semibold">
-                    {comments.length}
-                  </span>
-                )}
-              </Button>
+              
+              {/* Edit menu - contains Tag, Rename, Comment */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5 relative"
+                    data-testid="button-edit-menu"
+                    aria-label="Edit photo options"
+                    aria-haspopup="menu"
+                  >
+                    <Pencil className="w-6 h-6" />
+                    <span className="text-xs font-medium hidden sm:inline">Edit</span>
+                    {comments.length > 0 && (
+                      <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-semibold">
+                        {comments.length}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="bg-card">
+                  {onTag && (
+                    <DropdownMenuItem 
+                      onClick={() => onTag(currentPhoto)}
+                      data-testid="menu-item-tag"
+                    >
+                      <Tag className="w-4 h-4 mr-2" />
+                      Tag
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem 
+                    onClick={handleEditCaption}
+                    data-testid="menu-item-rename"
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowComments(!showComments)}
+                    data-testid="menu-item-comment"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Comment {comments.length > 0 && `(${comments.length})`}
+                  </DropdownMenuItem>
+                  {onSetCoverPhoto && (
+                    <DropdownMenuItem 
+                      onClick={handleSetCoverPhoto}
+                      data-testid="menu-item-use-as-icon"
+                    >
+                      <Image className="w-4 h-4 mr-2" />
+                      Use as Icon
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {onShare && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleShare}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
                   data-testid="button-share"
+                  aria-label="Share photo"
                 >
                   <Share2 className="w-6 h-6" />
-                  <span className="text-[11px] font-medium">Share</span>
+                  <span className="text-xs font-medium hidden sm:inline">Share</span>
                 </Button>
               )}
-            </div>
-
-            {/* Row 2: Management actions */}
-            <div className="flex items-center justify-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleEditCaption}
-                className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
-                data-testid="button-edit-caption"
-              >
-                <Pencil className="w-6 h-6" />
-                <span className="text-[11px] font-medium">Rename</span>
-              </Button>
-              {onSetCoverPhoto && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleSetCoverPhoto}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
-                  data-testid="button-set-cover-photo"
-                >
-                  <Image className="w-6 h-6" />
-                  <span className="text-[11px] font-medium">Use as Icon</span>
-                </Button>
-              )}
+              
               {onDelete && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleDeleteClick}
-                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
+                  className="text-white hover:bg-white/20 flex-col h-auto py-2 px-2 gap-0.5"
                   data-testid="button-delete"
+                  aria-label="Delete photo"
                 >
                   <Trash2 className="w-6 h-6" />
-                  <span className="text-[11px] font-medium">Delete</span>
+                  <span className="text-xs font-medium hidden sm:inline">Delete</span>
                 </Button>
               )}
             </div>
+
+            {/* Empty right column for grid symmetry */}
+            <div />
           </div>
         </div>
       </div>
@@ -556,7 +578,9 @@ export function PhotoGestureViewer({
       <div
         className={`absolute bottom-0 left-0 right-0 bg-background border-t max-h-[50vh] flex flex-col transition-transform duration-300 ${
           showComments ? "translate-y-0" : "translate-y-full"
-        }`}
+        } ${!showComments ? "pointer-events-none" : ""}`}
+        aria-hidden={!showComments}
+        {...(!showComments && { inert: '' })}
       >
         <div className="p-4 border-b flex items-center justify-between">
           <h3 className="font-semibold flex items-center gap-2">
@@ -568,6 +592,7 @@ export function PhotoGestureViewer({
             size="icon"
             onClick={() => setShowComments(false)}
             data-testid="button-close-comments"
+            aria-label="Close comments"
           >
             <X className="w-5 h-5" />
           </Button>
