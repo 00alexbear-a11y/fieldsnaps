@@ -37,6 +37,14 @@ The application features a multi-platform subscription system supporting Stripe 
 ### Feature Specifications
 The application includes a bottom navigation, a camera interface with a three-zone layout, and a To-Do system for team task management with photo attachments. Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout with tools for text, arrows, lines, circles, pens, and a tape measure. Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
 
+**Photo Viewer Controls (October 2025)**: Production-ready fullscreen photo viewer with optimized bottom controls for mobile and accessibility:
+- **Layout**: 3-column grid (`grid-cols-[1fr_auto_1fr]`) ensures true centering on all screen sizes (≥320px) without overlap
+- **Simplified Controls**: Back button (bottom-left), centered action group (Annotate, Edit menu, Share, Delete)
+- **Edit Menu**: DropdownMenu consolidates Tag, Rename, Comment, and "Use as Icon" actions; displays comment count badge when comments exist
+- **Responsive Labels**: Icon-only on small screens (`hidden sm:inline`), icon+label on sm+ for space efficiency
+- **Accessibility**: All buttons have aria-labels, Prev/Next navigation arrows labeled, comments panel uses `inert` when hidden to prevent focus trapping
+- **Safe-area Support**: Bottom padding uses `max(0.75rem, env(safe-area-inset-bottom))` for iOS home indicator compatibility
+
 ### System Design Choices
 The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing.
 
