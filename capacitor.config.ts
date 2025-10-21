@@ -9,6 +9,10 @@ const config: CapacitorConfig = {
     iosScheme: 'https',
   },
   plugins: {
+    App: {
+      // Deep linking URL scheme for OAuth callbacks
+      appUrlScheme: 'com.fieldsnaps.app'
+    },
     Camera: {
       presentationStyle: 'fullscreen',
     },
