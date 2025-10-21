@@ -1837,6 +1837,7 @@ export default function ProjectPhotos() {
               photoId={selectedPhoto.id}
               existingAnnotations={annotations}
               onSave={handleSaveAnnotations}
+              onCancel={() => setSelectedPhoto(null)}
             />
           </DialogContent>
         </Dialog>
