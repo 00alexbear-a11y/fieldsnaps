@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import {
   DropdownMenu,
@@ -56,6 +57,9 @@ export default function Projects() {
   const { isDark, toggleTheme } = useTheme();
   const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Enable keyboard management for form inputs
+  useKeyboardManager();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
   const [showCompleted, setShowCompleted] = useState(false);

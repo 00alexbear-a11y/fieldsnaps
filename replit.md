@@ -25,6 +25,15 @@ FieldSnaps is an offline-first PWA leveraging Service Workers for caching and In
 
 The application features a multi-platform subscription system supporting Stripe (web), Apple In-App Purchase (iOS), and Google Play Billing (Android) at a unified $19.99/month. A unified validation service (`server/subscriptionValidation.ts`) handles subscriptions from all sources. Authentication uses Replit Auth with OpenID Connect and biometric login.
 
+**Native iOS Integration (October 2025)**: Comprehensive Capacitor plugin integration transforms web app into truly native-feeling iOS experience. Native helpers (`client/src/lib/native*.ts`) provide platform detection with graceful web fallbacks. Features include:
+- **Haptic Feedback**: Success/error/light haptics in Camera (photo/video capture), PhotoGestureViewer (long-press), and clipboard operations
+- **Native Share**: Converts photos to filesystem temp files, shares via iOS share sheet with AirDrop support, respects cancellation without side effects, auto-cleans up cache files
+- **Status Bar Control**: Hides during camera use for immersive full-screen, shows with theme-aware styling on exit, auto-restores on unmount
+- **Network Detection**: Capacitor Network plugin with WiFi/cellular type detection, replaces navigator.onLine
+- **Clipboard**: Native clipboard with haptic feedback in ProjectPhotos, Projects, Settings (share links, invite links)
+- **Splash Screen**: Auto-hides 300ms after app initialization
+- **Keyboard Management**: useKeyboardManager hook with auto-scroll, listener cleanup (infrastructure ready for forms)
+
 ### Feature Specifications
 The application includes a bottom navigation, a camera interface with a three-zone layout, and a To-Do system for team task management with photo attachments. Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout with tools for text, arrows, lines, circles, pens, and a tape measure. Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
 
@@ -62,13 +71,25 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **Capacitor 6**: Native wrapper for iOS/Android.
 - **Capgo**: Encrypted over-the-air (OTA) updates.
 
-### Capacitor Plugins
-- **@capacitor/core**: Core functionality.
+### Capacitor Plugins (Native iOS Integration - October 2025)
+- **@capacitor/core**: Core functionality and platform detection.
 - **@capacitor/app**: App lifecycle management.
 - **@capacitor/device**: Device information.
 - **@capacitor/preferences**: Native storage for app preferences.
-- **@capacitor/filesystem**: Native file system access.
+- **@capacitor/filesystem**: Native file system access for photo sharing.
 - **@capacitor/camera**: Native camera integration.
+- **@capacitor/haptics**: Native haptic feedback (impact, notification, selection).
+- **@capacitor/share**: Native iOS share sheet with AirDrop support.
+- **@capacitor/status-bar**: Native status bar control (hide/show, theme-aware).
+- **@capacitor/network**: Native network detection (WiFi, cellular, offline).
+- **@capacitor/clipboard**: Native clipboard operations.
+- **@capacitor/keyboard**: Native keyboard management (show/hide, listeners).
+- **@capacitor/splash-screen**: Native splash screen control.
+- **@capacitor/action-sheet**: Native iOS action sheets (planned).
+- **@capacitor/toast**: Native iOS toast notifications (planned).
+- **@capacitor/dialog**: Native iOS dialogs/alerts (planned).
+- **@capacitor/local-notifications**: Native push notifications (planned).
+- **@capacitor/geolocation**: Native GPS coordinates for photos (planned).
 
 ### Third-Party APIs & Payment Processing
 - **Google Geocoding API**: Address to coordinates conversion.
