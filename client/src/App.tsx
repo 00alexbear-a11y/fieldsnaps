@@ -192,12 +192,37 @@ export default function App() {
         if (isOAuthCallback(url)) {
           console.log('[Deep Link] OAuth callback detected');
           
-          // Parse callback parameters (if needed for debugging)
+          // Parse callback parameters
           const params = parseOAuthCallback(url);
           console.log('[Deep Link] Callback params:', params);
 
           // Close the browser (Safari) if still open
           await closeBrowser();
+
+          // Exchange the session ID for a cookie
+          if (params.session_id) {
+            console.log('[Deep Link] Exchanging session ID for cookie...');
+            try {
+              const response = await fetch('/api/auth/exchange-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: params.session_id }),
+                credentials: 'include', // Important: include cookies
+              });
+
+              if (!response.ok) {
+                console.error('[Deep Link] Session exchange failed:', response.status);
+                window.location.href = '/login';
+                return;
+              }
+
+              console.log('[Deep Link] Session exchange successful');
+            } catch (error) {
+              console.error('[Deep Link] Session exchange error:', error);
+              window.location.href = '/login';
+              return;
+            }
+          }
 
           // Check if user needs company setup
           if (params.needs_company_setup === 'true') {

@@ -243,8 +243,10 @@ export async function setupAuth(app: Express) {
               const customRedirectUri = (req.session as any).customRedirectUri;
               if (customRedirectUri) {
                 delete (req.session as any).customRedirectUri;
-                console.log('[Auth] Redirecting native app to:', customRedirectUri);
-                return res.redirect(customRedirectUri);
+                const sessionId = req.sessionID;
+                const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
+                console.log('[Auth] Redirecting native app to:', redirectUrl);
+                return res.redirect(redirectUrl);
               }
 
               // Redirect to app
@@ -261,7 +263,8 @@ export async function setupAuth(app: Express) {
           const customRedirectUri = (req.session as any).customRedirectUri;
           if (customRedirectUri) {
             delete (req.session as any).customRedirectUri;
-            const redirectUrl = `${customRedirectUri}?needs_company_setup=true`;
+            const sessionId = req.sessionID;
+            const redirectUrl = `${customRedirectUri}?needs_company_setup=true&session_id=${sessionId}`;
             console.log('[Auth] New user needs company setup, redirecting to:', redirectUrl);
             return res.redirect(redirectUrl);
           }
@@ -272,8 +275,11 @@ export async function setupAuth(app: Express) {
         const customRedirectUri = (req.session as any).customRedirectUri;
         if (customRedirectUri) {
           delete (req.session as any).customRedirectUri;
-          console.log('[Auth] Redirecting native app to:', customRedirectUri);
-          return res.redirect(customRedirectUri);
+          // For native apps, pass the session ID so the app can authenticate
+          const sessionId = req.sessionID;
+          const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
+          console.log('[Auth] Redirecting native app to:', redirectUrl);
+          return res.redirect(redirectUrl);
         }
 
         // User has company - redirect to app
@@ -361,8 +367,10 @@ export async function setupAuth(app: Express) {
             
             // Redirect to custom URI if provided (native app)
             if (customRedirectUri) {
-              console.log('[Dev Login] Redirecting native app to:', customRedirectUri);
-              return res.redirect(customRedirectUri);
+              const sessionId = req.sessionID;
+              const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
+              console.log('[Dev Login] Redirecting native app to:', redirectUrl);
+              return res.redirect(redirectUrl);
             }
             return res.redirect("/");
           }
@@ -392,10 +400,51 @@ export async function setupAuth(app: Express) {
       // Redirect to custom URI if provided (native app deep link)
       console.log('[Dev Login] Dev user logged in successfully');
       if (customRedirectUri) {
-        console.log('[Dev Login] Redirecting native app to:', customRedirectUri);
-        return res.redirect(customRedirectUri);
+        // For native apps, we need to pass the session ID in the callback
+        // because Safari's cookies aren't shared with the Capacitor WebView
+        const sessionId = req.sessionID;
+        const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
+        console.log('[Dev Login] Redirecting native app to:', redirectUrl);
+        return res.redirect(redirectUrl);
       }
       return res.redirect("/");
+    });
+  });
+
+  // Native app session exchange endpoint
+  // The native app calls this with the session_id from the deep link
+  // to establish its own session cookie
+  app.post("/api/auth/exchange-session", async (req, res) => {
+    const { session_id } = req.body;
+    
+    if (!session_id) {
+      return res.status(400).json({ error: 'Missing session_id' });
+    }
+
+    // Verify the session exists and get its data
+    // This uses the session store to look up the session by ID
+    const sessionStore = req.sessionStore;
+    
+    sessionStore.get(session_id, (err, sessionData) => {
+      if (err || !sessionData) {
+        console.error('[Session Exchange] Failed to find session:', session_id, err);
+        return res.status(401).json({ error: 'Invalid session_id' });
+      }
+
+      // Session exists - now set it as the current session for this request
+      // This effectively "copies" the authenticated session from Safari to the native app
+      (req.session as any).passport = (sessionData as any).passport;
+      (req.session as any).cookie = (sessionData as any).cookie;
+      
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('[Session Exchange] Failed to save session:', saveErr);
+          return res.status(500).json({ error: 'Failed to establish session' });
+        }
+
+        console.log('[Session Exchange] Session successfully exchanged for native app');
+        return res.json({ success: true });
+      });
     });
   });
 
