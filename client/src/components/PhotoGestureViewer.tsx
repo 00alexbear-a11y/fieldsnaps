@@ -9,6 +9,8 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeShare, type ShareResult } from "@/lib/nativeShare";
 import { nativeClipboard } from "@/lib/nativeClipboard";
+import { nativeDialogs } from "@/lib/nativeDialogs";
+import { Capacitor } from "@capacitor/core";
 import type { Comment } from "../../../shared/schema";
 import {
   AlertDialog,
@@ -158,7 +160,7 @@ export function PhotoGestureViewer({
         longPressTimerRef.current = setTimeout(() => {
           if (state.moveDistance < 10) {
             haptics.medium();
-            setShowDeleteDialog(true);
+            handleDeleteClick();
           }
         }, 500);
       }
@@ -220,6 +222,37 @@ export function PhotoGestureViewer({
   const navigatePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    // On iOS: use native confirmation dialog
+    if (Capacitor.isNativePlatform()) {
+      const confirmed = await nativeDialogs.confirm({
+        title: "Delete Photo?",
+        message: "This action cannot be undone. This will permanently delete the photo from this project.",
+        okButtonTitle: "Delete",
+        cancelButtonTitle: "Cancel"
+      });
+      
+      if (confirmed && onDelete && currentPhoto) {
+        // Calculate next index BEFORE deletion (using current photos array)
+        const willClose = photos.length === 1;
+        const nextIndex = currentIndex >= photos.length - 1 ? photos.length - 2 : currentIndex;
+        
+        // Delete the photo
+        onDelete(currentPhoto.id);
+        
+        // Update state after deletion
+        if (willClose) {
+          onClose();
+        } else {
+          setCurrentIndex(nextIndex);
+        }
+      }
+    } else {
+      // On web: use AlertDialog component
+      setShowDeleteDialog(true);
     }
   };
 
@@ -454,7 +487,7 @@ export function PhotoGestureViewer({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowDeleteDialog(true)}
+                  onClick={handleDeleteClick}
                   className="text-white hover:bg-white/20 flex-col h-auto py-2 px-4 gap-1"
                   data-testid="button-delete"
                 >

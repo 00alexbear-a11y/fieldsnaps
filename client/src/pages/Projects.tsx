@@ -48,6 +48,8 @@ import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
 import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
+import { nativeDialogs } from "@/lib/nativeDialogs";
+import { Capacitor } from "@capacitor/core";
 import { Copy, Check } from "lucide-react";
 
 type SortOption = 'lastActivity' | 'name' | 'created';
@@ -227,9 +229,25 @@ export default function Projects() {
     createMutation.mutate({ name, description, address });
   };
 
-  const handleDeleteProject = (project: Project) => {
-    setProjectToDelete(project);
-    setDeleteDialogOpen(true);
+  const handleDeleteProject = async (project: Project) => {
+    // On iOS: use native confirmation dialog
+    if (Capacitor.isNativePlatform()) {
+      const photoCount = getPhotoCount(project.id);
+      const confirmed = await nativeDialogs.confirm({
+        title: "Delete Project?",
+        message: `Are you sure you want to delete "${project.name}"? The project and all ${photoCount} of its photos will be moved to trash for 30 days before permanent deletion.`,
+        okButtonTitle: "Delete",
+        cancelButtonTitle: "Cancel"
+      });
+      
+      if (confirmed) {
+        deleteMutation.mutate(project.id);
+      }
+    } else {
+      // On web: use AlertDialog component
+      setProjectToDelete(project);
+      setDeleteDialogOpen(true);
+    }
   };
 
   const confirmDelete = () => {
