@@ -8,8 +8,19 @@ import { Capacitor } from '@capacitor/core';
  */
 
 /**
+ * Server URL for native builds
+ * 
+ * IMPORTANT: Update this before building for production!
+ * - Development: Your Replit dev server URL
+ * - Production: Your production server URL (e.g., https://fieldsnaps.com)
+ * 
+ * This MUST match the server.url in your capacitor.config files.
+ */
+const SERVER_URL = 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev';
+
+/**
  * Get the base server URL
- * - In native (Capacitor), returns the server URL from config
+ * - In native (Capacitor), returns the configured server URL
  * - In web, returns empty string (uses relative URLs)
  */
 function getServerUrl(): string {
@@ -17,10 +28,9 @@ function getServerUrl(): string {
     return '';
   }
   
-  // In native mode, we need the full server URL
-  // This is set in capacitor.config.dev.ts during development
-  // In production builds, this would be the production server URL
-  return window.location.origin;
+  // In native mode, use the configured server URL
+  // window.location.origin returns "capacitor://localhost" which is wrong!
+  return SERVER_URL;
 }
 
 /**
