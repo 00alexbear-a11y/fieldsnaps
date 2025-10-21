@@ -15,6 +15,7 @@ import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
 import ToDos from "./pages/ToDos";
 import Login from "./pages/Login";
+import NativeAppLogin from "./pages/NativeAppLogin";
 import Landing from "./pages/Landing";
 import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
@@ -30,12 +31,14 @@ import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
+import { useIsNativeApp } from "./hooks/usePlatform";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 
 function AppContent() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
+  const isNativeApp = useIsNativeApp();
   const showSyncBanner = location === '/' || location === '/settings';
   
   // Disable swipe back on main pages to prevent blank white screen
@@ -104,9 +107,10 @@ function AppContent() {
     return (
       <main className="min-h-screen bg-white dark:bg-black text-foreground">
         <Switch>
-          <Route path="/" component={Landing} />
+          {/* Native app users see mobile-optimized login, web users see marketing landing */}
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
           <Route path="/impact" component={Impact} />
-          <Route path="/login" component={Login} />
+          <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
           <Route path="/shared/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
