@@ -4,7 +4,16 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing offline-reliable photo and video documentation. Its core purpose is to enhance efficiency and reduce disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. It aims for full offline functionality and touch optimization, aspiring to be a commercial SaaS product with a mission-driven model donating 20% of proceeds to missionaries.
 
 ## Recent Changes
-**October 21, 2025**: iOS production readiness - reliability improvements and device testing preparation
+**October 21, 2025** (Later): Fixed critical platform detection bug preventing native login screen on iPhone
+- **Platform detection fix**: Updated `useIsNativeApp` hook to use `Capacitor.isNativePlatform()` (same method as main.tsx) for immediate synchronous detection
+- **Polling safety net**: Extended polling to 10 seconds (100 iterations at 100ms) to handle slow Capacitor bridge initialization on cold launches
+- **Debug logging**: Added comprehensive console logging showing both `isNativePlatform()` and `getPlatform()` results for each poll iteration
+- **React hooks fix**: Fixed hooks ordering issue in App.tsx to ensure `useIsNativeApp` is always called before conditional rendering
+- **Browser verification**: Confirmed web platform detection works correctly (polls 100 times, detects 'web', times out appropriately)
+- **Architecture review**: Architect confirmed implementation is sound, mirrors main.tsx approach, and ready for device testing
+- **Next step**: Rebuild in Xcode and install on iPhone to verify native platform detection and NativeAppLogin screen appearance
+
+**October 21, 2025** (Earlier): iOS production readiness - reliability improvements and device testing preparation
 - **Camera reliability**: Added explicit `isCameraLoading` and `cameraError` states, session-based debouncing via `cameraSessionIdRef` to prevent race conditions during initialization, improved loading indicator with visual feedback, inline error display with retry button, 5-second error toasts, better permission denied handling
 - **Photo save reliability**: Changed sync queue error handling from `.catch()` to `try/catch with await`, improved error messages with actionable context, better distinction between local save and sync failures, 4-second error toast durations
 - **Edit save reliability**: Added try/catch around sync queue operations, improved success messages showing online/offline status, better loading state with spinner on black background, 5-second error toast durations
