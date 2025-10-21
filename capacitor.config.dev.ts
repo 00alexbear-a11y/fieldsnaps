@@ -18,10 +18,9 @@ const config: CapacitorConfig = {
   appName: 'FieldSnaps Dev',
   webDir: 'dist/public',
   server: {
-    // Connect to local dev server running on Replit
-    // Replace with your Replit webview URL (e.g., https://your-repl-name.repl.co)
-    url: 'http://localhost:5000',
-    cleartext: true, // Allow HTTP for local development
+    // Connect to Replit dev server
+    url: 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev',
+    cleartext: false,
     androidScheme: 'https',
     iosScheme: 'https',
   },

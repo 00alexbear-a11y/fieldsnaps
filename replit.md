@@ -3,6 +3,22 @@
 ## Overview
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its core purpose is to provide offline-reliable photo and video documentation, enhancing efficiency and reducing disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization, with ambitions to become a commercial SaaS product and a mission-driven model donating 20% of proceeds to missionaries.
 
+## Recent Changes
+
+### iOS Development Setup (October 2025)
+- **Dev Login Configuration**: Created `devMode.ts` to enable dev login button in native iOS builds
+  - `ENABLE_DEV_LOGIN_IN_NATIVE` flag controls dev login visibility
+  - Orange "Dev Login (Simulator)" button appears when enabled
+  - Set to `false` before production deployment
+- **Capacitor Dev Config**: Added `capacitor.config.dev.ts` for local iOS testing
+  - Connects iOS app to Replit development server
+  - Enables full authentication flow testing in simulator
+  - Use `./sync-ios-dev.sh` script to rebuild and sync
+- **Development Workflow**: iOS app can now connect to live backend during development
+  - All buttons (Dev Login, Sign In, Biometric) work in simulator
+  - Full API access for testing features
+  - See `iOS-Setup-Guide.md` for detailed instructions
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
