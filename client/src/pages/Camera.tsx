@@ -836,6 +836,12 @@ export default function Camera() {
         sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
         setSessionPhotos([...sessionPhotosRef.current]);
 
+        // Invalidate photos query to trigger refresh in ProjectPhotos page
+        queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject, 'photos'] });
+
+        // Dispatch custom event to trigger immediate IndexedDB reload (works offline)
+        window.dispatchEvent(new CustomEvent('photoAdded', { detail: { projectId: selectedProject } }));
+
         // Navigate back to todos if in Photo Attachment Mode
         if (isAttachMode) {
           console.log('[Camera] Video recorded in attach mode, navigating to todos with photoId:', savedPhoto.id);
@@ -1003,6 +1009,12 @@ export default function Camera() {
         });
       }
 
+      // Invalidate photos query to trigger refresh in ProjectPhotos page
+      queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject, 'photos'] });
+
+      // Dispatch custom event to trigger immediate IndexedDB reload (works offline)
+      window.dispatchEvent(new CustomEvent('photoAdded', { detail: { projectId: selectedProject } }));
+
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
       if (quickButton) {
         quickButton.style.transform = 'scale(0.9)';
@@ -1092,6 +1104,12 @@ export default function Camera() {
       setSessionPhotos([...sessionPhotosRef.current]);
 
       URL.revokeObjectURL(compressionResult.url);
+
+      // Invalidate photos query to trigger refresh in ProjectPhotos page
+      queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject, 'photos'] });
+
+      // Dispatch custom event to trigger immediate IndexedDB reload (works offline)
+      window.dispatchEvent(new CustomEvent('photoAdded', { detail: { projectId: selectedProject } }));
 
       // Navigate based on mode
       if (isAttachMode) {
