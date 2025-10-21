@@ -5,6 +5,18 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes
 
+### Native iOS OAuth Flow (October 21, 2025)
+- **OAuth Implementation**: Complete native OAuth authentication using Capacitor Browser plugin
+  - Opens Safari for authentication (not blocked like WebView navigation)
+  - Uses custom URL scheme `com.fieldsnaps.app://callback` for deep linking back to app
+  - Backend validates redirect_uri to prevent open redirect attacks
+  - Deep link listener in App.tsx captures callbacks and completes authentication
+  - Safari automatically closes after successful auth redirect
+- **Security**: Redirect URI validation ensures only native app scheme or same-origin URLs allowed
+- **Backend Updates**: All auth endpoints (`/api/login`, `/api/callback`, `/api/dev-login`) support custom redirect URIs
+- **Frontend Helper**: `client/src/lib/nativeOAuth.ts` provides Browser plugin integration and callback parsing
+- **Testing**: Ready for iOS simulator/device testing - see below for instructions
+
 ### iOS Development Setup (October 2025)
 - **Dev Login Configuration**: Created `devMode.ts` to enable dev login button in native iOS builds
   - `ENABLE_DEV_LOGIN_IN_NATIVE` flag controls dev login visibility
@@ -97,7 +109,8 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 
 ### Capacitor Plugins (Native iOS Integration - October 2025)
 - **@capacitor/core**: Core functionality and platform detection.
-- **@capacitor/app**: App lifecycle management.
+- **@capacitor/app**: App lifecycle management and deep link listening for OAuth callbacks.
+- **@capacitor/browser**: Opens OAuth URLs in Safari (not blocked by iOS security).
 - **@capacitor/device**: Device information.
 - **@capacitor/preferences**: Native storage for app preferences.
 - **@capacitor/filesystem**: Native file system access for photo sharing.
