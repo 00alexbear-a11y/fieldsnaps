@@ -1,0 +1,177 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/319DB2F0-1DAE-4279-BEA4-0EF9E1C57BA7/App.app'
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 9738c725-b89b-4b04-9606-a825271f2977
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("9738c725-b89b-4b04-9606-a825271f2977"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.0.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional(""))
+⚡️  Loading app at capacitor://localhost...
+Reachable via WiFi
+nw_connection_copy_protocol_metadata_internal_block_invoke [C5] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C5] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C5] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C5] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+Networking process (0x110058190) took 1.534903 seconds to launch
+GPU process (0x1101141e0) took 1.178692 seconds to launch
+WebContent process (0x1100e0100) took 1.322830 seconds to launch
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C6] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C6] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C6] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C6] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+WebContent[5412] Unable to hide query parameters from script (missing data)
+🔴 [✨  CapgoUpdater]: getLatest failed with error: app_not_found
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif app_not_found current: builtin latestVersionName: 
+⚡️  [error] - 🔴 ✨  CapgoUpdater : getLatest failed with error: app_not_found
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : endBackGroundTaskWithNotif app_not_found current: builtin latestVersionName: 
+⚡️  WebView loaded
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 49552140
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin","version":"builtin","checksum":""}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  ⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+CapacitorUpdater addListener 49552141
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 49552142
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 49552143
+⚡️  To Native ->  CapacitorUpdater current 49552144
+⚡️  TO JS {"bundle":{"checksum":"","status":"success","id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z"},"native":"1.0"}
+⚡️  [log] - [Capgo] Current bundle: {"checksum":"","status":"success","id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}
+⚡️  To Native ->  App addListener 49552145
+⚡️  To Native ->  App addListener 49552146
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for backend_refusal, version builtin
+⚡️  To Native ->  SplashScreen hide 49552147
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for backend_refusal, version builtin
+⚡️  TO JS undefined
+⚡️  [log] - [Native Navigation] {"isNative":true,"path":"/api/dev-login","serverUrl":"https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev","fullUrl":"https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/api/dev-login"}
+unable to make sandbox extension: [2: No such file or directory]
+1   0x1b1b1d678 0   WebKit                              0x00000001b1b1d678 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11150968
+2   0x1b17a0e30 1   WebKit                              0x00000001b17a0e30 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 7495216
+3   0x103f38f80 $sSo24WKNavigationActionPolicyVIeyBy_ABIegy_TR
+4   0x103f38aa0 $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctF
+5   0x103f38f18 $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctFTo
+6   0x1b1787924 5   WebKit                              0x00000001b1787924 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 7391524
+7   0x1b1b52a78 6   WebKit                              0x00000001b1b52a78 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11369080
+8   0x1b1b50cb8 7   WebKit                              0x00000001b1b50cb8 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11361464
+9   0x1b15f7b0c 8   WebKit                              0x00000001b15f7b0c ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 5753612
+10  0x1b21ea520 9   WebKit                              0x00000001b21ea520 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 18281760
+11  0x1b1bcf204 10  WebKit                              0x00000001b1bcf204 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11878916
+12  0x1b110fce8 11  WebKit                              0x00000001b110fce8 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 609512
+13  0x1b10fd838 12  WebKit                              0x00000001b10fd838 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 534584
+14  0x1b110d7ec 13  WebKit                              0x00000001b110d7ec ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 600044
+15  0x1abd1827c 14  JavaScriptCore                      0x00000001abd1827c 96A0A9B4-733A-3BCB-81CC-8F8247960D68 + 1655420
+16  0x1abd18034 15  JavaScriptCore                      0x00000001abd18034 96A0A9B4-733A-3BCB-81CC-8F8247960D68 + 1654836
+17  0x19712f230 16  CoreFoundation                      0x000000019712f230 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 434736
+18  0x19712f1a4 17  CoreFoundation                      0x000000019712f1a4 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 434596
+19  0x19710cc6c 18  CoreFoundation                      0x000000019710cc6c 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 293996
+20  0x1970e28b0 19  CoreFoundation                      0x00000001970e28b0 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 121008
+21  0x1970e1c44 20  CoreFoundation                      0x00000001970e1c44 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 117828
+22  0x2364d2498 GSEventRunModal
+23  0x19ca5cddc 22  UIKitCore                           0x000000019ca5cddc C98EAB32-B273-3430-B0C5-46522C904CBB + 695772
+24  0x19ca01b0c UIApplicationMain
+25  0x102df9114 __debug_main_executable_dylib_entry_point
+26  0x19415ae28 25  dyld                                0x000000019415ae28 9DC34712-11AA-3B1D-AFE0-01B95A6E40D3 + 20008
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 10000 ms, then check for notifyAppReady
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for update via https://plugin.capgo.app/updates
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("9738c725-b89b-4b04-9606-a825271f2977"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.0.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional(""))
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("9738c725-b89b-4b04-9606-a825271f2977"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.0.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional(""))
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+🔴 [✨  CapgoUpdater]: getLatest failed with error: app_not_found
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif app_not_found current: builtin latestVersionName: 
+⚡️  [error] - 🔴 ✨  CapgoUpdater : getLatest failed with error: app_not_found
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : endBackGroundTaskWithNotif app_not_found current: builtin latestVersionName: 
+🟢 [✨  CapgoUpdater]: Stats sent for backend_refusal, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for backend_refusal, version builtin
+⚡️  [log] - [Native Navigation] {"isNative":true,"path":"/api/dev-login","serverUrl":"https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev","fullUrl":"https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/api/dev-login"}
+unable to make sandbox extension: [2: No such file or directory]
+1   0x1b1b1d678 0   WebKit                              0x00000001b1b1d678 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11150968
+2   0x1b17a0e30 1   WebKit                              0x00000001b17a0e30 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 7495216
+3   0x103f38f80 $sSo24WKNavigationActionPolicyVIeyBy_ABIegy_TR
+4   0x103f38aa0 $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctF
+5   0x103f38f18 $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctFTo
+6   0x1b1787924 5   WebKit                              0x00000001b1787924 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 7391524
+7   0x1b1b52a78 6   WebKit                              0x00000001b1b52a78 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11369080
+8   0x1b1b50cb8 7   WebKit                              0x00000001b1b50cb8 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11361464
+9   0x1b15f7b0c 8   WebKit                              0x00000001b15f7b0c ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 5753612
+10  0x1b21ea520 9   WebKit                              0x00000001b21ea520 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 18281760
+11  0x1b1bcf204 10  WebKit                              0x00000001b1bcf204 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 11878916
+12  0x1b110fce8 11  WebKit                              0x00000001b110fce8 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 609512
+13  0x1b10fd838 12  WebKit                              0x00000001b10fd838 ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 534584
+14  0x1b110d76c 13  WebKit                              0x00000001b110d76c ECBA587C-B05B-32B1-98D6-63EAC27B13AB + 599916
+15  0x1abd1827c 14  JavaScriptCore                      0x00000001abd1827c 96A0A9B4-733A-3BCB-81CC-8F8247960D68 + 1655420
+16  0x1abd18034 15  JavaScriptCore                      0x00000001abd18034 96A0A9B4-733A-3BCB-81CC-8F8247960D68 + 1654836
+17  0x19712f230 16  CoreFoundation                      0x000000019712f230 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 434736
+18  0x19712f1a4 17  CoreFoundation                      0x000000019712f1a4 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 434596
+19  0x19710cc6c 18  CoreFoundation                      0x000000019710cc6c 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 293996
+20  0x1970e28b0 19  CoreFoundation                      0x00000001970e28b0 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 121008
+21  0x1970e1c44 20  CoreFoundation                      0x00000001970e1c44 973E47E5-88F0-3367-B9D4-46D5CB999B75 + 117828
+22  0x2364d2498 GSEventRunModal
+23  0x19ca5cddc 22  UIKitCore                           0x000000019ca5cddc C98EAB32-B273-3430-B0C5-46522C904CBB + 695772
+24  0x19ca01b0c UIApplicationMain
+25  0x102df9114 __debug_main_executable_dylib_entry_point
+26  0x19415ae28 25  dyld                                0x000000019415ae28 9DC34712-11AA-3B1D-AFE0-01B95A6E40D3 + 20008
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 10000ms
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
