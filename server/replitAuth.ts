@@ -211,6 +211,88 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
+  // Development-only login bypass for iOS simulator testing
+  app.get("/api/dev-login", async (req, res) => {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    if (!isDevelopment) {
+      return res.status(403).json({ error: "Dev login only available in development" });
+    }
+
+    // Create mock user data
+    const mockUser = {
+      claims: {
+        sub: 'dev-user-local',
+        email: 'dev@fieldsnaps.local',
+        first_name: 'Dev',
+        last_name: 'User',
+        exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+      },
+      access_token: 'dev-token',
+      refresh_token: 'dev-refresh-token',
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+    };
+
+    // Upsert dev user in database
+    await upsertUser(mockUser.claims);
+
+    // Log the user in with the mock session
+    req.login(mockUser, async (loginErr) => {
+      if (loginErr) {
+        return res.status(500).json({ error: "Failed to create dev session" });
+      }
+
+      // Check if user has a company
+      const dbUser = await storage.getUser(mockUser.claims.sub);
+      
+      // Check for invite token in session (for testing invite flows)
+      const inviteToken = (req.session as any).inviteToken;
+      
+      if (inviteToken && dbUser && !dbUser.companyId) {
+        // User has invite token - join company automatically
+        try {
+          const company = await storage.getCompanyByInviteToken(inviteToken);
+          
+          if (company && 
+              company.inviteLinkExpiresAt && 
+              new Date() <= company.inviteLinkExpiresAt &&
+              company.inviteLinkUses < company.inviteLinkMaxUses) {
+            
+            // Add user to company
+            await storage.updateUser(dbUser.id, {
+              companyId: company.id,
+              role: 'member',
+              invitedBy: company.ownerId,
+            });
+
+            // Increment invite uses
+            await storage.updateCompany(company.id, {
+              inviteLinkUses: company.inviteLinkUses + 1,
+            });
+
+            // Clear invite token from session
+            delete (req.session as any).inviteToken;
+
+            console.log('[Dev Login] Auto-joined company via invite token');
+            return res.redirect("/");
+          }
+        } catch (error) {
+          console.error('[Dev Login] Failed to auto-join company via invite:', error);
+        }
+      }
+      
+      if (dbUser && !dbUser.companyId) {
+        // Redirect to company setup
+        console.log('[Dev Login] Redirecting to company setup');
+        return res.redirect("/onboarding/company-setup");
+      }
+
+      // Redirect to app
+      console.log('[Dev Login] Dev user logged in successfully');
+      return res.redirect("/");
+    });
+  });
+
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
       // Use req.get('host') which already includes port if present

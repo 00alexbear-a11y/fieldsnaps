@@ -7,6 +7,7 @@ import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
+  const isDevelopment = import.meta.env.DEV;
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricSupported);
@@ -58,9 +59,22 @@ export default function NativeAppLogin() {
 
       {/* Bottom CTA Section */}
       <div className="p-6 space-y-4 pb-8">
-        {biometricSupported && (
+        {isDevelopment && (
           <Button
             variant="default"
+            size="default"
+            className="w-full bg-orange-600 hover:bg-orange-700"
+            onClick={() => window.location.href = '/api/dev-login'}
+            data-testid="button-dev-login"
+          >
+            <LogIn className="w-4 h-4 mr-2" />
+            Dev Login (Simulator)
+          </Button>
+        )}
+        
+        {biometricSupported && (
+          <Button
+            variant={isDevelopment ? "outline" : "default"}
             size="default"
             className="w-full"
             onClick={handleBiometricLogin}
@@ -73,7 +87,7 @@ export default function NativeAppLogin() {
         )}
         
         <Button
-          variant={biometricSupported ? "outline" : "default"}
+          variant={(biometricSupported || isDevelopment) ? "outline" : "default"}
           size="default"
           className="w-full"
           onClick={() => window.location.href = '/api/login'}
@@ -95,7 +109,9 @@ export default function NativeAppLogin() {
         </div>
 
         <p className="text-xs text-muted-foreground text-center px-4">
-          {biometricSupported 
+          {isDevelopment
+            ? 'Use Dev Login to bypass OAuth for testing in simulator'
+            : biometricSupported 
             ? 'Secure authentication with Face ID, Touch ID, or your account'
             : 'Sign in or start your free trial to get started'}
         </p>
