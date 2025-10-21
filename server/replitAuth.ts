@@ -294,8 +294,18 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/logout", (req, res) => {
+    const user = req.user as any;
+    const isDevUser = user?.claims?.sub === 'dev-user-local';
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
     req.logout(() => {
-      // Use req.get('host') which already includes port if present
+      // For dev users in development, just redirect to login without OIDC logout
+      if (isDevelopment && isDevUser) {
+        console.log('[Logout] Dev user logout - redirecting to /login');
+        return res.redirect('/login');
+      }
+      
+      // For real OAuth users, end the OIDC session
       const host = req.get('host') || req.hostname;
       const redirectUri = `${req.protocol}://${host}`;
       
@@ -322,42 +332,19 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
     const refreshToken = user.refresh_token;
     if (!refreshToken) {
-      if (isDevelopment) {
-        // Fall through to dev fallback below
-      } else {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-    } else {
-      try {
-        const config = await getOidcConfig();
-        const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
-        updateUserSession(user, tokenResponse);
-        return next();
-      } catch (error) {
-        if (isDevelopment) {
-          // Fall through to dev fallback below
-        } else {
-          return res.status(401).json({ message: "Unauthorized" });
-        }
-      }
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+      const config = await getOidcConfig();
+      const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
+      updateUserSession(user, tokenResponse);
+      return next();
+    } catch (error) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
   }
 
-  // Development fallback - mock session for dev user
-  if (isDevelopment) {
-    // Mock user session for development
-    (req as any).user = {
-      claims: {
-        sub: 'dev-user-local',
-        email: 'dev@fieldsnaps.local',
-        first_name: 'Dev',
-        last_name: 'User',
-      },
-      expires_at: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-    };
-    return next();
-  }
-
-  // Production or no valid session
+  // No valid session - user must authenticate via /api/login or /api/dev-login (development only)
   return res.status(401).json({ message: "Unauthorized" });
 };

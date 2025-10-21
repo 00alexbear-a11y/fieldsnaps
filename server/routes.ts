@@ -793,9 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes
   app.get('/api/auth/user', async (req: any, res) => {
-    const isDevelopment = process.env.NODE_ENV !== 'production';
-    
-    // Try real authentication first
+    // Only return user if authenticated
     if (req.isAuthenticated() && req.user?.claims?.sub) {
       try {
         const userId = req.user.claims.sub;
@@ -807,32 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
     
-    // Development fallback when OAuth session fails
-    if (isDevelopment) {
-      try {
-        const devUserId = 'dev-user-local';
-        let devUser = await storage.getUser(devUserId);
-        
-        if (!devUser) {
-          // Create dev user if doesn't exist
-          devUser = await storage.upsertUser({
-            id: devUserId,
-            email: 'dev@fieldsnaps.local',
-            firstName: 'Dev',
-            lastName: 'User',
-            profileImageUrl: null,
-          });
-          console.log('[Auth] Created development user');
-        }
-        
-        return res.json(devUser);
-      } catch (error) {
-        console.error("Error creating dev user:", error);
-        return res.status(500).json({ message: "Failed to create dev user" });
-      }
-    }
-    
-    // Production or no session - require authentication
+    // No session - require authentication via /api/login or /api/dev-login (development only)
     return res.status(401).json({ message: 'Unauthorized' });
   });
 
