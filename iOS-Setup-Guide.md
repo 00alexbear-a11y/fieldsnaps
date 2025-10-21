@@ -62,6 +62,52 @@ When using `capacitor.config.dev.ts`:
 - **Testing changes**: After code changes, rebuild and sync again
 - **Network required**: Your Mac and Replit must both have internet access
 
+## 🔗 Deep Linking Configuration (Required for OAuth)
+
+The native iOS app uses deep linking to handle OAuth callbacks. When running `npx cap sync`, Capacitor will automatically configure most of this, but you may need to verify the setup in Xcode.
+
+### What Capacitor Configures Automatically
+
+When you run `npx cap sync`, it updates `ios/App/App/Info.plist` with:
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLName</key>
+    <string>com.fieldsnaps.app</string>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>com.fieldsnaps.app</string>
+    </array>
+  </dict>
+</array>
+```
+
+This allows iOS to redirect URLs like `com.fieldsnaps.app://callback` back to your app.
+
+### Verifying the Configuration
+
+1. After running `npx cap sync`, open the project in Xcode:
+   ```bash
+   npx cap open ios
+   ```
+
+2. In Xcode, select the **App** target (top-left)
+3. Go to the **Info** tab
+4. Under **URL Types**, verify there's an entry with:
+   - **Identifier**: `com.fieldsnaps.app`
+   - **URL Schemes**: `com.fieldsnaps.app`
+
+If this entry is missing, Capacitor didn't sync it properly. You can add it manually in Xcode using the **+** button under URL Types.
+
+### How OAuth Works with Deep Links
+
+1. User clicks "Sign In" → App opens Safari via Browser plugin
+2. User authenticates in Safari
+3. Server redirects to `com.fieldsnaps.app://callback?code=...`
+4. iOS recognizes the URL scheme and opens your app
+5. App captures the callback and completes login
+
 ## 🐛 Troubleshooting
 
 **Buttons still don't work?**
