@@ -9,6 +9,7 @@
  */
 
 import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueItem } from './indexeddb';
+import { generateThumbnail } from './imageCompression';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -475,6 +476,19 @@ class SyncManager {
         // Create FormData for multipart upload
         const formData = new FormData();
         formData.append('photo', photo.blob, `photo-${photo.id}.jpg`);
+        
+        // Generate thumbnail for photos (skip for videos)
+        if (photo.mediaType === 'photo') {
+          try {
+            const file = new File([photo.blob], `photo-${photo.id}.jpg`, { type: photo.blob.type });
+            const thumbnailBlob = await generateThumbnail(file, 200);
+            formData.append('thumbnail', thumbnailBlob, `thumb-${photo.id}.jpg`);
+            console.log('[Sync] Thumbnail generated:', thumbnailBlob.size, 'bytes');
+          } catch (thumbError) {
+            console.warn('[Sync] Thumbnail generation failed, continuing without thumbnail:', thumbError);
+          }
+        }
+        
         if (photo.caption) {
           formData.append('caption', photo.caption);
         }

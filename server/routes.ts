@@ -37,7 +37,7 @@ const upload = multer({
   storage: multer.memoryStorage(), // Store in memory for processing
   limits: {
     fileSize: 50 * 1024 * 1024, // 50MB limit for videos
-    files: 1, // Only allow single file upload per request
+    files: 2, // Allow photo + thumbnail upload
   },
   fileFilter: (req, file, cb) => {
     // Validate MIME type against whitelist
@@ -50,7 +50,6 @@ const upload = multer({
 });
 
 // UUID validation middleware for route parameters
-import { z } from 'zod';
 
 const validateUuidParam = (paramName: string) => {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -1277,14 +1276,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), upload.single('photo'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), upload.fields([
+    { name: 'photo', maxCount: 1 },
+    { name: 'thumbnail', maxCount: 1 }
+  ]), async (req: any, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
-      if (!req.file) {
+      if (!req.files?.photo || !req.files.photo[0]) {
         throw errors.badRequest("No photo file provided");
       }
 
+      const photoFile = req.files.photo[0];
+      const thumbnailFile = req.files?.thumbnail?.[0];
       const userId = req.user?.claims?.sub;
       
       // Ensure dev user exists in database (for dev bypass mode)
@@ -1303,15 +1307,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const objectStorageService = new ObjectStorageService();
 
-      // Get presigned upload URL for object storage
+      // Upload main photo to object storage
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-
-      // Upload file directly to object storage using presigned URL
       const uploadResponse = await fetch(uploadURL, {
         method: 'PUT',
-        body: req.file.buffer,
+        body: photoFile.buffer,
         headers: {
-          'Content-Type': req.file.mimetype,
+          'Content-Type': photoFile.mimetype,
         },
       });
 
@@ -1319,7 +1321,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
       }
 
-      // Set ACL policy and get normalized object path
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
         uploadURL,
         {
@@ -1327,6 +1328,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           visibility: "private", // Photos are private by default, share flow can make them public
         }
       );
+
+      // Upload thumbnail if provided
+      let thumbnailPath: string | undefined;
+      if (thumbnailFile) {
+        const thumbnailUploadURL = await objectStorageService.getObjectEntityUploadURL();
+        const thumbnailUploadResponse = await fetch(thumbnailUploadURL, {
+          method: 'PUT',
+          body: thumbnailFile.buffer,
+          headers: {
+            'Content-Type': thumbnailFile.mimetype,
+          },
+        });
+
+        if (thumbnailUploadResponse.ok) {
+          thumbnailPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            thumbnailUploadURL,
+            {
+              owner: userId,
+              visibility: "private",
+            }
+          );
+        }
+      }
 
       // Get photographer info from auth or request body (for offline support)
       let photographerId = req.body.photographerId;
@@ -1341,8 +1365,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = insertPhotoSchema.parse({
         projectId: req.params.projectId,
         url: objectPath,
+        thumbnailUrl: thumbnailPath,
         mediaType: req.body.mediaType || 'photo', // Default to 'photo' if not provided
-        caption: req.body.caption || req.file.originalname,
+        caption: req.body.caption || photoFile.originalname,
         width: req.body.width ? parseInt(req.body.width) : undefined,
         height: req.body.height ? parseInt(req.body.height) : undefined,
         photographerId,
