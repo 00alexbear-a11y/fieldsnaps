@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useOfflineFirstPhotos } from "@/hooks/useOfflineFirstPhotos";
 import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,9 +94,8 @@ export default function ProjectPhotos() {
     enabled: showMoveDialog,
   });
 
-  const { data: photos = [], isLoading } = useQuery<Photo[]>({
-    queryKey: ["/api/projects", projectId, "photos"],
-  });
+  // Offline-first: load from IndexedDB immediately, fetch from server in background
+  const { photos = [], isLoading, isOnline, hasLocalData } = useOfflineFirstPhotos(projectId || '');
 
   // Fetch available tags for filtering
   const { data: availableTags = [] } = useQuery<Tag[]>({
