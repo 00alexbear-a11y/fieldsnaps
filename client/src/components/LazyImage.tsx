@@ -3,14 +3,17 @@ import { WifiOff } from 'lucide-react';
 
 interface LazyImageProps {
   src: string;
+  thumbnailSrc?: string;
   alt: string;
   className?: string;
 }
 
-export default function LazyImage({ src, alt, className = '' }: LazyImageProps) {
+export default function LazyImage({ src, thumbnailSrc, alt, className = '' }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState<string | undefined>(undefined);
+  const [isLoadingFullRes, setIsLoadingFullRes] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -37,10 +40,35 @@ export default function LazyImage({ src, alt, className = '' }: LazyImageProps) 
     };
   }, []);
 
+  // Load thumbnail first, then full-res when in view
+  useEffect(() => {
+    if (!isInView) return;
+
+    if (thumbnailSrc) {
+      setCurrentSrc(thumbnailSrc);
+      setIsLoaded(true);
+      
+      setIsLoadingFullRes(true);
+      const fullImg = new Image();
+      fullImg.src = src;
+      fullImg.crossOrigin = 'use-credentials';
+      fullImg.onload = () => {
+        setCurrentSrc(src);
+        setIsLoadingFullRes(false);
+      };
+      fullImg.onerror = () => {
+        setIsLoadingFullRes(false);
+      };
+    } else {
+      setCurrentSrc(src);
+    }
+  }, [isInView, src, thumbnailSrc]);
+
   // Reset error state when src changes
   useEffect(() => {
     setHasError(false);
     setIsLoaded(false);
+    setCurrentSrc(undefined);
   }, [src]);
 
   return (
@@ -61,13 +89,15 @@ export default function LazyImage({ src, alt, className = '' }: LazyImageProps) 
       
       <img
         ref={imgRef}
-        src={isInView ? src : undefined}
+        src={currentSrc}
         alt={alt}
         crossOrigin="use-credentials"
-        className={`${className} ${!isLoaded || hasError ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        className={`${className} ${!isLoaded || hasError ? 'opacity-0' : 'opacity-100'} ${isLoadingFullRes && thumbnailSrc ? 'blur-sm' : ''} transition-all duration-300`}
         onLoad={() => {
-          setIsLoaded(true);
-          setHasError(false); // Clear error state on successful load
+          if (!thumbnailSrc) {
+            setIsLoaded(true);
+          }
+          setHasError(false);
         }}
         onError={() => setHasError(true)}
       />

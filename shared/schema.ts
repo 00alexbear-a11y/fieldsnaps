@@ -132,6 +132,7 @@ export const photos = pgTable("photos", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Nullable for standalone photos (e.g., todo attachments)
   url: text("url").notNull(),
+  thumbnailUrl: text("thumbnail_url"), // 200x200px thumbnail for fast gallery loading
   mediaType: varchar("media_type", { length: 10 }).default('photo').notNull(), // 'photo' or 'video'
   caption: text("caption"),
   width: integer("width"), // Original photo width in pixels
