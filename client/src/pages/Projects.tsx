@@ -45,6 +45,8 @@ import {
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
+import { nativeClipboard } from "@/lib/nativeClipboard";
+import { haptics } from "@/lib/nativeHaptics";
 import { Copy, Check } from "lucide-react";
 
 type SortOption = 'lastActivity' | 'name' | 'created';
@@ -245,7 +247,8 @@ export default function Projects() {
     
     const shareUrl = `${window.location.origin}/shared/${shareToken}`;
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await nativeClipboard.write(shareUrl);
+      haptics.light();
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
       toast({
@@ -253,6 +256,7 @@ export default function Projects() {
         description: "Share link has been copied to clipboard"
       });
     } catch (error) {
+      haptics.error();
       toast({
         title: "Failed to copy link",
         variant: "destructive"
