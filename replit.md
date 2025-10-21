@@ -4,6 +4,13 @@
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing offline-reliable photo and video documentation. Its core purpose is to enhance efficiency and reduce disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. It aims for full offline functionality and touch optimization, aspiring to be a commercial SaaS product with a mission-driven model donating 20% of proceeds to missionaries.
 
 ## Recent Changes
+**October 21, 2025**: iOS production readiness improvements - reliability and UX polish
+- **Camera reliability**: Added explicit `isCameraLoading` and `cameraError` states, session-based debouncing via `cameraSessionIdRef` to prevent race conditions during initialization, improved loading indicator with visual feedback, inline error display with retry button, 5-second error toasts, better permission denied handling
+- **Photo save reliability**: Changed sync queue error handling from `.catch()` to `try/catch with await`, improved error messages with actionable context, better distinction between local save and sync failures, 4-second error toast durations
+- **Edit save reliability**: Added try/catch around sync queue operations, improved success messages showing online/offline status, better loading state with spinner on black background, 5-second error toast durations
+- **Offline mode**: Created global `OfflineIndicator` component with navigator.onLine detection, shows orange banner at top when offline, added to App.tsx for universal visibility with z-index 100
+- **Error messages**: All errors now have actionable instructions ("Please try again"), consistent toast durations (4-5s errors, 2s success), better visual feedback throughout
+- **Next validation needed**: Test on real iOS device (Capacitor build) to verify camera initialization, permission flows, and offline sync behavior
 **October 20, 2025**: UI cleanup for cleaner, more minimal design
 - **Top header**: Changed from semi-transparent with blue tint to solid white background, removed border separator line
 - **Search bar**: Made more transparent (white/80) with backdrop blur, removed top border separator, reduced padding
