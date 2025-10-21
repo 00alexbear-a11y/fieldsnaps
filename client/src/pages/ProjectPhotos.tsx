@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useOfflineFirstPhotos } from "@/hooks/useOfflineFirstPhotos";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3 } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -1582,6 +1582,39 @@ export default function ProjectPhotos() {
                             data-testid={`tag-overflow-badge-${photo.id}`}
                           >
                             +{photo.tags.length - 2}
+                          </div>
+                        )}
+                        
+                        {/* Sync status badge - bottom right corner */}
+                        {(photo as any).syncStatus && (photo as any).syncStatus !== 'synced' && (
+                          <div 
+                            className={`absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full backdrop-blur-sm z-10 ${
+                              (photo as any).syncStatus === 'pending' 
+                                ? 'bg-orange-500/80 text-white' 
+                                : (photo as any).syncStatus === 'syncing'
+                                ? 'bg-blue-500/80 text-white'
+                                : 'bg-red-500/80 text-white' // error
+                            }`}
+                            data-testid={`sync-status-${photo.id}`}
+                          >
+                            {(photo as any).syncStatus === 'pending' && (
+                              <>
+                                <Upload className="w-3 h-3" />
+                                <span>Pending</span>
+                              </>
+                            )}
+                            {(photo as any).syncStatus === 'syncing' && (
+                              <>
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                <span>Uploading</span>
+                              </>
+                            )}
+                            {(photo as any).syncStatus === 'error' && (
+                              <>
+                                <AlertCircle className="w-3 h-3" />
+                                <span>Failed</span>
+                              </>
+                            )}
                           </div>
                         )}
                         
