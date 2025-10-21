@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
 import { Plus, Home, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
@@ -68,10 +69,8 @@ export default function Projects() {
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const { toast } = useToast();
 
-  // Efficient bulk query - gets all projects with photo counts and cover photos in one request
-  const { data: projectsWithCounts = [], isLoading: projectsLoading } = useQuery<(Project & { photoCount: number, coverPhoto?: Photo })[]>({
-    queryKey: ["/api/projects/with-counts"],
-  });
+  // Offline-first: load from IndexedDB immediately, fetch from server in background
+  const { projects: projectsWithCounts, isLoading: projectsLoading, isOnline, hasLocalData } = useOfflineFirstProjects();
 
   // For backward compatibility, extract projects
   const projects = useMemo(() => 
