@@ -11,6 +11,7 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 - **Offline mode**: Created global `OfflineIndicator` component with navigator.onLine detection, shows orange banner at top when offline, added to App.tsx for universal visibility with z-index 100
 - **Error messages**: All errors now have actionable instructions ("Please try again"), consistent toast durations (4-5s errors, 2s success), better visual feedback throughout
 - **iOS project setup**: Initialized Capacitor iOS project, configured Info.plist with camera/location/biometric permissions, synced production build to ios/ directory, updated capacitor.config.ts webDir to 'dist/public'
+- **Platform-specific UX**: Created NativeAppLogin component for iOS app users, implemented useIsNativeApp hook using Capacitor.isNativePlatform(), native app shows mobile-optimized login on launch while web shows marketing landing page
 - **Testing documentation**: Created QUICK_START_IOS_TEST.md with streamlined instructions for testing on physical iPhone
 - **Ready for device testing**: All improvements can now be validated on real iOS hardware
 **October 20, 2025**: UI cleanup for cleaner, more minimal design
