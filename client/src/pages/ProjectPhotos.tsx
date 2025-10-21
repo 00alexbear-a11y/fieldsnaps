@@ -35,6 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
 import { nativeClipboard } from "@/lib/nativeClipboard";
+import { haptics } from "@/lib/nativeHaptics";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
@@ -1841,12 +1842,14 @@ export default function ProjectPhotos() {
               onClick={async () => {
                 if (shareLink) {
                   try {
-                    await navigator.clipboard.writeText(shareLink);
+                    await nativeClipboard.write(shareLink);
+                    haptics.light();
                     toast({
                       title: 'Copied!',
                       description: 'Share link copied to clipboard',
                     });
                   } catch (error) {
+                    haptics.error();
                     toast({
                       title: 'Copy failed',
                       description: 'Please copy the link manually',

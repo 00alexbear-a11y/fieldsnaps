@@ -18,6 +18,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { nativeClipboard } from '@/lib/nativeClipboard';
+import { haptics } from '@/lib/nativeHaptics';
 import type { Tag, Company, User as UserType } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
@@ -235,17 +237,28 @@ export default function Settings() {
     },
   });
 
-  const copyInviteLink = () => {
+  const copyInviteLink = async () => {
     if (company?.inviteLinkToken) {
       const inviteUrl = `${window.location.origin}/api/companies/invite/${company.inviteLinkToken}`;
-      navigator.clipboard.writeText(inviteUrl);
-      setInviteLinkCopied(true);
-      setTimeout(() => setInviteLinkCopied(false), 2000);
-      toast({
-        title: 'Invite link copied',
-        description: 'Share this link with your team members',
-        duration: 2000,
-      });
+      try {
+        await nativeClipboard.write(inviteUrl);
+        haptics.light();
+        setInviteLinkCopied(true);
+        setTimeout(() => setInviteLinkCopied(false), 2000);
+        toast({
+          title: 'Invite link copied',
+          description: 'Share this link with your team members',
+          duration: 2000,
+        });
+      } catch (error) {
+        haptics.error();
+        toast({
+          title: 'Failed to copy link',
+          description: 'Please try again',
+          variant: 'destructive',
+          duration: 2000,
+        });
+      }
     }
   };
 
