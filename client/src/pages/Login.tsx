@@ -10,6 +10,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
+  const isDevelopment = import.meta.env.DEV;
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricSupported);
@@ -44,9 +45,22 @@ export default function Login() {
         {/* Login Card */}
         <Card className="p-6 space-y-4">
           <div className="space-y-3">
-            {biometricSupported && (
+            {isDevelopment && (
               <Button
                 variant="default"
+                size="default"
+                className="w-full bg-orange-600 hover:bg-orange-700"
+                onClick={() => window.location.href = '/api/dev-login'}
+                data-testid="button-dev-login"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Dev Login (Simulator)
+              </Button>
+            )}
+            
+            {biometricSupported && (
+              <Button
+                variant={isDevelopment ? "outline" : "default"}
                 size="default"
                 className="w-full"
                 onClick={handleBiometricLogin}
@@ -59,7 +73,7 @@ export default function Login() {
             )}
             
             <Button
-              variant={biometricSupported ? "outline" : "default"}
+              variant={(biometricSupported || isDevelopment) ? "outline" : "default"}
               size="default"
               className="w-full"
               onClick={() => window.location.href = '/api/login'}
@@ -71,7 +85,9 @@ export default function Login() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            {biometricSupported 
+            {isDevelopment
+              ? 'Use Dev Login to bypass OAuth for testing in simulator'
+              : biometricSupported 
               ? 'Use Touch ID, Face ID, Windows Hello, or Replit to sign in'
               : 'Sign in with your Replit account to get started'}
           </p>
