@@ -36,17 +36,19 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 
 function AppContent() {
+  // CRITICAL: All hooks must be called at the top, before any conditional logic
   const [location, setLocation] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const isNativeApp = useIsNativeApp();
+  
+  // Initialize theme (handles localStorage and DOM automatically)
+  useTheme();
+  
   const showSyncBanner = location === '/' || location === '/settings';
   
   // Disable swipe back on main pages to prevent blank white screen
   const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
   const disableSwipeBack = isMainPage;
-  
-  // Initialize theme (handles localStorage and DOM automatically)
-  useTheme();
 
   // Public routes that don't require authentication
   const publicRoutes = ['/share/', '/shared/', '/impact', '/login'];
