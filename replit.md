@@ -1,44 +1,7 @@
 # FieldSnaps - Construction Photo PWA
 
 ## Overview
-FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing offline-reliable photo and video documentation. Its core purpose is to enhance efficiency and reduce disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. It aims for full offline functionality and touch optimization, aspiring to be a commercial SaaS product with a mission-driven model donating 20% of proceeds to missionaries.
-
-## Recent Changes
-**October 21, 2025** (Later): Fixed critical platform detection bug preventing native login screen on iPhone
-- **Platform detection fix**: Updated `useIsNativeApp` hook to use `Capacitor.isNativePlatform()` (same method as main.tsx) for immediate synchronous detection
-- **Polling safety net**: Extended polling to 10 seconds (100 iterations at 100ms) to handle slow Capacitor bridge initialization on cold launches
-- **Debug logging**: Added comprehensive console logging showing both `isNativePlatform()` and `getPlatform()` results for each poll iteration
-- **React hooks fix**: Fixed hooks ordering issue in App.tsx to ensure `useIsNativeApp` is always called before conditional rendering
-- **Browser verification**: Confirmed web platform detection works correctly (polls 100 times, detects 'web', times out appropriately)
-- **Architecture review**: Architect confirmed implementation is sound, mirrors main.tsx approach, and ready for device testing
-- **Next step**: Rebuild in Xcode and install on iPhone to verify native platform detection and NativeAppLogin screen appearance
-
-**October 21, 2025** (Earlier): iOS production readiness - reliability improvements and device testing preparation
-- **Camera reliability**: Added explicit `isCameraLoading` and `cameraError` states, session-based debouncing via `cameraSessionIdRef` to prevent race conditions during initialization, improved loading indicator with visual feedback, inline error display with retry button, 5-second error toasts, better permission denied handling
-- **Photo save reliability**: Changed sync queue error handling from `.catch()` to `try/catch with await`, improved error messages with actionable context, better distinction between local save and sync failures, 4-second error toast durations
-- **Edit save reliability**: Added try/catch around sync queue operations, improved success messages showing online/offline status, better loading state with spinner on black background, 5-second error toast durations
-- **Offline mode**: Created global `OfflineIndicator` component with navigator.onLine detection, shows orange banner at top when offline, added to App.tsx for universal visibility with z-index 100
-- **Error messages**: All errors now have actionable instructions ("Please try again"), consistent toast durations (4-5s errors, 2s success), better visual feedback throughout
-- **iOS project setup**: Initialized Capacitor iOS project, configured Info.plist with camera/location/biometric permissions, synced production build to ios/ directory, updated capacitor.config.ts webDir to 'dist/public'
-- **Platform-specific UX**: Created NativeAppLogin component for iOS app users, implemented useIsNativeApp hook using Capacitor.isNativePlatform(), native app shows mobile-optimized login on launch while web shows marketing landing page
-- **Testing documentation**: Created QUICK_START_IOS_TEST.md with streamlined instructions for testing on physical iPhone
-- **Ready for device testing**: All improvements can now be validated on real iOS hardware
-**October 20, 2025**: UI cleanup for cleaner, more minimal design
-- **Top header**: Changed from semi-transparent with blue tint to solid white background, removed border separator line
-- **Search bar**: Made more transparent (white/80) with backdrop blur, removed top border separator, reduced padding
-- **Search controls**: Made search input and sort dropdown thinner (h-9) for more compact appearance
-- **Bottom navigation**: Changed to semi-transparent (white/80) with backdrop blur, removed top border separator
-- **Overall**: Removed separator lines throughout for cleaner, more streamlined look
-
-**October 19, 2025**: Photo selection and grid sizing improvements
-- **Grid Size dropdown**: Added button in tab navigation bar with 3 options: Small (10 columns), Medium (5 columns), Large (3 columns) - only visible on Photos tab
-- **Selection toolbar repositioned**: Moved from mid-screen (blocking photos) to bottom position just above bottom navigation buttons
-- **View Transitions API integration**: Each photo has unique view-transition-name set via ref callback for smooth individual morphing
-- Photos smoothly slide and scale to new positions during grid changes (350ms cubic-bezier easing)
-- Removed pinch gesture controls in favor of simple dropdown button
-- Direct DOM manipulation via ref callback ensures reliable view-transition-name application
-- Graceful fallback for browsers without View Transitions API support
-- Minimal 2px gaps between photos for Apple Photos-like appearance
+FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its core purpose is to provide offline-reliable photo and video documentation, enhancing efficiency and reducing disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization, with ambitions to become a commercial SaaS product and a mission-driven model donating 20% of proceeds to missionaries.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -55,20 +18,18 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 ## System Architecture
 
 ### UI/UX Decisions
-The design follows an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, subtle depth, typography excellence, and an 8px grid. The color palette includes iOS Blue, Warm Gray, Success Green, Warning Orange, Pure White, and Light Gray. Interaction design incorporates fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar utilizing SF Symbols-inspired icons. The branding features the FieldSnaps logo. The bottom navigation includes "Map," "Projects," "To-Do," and "Camera" tabs, with Settings accessible from the Projects page header.
+The design adheres to an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, typography excellence, and an 8px grid. The color palette includes iOS Blue, Warm Gray, Success Green, Warning Orange, Pure White, and Light Gray. Interaction design incorporates fluid 0.3s easing animations, haptic feedback, natural gesture navigation, progressive disclosure, and swipe-to-delete. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar utilizing SF Symbols-inspired icons. The branding features the FieldSnaps logo.
 
 ### Technical Implementations
-FieldSnaps is an offline-first PWA utilizing Service Workers for caching and IndexedDB for local storage. The Background Sync API manages uploads. Performance is optimized via lazy loading and Web Workers for image compression. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and preserves native aspect ratios from all sources. Photos and videos are stored in Replit Object Storage, using presigned URLs and server-side ACL policies. Camera functionality includes auto-start, instant capture workflows, project-specific pre-selection, full-screen viewfinders, video recording with real-time annotation, and native HTML5 playback. PDF export supports flexible grid layouts (1, 2, 3, or 4 photos per page) with customizable detail options, ensuring images retain native aspect ratios. 
+FieldSnaps is an offline-first PWA leveraging Service Workers for caching and IndexedDB for local storage, with the Background Sync API managing uploads. Performance is optimized via lazy loading and Web Workers for image compression. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and preserves native aspect ratios. Photos and videos are stored in Replit Object Storage using presigned URLs. Camera functionality includes auto-start, instant capture workflows, and video recording with real-time annotation. PDF export supports flexible grid layouts with customizable detail options.
 
-**Multi-Platform Subscription System:** The app supports subscriptions from three payment sources at unified $19.99/month pricing: Stripe (web signups), Apple In-App Purchase (iOS), and Google Play Billing (Android). Database schema includes `subscriptionSource` and `platformSubscriptionId` fields to track payment platform. A unified subscription validation service (`server/subscriptionValidation.ts`) validates subscriptions from any source. Web subscribers can log into iOS/Android apps per Apple guideline 3.1.3(b) "Multiplatform Services". Apple/Google verification endpoints are secured (return 501) until proper receipt/token verification is implemented with Apple servers and Google Play Developer API.
-
-Project completion tracking and multi-photo sharing with date-grouped timeline views and public read-only pages are supported. Authentication uses Replit Auth with OpenID Connect and biometric login.
+The application features a multi-platform subscription system supporting Stripe (web), Apple In-App Purchase (iOS), and Google Play Billing (Android) at a unified $19.99/month. A unified validation service (`server/subscriptionValidation.ts`) handles subscriptions from all sources. Authentication uses Replit Auth with OpenID Connect and biometric login.
 
 ### Feature Specifications
-The application features a bottom navigation. The camera interface uses a three-zone layout with a compact header, dominant 16:9 viewfinder, and controls for quality, zoom, and auto-tagging, plus an action rail for capture and task creation. Photos are captured at full original resolution. The To-Do system enables team task management with photo attachments, viewable in "My Tasks," "Team Tasks," and "I Created" contexts, with filtering by status. Project organization is card-based with photo counts, search, address buttons, and completion marking. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout adapting to any aspect ratio, with size, color, and tool selectors (text, arrow, line, circle, pen, tape measure). Text annotations support scaling and rotation. The tape measure tool renders measurements in feet'inches". Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
+The application includes a bottom navigation, a camera interface with a three-zone layout, and a To-Do system for team task management with photo attachments. Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout with tools for text, arrows, lines, circles, pens, and a tape measure. Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
 
 ### System Design Choices
-The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage uses IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing.
+The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing.
 
 ## External Dependencies
 
@@ -107,38 +68,10 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **@capacitor/device**: Device information.
 - **@capacitor/preferences**: Native storage for app preferences.
 - **@capacitor/filesystem**: Native file system access.
-- **@capacitor/camera**: Native camera integration (currently using `getUserMedia`).
+- **@capacitor/camera**: Native camera integration.
 
 ### Third-Party APIs & Payment Processing
 - **Google Geocoding API**: Address to coordinates conversion.
-- **Stripe**: Web subscription management and payment processing (95.6% margin after fees).
-- **Apple StoreKit** (not yet implemented): iOS In-App Purchase for app subscriptions (70-85% margin).
-- **Google Play Billing Library** (not yet implemented): Android In-App Purchase for app subscriptions (85% margin).
-
-### Apple App Store & Google Play Compliance Status
-**Last Updated:** October 19, 2025
-
-**Payment System Implementation:**
-- ✅ **Multi-Platform Architecture**: Database and backend support Stripe/Apple/Google subscriptions
-- ✅ **Compliance Strategy**: Following Apple 3.1.3(b) "Multiplatform Services" - web subscribers can access app features, IAP offered in iOS app for new signups
-- ⚠️ **Apple IAP**: Endpoint structure created but secured (returns 501) until StoreKit receipt verification implemented
-- ⚠️ **Google Play Billing**: Endpoint structure created but secured (returns 501) until Play API verification implemented
-- ✅ **Unified Pricing**: $19.99/month across all platforms for simplicity
-- **See**: `MULTI_PLATFORM_PAYMENTS.md` and `APPLE_COMPLIANCE_REPORT.md` for complete details
-
-**Compliant Areas:**
-- ✅ Privacy Manifest (`PrivacyInfo.xcprivacy`) complete with all required APIs
-- ✅ Privacy Policy comprehensive and detailed
-- ✅ Capacitor 6 iOS integration configured
-- ✅ Camera/Location permission descriptions documented
-- ✅ Capgo OTA update system with AES-256 encryption
-- ✅ Payment endpoints secured to prevent unauthorized subscription activation
-
-**Pending Implementation:**
-- ⚠️ Apple StoreKit 2 SDK integration for actual receipt verification
-- ⚠️ Google Play Billing Library 7+ integration for actual purchase verification
-- ⚠️ App Store Connect product configuration
-- ⚠️ Google Play Console product configuration
-- ⚠️ Info.plist permissions must be added during iOS build
-- ⚠️ Third-party SDK privacy manifests need verification
-- ⚠️ iOS 18 SDK requirement (enforced April 2025)
+- **Stripe**: Web subscription management and payment processing.
+- **Apple StoreKit**: iOS In-App Purchase for app subscriptions (planned).
+- **Google Play Billing Library**: Android In-App Purchase for app subscriptions (planned).

@@ -1,0 +1,212 @@
+IMPORTANT: Before making ANY changes, please READ THIS CAREFULLY:
+
+⚠️ DO NOT MODIFY:
+- Existing camera views and camera functionality
+- Photo editing mode and annotation tools
+- Any custom camera UI components
+- Current photo capture workflow
+
+These have been specifically customized for this app and must remain untouched.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TASK: Analyze this app and suggest native iOS improvements
+
+Please review the codebase and CREATE A LIST of suggested native iOS integrations from the options below. For EACH suggestion:
+1. Explain WHERE you would add it
+2. Explain WHY it would improve the user experience
+3. Explain WHAT specifically would change
+
+DO NOT implement anything yet. Just provide the list of recommendations for me to review and approve.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AVAILABLE NATIVE iOS FEATURES TO CONSIDER:
+
+📱 USER INTERFACE & INTERACTIONS
+
+1. @capacitor/action-sheet
+   - Native bottom sheet menus for contextual actions
+   - Potential use: photo options, delete confirmations, bulk actions
+   - Example: Long-press photo → Delete/Share/Edit menu
+
+2. @capacitor/dialog
+   - Native iOS alerts, confirms, and prompts
+   - Potential use: Replace browser alerts/confirms with native dialogs
+   - Example: confirmations, warnings, input prompts
+
+3. @capacitor/toast
+   - Native toast notifications (brief messages)
+   - Potential use: success messages, info notifications, status updates
+   - Example: "Photo saved", "Upload complete"
+
+4. @capacitor/haptics
+   - Native haptic feedback (vibrations)
+   - Potential use: button taps, deletions, confirmations
+   - ⚠️ DO NOT add to camera capture - that's already customized
+   - Types: light, medium, heavy impacts; success, warning, error
+
+5. @capacitor/status-bar
+   - Control native iOS status bar appearance
+   - Potential use: hide/show, change color (light/dark), overlay content
+
+6. @capacitor/keyboard
+   - Native keyboard management
+   - Potential use: show/hide keyboard, adjust layout when keyboard appears
+
+7. @capacitor/splash-screen
+   - Native splash screen control
+   - Potential use: branded app launch experience
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📤 SHARING & COMMUNICATION
+
+8. @capacitor/share
+   - Native iOS share sheet
+   - Potential use: sharing photos, projects, links
+   - Includes: Messages, Mail, AirDrop, Instagram, etc.
+
+9. @capacitor/clipboard
+   - Native clipboard access
+   - Potential use: copy text, copy image URLs, paste functionality
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📸 MEDIA & FILES
+
+10. @capacitor/camera - ALREADY IN USE
+    ⚠️ DO NOT MODIFY existing camera functionality
+    - Camera views are custom-built
+    - Photo capture workflow is finalized
+    - Editing mode is specifically designed
+
+11. @capacitor/filesystem - ALREADY IN USE
+    - Review if any improvements needed for file operations
+
+12. @capawesome/capacitor-file-picker
+    - Native iOS document picker
+    - Potential use: import files, select multiple files, filter by type
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔔 NOTIFICATIONS
+
+13. @capacitor/local-notifications
+    - Native iOS local notifications
+    - Potential use: reminders, scheduled alerts, app badges
+
+14. @capacitor/push-notifications
+    - Native iOS push notifications (requires Apple Developer account)
+    - Potential use: remote notifications, engagement
+
+15. @capacitor/badge
+    - Native app icon badge
+    - Potential use: unread count, pending actions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 BROWSER & LINKS
+
+16. @capacitor/browser
+    - Native in-app browser (Safari View Controller)
+    - Potential use: opening external links without leaving app
+
+17. @capacitor/app-launcher
+    - Launch other iOS apps
+    - Potential use: open Maps, Phone, Mail, other apps
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 LOCATION & SENSORS
+
+18. @capacitor/geolocation
+    - Native location services
+    - Potential use: GPS coordinates, geotagging photos
+
+19. @capacitor/motion
+    - Native device motion sensors
+    - Potential use: accelerometer, gyroscope, orientation
+    - Example: Shake to undo, tilt interactions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 DEVICE & SYSTEM
+
+20. @capacitor/device - ALREADY IN USE
+    - Review if properly utilized
+
+21. @capacitor/app
+    - Native app lifecycle
+    - Potential use: app state (active/background), URL schemes
+
+22. @capacitor/network
+    - Native network information
+    - Potential use: connection status (wifi/cellular/offline)
+
+23. @capacitor/screen-orientation
+    - Native screen orientation control
+    - Potential use: lock orientation, detect rotation
+
+24. @capacitor/screen-reader
+    - VoiceOver accessibility support
+    - Potential use: accessibility announcements
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💾 DATA & STORAGE
+
+25. @capacitor/preferences - ALREADY IN USE
+    - Review current usage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎵 AUDIO & VIDEO
+
+26. @capacitor/text-to-speech
+    - Native text-to-speech
+    - Potential use: voice feedback, accessibility
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITY & BIOMETRICS
+
+27. @capacitor-community/native-biometric
+    - Face ID / Touch ID authentication
+    - Potential use: secure login, confirm sensitive actions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR TASK:
+
+1. Analyze the current FieldSnaps codebase
+2. Review which Capacitor plugins are already installed
+3. Identify opportunities for native iOS improvements
+4. Create a numbered list of recommendations in this format:
+
+RECOMMENDATION #[number]:
+Plugin: @capacitor/[name]
+Location: [specific file/component where it would be added]
+Current behavior: [what happens now]
+Proposed behavior: [what would change with native implementation]
+User benefit: [why this improves the experience]
+Risk level: [Low/Medium/High - how much existing code affected]
+
+5. Present the complete list for review
+6. Wait for approval before implementing ANY changes
+
+PRIORITY AREAS TO FOCUS ON:
+- Sharing functionality (photos, projects)
+- User feedback (haptics, toasts, dialogs)
+- Contextual menus (action sheets)
+- System integration (status bar, keyboard)
+- Accessibility improvements
+
+REMINDERS:
+❌ Do NOT touch camera views
+❌ Do NOT modify photo editing mode
+❌ Do NOT change photo capture workflow
+❌ Do NOT implement anything without approval
+✅ Only provide recommendations for review
+
+Please analyze the app and provide your recommendations
