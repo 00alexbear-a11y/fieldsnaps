@@ -4,7 +4,18 @@ import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { isDevModeEnabled } from '@/config/devMode';
-import { navigateToAuthEndpoint } from '@/lib/nativeNavigation';
+import { buildDevLoginUrl, buildReplitAuthUrl, openOAuthInBrowser } from '@/lib/nativeOAuth';
+
+// Get server URL from environment or use current origin as fallback
+const getServerUrl = () => {
+  // In development with Capacitor, use the Replit dev server
+  // This URL should match capacitor.config.dev.ts
+  if (import.meta.env.DEV) {
+    return 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev';
+  }
+  // In production, use the current origin
+  return window.location.origin;
+};
 
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
@@ -20,6 +31,18 @@ export default function NativeAppLogin() {
     if (user) {
       window.location.href = '/';
     }
+  };
+
+  const handleDevLogin = async () => {
+    const serverUrl = getServerUrl();
+    const devLoginUrl = buildDevLoginUrl(serverUrl);
+    await openOAuthInBrowser(devLoginUrl);
+  };
+
+  const handleSignIn = async () => {
+    const serverUrl = getServerUrl();
+    const authUrl = buildReplitAuthUrl(serverUrl);
+    await openOAuthInBrowser(authUrl);
   };
 
   return (
@@ -66,7 +89,7 @@ export default function NativeAppLogin() {
             variant="default"
             size="default"
             className="w-full bg-orange-600 hover:bg-orange-700"
-            onClick={() => navigateToAuthEndpoint('/api/dev-login')}
+            onClick={handleDevLogin}
             data-testid="button-dev-login"
           >
             <LogIn className="w-4 h-4 mr-2" />
@@ -92,7 +115,7 @@ export default function NativeAppLogin() {
           variant={(biometricSupported || isDevelopment) ? "outline" : "default"}
           size="default"
           className="w-full"
-          onClick={() => navigateToAuthEndpoint('/api/login')}
+          onClick={handleSignIn}
           data-testid="button-login"
         >
           <LogIn className="w-4 h-4 mr-2" />
@@ -101,7 +124,7 @@ export default function NativeAppLogin() {
 
         <div className="text-center pt-2">
           <button
-            onClick={() => navigateToAuthEndpoint('/api/login')}
+            onClick={handleSignIn}
             className="text-sm text-primary font-medium inline-flex items-center gap-1 hover-elevate active-elevate-2"
             data-testid="link-try-now"
           >

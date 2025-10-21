@@ -34,6 +34,9 @@ import { useTheme } from "./hooks/useTheme";
 import { useIsNativeApp } from "./hooks/usePlatform";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { isOAuthCallback, parseOAuthCallback, closeBrowser } from './lib/nativeOAuth';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -166,6 +169,58 @@ export default function App() {
     if (!onboardingComplete) {
       setShowOnboarding(true);
     }
+  }, []);
+
+  // Handle deep linking for native apps (OAuth callbacks)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) {
+      // Only set up deep link listener for native platforms
+      return;
+    }
+
+    console.log('[Deep Link] Setting up app URL listener for OAuth callbacks');
+
+    let listenerHandle: any = null;
+
+    // Set up the listener
+    const setupListener = async () => {
+      listenerHandle = await CapacitorApp.addListener('appUrlOpen', async (event) => {
+        const url = event.url;
+        console.log('[Deep Link] App opened with URL:', url);
+
+        // Check if this is an OAuth callback
+        if (isOAuthCallback(url)) {
+          console.log('[Deep Link] OAuth callback detected');
+          
+          // Parse callback parameters (if needed for debugging)
+          const params = parseOAuthCallback(url);
+          console.log('[Deep Link] Callback params:', params);
+
+          // Close the browser (Safari) if still open
+          await closeBrowser();
+
+          // Check if user needs company setup
+          if (params.needs_company_setup === 'true') {
+            console.log('[Deep Link] New user needs company setup, redirecting...');
+            window.location.href = '/onboarding/company-setup';
+          } else {
+            // Reload the page to trigger auth check
+            // The session cookie should now be set by the backend
+            console.log('[Deep Link] OAuth callback successful, reloading app...');
+            window.location.href = '/projects';
+          }
+        }
+      });
+    };
+
+    setupListener();
+
+    // Cleanup listener on unmount
+    return () => {
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
+    };
   }, []);
 
   const handleOnboardingComplete = () => {
