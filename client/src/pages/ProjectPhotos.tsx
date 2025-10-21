@@ -37,6 +37,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { indexedDB as idb } from "@/lib/indexeddb";
 import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
+import { actionSheet } from "@/lib/nativeActionSheet";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
@@ -391,6 +392,39 @@ export default function ProjectPhotos() {
       toast({ title: "Failed to delete task", variant: "destructive" });
     },
   });
+
+  const handleTodoMenuClick = async (e: React.MouseEvent, todo: TodoWithDetails) => {
+    e.stopPropagation();
+    
+    // On iOS, show native action sheet
+    if (actionSheet.isSupported()) {
+      const buttons = [];
+      
+      if (!todo.completed) {
+        buttons.push({
+          title: 'Mark Complete',
+          handler: () => completeTaskMutation.mutate(todo.id),
+        });
+      }
+      
+      buttons.push({
+        title: 'Delete',
+        style: 'destructive' as const,
+        handler: () => deleteTaskMutation.mutate(todo.id),
+      });
+      
+      buttons.push({
+        title: 'Cancel',
+        style: 'cancel' as const,
+      });
+      
+      await actionSheet.show({
+        title: todo.title,
+        buttons,
+      });
+    }
+    // On web, dropdown menu will handle it
+  };
 
   const deleteProjectMutation = useMutation({
     mutationFn: async () => {
@@ -1390,39 +1424,51 @@ export default function ProjectPhotos() {
                           </h3>
                         </div>
 
-                        {/* Three-dot menu */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-12 w-12 flex-shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                              data-testid={`button-menu-todo-${todo.id}`}
-                            >
-                              <MoreVertical className="w-5 h-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {!todo.completed && (
-                              <DropdownMenuItem
-                                onClick={() => completeTaskMutation.mutate(todo.id)}
-                                disabled={completeTaskMutation.isPending}
-                                data-testid={`menu-complete-todo-${todo.id}`}
+                        {/* Three-dot menu - Native action sheet on iOS, dropdown on web */}
+                        {actionSheet.isSupported() ? (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-12 w-12 flex-shrink-0"
+                            onClick={(e) => handleTodoMenuClick(e, todo)}
+                            data-testid={`button-menu-todo-${todo.id}`}
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        ) : (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-12 w-12 flex-shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                                data-testid={`button-menu-todo-${todo.id}`}
                               >
-                                Mark Complete
+                                <MoreVertical className="w-5 h-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {!todo.completed && (
+                                <DropdownMenuItem
+                                  onClick={() => completeTaskMutation.mutate(todo.id)}
+                                  disabled={completeTaskMutation.isPending}
+                                  data-testid={`menu-complete-todo-${todo.id}`}
+                                >
+                                  Mark Complete
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() => deleteTaskMutation.mutate(todo.id)}
+                                disabled={deleteTaskMutation.isPending}
+                                className="text-destructive"
+                                data-testid={`menu-delete-todo-${todo.id}`}
+                              >
+                                Delete
                               </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              onClick={() => deleteTaskMutation.mutate(todo.id)}
-                              disabled={deleteTaskMutation.isPending}
-                              className="text-destructive"
-                              data-testid={`menu-delete-todo-${todo.id}`}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                     </Card>
                   );
