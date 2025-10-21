@@ -3,10 +3,11 @@ import { Card } from '@/components/ui/card';
 import { Camera, MapPin, Share2, Cloud, Smartphone, Edit3, ArrowRight, Heart, LogIn } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = isDevModeEnabled();
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
