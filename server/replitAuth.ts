@@ -298,23 +298,37 @@ export async function setupAuth(app: Express) {
     const isDevUser = user?.claims?.sub === 'dev-user-local';
     const isDevelopment = process.env.NODE_ENV !== 'production';
     
-    req.logout(() => {
-      // For dev users in development, just redirect to login without OIDC logout
-      if (isDevelopment && isDevUser) {
-        console.log('[Logout] Dev user logout - redirecting to /login');
-        return res.redirect('/login');
+    req.logout((logoutErr) => {
+      if (logoutErr) {
+        console.error('[Logout] Error during req.logout():', logoutErr);
       }
       
-      // For real OAuth users, end the OIDC session
-      const host = req.get('host') || req.hostname;
-      const redirectUri = `${req.protocol}://${host}`;
-      
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: redirectUri,
-        }).href
-      );
+      // Destroy the session completely
+      req.session.destroy((destroyErr) => {
+        if (destroyErr) {
+          console.error('[Logout] Error destroying session:', destroyErr);
+        }
+        
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        
+        // For dev users in development, just redirect to login without OIDC logout
+        if (isDevelopment && isDevUser) {
+          console.log('[Logout] Dev user logout - redirecting to /login');
+          return res.redirect('/login');
+        }
+        
+        // For real OAuth users, end the OIDC session
+        const host = req.get('host') || req.hostname;
+        const redirectUri = `${req.protocol}://${host}`;
+        
+        res.redirect(
+          client.buildEndSessionUrl(config, {
+            client_id: process.env.REPL_ID!,
+            post_logout_redirect_uri: redirectUri,
+          }).href
+        );
+      });
     });
   });
 }
