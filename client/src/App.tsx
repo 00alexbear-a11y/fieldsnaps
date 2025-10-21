@@ -27,6 +27,7 @@ import SyncBanner from "./components/SyncBanner";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -117,6 +118,9 @@ function AppContent() {
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
       {/* Universal swipe-back gesture (disabled on main pages) */}
       <SwipeBackGesture disabled={disableSwipeBack} />
+      
+      {/* Global offline indicator */}
+      <OfflineIndicator />
       
       {/* Show payment notification for past_due users */}
       <PaymentNotification />

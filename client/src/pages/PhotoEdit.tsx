@@ -222,24 +222,30 @@ export default function PhotoEdit() {
       });
 
       // Add to sync queue to upload the annotated photo to server
-      await idb.addToSyncQueue({
-        type: 'photo',
-        localId: photoId,
-        projectId: projectId,
-        action: 'update',
-        data: { 
-          blob: annotatedBlob,
-          annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
-        },
-        retryCount: 0,
-      });
+      try {
+        await idb.addToSyncQueue({
+          type: 'photo',
+          localId: photoId,
+          projectId: projectId,
+          action: 'update',
+          data: { 
+            blob: annotatedBlob,
+            annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
+          },
+          retryCount: 0,
+        });
+        console.log('[PhotoEdit] Successfully queued photo for sync');
+      } catch (syncQueueError) {
+        console.error('[PhotoEdit] Failed to queue for sync:', syncQueueError);
+        // Continue anyway - photo is saved locally
+      }
 
       toast({
-        title: '✓ Saved',
+        title: '✓ Saved Successfully',
         description: annotations.length > 0 
-          ? `Annotations saved and will sync when online`
-          : 'Photo saved',
-        duration: 1500,
+          ? `Annotations saved${navigator.onLine ? ' and will sync when online' : ' locally'}`
+          : 'Photo saved successfully',
+        duration: 2000,
       });
 
       if (photoUrlRef.current) {
@@ -260,10 +266,12 @@ export default function PhotoEdit() {
       }
     } catch (error) {
       console.error('[PhotoEdit] Error saving annotations:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
-        title: 'Failed to save annotations',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Save Failed',
+        description: `${errorMsg}. Your changes were not saved. Please try again.`,
         variant: 'destructive',
+        duration: 5000,
       });
     } finally {
       setIsSaving(false);
@@ -319,9 +327,10 @@ export default function PhotoEdit() {
 
   if (!photoUrl) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading photo...</p>
+      <div className="flex items-center justify-center h-screen bg-black">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-white text-sm">Loading photo...</p>
         </div>
       </div>
     );

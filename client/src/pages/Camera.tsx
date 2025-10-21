@@ -68,6 +68,8 @@ export default function Camera() {
   const [hasPermission, setHasPermission] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [isCameraLoading, setIsCameraLoading] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<QualityPreset>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('camera-quality');
@@ -251,7 +253,7 @@ export default function Camera() {
   }, [projects, selectedProject]);
 
   useEffect(() => {
-    if (selectedProject && !showProjectSelection && !isActive && !permissionDenied) {
+    if (selectedProject && !showProjectSelection && !isActive && !permissionDenied && !isCameraLoading) {
       startCamera();
     }
   }, [selectedProject, showProjectSelection]);
@@ -365,6 +367,9 @@ export default function Camera() {
     const sessionId = ++cameraSessionIdRef.current;
     console.log(`[Camera] Starting camera session ${sessionId}`);
     
+    setIsCameraLoading(true);
+    setCameraError(null);
+    
     try {
       try {
         const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
@@ -372,10 +377,13 @@ export default function Camera() {
           setPermissionDenied(true);
           setHasPermission(false);
           setIsActive(false);
+          setIsCameraLoading(false);
+          setCameraError('Camera access denied. Please enable camera in your browser settings.');
           toast({
             title: 'Camera Access Denied',
             description: 'Please enable camera access in your browser settings.',
             variant: 'destructive',
+            duration: 5000,
           });
           return;
         }
@@ -385,6 +393,7 @@ export default function Camera() {
       
       if (sessionId !== cameraSessionIdRef.current) {
         console.log(`[Camera] Session ${sessionId} aborted - newer session started`);
+        setIsCameraLoading(false);
         return;
       }
 
@@ -472,6 +481,7 @@ export default function Camera() {
         });
 
         setIsActive(true);
+        setIsCameraLoading(false);
         console.log('[Camera] isActive set to true, loading overlay should hide');
         
         await detectAvailableCameras();
@@ -481,10 +491,16 @@ export default function Camera() {
       setPermissionDenied(true);
       setHasPermission(false);
       setIsActive(false);
+      setIsCameraLoading(false);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unable to access camera';
+      setCameraError(errorMessage);
+      
       toast({
-        title: 'Camera Access Denied',
-        description: 'Unable to access camera. Please check permissions.',
+        title: 'Camera Access Failed',
+        description: `${errorMessage}. Please check your camera permissions and try again.`,
         variant: 'destructive',
+        duration: 5000,
       });
     }
   };
@@ -974,15 +990,18 @@ export default function Camera() {
       }
 
       // For normal mode (not attach), queue for background sync
-      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+      try {
+        await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
+        console.log('[Camera] Photo queued for sync successfully');
+      } catch (err) {
         console.error('[Camera] Sync queue error:', err);
         toast({
-          title: 'Sync queue failed',
-          description: 'Photo saved locally but not queued for upload. Try manual sync.',
-          variant: 'destructive',
-          duration: 3000,
+          title: 'Photo Saved Locally',
+          description: 'Photo saved but needs manual sync. Check sync status in settings.',
+          variant: 'default',
+          duration: 4000,
         });
-      });
+      }
 
       const quickButton = document.querySelector('[data-testid="button-quick-capture"]') as HTMLElement;
       if (quickButton) {
@@ -994,10 +1013,12 @@ export default function Camera() {
 
     } catch (error) {
       console.error('Quick capture error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
-        title: 'Capture Failed',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Photo Capture Failed',
+        description: errorMsg + '. Please try again.',
         variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setIsCapturing(false);
@@ -1058,15 +1079,14 @@ export default function Camera() {
 
       console.log('[Camera] Photo saved for edit:', savedPhoto.id);
 
-      syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
+      try {
+        await syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create');
+        console.log('[Camera] Photo queued for sync successfully');
+      } catch (err) {
         console.error('[Camera] Sync queue error:', err);
-        toast({
-          title: 'Sync queue failed',
-          description: 'Photo saved locally but not queued for upload. Try manual sync.',
-          variant: 'destructive',
-          duration: 3000,
-        });
-      });
+        // Don't show error toast here since user is navigating to edit
+        // The photo is still saved locally and can be synced later
+      }
 
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
@@ -1087,10 +1107,12 @@ export default function Camera() {
 
     } catch (error) {
       console.error('Capture and edit error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
       toast({
-        title: 'Capture Failed',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Photo Capture Failed',
+        description: errorMsg + '. Please try again.',
         variant: 'destructive',
+        duration: 4000,
       });
       setIsCapturing(false);
     }
@@ -1299,13 +1321,40 @@ export default function Camera() {
           >
             <SwitchCamera className="w-5 h-5" />
           </Button>
-          {/* Loading state */}
-          {!isActive && (
+          {/* Loading and Error states */}
+          {(!isActive || isCameraLoading) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
-              <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
-                <CameraIcon className="w-10 h-10 text-primary" />
-              </div>
-              <p className="text-white text-sm">Starting Camera...</p>
+              {cameraError ? (
+                <>
+                  <div className="w-20 h-20 bg-red-600/20 rounded-full flex items-center justify-center">
+                    <X className="w-10 h-10 text-red-600" />
+                  </div>
+                  <div className="text-center space-y-2 px-6">
+                    <p className="text-white text-sm font-medium">Camera Error</p>
+                    <p className="text-white/60 text-xs max-w-xs">{cameraError}</p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setCameraError(null);
+                      setPermissionDenied(false);
+                      startCamera();
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    data-testid="button-retry-camera"
+                  >
+                    Try Again
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
+                    <CameraIcon className="w-10 h-10 text-primary" />
+                  </div>
+                  <p className="text-white text-sm">Starting Camera...</p>
+                </>
+              )}
             </div>
           )}
           
