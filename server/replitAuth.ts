@@ -567,10 +567,13 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   // Try JWT authentication first (for native apps)
   const authHeader = req.headers.authorization;
+  console.log('[isAuthenticated] DEBUG: Authorization header:', authHeader ? `${authHeader.substring(0, 20)}...` : 'MISSING');
   
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    console.log('[isAuthenticated] DEBUG: Extracted token (first 30 chars):', token.substring(0, 30));
     const payload = verifyAccessToken(token);
+    console.log('[isAuthenticated] DEBUG: Token verification result:', payload ? 'VALID' : 'INVALID/EXPIRED');
     
     if (payload) {
       // Valid JWT token - create a req.user object compatible with session-based auth
