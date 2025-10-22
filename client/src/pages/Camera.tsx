@@ -1346,7 +1346,7 @@ export default function Camera() {
   return (
     <div className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
       {/* Dominant Viewfinder - Extended to top of screen */}
-      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto" style={{ aspectRatio: '16/9' }}>
+      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
           {/* Flip Camera Button - Centered at top, semi-transparent */}
           <Button
             variant="ghost"
@@ -1549,7 +1549,7 @@ export default function Camera() {
       </div>
 
       {/* Controls Row - Zoom, Tags */}
-      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10">
+      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0.5rem))' }}>
         <div className="flex items-center justify-center gap-4">
           {/* Zoom controls */}
           <div className="flex gap-1">
@@ -1636,7 +1636,7 @@ export default function Camera() {
       </div>
 
       {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
-      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10">
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
         {/* Back */}
         <Button
           variant="ghost"

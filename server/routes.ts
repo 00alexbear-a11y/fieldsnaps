@@ -1271,6 +1271,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Serve photo image with CORS headers for iOS WebView
+  app.get("/api/photos/:id/image", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
+      
+      const photo = await storage.getPhoto(req.params.id);
+      if (!photo) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+
+      if (!photo.url) {
+        return res.status(404).json({ error: "Photo has no image" });
+      }
+
+      // Set CORS headers for iOS WebView
+      res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      });
+
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(photo.url);
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error: any) {
+      console.error("Error serving photo image:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Serve photo thumbnail with CORS headers for iOS WebView
+  app.get("/api/photos/:id/thumbnail", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
+      
+      const photo = await storage.getPhoto(req.params.id);
+      if (!photo) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+
+      // If no thumbnail, serve the full image
+      const imageUrl = photo.thumbnailUrl || photo.url;
+      if (!imageUrl) {
+        return res.status(404).json({ error: "Photo has no image" });
+      }
+
+      // Set CORS headers for iOS WebView
+      res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      });
+
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(imageUrl);
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error: any) {
+      console.error("Error serving photo thumbnail:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Thumbnail not found" });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Unauthenticated photo proxy for public share links
+  app.get("/api/shared/:shareToken/photos/:id/image", validateUuidParam('id'), async (req, res) => {
+    try {
+      // Validate share token
+      const share = await storage.getShareByToken(req.params.shareToken);
+      if (!share) {
+        return res.status(404).json({ error: "Share not found or expired" });
+      }
+
+      // Check if expired
+      if (share.expiresAt && new Date(share.expiresAt) < new Date()) {
+        return res.status(404).json({ error: "Share has expired" });
+      }
+
+      // Get photo and verify it belongs to the shared project
+      const photo = await storage.getPhoto(req.params.id);
+      if (!photo) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+
+      if (photo.projectId !== share.projectId) {
+        return res.status(403).json({ error: "Photo does not belong to this share" });
+      }
+
+      if (!photo.url) {
+        return res.status(404).json({ error: "Photo has no image" });
+      }
+
+      // Set CORS headers for iOS WebView
+      res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      });
+
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(photo.url);
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error: any) {
+      console.error("Error serving shared photo image:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 }
