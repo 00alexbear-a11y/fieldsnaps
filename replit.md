@@ -34,7 +34,9 @@ The application includes a bottom navigation, a camera interface with a three-zo
 The fullscreen photo viewer includes optimized bottom controls with a 3-column grid layout for centering, simplified controls (Back button, centered action group), and an Edit Menu consolidating Tag, Rename, Comment, and "Use as Icon" actions. It features responsive labels, accessibility considerations (aria-labels, `inert` attribute), and safe-area support for iOS home indicator compatibility.
 
 ### System Design Choices
-The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing. OAuth implementation for native apps uses Capacitor Browser plugin with custom URL schemes and backend redirect URI validation for security.
+The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing. 
+
+**OAuth for Native Apps**: Uses Capacitor Browser plugin with custom URL schemes (`com.fieldsnaps.app://callback`) and backend redirect URI validation for security. Safari View Controller dismissal is handled with a 200ms awaited delay before `Browser.close()` to allow iOS to process the deep link transition smoothly, preventing Safari from staying as a modal overlay after OAuth login.
 
 ## External Dependencies
 
