@@ -4,9 +4,6 @@ import { jwtDecode } from 'jwt-decode';
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
-// Extend type to handle SecureStorage API correctly
-type SecureStorageData = string | null;
-
 interface JWTPayload {
   sub: string; // user ID
   email: string;
@@ -25,15 +22,8 @@ class TokenManager {
     try {
       console.log('[TokenManager] Storing tokens in iOS Keychain');
       
-      await (SecureStorage as any).set({
-        key: ACCESS_TOKEN_KEY,
-        value: accessToken,
-      });
-
-      await (SecureStorage as any).set({
-        key: REFRESH_TOKEN_KEY,
-        value: refreshToken,
-      });
+      await SecureStorage.set(ACCESS_TOKEN_KEY, accessToken);
+      await SecureStorage.set(REFRESH_TOKEN_KEY, refreshToken);
 
       console.log('[TokenManager] ✅ Tokens stored successfully');
     } catch (error) {
@@ -47,8 +37,8 @@ class TokenManager {
    */
   async getAccessToken(): Promise<string | null> {
     try {
-      const result = await (SecureStorage as any).get({ key: ACCESS_TOKEN_KEY }) as SecureStorageData;
-      return result;
+      const result = await SecureStorage.get(ACCESS_TOKEN_KEY);
+      return result as string | null;
     } catch (error) {
       // Key not found is expected when user is not logged in
       console.log('[TokenManager] No access token found');
@@ -61,8 +51,8 @@ class TokenManager {
    */
   async getRefreshToken(): Promise<string | null> {
     try {
-      const result = await (SecureStorage as any).get({ key: REFRESH_TOKEN_KEY }) as SecureStorageData;
-      return result;
+      const result = await SecureStorage.get(REFRESH_TOKEN_KEY);
+      return result as string | null;
     } catch (error) {
       console.log('[TokenManager] No refresh token found');
       return null;
@@ -143,10 +133,7 @@ class TokenManager {
       const newAccessToken = data.access_token;
 
       // Store new access token
-      await (SecureStorage as any).set({
-        key: ACCESS_TOKEN_KEY,
-        value: newAccessToken,
-      });
+      await SecureStorage.set(ACCESS_TOKEN_KEY, newAccessToken);
 
       console.log('[TokenManager] ✅ Access token refreshed successfully');
       return newAccessToken;
@@ -188,8 +175,8 @@ class TokenManager {
     try {
       console.log('[TokenManager] Clearing tokens from iOS Keychain');
       
-      await (SecureStorage as any).remove({ key: ACCESS_TOKEN_KEY });
-      await (SecureStorage as any).remove({ key: REFRESH_TOKEN_KEY });
+      await SecureStorage.remove(ACCESS_TOKEN_KEY);
+      await SecureStorage.remove(REFRESH_TOKEN_KEY);
 
       console.log('[TokenManager] ✅ Tokens cleared');
     } catch (error) {
