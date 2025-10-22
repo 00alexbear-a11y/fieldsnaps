@@ -502,13 +502,24 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
   const isDevelopment = process.env.NODE_ENV !== 'production';
 
-  // Try real authentication first
-  if (req.isAuthenticated() && user?.expires_at) {
+  // Check if user is authenticated
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // Dev users (from dev-login) don't have expires_at - allow them in development
+  if (user?.claims?.sub === 'dev-user-local' && isDevelopment) {
+    return next();
+  }
+
+  // For OAuth users, check token expiration
+  if (user?.expires_at) {
     const now = Math.floor(Date.now() / 1000);
     if (now <= user.expires_at) {
       return next();
     }
 
+    // Token expired - try to refresh
     const refreshToken = user.refresh_token;
     if (!refreshToken) {
       return res.status(401).json({ message: "Unauthorized" });
