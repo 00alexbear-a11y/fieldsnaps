@@ -81,16 +81,16 @@ export default function Login() {
               data-testid="button-login"
             >
               <LogIn className="w-4 h-4 mr-2" />
-              Sign In with Replit
+              Sign In
             </Button>
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
             {isDevelopment
-              ? 'Use Dev Login to bypass OAuth for testing in simulator'
+              ? 'Use Dev Login to bypass authentication for testing in simulator'
               : biometricSupported 
-              ? 'Use Touch ID, Face ID, Windows Hello, or Replit to sign in'
-              : 'Sign in with your Replit account to get started'}
+              ? 'Use Touch ID, Face ID, Windows Hello, or sign in with your account'
+              : 'Sign in to access your projects and photos'}
           </p>
         </Card>
 

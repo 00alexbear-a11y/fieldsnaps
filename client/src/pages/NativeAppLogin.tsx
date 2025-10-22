@@ -139,7 +139,7 @@ export default function NativeAppLogin() {
 
         <p className="text-xs text-muted-foreground text-center px-4">
           {isDevelopment
-            ? 'Use Dev Login to bypass OAuth for testing in simulator'
+            ? 'Use Dev Login to bypass authentication for testing in simulator'
             : biometricSupported 
             ? 'Secure authentication with Face ID, Touch ID, or your account'
             : 'Sign in or start your free trial to get started'}
