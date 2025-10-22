@@ -68,6 +68,7 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
   - See `iOS-Setup-Guide.md` for detailed instructions
 
 ## User Preferences
+- **Project path on Mac**: `~/Documents/Projects/FieldSnaps`
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
 - **Workflow preferences**: I want iterative development with frequent updates and feedback loops. Prioritize core functionality first.
