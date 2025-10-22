@@ -101,24 +101,13 @@ export default function NativeAppLogin() {
           data-testid="button-login"
         >
           <LogIn className="w-4 h-4 mr-2" />
-          Sign In
+          Sign In with Replit
         </Button>
 
-        <div className="text-center pt-2">
-          <button
-            onClick={handleSignIn}
-            className="text-sm text-primary font-medium inline-flex items-center gap-1 hover-elevate active-elevate-2"
-            data-testid="link-try-now"
-          >
-            Try Now - Start Free Trial
-            <ArrowRight className="w-3 h-3" />
-          </button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center px-4">
+        <p className="text-xs text-muted-foreground text-center px-4 pt-2">
           {biometricSupported 
             ? 'Secure authentication with Face ID, Touch ID, or your account'
-            : 'Sign in or start your free trial to get started'}
+            : 'Sign in to get started with your free trial'}
         </p>
       </div>
     </div>
