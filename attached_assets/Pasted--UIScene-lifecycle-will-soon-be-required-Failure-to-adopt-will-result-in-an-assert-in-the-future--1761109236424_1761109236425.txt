@@ -1,0 +1,263 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: 56EB9E14-59D6-4900-9150-C08A90FADA15])
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: ::::: SIMULATOR :::::
+🟢 [✨  CapgoUpdater]: Application directory: /Users/bearmac/Library/Developer/CoreSimulator/Devices/53FCA773-BDE3-462F-B580-602BA09A5631/data/Containers/Data/Application/368E1724-3706-481A-B137-A22B6D825168
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f99390d8-878f-4bae-80d7-5f1be7fe36bc
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+Loading network plugin
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+⚡️  Loading app at capacitor://localhost...
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("f99390d8-878f-4bae-80d7-5f1be7fe36bc"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.0.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(true), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional(""))
+Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+Reachable via WiFi
+nw_connection_copy_protocol_metadata_internal_block_invoke [C5] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C5] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C5] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C5] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+nw_connection_copy_protocol_metadata_internal_block_invoke [C6] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C6] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C6] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C6] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+void * _Nullable NSMapGet(NSMapTable * _Nonnull, const void * _Nullable): map table argument is NULL
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  Can only perform input operation for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x6000021314f0 V:|-(7)-[TUIKeyboardContentView:0x10482b020]   (active, names: '|':TUIKeyplaneView:0x104a2faf0 )>",
+    "<NSLayoutConstraint:0x600002130aa0 V:[TUIKeyboardContentView:0x10482b020]-(12)-|   (active, names: '|':TUIKeyplaneView:0x104a2faf0 )>",
+    "<NSLayoutConstraint:0x60000213f160 V:|-(0)-[TUIKeyplaneView:0x104a2faf0]   (active, names: UIKeyboardLayoutStar Prev...:0x10682d600, '|':UIKeyboardLayoutStar Prev...:0x10682d600 )>",
+    "<NSLayoutConstraint:0x60000213e4e0 V:[TUIKeyplaneView:0x104a2faf0]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10682d600, '|':UIKeyboardLayoutStar Prev...:0x10682d600 )>",
+    "<NSLayoutConstraint:0x60000213e850 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10682d600, '|':UIKeyboardImpl:0x1048221f0 )>",
+    "<NSLayoutConstraint:0x60000213d900 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10682d600, '|':UIKeyboardImpl:0x1048221f0 )>",
+    "<NSLayoutConstraint:0x6000021522b0 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x1048221f0.height == 241   (active)>",
+    "<NSLayoutConstraint:0x600002130a50 'TUIKeyplane.height' TUIKeyboardContentView:0x10482b020.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x600002130a50 'TUIKeyplane.height' TUIKeyboardContentView:0x10482b020.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+Result accumulator timeout: 0.250000, exceeded.
+🔴 [✨  CapgoUpdater]: getLatest failed with error: app_not_found
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif app_not_found current: builtin latestVersionName: 
+WebContent[42776] Could not register system wide server: -25204
+WebContent[42776] _AXAddToElementCache was called even though the element was in the cache: <WKAccessibilityWebPageObject: 0x600002105db0>
+🟢 [✨  CapgoUpdater]: Stats sent for backend_refusal, version builtin
+WebContent[42776] Unable to hide query parameters from script (missing data)
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 126547528
+⚡️  WebView loaded
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":"","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater ⚡️  [log] - [Capgo] App ready notification sent
+addListener 126547529
+⚡️  To Native ->  CapacitorUpdater addListener 126547530
+⚡️  To Native ->  CapacitorUpdater addListener 126547531
+⚡️  To Native ->  CapacitorUpdater current 126547532
+⚡️  TO JS {"bundle":{"version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","checksum":"","id":"builtin"},"native":"1.0"}
+⚡️  To Native ->  App addListener ⚡️  [log] - [Capgo] Current bundle: {"version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","checksum":"","id":"builtin"}
+126547533
+⚡️  To Native ->  App addListener 126547534
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  App addListener 126547535
+⚡️  To Native ->  SecureStorage internalGetItem 126547536
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 126547537
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 126547538
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 126547539
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 126547540
+⚡️  TO JS undefined
+AX Safe category class 'SLHighlightDisambiguationPillViewAccessibility' was not found!
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  To Native ->  Browser open 126547541
+⚡️  [log] - [Native OAuth] Opening URL in browser: https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/api/dev-login?redirect_uri=com.fieldsnaps.app%3A%2F%2Fcallback
+Error acquiring assertion: <Error Domain=RBSAssertionErrorDomain Code=2 "Could not find attribute name in domain plist" UserInfo={NSLocalizedFailureReason=Could not find attribute name in domain plist}>
+⚡️  TO JS undefined
+⚡️  [log] - [Native OAuth] Browser opened successfully
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS {"iosOpenInPlace":"","iosSourceApplication":"com.apple.SafariViewService","url":"com.fieldsnaps.app:\/\/callback?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzI
+⚡️  [log] - [Deep Link] App opened with URL: com.fieldsnaps.app://callback?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjE4LCJleHAiOjE3NjExMTAxMTh9.8PT5TnBKNFKIVKciGT4a2jPwJhEFbXytGABviMOoB4E&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIxOCwiZXhwIjoxNzYzNzAxMjE4fQ.1WkdN8oYGmqs0tjvKpNWlgq5WXnAyZv57H3hEIlKGi0&expires_in=900
+⚡️  [log] - [Deep Link] OAuth callback detected
+⚡️  [log] - [Native OAuth] Parsed callback params: {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjE4LCJleHAiOjE3NjExMTAxMTh9.8PT5TnBKNFKIVKciGT4a2jPwJhEFbXytGABviMOoB4E","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIxOCwiZXhwIjoxNzYzNzAxMjE4fQ.1WkdN8oYGmqs0tjvKpNWlgq5WXnAyZv57H3hEIlKGi0","expires_in":"900"}
+⚡️  [log] - [Deep Link] Callback params: {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjE4LCJleHAiOjE3NjExMTAxMTh9.8PT5TnBKNFKIVKciGT4a2jPwJhEFbXytGABviMOoB4E","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIxOCwiZXhwIjoxNzYzNzAxMjE4fQ.1WkdN8oYGmqs0tjvKpNWlgq5WXnAyZv57H3hEIlKGi0","expires_in":"900"}
+⚡️  To Native ->  Browser close 126547542
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS undefined
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+⚡️  [log] - [Native OAuth] Browser closed
+⚡️  To Native ->  SecureStorage internalSetItem 126547543
+⚡️  [log] - [Deep Link] Saving JWT tokens to iOS Keychain...
+⚡️  [log] - [TokenManager] Storing tokens in iOS Keychain
+ERROR MESSAGE:  {"code":"invalidData","errorMessage":"The data is in an invalid format","message":"The data is in an invalid format"}
+⚡️  [error] - {"code":"invalidData","errorMessage":"The data is in an invalid format","message":"The data is in an invalid format"}
+⚡️  [error] - [TokenManager] Failed to store tokens: {"name":"StorageError","code":"invalidData"}
+⚡️  [error] - [Deep Link] ❌ Failed to save tokens: {"name":"StorageError","code":"invalidData"}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+⚡️  WebView loaded
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 109394639
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"checksum":"","status":"success","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 109394640
+⚡️  To Native ->  CapacitorUpdater addListener 109394641
+⚡️  To Native ->  CapacitorUpdater addListener 109394642
+⚡️  To Native ->  CapacitorUpdater current 109394643
+⚡️  TO JS {"bundle":{"status":"success","version":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin"},"native":"1.0"}
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","version":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin"}
+⚡️  To Native ->  App addListener 109394644
+⚡️  To Native ->  App addListener 109394645
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  App addListener 109394646
+⚡️  To Native ->  SecureStorage internalGetItem 109394647
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 109394648
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 109394649
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 109394650
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+Result accumulator timeout: 0.250000, exceeded.
+⚡️  To Native ->  SplashScreen hide 109394651
+⚡️  TO JS undefined
+⚡️  [log] - [Native OAuth] Opening URL in browser: https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev/api/dev-login?redirect_uri=com.fieldsnaps.app%3A%2F%2Fcallback
+⚡️  To Native ->  Browser open 109394652
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS undefined
+⚡️  [log] - [Native OAuth] Browser opened successfully
+⚡️  TO JS {"url":"com.fieldsnaps.app:\/\/callback?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjI2LCJleHAiOjE3NjExMTAxMjZ9.-zLR6Pz40VIz_IbFkoewbtnoL
+⚡️  [log] - [Deep Link] App opened with URL: com.fieldsnaps.app://callback?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjI2LCJleHAiOjE3NjExMTAxMjZ9.-zLR6Pz40VIz_IbFkoewbtnoLmZSaSveWMKU8j0JXqs&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIyNiwiZXhwIjoxNzYzNzAxMjI2fQ.kR661N8ze_z9Y1xxyOfCcN8vOr__gFJ2wlvP-Vx2FIk&expires_in=900
+⚡️  To Native ->  Browser close 109394653
+⚡️  [log] - [Deep Link] OAuth callback detected
+⚡️  [log] - [Native OAuth] Parsed callback params: {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjI2LCJleHAiOjE3NjExMTAxMjZ9.-zLR6Pz40VIz_IbFkoewbtnoLmZSaSveWMKU8j0JXqs","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIyNiwiZXhwIjoxNzYzNzAxMjI2fQ.kR661N8ze_z9Y1xxyOfCcN8vOr__gFJ2wlvP-Vx2FIk","expires_in":"900"}
+⚡️  [log] - [Deep Link] Callback params: {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTA5MjI2LCJleHAiOjE3NjExMTAxMjZ9.-zLR6Pz40VIz_IbFkoewbtnoLmZSaSveWMKU8j0JXqs","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTEwOTIyNiwiZXhwIjoxNzYzNzAxMjI2fQ.kR661N8ze_z9Y1xxyOfCcN8vOr__gFJ2wlvP-Vx2FIk","expires_in":"900"}
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS undefined
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+⚡️  [log] - [Native OAuth] Browser closed
+⚡️  To Native ->  SecureStorage internalSetItem ⚡️  [log] - [Deep Link] Saving JWT tokens to iOS Keychain...
+109394654
+⚡️  [log] - [TokenManager] Storing tokens in iOS Keychain
+ERROR MESSAGE:  {"errorMessage":"The data is in an invalid format","code":"invalidData","message":"The data is in an invalid format"}
+⚡️  [error] - {"errorMessage":"The data is in an invalid format","code":"invalidData","message":"The data is in an invalid format"}
+⚡️  [error] - [TokenManager] Failed to store tokens: {"name":"StorageError","code":"invalidData"}
+⚡️  [error] - [Deep Link] ❌ Failed to save tokens: {"name":"StorageError","code":"invalidData"}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = FCA9B71A-8919-4ECC-94E5-75A56C2F8069
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  To Native ->  ⚡️  [log] - [App] Platform: ios
+CapacitorUpdater notifyAppReady 13292237
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":"","id":"builtin"}}
+⚡️  WebView loaded
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener ⚡️  [log] - [Capgo] App ready notification sent
+13292238
+⚡️  To Native ->  CapacitorUpdater addListener 13292239
+⚡️  To Native ->  CapacitorUpdater addListener 13292240
+⚡️  To Native ->  CapacitorUpdater current 13292241
+⚡️  TO JS {"native":"1.0","bundle":{"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":"","status":"success","id":"builtin"}}
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":"","status":"success","id":"builtin"}
+⚡️  To Native ->  App addListener 13292242
+⚡️  To Native ->  App addListener 13292243
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App addListener 13292244
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  SecureStorage internalGetItem 13292245
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 13292246
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 13292247
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 13292248
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+Result accumulator timeout: 0.250000, exceeded.
+⚡️  To Native ->  SplashScreen hide 13292249
+⚡️  TO JS undefined
