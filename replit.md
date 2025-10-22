@@ -5,19 +5,21 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes
 
-### iOS Keychain JWT Storage Fix (October 22, 2025)
-- **Critical Bug Fix**: Resolved login loop caused by incorrect @aparajita/capacitor-secure-storage API usage
+### iOS JWT Authentication Complete (October 22, 2025)
+- **Critical Backend Fix**: Fixed `/api/auth/user` route to accept JWT tokens from native apps
+  - Route was calling `req.isAuthenticated()` (session-only) instead of using `isAuthenticated` middleware
+  - Middleware now correctly checks JWT tokens first, then falls back to session auth
+  - iOS app can now authenticate using JWT tokens from Keychain without login loops
+- **iOS Keychain JWT Storage**: Resolved SecureStorage integration issues
   - Changed from object syntax `set({ key, value })` to positional syntax `set(key, data)`
   - Fixed "invalidData" error that prevented tokens from persisting in iOS Keychain
-- **SecureStorage Response Format Fix**: Fixed data extraction to handle both possible response formats
   - SecureStorage.get() can return either `{data: "..."}` object or raw string depending on platform
-  - tokenManager now defensively checks for both formats before extracting value
-  - Prevents null returns that were causing 401 Unauthorized errors
-- **JSON Double-Encoding Fix**: Added parsing logic to handle SecureStorage's auto-JSON-stringification
-  - Plugin wraps string values in additional JSON encoding: `"token"` → `"\"token\""`
-  - Added detection and unwrapping in `getAccessToken()` and `getRefreshToken()`
-  - Ensures downstream JWT decoding and API calls receive clean token strings
-- **Result**: JWT authentication now works correctly in native iOS app with persistent login
+  - Added JSON double-encoding detection and unwrapping: `"token"` → `"\"token\""`
+- **Production Cleanup**: Removed debug logging from authentication middleware
+- **Result**: Native iOS app now fully functional with JWT-based authentication
+  - App loads dashboard directly on launch (no login loop)
+  - All API endpoints work correctly (projects, photos, todos, maps)
+  - Tokens persist across app restarts via iOS Keychain
 
 ### Native iOS OAuth Flow (October 21, 2025)
 - **OAuth Implementation**: Complete native OAuth authentication using Capacitor Browser plugin
