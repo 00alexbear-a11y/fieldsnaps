@@ -8,6 +8,7 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { emailService } from "./email";
+import { generateTokenPair, verifyAccessToken, refreshAccessToken as refreshJwtAccessToken, revokeRefreshToken } from "./jwtService";
 
 // REPLIT_DOMAINS may not be set in local development
 const isProduction = process.env.NODE_ENV === 'production';
@@ -246,9 +247,17 @@ export async function setupAuth(app: Express) {
               const customRedirectUri = (req.session as any).customRedirectUri;
               if (customRedirectUri) {
                 delete (req.session as any).customRedirectUri;
-                const sessionId = req.sessionID;
-                const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
-                console.log('[Auth] Redirecting native app to:', redirectUrl);
+                
+                // Generate JWT tokens for native app
+                const tokens = await generateTokenPair({
+                  id: dbUser.id,
+                  email: dbUser.email,
+                  displayName: dbUser.displayName || undefined,
+                  profilePicture: dbUser.profilePicture || undefined,
+                });
+                
+                const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
+                console.log('[Auth] Redirecting native app with JWT tokens');
                 return res.redirect(redirectUrl);
               }
 
@@ -266,9 +275,17 @@ export async function setupAuth(app: Express) {
           const customRedirectUri = (req.session as any).customRedirectUri;
           if (customRedirectUri) {
             delete (req.session as any).customRedirectUri;
-            const sessionId = req.sessionID;
-            const redirectUrl = `${customRedirectUri}?needs_company_setup=true&session_id=${sessionId}`;
-            console.log('[Auth] New user needs company setup, redirecting to:', redirectUrl);
+            
+            // Generate JWT tokens for native app
+            const tokens = await generateTokenPair({
+              id: dbUser.id,
+              email: dbUser.email,
+              displayName: dbUser.displayName || undefined,
+              profilePicture: dbUser.profilePicture || undefined,
+            });
+            
+            const redirectUrl = `${customRedirectUri}?needs_company_setup=true&access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
+            console.log('[Auth] New user needs company setup, redirecting with JWT tokens');
             return res.redirect(redirectUrl);
           }
           return res.redirect("/onboarding/company-setup");
@@ -278,10 +295,17 @@ export async function setupAuth(app: Express) {
         const customRedirectUri = (req.session as any).customRedirectUri;
         if (customRedirectUri) {
           delete (req.session as any).customRedirectUri;
-          // For native apps, pass the session ID so the app can authenticate
-          const sessionId = req.sessionID;
-          const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
-          console.log('[Auth] Redirecting native app to:', redirectUrl);
+          
+          // Generate JWT tokens for native app
+          const tokens = await generateTokenPair({
+            id: dbUser.id,
+            email: dbUser.email,
+            displayName: dbUser.displayName || undefined,
+            profilePicture: dbUser.profilePicture || undefined,
+          });
+          
+          const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
+          console.log('[Auth] Redirecting native app with JWT tokens');
           return res.redirect(redirectUrl);
         }
 
@@ -370,9 +394,15 @@ export async function setupAuth(app: Express) {
             
             // Redirect to custom URI if provided (native app)
             if (customRedirectUri) {
-              const sessionId = req.sessionID;
-              const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
-              console.log('[Dev Login] Redirecting native app to:', redirectUrl);
+              const tokens = await generateTokenPair({
+                id: dbUser.id,
+                email: dbUser.email,
+                displayName: dbUser.displayName || undefined,
+                profilePicture: dbUser.profilePicture || undefined,
+              });
+              
+              const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
+              console.log('[Dev Login] Redirecting native app with JWT tokens');
               return res.redirect(redirectUrl);
             }
             return res.redirect("/");
@@ -400,62 +430,98 @@ export async function setupAuth(app: Express) {
         console.log('[Dev Login] Dev company created successfully');
       }
 
-      // Redirect to custom URI if provided (native app deep link)
+      // Return JWT tokens for native app or redirect for web
       console.log('[Dev Login] Dev user logged in successfully');
       if (customRedirectUri) {
-        // For native apps, we need to pass the session ID in the callback
-        // because Safari's cookies aren't shared with the Capacitor WebView
-        const sessionId = req.sessionID;
-        const redirectUrl = `${customRedirectUri}?session_id=${sessionId}`;
-        console.log('[Dev Login] Redirecting native app to:', redirectUrl);
+        // For native apps, generate JWT tokens instead of using sessions
+        const dbUser = await storage.getUser(mockUser.claims.sub);
+        if (!dbUser) {
+          return res.status(500).json({ error: "Failed to retrieve user" });
+        }
+
+        const tokens = await generateTokenPair({
+          id: dbUser.id,
+          email: dbUser.email,
+          displayName: dbUser.displayName || undefined,
+          profilePicture: dbUser.profilePicture || undefined,
+        });
+
+        // Redirect with tokens in URL (they'll be saved to iOS Keychain on the client)
+        const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
+        console.log('[Dev Login] Redirecting native app with JWT tokens');
         return res.redirect(redirectUrl);
       }
       return res.redirect("/");
     });
   });
 
-  // Native app session exchange endpoint
-  // The native app calls this with the session_id from the deep link
-  // to establish its own session cookie
-  app.post("/api/auth/exchange-session", async (req, res) => {
-    console.log('[Session Exchange] Request received with body:', req.body);
-    const { session_id } = req.body;
+  // JWT token refresh endpoint for native apps
+  // Exchanges a valid refresh token for a new access token
+  app.post("/api/auth/refresh", async (req, res) => {
+    console.log('[JWT Refresh] Request received');
+    const { refresh_token } = req.body;
     
-    if (!session_id) {
-      console.error('[Session Exchange] Missing session_id in request');
-      return res.status(400).json({ error: 'Missing session_id' });
+    if (!refresh_token) {
+      console.error('[JWT Refresh] Missing refresh_token in request');
+      return res.status(400).json({ error: 'Missing refresh_token' });
     }
 
-    console.log('[Session Exchange] Looking up session:', session_id);
-    
-    // Verify the session exists and get its data
-    // This uses the session store to look up the session by ID
-    const sessionStore = req.sessionStore;
-    
-    sessionStore.get(session_id, (err, sessionData) => {
-      if (err || !sessionData) {
-        console.error('[Session Exchange] Failed to find session:', session_id, err);
-        return res.status(401).json({ error: 'Invalid session_id' });
+    try {
+      // Verify refresh token and extract payload
+      const payload = verifyAccessToken(refresh_token);
+      if (!payload) {
+        console.log('[JWT Refresh] Invalid or expired refresh token');
+        return res.status(401).json({ error: 'Invalid refresh token' });
       }
 
-      console.log('[Session Exchange] Found session data, copying to new session');
-      
-      // Session exists - now set it as the current session for this request
-      // This effectively "copies" the authenticated session from Safari to the native app
-      (req.session as any).passport = (sessionData as any).passport;
-      (req.session as any).cookie = (sessionData as any).cookie;
-      
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('[Session Exchange] Failed to save session:', saveErr);
-          return res.status(500).json({ error: 'Failed to establish session' });
-        }
+      // Get user from database
+      const user = await storage.getUser(payload.sub);
+      if (!user) {
+        console.error('[JWT Refresh] User not found:', payload.sub);
+        return res.status(401).json({ error: 'User not found' });
+      }
 
-        console.log('[Session Exchange] ✅ Session successfully exchanged for native app');
-        console.log('[Session Exchange] New session ID:', req.sessionID);
-        return res.json({ success: true });
+      // Generate new access token
+      const newAccessToken = await refreshJwtAccessToken(refresh_token, {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName || undefined,
+        profilePicture: user.profilePicture || undefined,
       });
-    });
+
+      if (!newAccessToken) {
+        console.log('[JWT Refresh] Failed to refresh token');
+        return res.status(401).json({ error: 'Failed to refresh token' });
+      }
+
+      console.log('[JWT Refresh] ✅ Token refreshed successfully');
+      return res.json({
+        access_token: newAccessToken,
+        expires_in: 15 * 60, // 15 minutes in seconds
+      });
+    } catch (error: any) {
+      console.error('[JWT Refresh] Error:', error.message);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // JWT logout endpoint for native apps
+  // Revokes the refresh token and clears authentication
+  app.post("/api/auth/logout", async (req, res) => {
+    console.log('[JWT Logout] Request received');
+    const { refresh_token } = req.body;
+    
+    if (refresh_token) {
+      // Revoke the refresh token
+      const revoked = await revokeRefreshToken(refresh_token);
+      if (revoked) {
+        console.log('[JWT Logout] ✅ Refresh token revoked');
+      } else {
+        console.log('[JWT Logout] ⚠️ Refresh token not found (may have already been revoked)');
+      }
+    }
+
+    return res.json({ success: true });
   });
 
   app.get("/api/logout", (req, res) => {
@@ -499,26 +565,44 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // Try JWT authentication first (for native apps)
+  const authHeader = req.headers.authorization;
+  
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    const payload = verifyAccessToken(token);
+    
+    if (payload) {
+      // Valid JWT token - create a req.user object compatible with session-based auth
+      (req as any).user = {
+        claims: {
+          sub: payload.sub,
+          email: payload.email,
+        },
+        displayName: payload.displayName,
+        profilePicture: payload.profilePicture,
+      };
+      console.log('[isAuthenticated] ✅ JWT auth successful for user:', payload.sub);
+      return next();
+    } else {
+      console.log('[isAuthenticated] ❌ Invalid or expired JWT token');
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  }
+
+  // Fall back to session-based authentication (for web)
   const user = req.user as any;
   const isDevelopment = process.env.NODE_ENV !== 'production';
 
-  console.log('[isAuthenticated] ====== START ======');
-  console.log('[isAuthenticated] Session ID:', req.sessionID);
-  console.log('[isAuthenticated] Has session:', !!req.session);
-  console.log('[isAuthenticated] Session data:', JSON.stringify(req.session, null, 2));
-  console.log('[isAuthenticated] req.isAuthenticated():', req.isAuthenticated());
-  console.log('[isAuthenticated] req.user:', JSON.stringify(user, null, 2));
-  console.log('[isAuthenticated] isDevelopment:', isDevelopment);
-
-  // Check if user is authenticated
+  // Check if user is authenticated via session
   if (!req.isAuthenticated()) {
-    console.log('[isAuthenticated] ❌ FAIL: req.isAuthenticated() returned false');
+    console.log('[isAuthenticated] ❌ No valid JWT or session found');
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   // Dev users (from dev-login) don't have expires_at - allow them in development
   if (user?.claims?.sub === 'dev-user-local' && isDevelopment) {
-    console.log('[isAuthenticated] ✅ SUCCESS: Dev user authenticated');
+    console.log('[isAuthenticated] ✅ Dev user authenticated via session');
     return next();
   }
 
@@ -526,6 +610,7 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   if (user?.expires_at) {
     const now = Math.floor(Date.now() / 1000);
     if (now <= user.expires_at) {
+      console.log('[isAuthenticated] ✅ Session auth successful');
       return next();
     }
 
@@ -539,12 +624,14 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
       const config = await getOidcConfig();
       const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
       updateUserSession(user, tokenResponse);
+      console.log('[isAuthenticated] ✅ Session token refreshed');
       return next();
     } catch (error) {
+      console.log('[isAuthenticated] ❌ Session token refresh failed');
       return res.status(401).json({ message: "Unauthorized" });
     }
   }
 
-  // No valid session - user must authenticate via /api/login or /api/dev-login (development only)
-  return res.status(401).json({ message: "Unauthorized" });
+  console.log('[isAuthenticated] ✅ Session auth successful');
+  next();
 };

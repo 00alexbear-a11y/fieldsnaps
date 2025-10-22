@@ -38,6 +38,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isOAuthCallback, parseOAuthCallback, closeBrowser } from './lib/nativeOAuth';
 import { isNativePlatform } from './lib/nativeNavigation';
+import { tokenManager } from './lib/tokenManager';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -200,48 +201,20 @@ export default function App() {
           // Close the browser (Safari) if still open
           await closeBrowser();
 
-          // Exchange the session ID for a cookie
-          if (params.session_id) {
-            console.log('[Deep Link] Exchanging session ID for cookie...');
+          // Save JWT tokens to iOS Keychain
+          if (params.access_token && params.refresh_token) {
+            console.log('[Deep Link] Saving JWT tokens to iOS Keychain...');
             try {
-              // In native mode, use full server URL (fetch with relative URLs doesn't work in Capacitor)
-              const serverUrl = isNativePlatform() 
-                ? 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev'
-                : '';
-              
-              const exchangeUrl = `${serverUrl}/api/auth/exchange-session`;
-              console.log('[Deep Link] 🔄 Exchanging session at:', exchangeUrl);
-              console.log('[Deep Link] 🔑 Session ID:', params.session_id);
-              
-              const response = await fetch(exchangeUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ session_id: params.session_id }),
-                credentials: 'include', // Important: include cookies
-              });
-
-              console.log('[Deep Link] 📡 Response status:', response.status, response.statusText);
-              console.log('[Deep Link] 📋 Response headers:', Object.fromEntries(response.headers.entries()));
-
-              if (!response.ok) {
-                const errorText = await response.text();
-                console.error('[Deep Link] ❌ Session exchange failed:', response.status, errorText);
-                window.location.href = '/login';
-                return;
-              }
-
-              const responseData = await response.json();
-              console.log('[Deep Link] ✅ Session exchange successful, response:', responseData);
+              await tokenManager.storeTokens(params.access_token, params.refresh_token);
+              console.log('[Deep Link] ✅ Tokens saved successfully to iOS Keychain');
             } catch (error) {
-              console.error('[Deep Link] ❌ Session exchange error (exception):', error);
-              console.error('[Deep Link] ❌ Error details:', {
-                name: (error as Error).name,
-                message: (error as Error).message,
-                stack: (error as Error).stack
-              });
+              console.error('[Deep Link] ❌ Failed to save tokens:', error);
               window.location.href = '/login';
               return;
             }
+          } else if (params.session_id) {
+            // Fallback: If server still returns session_id (shouldn't happen after migration)
+            console.warn('[Deep Link] ⚠️ Received session_id instead of JWT tokens - auth may not work correctly');
           }
 
           // Check if user needs company setup
