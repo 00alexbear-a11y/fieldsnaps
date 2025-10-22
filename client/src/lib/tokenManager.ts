@@ -38,7 +38,14 @@ class TokenManager {
   async getAccessToken(): Promise<string | null> {
     try {
       const result = await SecureStorage.get(ACCESS_TOKEN_KEY);
-      return result as string | null;
+      if (!result) return null;
+      
+      // SecureStorage auto-JSON-encodes strings, so parse it if needed
+      if (typeof result === 'string' && result.startsWith('"') && result.endsWith('"')) {
+        return JSON.parse(result);
+      }
+      
+      return result as string;
     } catch (error) {
       // Key not found is expected when user is not logged in
       console.log('[TokenManager] No access token found');
@@ -52,7 +59,14 @@ class TokenManager {
   async getRefreshToken(): Promise<string | null> {
     try {
       const result = await SecureStorage.get(REFRESH_TOKEN_KEY);
-      return result as string | null;
+      if (!result) return null;
+      
+      // SecureStorage auto-JSON-encodes strings, so parse it if needed
+      if (typeof result === 'string' && result.startsWith('"') && result.endsWith('"')) {
+        return JSON.parse(result);
+      }
+      
+      return result as string;
     } catch (error) {
       console.log('[TokenManager] No refresh token found');
       return null;
