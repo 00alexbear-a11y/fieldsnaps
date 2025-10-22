@@ -1,0 +1,115 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: 8EF82D9C-CBC5-4F73-8496-86D7410A4EB9])
+Loading network plugin
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: ::::: SIMULATOR :::::
+🟢 [✨  CapgoUpdater]: Application directory: /Users/bearmac/Library/Developer/CoreSimulator/Devices/53FCA773-BDE3-462F-B580-602BA09A5631/data/Containers/Data/Application/42207B8C-0EF3-4762-B305-176148FA66BE
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f99390d8-878f-4bae-80d7-5f1be7fe36bc
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  Loading app at capacitor://localhost...
+Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+Reachable via WiFi
+UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+GPU process (0x1131481e0) took 1.220480 seconds to launch
+WebContent process (0x113114100) took 1.239253 seconds to launch
+Networking process (0x11308c190) took 1.308023 seconds to launch
+void * _Nullable NSMapGet(NSMapTable * _Nonnull, const void * _Nullable): map table argument is NULL
+WebContent[68862] Could not register system wide server: -25204
+WebContent[68862] _AXAddToElementCache was called even though the element was in the cache: <WKAccessibilityWebPageObject: 0x600002100780>
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x60000214c280 V:|-(7)-[TUIKeyboardContentView:0x10419dd70]   (active, names: '|':TUIKeyplaneView:0x10271e330 )>",
+    "<NSLayoutConstraint:0x60000214c2d0 V:[TUIKeyboardContentView:0x10419dd70]-(12)-|   (active, names: '|':TUIKeyplaneView:0x10271e330 )>",
+    "<NSLayoutConstraint:0x600002148f50 V:|-(0)-[TUIKeyplaneView:0x10271e330]   (active, names: UIKeyboardLayoutStar Prev...:0x10601b000, '|':UIKeyboardLayoutStar Prev...:0x10601b000 )>",
+    "<NSLayoutConstraint:0x600002148fa0 V:[TUIKeyplaneView:0x10271e330]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10601b000, '|':UIKeyboardLayoutStar Prev...:0x10601b000 )>",
+    "<NSLayoutConstraint:0x600002149040 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10601b000, '|':UIKeyboardImpl:0x10419a9a0 )>",
+    "<NSLayoutConstraint:0x6000021490e0 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10601b000, '|':UIKeyboardImpl:0x10419a9a0 )>",
+    "<NSLayoutConstraint:0x6000021270c0 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x10419a9a0.height == 241   (active)>",
+    "<NSLayoutConstraint:0x60000214c460 'TUIKeyplane.height' TUIKeyboardContentView:0x10419dd70.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x60000214c460 'TUIKeyplane.height' TUIKeyboardContentView:0x10419dd70.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+WebContent[68862] Unable to hide query parameters from script (missing data)
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 3ED50CD7-4792-4AAD-9760-3E4344816DEA
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 44035376
+⚡️  WebView loaded
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","id":"builtin","checksum":"","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 44035377
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 44035378
+⚡️  To Native ->  CapacitorUpdater addListener 44035379
+⚡️  To Native ->  CapacitorUpdater current 44035380
+⚡️  TO JS {"native":"1.0","bundle":{"status":"success","id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":""}}
+⚡️  To Native ->  App ⚡️  [log] - [Capgo] Current bundle: {"status":"success","id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":""}
+addListener 44035381
+⚡️  To Native ->  App addListener 44035382
+AX Safe category class 'SLHighlightDisambiguationPillViewAccessibility' was not found!
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  App addListener 44035383
+⚡️  To Native ->  SecureStorage internalGetItem 44035384
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTU0NTUxLCJleHAiOjE3NjExNTU0NTF9.VrQMjJ2MQ26ez6-_tSv8HctbR3TS_tfD1O9547Tybrc\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: false
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 44035385
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc2MTE1NDU1MSwiZXhwIjoxNzYzNzQ2NTUxfQ.jVUBi4o6KfLhcwp_kKUdQPnFyVssrWoE2Lqm9aSgyik\""}
+⚡️  [error] - [TokenManager] Error refreshing token: {}
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 44035386
+⚡️  TO JS {"success":true}
+⚡️  To Native ->  SecureStorage internalRemoveItem 44035387
+⚡️  TO JS {"success":true}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+⚡️  To Native ->  SplashScreen hide 44035388
+⚡️  TO JS undefined
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [Native OAuth] Opening URL in browser: https://fieldsnaps.replit.app/api/dev-login?redirect_uri=com.fieldsnaps.app%3A%2F%2Fcallback
+⚡️  To Native ->  Browser open 44035389
+Error acquiring assertion: <Error Domain=RBSAssertionErrorDomain Code=2 "Could not find attribute name in domain plist" UserInfo={NSLocalizedFailureReason=Could not find attribute name in domain plist}>
+⚡️  TO JS undefined
+⚡️  [log] - [Native OAuth] Browser opened successfully
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
