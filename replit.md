@@ -5,6 +5,16 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes
 
+### iOS Keychain JWT Storage Fix (October 22, 2025)
+- **Critical Bug Fix**: Resolved login loop caused by incorrect @aparajita/capacitor-secure-storage API usage
+  - Changed from object syntax `set({ key, value })` to positional syntax `set(key, data)`
+  - Fixed "invalidData" error that prevented tokens from persisting in iOS Keychain
+- **JSON Double-Encoding Fix**: Added parsing logic to handle SecureStorage's auto-JSON-stringification
+  - Plugin wraps string values in additional JSON encoding: `"token"` → `"\"token\""`
+  - Added detection and unwrapping in `getAccessToken()` and `getRefreshToken()`
+  - Ensures downstream JWT decoding and API calls receive clean token strings
+- **Result**: JWT authentication now works correctly in native iOS app with persistent login
+
 ### Native iOS OAuth Flow (October 21, 2025)
 - **OAuth Implementation**: Complete native OAuth authentication using Capacitor Browser plugin
   - Opens Safari for authentication (not blocked like WebView navigation)
