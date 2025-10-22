@@ -56,7 +56,7 @@ function AppContent() {
   const disableSwipeBack = isMainPage;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/share/', '/shared/', '/impact', '/login'];
+  const publicRoutes = ['/share/', '/impact', '/login'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
   
   // Onboarding routes are authenticated but before full setup
@@ -118,7 +118,7 @@ function AppContent() {
           <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
           <Route path="/impact" component={Impact} />
           <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
-          <Route path="/shared/:token" component={ShareView} />
+          <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
       </main>
@@ -153,7 +153,7 @@ function AppContent() {
           <Route path="/map" component={Map} />
           <Route path="/todos" component={ToDos} />
           <Route path="/billing/success" component={BillingSuccess} />
-          <Route path="/shared/:token" component={ShareView} />
+          <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
       </main>
