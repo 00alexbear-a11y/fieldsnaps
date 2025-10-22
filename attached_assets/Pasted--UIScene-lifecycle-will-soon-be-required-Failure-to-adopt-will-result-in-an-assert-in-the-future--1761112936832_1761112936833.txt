@@ -1,0 +1,566 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: 10BFC080-D421-424E-9025-D066FC08C1FC])
+KeyboardPlugin: resize mode - native
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: ::::: SIMULATOR :::::
+🟢 [✨  CapgoUpdater]: Application directory: /Users/bearmac/Library/Developer/CoreSimulator/Devices/53FCA773-BDE3-462F-B580-602BA09A5631/data/Containers/Data/Application/3861FE8E-E66E-4EC4-9A2C-7869FAB1FFC0
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f99390d8-878f-4bae-80d7-5f1be7fe36bc
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟠 [✨  CapgoUpdater]: AutoUpdate is automatic disabled when serverUrl is set.
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  Loading app at https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev...
+Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+Reachable via WiFi
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+void * _Nullable NSMapGet(NSMapTable * _Nonnull, const void * _Nullable): map table argument is NULL
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  Can only perform input operation for an active session. sessionID = E7E43DAE-53E9-4F12-B496-DB0D5BEAC149
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E7E43DAE-53E9-4F12-B496-DB0D5BEAC149
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x6000021363f0 V:|-(7)-[TUIKeyboardContentView:0x104117710]   (active, names: '|':TUIKeyplaneView:0x10422f730 )>",
+    "<NSLayoutConstraint:0x600002135540 V:[TUIKeyboardContentView:0x104117710]-(12)-|   (active, names: '|':TUIKeyplaneView:0x10422f730 )>",
+    "<NSLayoutConstraint:0x600002137480 V:|-(0)-[TUIKeyplaneView:0x10422f730]   (active, names: UIKeyboardLayoutStar Prev...:0x104827a00, '|':UIKeyboardLayoutStar Prev...:0x104827a00 )>",
+    "<NSLayoutConstraint:0x600002136940 V:[TUIKeyplaneView:0x10422f730]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x104827a00, '|':UIKeyboardLayoutStar Prev...:0x104827a00 )>",
+    "<NSLayoutConstraint:0x600002137cf0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x104827a00, '|':UIKeyboardImpl:0x104228b30 )>",
+    "<NSLayoutConstraint:0x600002136260 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x104827a00, '|':UIKeyboardImpl:0x104228b30 )>",
+    "<NSLayoutConstraint:0x600002153250 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x104228b30.height == 241   (active)>",
+    "<NSLayoutConstraint:0x600002137ca0 'TUIKeyplane.height' TUIKeyboardContentView:0x104117710.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x600002137ca0 'TUIKeyplane.height' TUIKeyboardContentView:0x104117710.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E7E43DAE-53E9-4F12-B496-DB0D5BEAC149
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+WebContent[52930] Could not register system wide server: -25204
+WebContent[52930] _AXAddToElementCache was called even though the element was in the cache: <WKAccessibilityWebPageObject: 0x600002100550>
+Result accumulator timeout: 0.250000, exceeded.
+WebContent[52930] Unable to hide query parameters from script (missing data)
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E7E43DAE-53E9-4F12-B496-DB0D5BEAC149
+⚡️  [debug] - [vite] connecting...
+⚡️  WebView loaded
+⚡️  [debug] - [vite] connected.
+Error acquiring assertion: <Error Domain=RBSAssertionErrorDomain Code=2 "Could not find attribute name in domain plist" UserInfo={NSLocalizedFailureReason=Could not find attribute name in domain plist}>
+Failed to change to usage state 2: (null)
+AX Safe category class 'SLHighlightDisambiguationPillViewAccessibility' was not found!
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 40103364
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"checksum":"","downloaded":"1970-01-01T00:00:00.000Z","status":"success","version":"builtin","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 40103365
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 40103366
+⚡️  To Native ->  CapacitorUpdater addListener 40103367
+⚡️  To Native ->  CapacitorUpdater current 40103368
+⚡️  TO JS {"bundle":{"status":"success","version":"builtin","checksum":"","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z"},"native":"1.0"}
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","version":"builtin","checksum":"","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}
+⚡️  To Native ->  App addListener 40103369
+⚡️  To Native ->  App addListener 40103370
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  App addListener 40103371
+⚡️  To Native ->  SecureStorage internalGetItem 40103372
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103373
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  To Native ->  SplashScreen hide 40103374
+⚡️  TO JS undefined
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  Network getStatus 40103375
+⚡️  To Native ->  Network addListener 40103376
+⚡️  To Native ->  Keyboard addListener 40103377
+⚡️  To Native ->  Keyboard addListener 40103378
+⚡️  To Native ->  SecureStorage internalGetItem 40103379
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  SecureStorage internalGetItem 40103380
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103381
+⚡️  To Native ->  SecureStorage internalGetItem 40103382
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [QueryClient] Fetching: /api/companies/me
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6/photos
+⚡️  [log] - [QueryClient] Fetching: /api/tags
+⚡️  To Native ->  Keyboard addListener 40103383
+⚡️  To Native ->  Keyboard addListener 40103384
+⚡️  To Native ->  SecureStorage internalGetItem 40103385
+⚡️  To Native ->  SecureStorage internalGetItem 40103386
+⚡️  To Native ->  SecureStorage internalGetItem 40103387
+⚡️  To Native ->  SecureStorage internalGetItem 40103388
+⚡️  To Native ->  Keyboard removeListener 40103389
+⚡️  To Native ->  Keyboard removeListener 40103390
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103391
+⚡️  To Native ->  SecureStorage internalGetItem 40103392
+⚡️  To Native ->  SecureStorage internalGetItem 40103393
+⚡️  To Native ->  SecureStorage internalGetItem 40103394
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  Keyboard addListener 40103395
+⚡️  To Native ->  Keyboard addListener 40103396
+⚡️  To Native ->  SecureStorage internalGetItem 40103397
+⚡️  To Native ->  SecureStorage internalGetItem 40103398
+⚡️  To Native ->  Keyboard removeListener 40103399
+⚡️  To Native ->  Keyboard removeListener 40103400
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103401
+⚡️  To Native ->  SecureStorage internalGetItem 40103402
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [QueryClient] Fetching: /api/companies/me
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6/photos
+⚡️  [log] - [QueryClient] Fetching: /api/tags
+⚡️  To Native ->  Keyboard addListener 40103403
+⚡️  To Native ->  Keyboard addListener 40103404
+⚡️  To Native ->  SecureStorage internalGetItem 40103405
+⚡️  To Native ->  SecureStorage internalGetItem 40103406
+⚡️  To Native ->  SecureStorage internalGetItem 40103407
+⚡️  To Native ->  SecureStorage internalGetItem 40103408
+⚡️  To Native ->  Keyboard removeListener 40103409
+⚡️  To Native ->  Keyboard removeListener 40103410
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103411
+⚡️  To Native ->  SecureStorage internalGetItem 40103412
+⚡️  To Native ->  SecureStorage internalGetItem 40103413
+⚡️  To Native ->  SecureStorage internalGetItem 40103414
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  Keyboard addListener 40103415
+⚡️  To Native ->  Keyboard addListener 40103416
+⚡️  To Native ->  SecureStorage internalGetItem 40103417
+⚡️  To Native ->  SecureStorage internalGetItem 40103418
+⚡️  To Native ->  Keyboard removeListener 40103419
+⚡️  To Native ->  Keyboard removeListener 40103420
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103421
+⚡️  To Native ->  SecureStorage internalGetItem 40103422
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [QueryClient] Fetching: /api/companies/me
+⚡️  [log] - [QueryClient] Fetching: /api/projects/566fac21-5507-41d8-8f98-1ce59afeb6d6/photos
+⚡️  [log] - [QueryClient] Fetching: /api/tags
+⚡️  To Native ->  Keyboard addListener 40103423
+⚡️  To Native ->  Keyboard addListener 40103424
+⚡️  To Native ->  SecureStorage internalGetItem 40103425
+⚡️  To Native ->  SecureStorage internalGetItem 40103426
+⚡️  To Native ->  SecureStorage internalGetItem 40103427
+⚡️  To Native ->  SecureStorage internalGetItem 40103428
+⚡️  To Native ->  Keyboard removeListener 40103429
+⚡️  To Native ->  Keyboard removeListener 40103430
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103431
+⚡️  To Native ->  SecureStorage internalGetItem 40103432
+⚡️  To Native ->  SecureStorage internalGetItem 40103433
+⚡️  To Native ->  SecureStorage internalGetItem 40103434
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/photos/43ee50ed-ed8e-464f-805e-7f61f2492c38/comments
+⚡️  To Native ->  SecureStorage internalGetItem 40103435
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  To Native ->  SecureStorage internalGetItem 40103436
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/photos/99e60b05-abf7-4127-b6e1-27776edc7ee1/comments
+⚡️  To Native ->  SecureStorage internalGetItem 40103437
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  To Native ->  SecureStorage internalGetItem 40103438
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  Keyboard addListener 40103439
+⚡️  To Native ->  Keyboard addListener 40103440
+⚡️  To Native ->  SecureStorage internalGetItem 40103441
+⚡️  To Native ->  SecureStorage internalGetItem 40103442
+⚡️  To Native ->  Keyboard removeListener 40103443
+⚡️  To Native ->  Keyboard removeListener 40103444
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103445
+⚡️  To Native ->  SecureStorage internalGetItem 40103446
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  SecureStorage internalGetItem 40103447
+⚡️  To Native ->  SecureStorage internalGetItem 40103448
+⚡️  To Native ->  Keyboard removeListener 40103449
+⚡️  To Native ->  Keyboard removeListener 40103450
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103451
+⚡️  To Native ->  SecureStorage internalGetItem 40103452
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [Camera Tags] Selected project: 566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera Tags] Selected project: 566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera Tags] Selected project: 566fac21-5507-41d8-8f98-1ce59afeb6d6
+⚡️  [log] - [Camera Tags] Tags loaded: {"message":"Unauthorized"}
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 3840 x 2160
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+CoreAudioSharedUnit::setMutedState failed due to error: not yet implemented.
+CoreAudioSharedUnit::setMutedState failed due to error: not yet implemented.
+CoreAudioSharedUnit::setMutedState failed due to error: not yet implemented.
+⚡️  To Native ->  StatusBar hide 40103453
+⚡️  TO JS undefined
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  StatusBar show 40103454
+⚡️  To Native ->  StatusBar show 40103455
+⚡️  TO JS ⚡️  To Native ->  Keyboard addListener 40103456
+undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 40103457
+⚡️  To Native ->  SecureStorage internalGetItem 40103458
+⚡️  To Native ->  SecureStorage internalGetItem 40103459
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103460
+⚡️  To Native ->  SecureStorage internalGetItem 40103461
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/projects
+⚡️  To Native ->  SecureStorage internalGetItem 40103462
+⚡️  To Native ->  Keyboard removeListener 40103463
+⚡️  To Native ->  Keyboard removeListener 40103464
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103465
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Fetching: /api/auth/user
+⚡️  [log] - [QueryClient] Fetching: /api/projects/with-counts
+⚡️  To Native ->  Keyboard addListener 40103466
+⚡️  To Native ->  Keyboard addListener 40103467
+⚡️  To Native ->  SecureStorage internalGetItem 40103468
+⚡️  To Native ->  SecureStorage internalGetItem 40103469
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  To Native ->  SecureStorage internalGetItem 40103470
+⚡️  To Native ->  SecureStorage internalGetItem 40103471
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] Access token valid: true
+⚡️  TO JS {"data":"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZXYtdXNlci1sb2NhbCIsImVtYWlsIjoiZGV2QGZpZWxkc25hcHMubG9jYWwiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYxMTEyNjg3LCJleHAiOjE3NjExMTM1ODd9.uh-fjtwjNChQ9Y7HYYNG_TYEgoc4yrXQpbvIqsjZzGE\""}
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [TokenManager] Raw value from SecureStorage: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [TokenManager] ✅ Returning clean token: string eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZ
+⚡️  [log] - [QueryClient] Token retrieved: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...
+⚡️  [log] - [QueryClient] ✅ Authorization header set
+⚡️  [log] - [Offline] Saved 4 projects to IndexedDB
+⚡️  [log] - [QueryClient] Response status: 200
+⚡️  [log] - [QueryClient] Response status: 200
