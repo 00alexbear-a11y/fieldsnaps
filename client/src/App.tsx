@@ -210,7 +210,8 @@ export default function App() {
                 : '';
               
               const exchangeUrl = `${serverUrl}/api/auth/exchange-session`;
-              console.log('[Deep Link] Exchanging session at:', exchangeUrl);
+              console.log('[Deep Link] 🔄 Exchanging session at:', exchangeUrl);
+              console.log('[Deep Link] 🔑 Session ID:', params.session_id);
               
               const response = await fetch(exchangeUrl, {
                 method: 'POST',
@@ -219,15 +220,25 @@ export default function App() {
                 credentials: 'include', // Important: include cookies
               });
 
+              console.log('[Deep Link] 📡 Response status:', response.status, response.statusText);
+              console.log('[Deep Link] 📋 Response headers:', Object.fromEntries(response.headers.entries()));
+
               if (!response.ok) {
-                console.error('[Deep Link] Session exchange failed:', response.status);
+                const errorText = await response.text();
+                console.error('[Deep Link] ❌ Session exchange failed:', response.status, errorText);
                 window.location.href = '/login';
                 return;
               }
 
-              console.log('[Deep Link] ✅ Session exchange successful');
+              const responseData = await response.json();
+              console.log('[Deep Link] ✅ Session exchange successful, response:', responseData);
             } catch (error) {
-              console.error('[Deep Link] ❌ Session exchange error:', error);
+              console.error('[Deep Link] ❌ Session exchange error (exception):', error);
+              console.error('[Deep Link] ❌ Error details:', {
+                name: (error as Error).name,
+                message: (error as Error).message,
+                stack: (error as Error).stack
+              });
               window.location.href = '/login';
               return;
             }
