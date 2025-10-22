@@ -37,6 +37,7 @@ import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isOAuthCallback, parseOAuthCallback, closeBrowser } from './lib/nativeOAuth';
+import { isNativePlatform } from './lib/nativeNavigation';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -203,7 +204,15 @@ export default function App() {
           if (params.session_id) {
             console.log('[Deep Link] Exchanging session ID for cookie...');
             try {
-              const response = await fetch('/api/auth/exchange-session', {
+              // In native mode, use full server URL (fetch with relative URLs doesn't work in Capacitor)
+              const serverUrl = isNativePlatform() 
+                ? 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev'
+                : '';
+              
+              const exchangeUrl = `${serverUrl}/api/auth/exchange-session`;
+              console.log('[Deep Link] Exchanging session at:', exchangeUrl);
+              
+              const response = await fetch(exchangeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: params.session_id }),
@@ -216,9 +225,9 @@ export default function App() {
                 return;
               }
 
-              console.log('[Deep Link] Session exchange successful');
+              console.log('[Deep Link] ✅ Session exchange successful');
             } catch (error) {
-              console.error('[Deep Link] Session exchange error:', error);
+              console.error('[Deep Link] ❌ Session exchange error:', error);
               window.location.href = '/login';
               return;
             }
