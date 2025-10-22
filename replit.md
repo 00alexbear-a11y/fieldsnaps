@@ -1,71 +1,7 @@
 # FieldSnaps - Construction Photo PWA
 
 ## Overview
-FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its core purpose is to provide offline-reliable photo and video documentation, enhancing efficiency and reducing disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization, with ambitions to become a commercial SaaS product and a mission-driven model donating 20% of proceeds to missionaries.
-
-## Recent Changes
-
-### iOS Photo Loading & UI Layout Fixes (October 22, 2025)
-- **Photo Proxy Routes**: Solved iOS WebView CORS issues with Object Storage photos
-  - Added authenticated proxy routes: `/api/photos/:id/image` and `/api/photos/:id/thumbnail` with CORS headers
-  - Added unauthenticated proxy route: `/api/shared/:shareToken/photos/:id/image` for public share links
-  - Created `photoUrls.ts` helper to transform all Object Storage URLs to proxy routes
-  - Updated `useOfflineFirstPhotos`, `Trash`, and `ShareView` to use proxy URLs throughout
-- **ShareView Fix**: Fixed share link route from `/shared/:token` to `/share/:token` for consistency with generated URLs
-  - Public viewers can now access share links without authentication
-  - All photos (grid, modal, download) use unauthenticated proxy for security
-- **Photo Viewer UI Cleanup**: Consolidated cramped controls into clean 3-column grid layout
-  - **Before**: 8 cramped buttons in bottom controls (Back, Annotate, Tag, Rename, Comment, Icon, Share, Delete)
-  - **After**: Clean layout with Edit dropdown menu containing Tag/Rename/Comment/Icon, saving critical screen space
-  - Layout: `grid-cols-[1fr_auto_1fr]` ensures proper centering on all iOS screen sizes
-  - Comment count badge displays on Edit menu when comments exist
-- **Camera UI Fix**: Resolved gray screen and misaligned controls in iOS WebView
-  - Removed `aspectRatio: 16/9` constraint that caused blank gray screens
-  - Added `pb-[env(safe-area-inset-bottom)]` padding to both control rows for iOS home indicator
-- **PhotoAnnotationEditor Fix**: Added safe-area-inset-bottom padding to annotation tools and bottom action rail
-- **Result**: Photos now load correctly in iOS WebView, share links work for unauthenticated users, and all UI layouts respect iOS safe areas
-
-### iOS JWT Authentication Complete (October 22, 2025)
-- **Critical Backend Fix**: Fixed `/api/auth/user` route to accept JWT tokens from native apps
-  - Route was calling `req.isAuthenticated()` (session-only) instead of using `isAuthenticated` middleware
-  - Middleware now correctly checks JWT tokens first, then falls back to session auth
-  - iOS app can now authenticate using JWT tokens from Keychain without login loops
-- **iOS Keychain JWT Storage**: Resolved SecureStorage integration issues
-  - Changed from object syntax `set({ key, value })` to positional syntax `set(key, data)`
-  - Fixed "invalidData" error that prevented tokens from persisting in iOS Keychain
-  - SecureStorage.get() can return either `{data: "..."}` object or raw string depending on platform
-  - Added JSON double-encoding detection and unwrapping: `"token"` → `"\"token\""`
-- **Production Cleanup**: Removed debug logging from authentication middleware
-- **Result**: Native iOS app now fully functional with JWT-based authentication
-  - App loads dashboard directly on launch (no login loop)
-  - All API endpoints work correctly (projects, photos, todos, maps)
-  - Tokens persist across app restarts via iOS Keychain
-
-### Native iOS OAuth Flow (October 21, 2025)
-- **OAuth Implementation**: Complete native OAuth authentication using Capacitor Browser plugin
-  - Opens Safari for authentication (not blocked like WebView navigation)
-  - Uses custom URL scheme `com.fieldsnaps.app://callback` for deep linking back to app
-  - Backend validates redirect_uri to prevent open redirect attacks
-  - Deep link listener in App.tsx captures callbacks and completes authentication
-  - Safari automatically closes after successful auth redirect
-- **Security**: Redirect URI validation ensures only native app scheme or same-origin URLs allowed
-- **Backend Updates**: All auth endpoints (`/api/login`, `/api/callback`, `/api/dev-login`) support custom redirect URIs
-- **Frontend Helper**: `client/src/lib/nativeOAuth.ts` provides Browser plugin integration and callback parsing
-- **Testing**: Ready for iOS simulator/device testing - see below for instructions
-
-### iOS Development Setup (October 2025)
-- **Dev Login Configuration**: Created `devMode.ts` to enable dev login button in native iOS builds
-  - `ENABLE_DEV_LOGIN_IN_NATIVE` flag controls dev login visibility
-  - Orange "Dev Login (Simulator)" button appears when enabled
-  - Set to `false` before production deployment
-- **Capacitor Dev Config**: Added `capacitor.config.dev.ts` for local iOS testing
-  - Connects iOS app to Replit development server
-  - Enables full authentication flow testing in simulator
-  - Use `./sync-ios-dev.sh` script to rebuild and sync
-- **Development Workflow**: iOS app can now connect to live backend during development
-  - All buttons (Dev Login, Sign In, Biometric) work in simulator
-  - Full API access for testing features
-  - See `iOS-Setup-Guide.md` for detailed instructions
+FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its core purpose is to provide offline-reliable photo and video documentation, enhancing efficiency and reducing disputes through features like instant media capture, smart compression, auto-timestamping, and efficient project organization. The project aims for full offline functionality and touch optimization, with ambitions to become a commercial SaaS product and a mission-driven model.
 
 ## User Preferences
 - **Project path on Mac**: `~/Documents/Projects/FieldSnaps`
@@ -88,30 +24,17 @@ The design adheres to an "Apple-inspired" philosophy, emphasizing minimalism, co
 ### Technical Implementations
 FieldSnaps is an offline-first PWA leveraging Service Workers for caching and IndexedDB for local storage, with the Background Sync API managing uploads. Performance is optimized via lazy loading and Web Workers for image compression. The intelligent photo system offers three compression levels via the Canvas API, instant thumbnail generation, and preserves native aspect ratios. Photos and videos are stored in Replit Object Storage using presigned URLs. Camera functionality includes auto-start, instant capture workflows, and video recording with real-time annotation. PDF export supports flexible grid layouts with customizable detail options.
 
-The application features a multi-platform subscription system supporting Stripe (web), Apple In-App Purchase (iOS), and Google Play Billing (Android) at a unified $19.99/month. A unified validation service (`server/subscriptionValidation.ts`) handles subscriptions from all sources. Authentication uses Replit Auth with OpenID Connect and biometric login.
+The application features a multi-platform subscription system supporting Stripe (web), Apple In-App Purchase (iOS), and Google Play Billing (Android) at a unified $19.99/month. A unified validation service handles subscriptions from all sources. Authentication uses Replit Auth with OpenID Connect and biometric login.
 
-**Native iOS Integration (October 2025)**: Comprehensive Capacitor plugin integration transforms web app into truly native-feeling iOS experience. Native helpers (`client/src/lib/native*.ts`) provide platform detection with graceful web fallbacks. Features include:
-- **Haptic Feedback**: Success/error/light haptics in Camera (photo/video capture), PhotoGestureViewer (long-press), and clipboard operations
-- **Native Share**: Converts photos to filesystem temp files, shares via iOS share sheet with AirDrop support, respects cancellation without side effects, auto-cleans up cache files
-- **Status Bar Control**: Hides during camera use for immersive full-screen, shows with theme-aware styling on exit, auto-restores on unmount
-- **Network Detection**: Capacitor Network plugin with WiFi/cellular type detection, replaces navigator.onLine
-- **Clipboard**: Native clipboard with haptic feedback in ProjectPhotos, Projects, Settings (share links, invite links)
-- **Splash Screen**: Auto-hides 300ms after app initialization
-- **Keyboard Management**: useKeyboardManager hook with auto-scroll, listener cleanup (infrastructure ready for forms)
+Comprehensive Capacitor plugin integration transforms the web app into a truly native-feeling iOS experience. Native helpers provide platform detection with graceful web fallbacks, supporting features like Haptic Feedback, Native Share, Status Bar Control, Network Detection, Clipboard integration, Splash Screen management, and Keyboard Management. Authentication in native iOS uses JWT tokens stored in the Keychain.
 
 ### Feature Specifications
 The application includes a bottom navigation, a camera interface with a three-zone layout, and a To-Do system for team task management with photo attachments. Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor features a centered visual island layout with tools for text, arrows, lines, circles, pens, and a tape measure. Photo auto-naming follows `[ProjectName]_[Date]_[Time]`. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality.
 
-**Photo Viewer Controls (October 2025)**: Production-ready fullscreen photo viewer with optimized bottom controls for mobile and accessibility:
-- **Layout**: 3-column grid (`grid-cols-[1fr_auto_1fr]`) ensures true centering on all screen sizes (≥320px) without overlap
-- **Simplified Controls**: Back button (bottom-left), centered action group (Annotate, Edit menu, Share, Delete)
-- **Edit Menu**: DropdownMenu consolidates Tag, Rename, Comment, and "Use as Icon" actions; displays comment count badge when comments exist
-- **Responsive Labels**: Icon-only on small screens (`hidden sm:inline`), icon+label on sm+ for space efficiency
-- **Accessibility**: All buttons have aria-labels, Prev/Next navigation arrows labeled, comments panel uses `inert` when hidden to prevent focus trapping
-- **Safe-area Support**: Bottom padding uses `max(0.75rem, env(safe-area-inset-bottom))` for iOS home indicator compatibility
+The fullscreen photo viewer includes optimized bottom controls with a 3-column grid layout for centering, simplified controls (Back button, centered action group), and an Edit Menu consolidating Tag, Rename, Comment, and "Use as Icon" actions. It features responsive labels, accessibility considerations (aria-labels, `inert` attribute), and safe-area support for iOS home indicator compatibility.
 
 ### System Design Choices
-The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing.
+The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing. OAuth implementation for native apps uses Capacitor Browser plugin with custom URL schemes and backend redirect URI validation for security.
 
 ## External Dependencies
 
@@ -144,29 +67,22 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **Capacitor 6**: Native wrapper for iOS/Android.
 - **Capgo**: Encrypted over-the-air (OTA) updates.
 
-### Capacitor Plugins (Native iOS Integration - October 2025)
+### Capacitor Plugins
 - **@capacitor/core**: Core functionality and platform detection.
-- **@capacitor/app**: App lifecycle management and deep link listening for OAuth callbacks.
-- **@capacitor/browser**: Opens OAuth URLs in Safari (not blocked by iOS security).
+- **@capacitor/app**: App lifecycle management and deep link listening.
+- **@capacitor/browser**: Opens OAuth URLs in Safari.
 - **@capacitor/device**: Device information.
 - **@capacitor/preferences**: Native storage for app preferences.
-- **@capacitor/filesystem**: Native file system access for photo sharing.
+- **@capacitor/filesystem**: Native file system access.
 - **@capacitor/camera**: Native camera integration.
-- **@capacitor/haptics**: Native haptic feedback (impact, notification, selection).
-- **@capacitor/share**: Native iOS share sheet with AirDrop support.
-- **@capacitor/status-bar**: Native status bar control (hide/show, theme-aware).
-- **@capacitor/network**: Native network detection (WiFi, cellular, offline).
+- **@capacitor/haptics**: Native haptic feedback.
+- **@capacitor/share**: Native iOS share sheet.
+- **@capacitor/status-bar**: Native status bar control.
+- **@capacitor/network**: Native network detection.
 - **@capacitor/clipboard**: Native clipboard operations.
-- **@capacitor/keyboard**: Native keyboard management (show/hide, listeners).
+- **@capacitor/keyboard**: Native keyboard management.
 - **@capacitor/splash-screen**: Native splash screen control.
-- **@capacitor/action-sheet**: Native iOS action sheets (planned).
-- **@capacitor/toast**: Native iOS toast notifications (planned).
-- **@capacitor/dialog**: Native iOS dialogs/alerts (planned).
-- **@capacitor/local-notifications**: Native push notifications (planned).
-- **@capacitor/geolocation**: Native GPS coordinates for photos (planned).
 
 ### Third-Party APIs & Payment Processing
 - **Google Geocoding API**: Address to coordinates conversion.
 - **Stripe**: Web subscription management and payment processing.
-- **Apple StoreKit**: iOS In-App Purchase for app subscriptions (planned).
-- **Google Play Billing Library**: Android In-App Purchase for app subscriptions (planned).
