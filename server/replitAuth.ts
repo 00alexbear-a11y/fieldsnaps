@@ -43,8 +43,11 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'lax' : 'lax',
+      // Always use secure cookies (required for sameSite: 'none')
+      secure: true,
+      // Use 'none' to allow cookies in Capacitor WebView loading from external domain
+      // This is safe because we validate origins and use secure cookies
+      sameSite: 'none',
       maxAge: sessionTtl,
     },
   });
