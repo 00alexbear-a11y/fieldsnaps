@@ -5,20 +5,19 @@ import { useState, useEffect } from 'react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { isDevModeEnabled } from '@/config/devMode';
 import { buildDevLoginUrl, buildReplitAuthUrl, openOAuthInBrowser } from '@/lib/nativeOAuth';
-import { Capacitor } from '@capacitor/core';
+import { getApiBaseUrl } from '@/lib/apiUrl';
 
 // Get server URL based on platform
 const getServerUrl = () => {
-  // For native platforms, always use the backend server URL
-  if (Capacitor.isNativePlatform()) {
-    // In development, use the Replit dev server
-    // This URL should match capacitor.config.dev.ts
-    // TODO: For production builds, this should use your production server URL
-    return 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev';
+  const baseUrl = getApiBaseUrl();
+  
+  // If baseUrl is empty (web platform), use current origin
+  if (!baseUrl) {
+    return window.location.origin;
   }
   
-  // For web, use the current origin
-  return window.location.origin;
+  // Native platform - use the configured API base URL (production server)
+  return baseUrl;
 };
 
 export default function NativeAppLogin() {
