@@ -40,11 +40,16 @@ class TokenManager {
       const result = await SecureStorage.get(ACCESS_TOKEN_KEY);
       if (!result) return null;
       
+      console.log('[TokenManager] Raw token from SecureStorage:', typeof result, typeof result === 'string' ? result.substring(0, 50) : result);
+      
       // SecureStorage auto-JSON-encodes strings, so parse it if needed
       if (typeof result === 'string' && result.startsWith('"') && result.endsWith('"')) {
-        return JSON.parse(result);
+        const unwrapped = JSON.parse(result);
+        console.log('[TokenManager] Unwrapped token:', typeof unwrapped, typeof unwrapped === 'string' ? unwrapped.substring(0, 50) : unwrapped);
+        return unwrapped;
       }
       
+      console.log('[TokenManager] Returning token as-is:', typeof result, typeof result === 'string' ? result.substring(0, 50) : result);
       return result as string;
     } catch (error) {
       // Key not found is expected when user is not logged in
