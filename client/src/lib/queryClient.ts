@@ -38,17 +38,27 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    const url = queryKey.join("/") as string;
+    console.log('[QueryClient] Fetching:', url);
+    
     // Add JWT token if available (for native apps)
     const token = await tokenManager.getValidAccessToken();
+    console.log('[QueryClient] Token retrieved:', token ? `${token.substring(0, 30)}...` : 'NULL');
+    
     const headers: Record<string, string> = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
+      console.log('[QueryClient] ✅ Authorization header set');
+    } else {
+      console.log('[QueryClient] ❌ No token - Authorization header NOT set');
     }
     
-    const res = await fetch(queryKey.join("/") as string, {
+    const res = await fetch(url, {
       headers,
       credentials: "include", // Still include for web session-based auth fallback
     });
+    
+    console.log('[QueryClient] Response status:', res.status);
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;
