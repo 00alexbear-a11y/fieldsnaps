@@ -760,7 +760,26 @@ export default function Settings() {
             variant="outline"
             size="default"
             className="w-full"
-            onClick={() => window.location.href = '/api/logout'}
+            onClick={async () => {
+              try {
+                // Import tokenManager dynamically to avoid circular dependencies
+                const { tokenManager } = await import('@/lib/tokenManager');
+                const { Capacitor } = await import('@capacitor/core');
+                
+                // For native apps, use JWT logout
+                if (Capacitor.isNativePlatform()) {
+                  await tokenManager.logout();
+                  window.location.href = '/login';
+                } else {
+                  // For web, use session-based logout
+                  window.location.href = '/api/logout';
+                }
+              } catch (error) {
+                console.error('Logout failed:', error);
+                // Fallback to session logout
+                window.location.href = '/api/logout';
+              }
+            }}
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4 mr-2" />

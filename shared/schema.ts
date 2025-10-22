@@ -101,6 +101,20 @@ export const credentials = pgTable("credentials", {
   index("idx_credentials_user_id").on(table.userId),
 ]);
 
+// Refresh tokens table (for JWT authentication persistence)
+export const refreshTokens = pgTable("refresh_tokens", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  token: text("token").notNull().unique(), // The actual refresh token
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(), // When this token expires (30 days)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastUsedAt: timestamp("last_used_at"), // Track when token was last used for refresh
+}, (table) => [
+  index("idx_refresh_tokens_user_id").on(table.userId),
+  index("idx_refresh_tokens_expires_at").on(table.expiresAt), // For cleanup queries
+  index("idx_refresh_tokens_token").on(table.token), // For fast lookups
+]);
+
 // Projects table - simplified for photo organization
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),

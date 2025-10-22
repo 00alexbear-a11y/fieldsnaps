@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { tokenManager } from "./tokenManager";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -14,11 +15,17 @@ export async function apiRequest(
 ): Promise<Response> {
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   
+  // Add JWT token if available (for native apps)
+  const token = await tokenManager.getValidAccessToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(url, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
+    credentials: "include", // Still include for web session-based auth fallback
   });
 
   await throwIfResNotOk(res);
@@ -31,8 +38,16 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    // Add JWT token if available (for native apps)
+    const token = await tokenManager.getValidAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    
     const res = await fetch(queryKey.join("/") as string, {
-      credentials: "include",
+      headers,
+      credentials: "include", // Still include for web session-based auth fallback
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
