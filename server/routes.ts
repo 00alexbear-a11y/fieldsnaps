@@ -791,21 +791,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes
-  app.get('/api/auth/user', async (req: any, res) => {
-    // Only return user if authenticated
-    if (req.isAuthenticated() && req.user?.claims?.sub) {
-      try {
-        const userId = req.user.claims.sub;
-        const user = await storage.getUser(userId);
-        return res.json(user);
-      } catch (error) {
-        console.error("Error fetching authenticated user:", error);
-        return res.status(500).json({ message: "Failed to fetch user" });
-      }
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    // User is authenticated (via JWT or session) - return user data
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      return res.json(user);
+    } catch (error) {
+      console.error("Error fetching authenticated user:", error);
+      return res.status(500).json({ message: "Failed to fetch user" });
     }
-    
-    // No session - require authentication via /api/login or /api/dev-login (development only)
-    return res.status(401).json({ message: 'Unauthorized' });
   });
 
   // Projects - protected routes
