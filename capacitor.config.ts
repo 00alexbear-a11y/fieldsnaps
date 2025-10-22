@@ -21,17 +21,13 @@ const config: CapacitorConfig = {
       backgroundColor: '#FFFFFF',
     },
     CapacitorUpdater: {
-      // Auto-update configuration for Capgo OTA updates
-      autoUpdate: true,
-      // Set to false in development, true in production
+      // Auto-update DISABLED to prevent old dev bundles from overriding production builds
+      // This was causing login loops by downloading old bundles with dev server URLs
+      autoUpdate: false,
       resetWhenUpdate: false,
-      // Check for updates on app start and resume
       appReadyTimeout: 10000,
-      // Update in background
       responseDelay: 0,
-      // Enable stats for update monitoring
       statsUrl: 'https://api.capgo.app/stats',
-      // Enable encrypted channel (requires Capgo account)
       channelUrl: 'https://api.capgo.app',
     },
   },
