@@ -135,20 +135,26 @@ async function verifyProjectCompanyAccess(req: any, res: any, projectId: string)
 }
 
 // Helper to verify company access for photos
-async function verifyPhotoCompanyAccess(req: any, res: any, photoId: string): Promise<boolean> {
+// Returns photo and project objects to avoid duplicate database queries
+async function verifyPhotoCompanyAccess(
+  req: any, 
+  res: any, 
+  photoId: string
+): Promise<{ authorized: boolean; photo: any | null; project: any | null }> {
   const photo = await storage.getPhoto(photoId);
   if (!photo) {
     res.status(404).json({ error: "Photo not found" });
-    return false;
+    return { authorized: false, photo: null, project: null };
   }
 
   const project = await storage.getProject(photo.projectId);
   if (!project || !project.companyId) {
     res.status(404).json({ error: "Project not found" });
-    return false;
+    return { authorized: false, photo, project: null };
   }
 
-  return verifyCompanyAccess(req, res, project.companyId);
+  const authorized = await verifyCompanyAccess(req, res, project.companyId);
+  return { authorized, photo, project };
 }
 
 // Helper to verify company access for annotations
@@ -1259,7 +1265,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      if (!authorized) return;
       
       const photo = await storage.getPhoto(req.params.id);
       if (!photo) {
@@ -1274,14 +1281,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve photo image with CORS headers for iOS WebView
   app.get("/api/photos/:id/image", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
-      
-      const photo = await storage.getPhoto(req.params.id);
-      if (!photo) {
-        return res.status(404).json({ error: "Photo not found" });
-      }
+      // Verify access and get photo in one query (optimization)
+      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      if (!authorized) return;
 
-      if (!photo.url) {
+      if (!photo || !photo.url) {
         return res.status(404).json({ error: "Photo has no image" });
       }
 
@@ -1306,15 +1310,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve photo thumbnail with CORS headers for iOS WebView
   app.get("/api/photos/:id/thumbnail", isAuthenticated, validateUuidParam('id'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
-      
-      const photo = await storage.getPhoto(req.params.id);
-      if (!photo) {
-        return res.status(404).json({ error: "Photo not found" });
-      }
+      // Verify access and get photo in one query (optimization)
+      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      if (!authorized) return;
 
       // If no thumbnail, serve the full image
-      const imageUrl = photo.thumbnailUrl || photo.url;
+      const imageUrl = photo?.thumbnailUrl || photo?.url;
       if (!imageUrl) {
         return res.status(404).json({ error: "Photo has no image" });
       }
@@ -1658,7 +1659,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
     try {
       // Security: Verify company access (any team member can delete their company's photos)
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.id)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      if (!authorized) return;
       
       const deleted = await storage.deletePhoto(req.params.id);
       if (!deleted) {
@@ -1673,7 +1675,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photo Annotations
   app.get("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const annotations = await storage.getPhotoAnnotations(req.params.photoId);
       res.json(annotations);
@@ -1684,7 +1687,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const validated = insertPhotoAnnotationSchema.parse({
         ...req.body,
@@ -1715,7 +1719,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Comments
   app.get("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const comments = await storage.getPhotoComments(req.params.photoId);
       res.json(comments);
@@ -1726,7 +1731,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const validated = insertCommentSchema.parse({
         ...req.body,
@@ -2181,7 +2187,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photo Tags - Associate tags with photos
   app.get("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const photoTags = await storage.getPhotoTags(req.params.photoId);
       res.json(photoTags);
@@ -2192,7 +2199,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const validated = insertPhotoTagSchema.parse({
         photoId: req.params.photoId,
@@ -2207,7 +2215,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, validateUuidParams('photoId', 'tagId'), async (req, res) => {
     try {
-      if (!await verifyPhotoCompanyAccess(req, res, req.params.photoId)) return;
+      const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
+      if (!authorized) return;
       
       const deleted = await storage.removePhotoTag(req.params.photoId, req.params.tagId);
       if (!deleted) {
