@@ -524,8 +524,9 @@ export default function Settings() {
   };
 
   return (
-    <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
-      <div className="flex flex-col items-center space-y-4 pb-2">
+    <div className="h-full overflow-y-auto">
+      <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
+        <div className="flex flex-col items-center space-y-4 pb-2">
         <img 
           src={logoPath} 
           alt="FieldSnaps" 
@@ -535,7 +536,7 @@ export default function Settings() {
         <h1 className="text-xl font-semibold text-muted-foreground" data-testid="text-settings-title">
           Settings
         </h1>
-      </div>
+        </div>
 
       {/* Appearance */}
       <Card className="p-4 space-y-4">
@@ -1522,6 +1523,7 @@ export default function Settings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     </div>
   );
 }

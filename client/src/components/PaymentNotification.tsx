@@ -51,9 +51,10 @@ export function PaymentNotification() {
   return (
     <div 
       className="bg-orange-50 dark:bg-orange-950/30 border-b border-orange-200 dark:border-orange-800"
+      style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
       data-testid="notification-payment-issue"
     >
-      <div className="max-w-screen-xl mx-auto px-4 py-3">
+      <div className="max-w-screen-xl mx-auto px-4 pb-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0" data-testid="icon-alert" />
