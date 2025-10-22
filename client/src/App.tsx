@@ -194,12 +194,18 @@ export default function App() {
         if (isOAuthCallback(url)) {
           console.log('[Deep Link] OAuth callback detected');
           
+          // CRITICAL: Close the browser IMMEDIATELY before any other operations
+          // This ensures the Safari overlay is dismissed right away
+          try {
+            await closeBrowser();
+            console.log('[Deep Link] Browser closed successfully');
+          } catch (error) {
+            console.log('[Deep Link] Browser close attempted (may already be closed):', error);
+          }
+          
           // Parse callback parameters
           const params = parseOAuthCallback(url);
           console.log('[Deep Link] Callback params:', params);
-
-          // Close the browser (Safari) if still open
-          await closeBrowser();
 
           // Save JWT tokens to iOS Keychain
           if (params.access_token && params.refresh_token) {
