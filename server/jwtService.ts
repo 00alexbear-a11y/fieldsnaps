@@ -4,11 +4,17 @@ import { refreshTokens } from '../shared/schema';
 import { eq, lt } from 'drizzle-orm';
 
 // JWT configuration - REQUIRE JWT_SECRET for production security
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 if (!process.env.JWT_SECRET) {
-  throw new Error('[JWT] FATAL: JWT_SECRET environment variable must be set. Generate one with: openssl rand -hex 64');
+  if (!isDevelopment) {
+    throw new Error('[JWT] FATAL: JWT_SECRET environment variable must be set in production. Generate one with: openssl rand -hex 64');
+  }
+  console.warn('[JWT] ⚠️ WARNING: JWT_SECRET not set, using development secret. DO NOT USE IN PRODUCTION!');
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
+// Use env secret or fallback to development secret
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-DO-NOT-USE-IN-PRODUCTION-12345678901234567890123456789012';
 const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
 const REFRESH_TOKEN_EXPIRY = '30d'; // 30 days
 
@@ -183,14 +189,14 @@ export async function verifyRefreshToken(token: string): Promise<TokenPayload | 
 /**
  * Refresh an access token using a valid refresh token
  */
-export function refreshAccessToken(refreshToken: string, user: {
+export async function refreshAccessToken(refreshToken: string, user: {
   id: string;
   email: string;
   displayName?: string;
   profilePicture?: string;
-}): string | null {
+}): Promise<string | null> {
   // Verify refresh token
-  const payload = verifyRefreshToken(refreshToken);
+  const payload = await verifyRefreshToken(refreshToken);
   if (!payload) {
     return null;
   }
