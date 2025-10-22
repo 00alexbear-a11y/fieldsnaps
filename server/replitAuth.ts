@@ -415,12 +415,16 @@ export async function setupAuth(app: Express) {
   // The native app calls this with the session_id from the deep link
   // to establish its own session cookie
   app.post("/api/auth/exchange-session", async (req, res) => {
+    console.log('[Session Exchange] Request received with body:', req.body);
     const { session_id } = req.body;
     
     if (!session_id) {
+      console.error('[Session Exchange] Missing session_id in request');
       return res.status(400).json({ error: 'Missing session_id' });
     }
 
+    console.log('[Session Exchange] Looking up session:', session_id);
+    
     // Verify the session exists and get its data
     // This uses the session store to look up the session by ID
     const sessionStore = req.sessionStore;
@@ -431,6 +435,8 @@ export async function setupAuth(app: Express) {
         return res.status(401).json({ error: 'Invalid session_id' });
       }
 
+      console.log('[Session Exchange] Found session data, copying to new session');
+      
       // Session exists - now set it as the current session for this request
       // This effectively "copies" the authenticated session from Safari to the native app
       (req.session as any).passport = (sessionData as any).passport;
@@ -442,7 +448,8 @@ export async function setupAuth(app: Express) {
           return res.status(500).json({ error: 'Failed to establish session' });
         }
 
-        console.log('[Session Exchange] Session successfully exchanged for native app');
+        console.log('[Session Exchange] ✅ Session successfully exchanged for native app');
+        console.log('[Session Exchange] New session ID:', req.sessionID);
         return res.json({ success: true });
       });
     });
