@@ -30,14 +30,23 @@ export default function ShareView() {
     queryKey: [`/api/shared/${token}`],
   });
 
-  // Group photos by date (newest first)
-  const photosByDate = useMemo(() => {
-    if (!data?.photos || data.photos.length === 0) return [];
+  // Transform all photo URLs to use unauthenticated share proxy routes
+  const transformedPhotos = useMemo(() => {
+    if (!data?.photos || !token) return [];
+    return data.photos.map(photo => ({
+      ...photo,
+      url: `/api/shared/${token}/photos/${photo.id}/image`,
+    }));
+  }, [data?.photos, token]);
 
-    type SharedPhoto = ShareData['photos'][0];
+  // Group transformed photos by date (newest first)
+  const photosByDate = useMemo(() => {
+    if (transformedPhotos.length === 0) return [];
+
+    type SharedPhoto = typeof transformedPhotos[0];
 
     // Sort photos by createdAt (newest first)
-    const sortedPhotos = [...data.photos].sort((a, b) => 
+    const sortedPhotos = [...transformedPhotos].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
@@ -56,7 +65,7 @@ export default function ShareView() {
       date,
       photos,
     }));
-  }, [data?.photos]);
+  }, [transformedPhotos]);
 
   const handleDownload = async (photo: ShareData['photos'][0]) => {
     try {
@@ -99,7 +108,7 @@ export default function ShareView() {
     );
   }
 
-  const { photos, project } = data;
+  const { project } = data;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -114,7 +123,7 @@ export default function ShareView() {
       </header>
 
       <main className="flex-1 p-4">
-        {photos.length === 0 ? (
+        {transformedPhotos.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No photos shared</p>
           </div>
@@ -130,7 +139,7 @@ export default function ShareView() {
                 {/* Photos Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {datePhotos.map((photo, index) => {
-                    const photoIndex = photos.findIndex(p => p.id === photo.id);
+                    const photoIndex = transformedPhotos.findIndex(p => p.id === photo.id);
                     return (
                       <div
                         key={photo.id}
@@ -178,7 +187,7 @@ export default function ShareView() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDownload(photos[viewerPhotoIndex])}
+              onClick={() => handleDownload(transformedPhotos[viewerPhotoIndex])}
               className="text-white hover:bg-white/20"
               data-testid="button-download"
             >
@@ -189,8 +198,8 @@ export default function ShareView() {
           {/* Photo */}
           <div className="flex-1 flex items-center justify-center p-4">
             <img
-              src={photos[viewerPhotoIndex].url}
-              alt={photos[viewerPhotoIndex].caption || "Photo"}
+              src={transformedPhotos[viewerPhotoIndex].url}
+              alt={transformedPhotos[viewerPhotoIndex].caption || "Photo"}
               className="max-w-full max-h-full object-contain"
             />
           </div>
@@ -208,12 +217,12 @@ export default function ShareView() {
               Previous
             </Button>
             <span className="text-white text-sm">
-              {viewerPhotoIndex + 1} / {photos.length}
+              {viewerPhotoIndex + 1} / {transformedPhotos.length}
             </span>
             <Button
               variant="ghost"
-              onClick={() => setViewerPhotoIndex(Math.min(photos.length - 1, viewerPhotoIndex + 1))}
-              disabled={viewerPhotoIndex === photos.length - 1}
+              onClick={() => setViewerPhotoIndex(Math.min(transformedPhotos.length - 1, viewerPhotoIndex + 1))}
+              disabled={viewerPhotoIndex === transformedPhotos.length - 1}
               className="text-white hover:bg-white/20"
               data-testid="button-next"
             >

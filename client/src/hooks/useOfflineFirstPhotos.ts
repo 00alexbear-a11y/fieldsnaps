@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { indexedDB as idb, createPhotoUrl, type LocalPhoto } from '@/lib/indexeddb';
 import type { Photo, Tag } from '../../../shared/schema';
+import { getPhotoImageUrl, getPhotoThumbnailUrl } from '@/lib/photoUrls';
 
 export type PhotoWithStatus = Photo & {
   syncStatus?: 'pending' | 'syncing' | 'synced' | 'error';
@@ -118,9 +119,11 @@ export function useOfflineFirstPhotos(projectId: string) {
   const mergedPhotos = useMemo(() => {
     if (serverPhotos.length > 0) {
       // Server data available - use it
-      // Add isLocal=false and syncStatus=synced for server photos
+      // Transform URLs to use backend proxy routes for proper CORS support
       const serverPhotosWithStatus: PhotoWithStatus[] = serverPhotos.map(p => ({
         ...p,
+        url: getPhotoImageUrl(p.id, p.url),
+        thumbnailUrl: p.thumbnailUrl ? getPhotoThumbnailUrl(p.id, p.thumbnailUrl) : undefined,
         syncStatus: 'synced' as const,
         isLocal: false,
       }));

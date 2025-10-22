@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Trash2, RotateCcw, AlertTriangle, Home, Image, CheckSquare } from 'lucide-react';
@@ -9,6 +9,7 @@ import { queryClient, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { format, differenceInDays } from 'date-fns';
 import type { Project, Photo } from '@shared/schema';
+import { getPhotoImageUrl } from '@/lib/photoUrls';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,9 +35,18 @@ export default function Trash() {
     queryKey: ['/api/trash/projects'],
   });
 
-  const { data: deletedPhotos = [], isLoading: photosLoading } = useQuery<Photo[]>({
+  const { data: rawDeletedPhotos = [], isLoading: photosLoading } = useQuery<Photo[]>({
     queryKey: ['/api/trash/photos'],
   });
+
+  // Transform photo URLs to use proxy routes
+  const deletedPhotos = useMemo(
+    () => rawDeletedPhotos.map(photo => ({
+      ...photo,
+      url: getPhotoImageUrl(photo.id, photo.url),
+    })),
+    [rawDeletedPhotos]
+  );
 
   const restoreProjectMutation = useMutation({
     mutationFn: async (id: string) => {
