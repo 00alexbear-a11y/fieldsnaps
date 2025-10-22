@@ -247,12 +247,11 @@ export default function App() {
           // Check if user needs company setup
           if (params.needs_company_setup === 'true') {
             console.log('[Deep Link] New user needs company setup, redirecting...');
-            window.location.href = '/onboarding/company-setup';
+            window.location.replace('/onboarding/company-setup');
           } else {
-            // Reload the page to trigger auth check
-            // The session cookie should now be set by the backend
-            console.log('[Deep Link] OAuth callback successful, reloading app...');
-            window.location.href = '/projects';
+            // Reload to trigger auth check with new session
+            console.log('[Deep Link] OAuth callback successful, reloading to apply session...');
+            window.location.reload();
           }
         }
       });
