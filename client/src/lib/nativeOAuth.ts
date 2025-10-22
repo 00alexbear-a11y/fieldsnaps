@@ -54,11 +54,10 @@ export async function openOAuthInBrowser(url: string): Promise<void> {
   if (Capacitor.isNativePlatform()) {
     try {
       // Open in system browser (Safari on iOS, Chrome on Android)
-      // presentationStyle: 'fullscreen' ensures browser can be closed programmatically
+      // Use default presentation style for easier dismissal
       await Browser.open({ 
         url,
-        windowName: '_self',
-        presentationStyle: 'fullscreen'
+        windowName: '_self'
       });
       console.log('[Native OAuth] Browser opened successfully');
     } catch (error) {

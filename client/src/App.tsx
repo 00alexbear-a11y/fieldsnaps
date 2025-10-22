@@ -194,8 +194,11 @@ export default function App() {
         if (isOAuthCallback(url)) {
           console.log('[Deep Link] OAuth callback detected');
           
-          // CRITICAL: Close the browser IMMEDIATELY before any other operations
-          // This ensures the Safari overlay is dismissed right away
+          // CRITICAL: Wait 200ms before closing Safari to allow iOS to process the deep link transition
+          // This prevents Safari View Controller from staying as a modal overlay
+          // Use awaited delay to ensure Safari closes before reload
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
           try {
             await closeBrowser();
             console.log('[Deep Link] Browser closed successfully');
