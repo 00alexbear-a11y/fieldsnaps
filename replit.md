@@ -9,6 +9,10 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 - **Critical Bug Fix**: Resolved login loop caused by incorrect @aparajita/capacitor-secure-storage API usage
   - Changed from object syntax `set({ key, value })` to positional syntax `set(key, data)`
   - Fixed "invalidData" error that prevented tokens from persisting in iOS Keychain
+- **SecureStorage Response Format Fix**: Fixed data extraction to handle both possible response formats
+  - SecureStorage.get() can return either `{data: "..."}` object or raw string depending on platform
+  - tokenManager now defensively checks for both formats before extracting value
+  - Prevents null returns that were causing 401 Unauthorized errors
 - **JSON Double-Encoding Fix**: Added parsing logic to handle SecureStorage's auto-JSON-stringification
   - Plugin wraps string values in additional JSON encoding: `"token"` → `"\"token\""`
   - Added detection and unwrapping in `getAccessToken()` and `getRefreshToken()`
