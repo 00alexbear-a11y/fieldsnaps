@@ -5,6 +5,26 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes
 
+### iOS Photo Loading & UI Layout Fixes (October 22, 2025)
+- **Photo Proxy Routes**: Solved iOS WebView CORS issues with Object Storage photos
+  - Added authenticated proxy routes: `/api/photos/:id/image` and `/api/photos/:id/thumbnail` with CORS headers
+  - Added unauthenticated proxy route: `/api/shared/:shareToken/photos/:id/image` for public share links
+  - Created `photoUrls.ts` helper to transform all Object Storage URLs to proxy routes
+  - Updated `useOfflineFirstPhotos`, `Trash`, and `ShareView` to use proxy URLs throughout
+- **ShareView Fix**: Fixed share link route from `/shared/:token` to `/share/:token` for consistency with generated URLs
+  - Public viewers can now access share links without authentication
+  - All photos (grid, modal, download) use unauthenticated proxy for security
+- **Photo Viewer UI Cleanup**: Consolidated cramped controls into clean 3-column grid layout
+  - **Before**: 8 cramped buttons in bottom controls (Back, Annotate, Tag, Rename, Comment, Icon, Share, Delete)
+  - **After**: Clean layout with Edit dropdown menu containing Tag/Rename/Comment/Icon, saving critical screen space
+  - Layout: `grid-cols-[1fr_auto_1fr]` ensures proper centering on all iOS screen sizes
+  - Comment count badge displays on Edit menu when comments exist
+- **Camera UI Fix**: Resolved gray screen and misaligned controls in iOS WebView
+  - Removed `aspectRatio: 16/9` constraint that caused blank gray screens
+  - Added `pb-[env(safe-area-inset-bottom)]` padding to both control rows for iOS home indicator
+- **PhotoAnnotationEditor Fix**: Added safe-area-inset-bottom padding to annotation tools and bottom action rail
+- **Result**: Photos now load correctly in iOS WebView, share links work for unauthenticated users, and all UI layouts respect iOS safe areas
+
 ### iOS JWT Authentication Complete (October 22, 2025)
 - **Critical Backend Fix**: Fixed `/api/auth/user` route to accept JWT tokens from native apps
   - Route was calling `req.isAuthenticated()` (session-only) instead of using `isAuthenticated` middleware
