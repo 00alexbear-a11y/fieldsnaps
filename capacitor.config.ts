@@ -5,10 +5,8 @@ const config: CapacitorConfig = {
   appName: 'FieldSnaps',
   webDir: 'dist/public',
   server: {
-    url: 'https://fieldsnaps.replit.app',
     androidScheme: 'https',
     iosScheme: 'https',
-    cleartext: true,
   },
   plugins: {
     App: {
