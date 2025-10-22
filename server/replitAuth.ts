@@ -567,13 +567,10 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   // Try JWT authentication first (for native apps)
   const authHeader = req.headers.authorization;
-  console.log('[isAuthenticated] DEBUG: Authorization header:', authHeader ? `${authHeader.substring(0, 20)}...` : 'MISSING');
   
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
-    console.log('[isAuthenticated] DEBUG: Extracted token (first 30 chars):', token.substring(0, 30));
     const payload = verifyAccessToken(token);
-    console.log('[isAuthenticated] DEBUG: Token verification result:', payload ? 'VALID' : 'INVALID/EXPIRED');
     
     if (payload) {
       // Valid JWT token - create a req.user object compatible with session-based auth
@@ -585,10 +582,8 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
         displayName: payload.displayName,
         profilePicture: payload.profilePicture,
       };
-      console.log('[isAuthenticated] ✅ JWT auth successful for user:', payload.sub);
       return next();
     } else {
-      console.log('[isAuthenticated] ❌ Invalid or expired JWT token');
       return res.status(401).json({ message: "Invalid or expired token" });
     }
   }
@@ -599,13 +594,11 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
   // Check if user is authenticated via session
   if (!req.isAuthenticated()) {
-    console.log('[isAuthenticated] ❌ No valid JWT or session found');
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   // Dev users (from dev-login) don't have expires_at - allow them in development
   if (user?.claims?.sub === 'dev-user-local' && isDevelopment) {
-    console.log('[isAuthenticated] ✅ Dev user authenticated via session');
     return next();
   }
 
@@ -613,7 +606,6 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   if (user?.expires_at) {
     const now = Math.floor(Date.now() / 1000);
     if (now <= user.expires_at) {
-      console.log('[isAuthenticated] ✅ Session auth successful');
       return next();
     }
 
@@ -627,14 +619,11 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
       const config = await getOidcConfig();
       const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
       updateUserSession(user, tokenResponse);
-      console.log('[isAuthenticated] ✅ Session token refreshed');
       return next();
     } catch (error) {
-      console.log('[isAuthenticated] ❌ Session token refresh failed');
       return res.status(401).json({ message: "Unauthorized" });
     }
   }
 
-  console.log('[isAuthenticated] ✅ Session auth successful');
   next();
 };
