@@ -40,17 +40,28 @@ class TokenManager {
       const result = await SecureStorage.get(ACCESS_TOKEN_KEY);
       if (!result) return null;
       
-      console.log('[TokenManager] Raw token from SecureStorage:', typeof result, typeof result === 'string' ? result.substring(0, 50) : result);
+      // SecureStorage.get() may return { data: "..." } or just the string directly
+      // depending on the platform/version. Handle both cases.
+      let rawValue: string;
+      if (typeof result === 'object' && 'data' in result) {
+        rawValue = (result as any).data;
+      } else {
+        rawValue = result as string;
+      }
       
-      // SecureStorage auto-JSON-encodes strings, so parse it if needed
-      if (typeof result === 'string' && result.startsWith('"') && result.endsWith('"')) {
-        const unwrapped = JSON.parse(result);
-        console.log('[TokenManager] Unwrapped token:', typeof unwrapped, typeof unwrapped === 'string' ? unwrapped.substring(0, 50) : unwrapped);
+      if (!rawValue) return null;
+      
+      console.log('[TokenManager] Raw value from SecureStorage:', typeof rawValue, typeof rawValue === 'string' ? rawValue.substring(0, 50) : rawValue);
+      
+      // SecureStorage auto-JSON-encodes strings, so unwrap if needed
+      if (typeof rawValue === 'string' && rawValue.startsWith('"') && rawValue.endsWith('"')) {
+        const unwrapped = JSON.parse(rawValue);
+        console.log('[TokenManager] ✅ Unwrapped token (removed quotes):', typeof unwrapped, typeof unwrapped === 'string' ? unwrapped.substring(0, 50) : unwrapped);
         return unwrapped;
       }
       
-      console.log('[TokenManager] Returning token as-is:', typeof result, typeof result === 'string' ? result.substring(0, 50) : result);
-      return result as string;
+      console.log('[TokenManager] ✅ Returning clean token:', typeof rawValue, typeof rawValue === 'string' ? rawValue.substring(0, 50) : rawValue);
+      return rawValue;
     } catch (error) {
       // Key not found is expected when user is not logged in
       console.log('[TokenManager] No access token found');
@@ -66,12 +77,23 @@ class TokenManager {
       const result = await SecureStorage.get(REFRESH_TOKEN_KEY);
       if (!result) return null;
       
-      // SecureStorage auto-JSON-encodes strings, so parse it if needed
-      if (typeof result === 'string' && result.startsWith('"') && result.endsWith('"')) {
-        return JSON.parse(result);
+      // SecureStorage.get() may return { data: "..." } or just the string directly
+      // depending on the platform/version. Handle both cases.
+      let rawValue: string;
+      if (typeof result === 'object' && 'data' in result) {
+        rawValue = (result as any).data;
+      } else {
+        rawValue = result as string;
       }
       
-      return result as string;
+      if (!rawValue) return null;
+      
+      // SecureStorage auto-JSON-encodes strings, so unwrap if needed
+      if (typeof rawValue === 'string' && rawValue.startsWith('"') && rawValue.endsWith('"')) {
+        return JSON.parse(rawValue);
+      }
+      
+      return rawValue;
     } catch (error) {
       console.log('[TokenManager] No refresh token found');
       return null;
