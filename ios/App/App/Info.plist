@@ -46,6 +46,19 @@
         <key>UIViewControllerBasedStatusBarAppearance</key>
         <true/>
         
+        <!-- Deep Link URL Scheme for OAuth Callback -->
+        <key>CFBundleURLTypes</key>
+        <array>
+                <dict>
+                        <key>CFBundleURLName</key>
+                        <string>com.fieldsnaps.app</string>
+                        <key>CFBundleURLSchemes</key>
+                        <array>
+                                <string>com.fieldsnaps.app</string>
+                        </array>
+                </dict>
+        </array>
+        
         <!-- Camera Access -->
         <key>NSCameraUsageDescription</key>
         <string>FieldSnaps needs camera access to capture photos and videos for construction documentation.</string>
