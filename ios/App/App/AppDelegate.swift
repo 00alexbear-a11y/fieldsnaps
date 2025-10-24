@@ -39,32 +39,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // DIAGNOSTIC: Check window and root view controller
         print("🔍 [AppDelegate] window exists: \(window != nil)")
-        print("🔍 [AppDelegate] rootViewController exists: \(window?.rootViewController != nil)")
-        print("🔍 [AppDelegate] rootViewController type: \(type(of: window?.rootViewController))")
         
-        // Dismiss Safari View Controller when deep link fires (OAuth callback)
-        // This is required because Browser.close() from JavaScript doesn't work reliably on iOS
-        if let rootVC = window?.rootViewController as? CAPBridgeViewController {
-            print("✅ [AppDelegate] Found CAPBridgeViewController")
-            print("🔍 [AppDelegate] presentedViewController exists: \(rootVC.presentedViewController != nil)")
-            if let presented = rootVC.presentedViewController {
-                print("🔍 [AppDelegate] presentedViewController type: \(type(of: presented))")
-                DispatchQueue.main.async {
-                    print("🚀 [AppDelegate] Dismissing Safari View Controller...")
-                    presented.dismiss(animated: true) {
-                        print("✅ [AppDelegate] Safari dismissed successfully")
-                    }
-                }
-            } else {
-                print("⚠️ [AppDelegate] No presentedViewController to dismiss")
-            }
-        } else {
-            print("❌ [AppDelegate] Could not cast rootViewController to CAPBridgeViewController")
+        guard let rootVC = window?.rootViewController else {
+            print("❌ [AppDelegate] No root view controller found")
+            return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
         }
         
-        // Called when the app was launched with a url. Feel free to add additional processing here,
-        // but if you want the App API to support tracking app url opens, make sure to keep this call
-        return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+        print("✅ [AppDelegate] Found root view controller: \(type(of: rootVC))")
+        
+        // Traverse view hierarchy to find topmost presented view controller (Safari)
+        var topController = rootVC
+        while let presented = topController.presentedViewController {
+            topController = presented
+        }
+        
+        // If we found a presented view controller (Safari), dismiss it
+        if topController != rootVC {
+            print("🚀 [AppDelegate] Dismissing presented view controller: \(type(of: topController))")
+            
+            DispatchQueue.main.async {
+                topController.dismiss(animated: true) {
+                    print("✅ [AppDelegate] Safari dismissed successfully")
+                    
+                    // CRITICAL: Forward to Capacitor AFTER dismissal completes
+                    // This ensures the appUrlOpen event fires after Safari is gone
+                    _ = ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+                }
+            }
+            
+            // Return true immediately to indicate we handled the URL
+            return true
+            
+        } else {
+            print("⚠️ [AppDelegate] No presented view controller to dismiss")
+            // No Safari to dismiss, forward immediately
+            return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+        }
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
