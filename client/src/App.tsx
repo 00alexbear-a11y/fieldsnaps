@@ -194,16 +194,13 @@ export default function App() {
         if (isOAuthCallback(url)) {
           console.log('[Deep Link] OAuth callback detected');
           
-          // CRITICAL: Wait 200ms before closing Safari to allow iOS to process the deep link transition
-          // This prevents Safari View Controller from staying as a modal overlay
-          // Use awaited delay to ensure Safari closes before reload
-          await new Promise(resolve => setTimeout(resolve, 200));
-          
+          // Note: Safari View Controller is dismissed by native AppDelegate.swift
+          // Browser.close() from JavaScript doesn't work reliably on iOS
           try {
             await closeBrowser();
-            console.log('[Deep Link] Browser closed successfully');
+            console.log('[Deep Link] Browser close attempted (handled by native code)');
           } catch (error) {
-            console.log('[Deep Link] Browser close attempted (may already be closed):', error);
+            console.log('[Deep Link] Browser close error (expected on iOS):', error);
           }
           
           // Parse callback parameters
