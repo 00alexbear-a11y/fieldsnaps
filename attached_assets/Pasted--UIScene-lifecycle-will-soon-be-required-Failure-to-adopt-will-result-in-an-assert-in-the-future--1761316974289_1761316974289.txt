@@ -1,0 +1,170 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: 4D2A166E-14D5-44B5-9088-C71D85370B1F])
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: ::::: SIMULATOR :::::
+🟢 [✨  CapgoUpdater]: Application directory: /Users/bearmac/Library/Developer/CoreSimulator/Devices/2978AD85-A27F-4BC5-98D3-14F53EB61154/data/Containers/Data/Application/483915C2-3EAD-43AE-87A5-943B96B08717
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f84082fd-0e7d-4dc9-8b3b-65c4ee85ae7b
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+Loading network plugin
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+Reachable via WiFi
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+nw_connection_copy_connected_local_endpoint_block_invoke [C1] Connection has no local endpoint
+UIKeyboardLayoutStar implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen.
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+void * _Nullable NSMapGet(NSMapTable * _Nonnull, const void * _Nullable): map table argument is NULL
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  Can only perform input operation for an active session. sessionID = 2B570B9C-A3D9-4E4B-8192-CEE5EA02387D
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x60000214f200 V:|-(7)-[TUIKeyboardContentView:0x102f49b80]   (active, names: '|':TUIKeyplaneView:0x102f48290 )>",
+    "<NSLayoutConstraint:0x60000214f250 V:[TUIKeyboardContentView:0x102f49b80]-(12)-|   (active, names: '|':TUIKeyplaneView:0x102f48290 )>",
+    "<NSLayoutConstraint:0x60000214ed50 V:|-(0)-[TUIKeyplaneView:0x102f48290]   (active, names: UIKeyboardLayoutStar Prev...:0x105045a00, '|':UIKeyboardLayoutStar Prev...:0x105045a00 )>",
+    "<NSLayoutConstraint:0x60000214eda0 V:[TUIKeyplaneView:0x102f48290]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x105045a00, '|':UIKeyboardLayoutStar Prev...:0x105045a00 )>",
+    "<NSLayoutConstraint:0x60000214ee40 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x105045a00, '|':UIKeyboardImpl:0x102f2d800 )>",
+    "<NSLayoutConstraint:0x60000214eee0 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x105045a00, '|':UIKeyboardImpl:0x102f2d800 )>",
+    "<NSLayoutConstraint:0x60000215d270 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x102f2d800.height == 241   (active)>",
+    "<NSLayoutConstraint:0x60000214f3e0 'TUIKeyplane.height' TUIKeyboardContentView:0x102f49b80.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x60000214f3e0 'TUIKeyplane.height' TUIKeyboardContentView:0x102f49b80.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 2B570B9C-A3D9-4E4B-8192-CEE5EA02387D
+Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 2B570B9C-A3D9-4E4B-8192-CEE5EA02387D
+WebContent[9692] Could not register system wide server: -25204
+WebContent[9692] _AXAddToElementCache was called even though the element was in the cache: <WKAccessibilityWebPageObject: 0x600002110690>
+Result accumulator timeout: 0.250000, exceeded.
+WebContent[9692] Unable to hide query parameters from script (missing data)
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 2B570B9C-A3D9-4E4B-8192-CEE5EA02387D
+⚡️  WebView loaded
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 113402647
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"id":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","version":"builtin","checksum":""}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener ⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+113402648
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 113402649
+⚡️  To Native ->  CapacitorUpdater addListener 113402650
+⚡️  To Native ->  CapacitorUpdater current 113402651
+⚡️  TO JS {"native":"1.0","bundle":{"status":"success","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","id":"builtin"}}
+⚡️  To Native ->  App ⚡️  [log] - [Capgo] Current bundle: {"status":"success","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","id":"builtin"}
+addListener 113402652
+⚡️  To Native ->  App addListener 113402653
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Deep Link] Setting up app URL listener for OAuth callbacks
+⚡️  To Native ->  App addListener 113402654
+⚡️  To Native ->  SecureStorage internalGetItem 113402655
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 113402656
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 113402657
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 113402658
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 113402659
+⚡️  TO JS undefined
+AX Safe category class 'SLHighlightDisambiguationPillViewAccessibility' was not found!
+⚡️  [log] - [Native OAuth] Opening URL in browser: https://fieldsnaps.replit.app/api/login?redirect_uri=com.fieldsnaps.app%3A%2F%2Fcallback
+⚡️  To Native ->  Browser open 113402660
+Error acquiring assertion: <Error Domain=RBSAssertionErrorDomain Code=2 "Could not find attribute name in domain plist" UserInfo={NSLocalizedFailureReason=Could not find attribute name in domain plist}>
+⚡️  TO JS undefined
+⚡️  [log] - [Native OAuth] Browser opened successfully
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+[Notifications]: Attempting to post will notification with nil userInfo
+[Notifications]: Attempting to post did notification with nil userInfo
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
