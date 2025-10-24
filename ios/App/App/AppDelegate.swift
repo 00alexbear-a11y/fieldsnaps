@@ -34,12 +34,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        // DIAGNOSTIC: Log deep link trigger
+        print("🔗 [AppDelegate] Deep link received: \(url.absoluteString)")
+        
+        // DIAGNOSTIC: Check window and root view controller
+        print("🔍 [AppDelegate] window exists: \(window != nil)")
+        print("🔍 [AppDelegate] rootViewController exists: \(window?.rootViewController != nil)")
+        print("🔍 [AppDelegate] rootViewController type: \(type(of: window?.rootViewController))")
+        
         // Dismiss Safari View Controller when deep link fires (OAuth callback)
         // This is required because Browser.close() from JavaScript doesn't work reliably on iOS
         if let rootVC = window?.rootViewController as? CAPBridgeViewController {
-            DispatchQueue.main.async {
-                rootVC.presentedViewController?.dismiss(animated: true, completion: nil)
+            print("✅ [AppDelegate] Found CAPBridgeViewController")
+            print("🔍 [AppDelegate] presentedViewController exists: \(rootVC.presentedViewController != nil)")
+            if let presented = rootVC.presentedViewController {
+                print("🔍 [AppDelegate] presentedViewController type: \(type(of: presented))")
+                DispatchQueue.main.async {
+                    print("🚀 [AppDelegate] Dismissing Safari View Controller...")
+                    presented.dismiss(animated: true) {
+                        print("✅ [AppDelegate] Safari dismissed successfully")
+                    }
+                }
+            } else {
+                print("⚠️ [AppDelegate] No presentedViewController to dismiss")
             }
+        } else {
+            print("❌ [AppDelegate] Could not cast rootViewController to CAPBridgeViewController")
         }
         
         // Called when the app was launched with a url. Feel free to add additional processing here,
