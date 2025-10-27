@@ -740,32 +740,32 @@ export default function ToDos() {
                       key={index}
                       onClick={() => setSelectedDate(dayDate)}
                       className={`
-                        relative p-4 border-r last:border-r-0 hover-elevate transition-colors
+                        relative h-24 border-r last:border-r-0 hover-elevate transition-colors
                         ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-card'}
                         ${isDayToday && !isSelected ? 'bg-accent' : ''}
                       `}
                       data-testid={`day-${dateString}`}
                     >
-                      <div className="flex flex-col items-center gap-1">
+                      <div className="flex flex-col items-center justify-start pt-3">
                         <span className="text-xs font-medium uppercase">
                           {format(dayDate, 'EEE')}
                         </span>
-                        <span className={`text-2xl font-semibold ${isSelected ? '' : 'text-foreground'}`}>
+                        <span className={`text-2xl font-semibold mt-1 ${isSelected ? '' : 'text-foreground'}`}>
                           {format(dayDate, 'd')}
                         </span>
-                        {count > 0 && (
-                          <div 
-                            className={`flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
-                              isSelected 
-                                ? 'bg-primary-foreground text-primary' 
-                                : 'bg-primary text-primary-foreground'
-                            }`}
-                            data-testid={`badge-count-${dateString}`}
-                          >
-                            {count}
-                          </div>
-                        )}
                       </div>
+                      {count > 0 && (
+                        <div 
+                          className={`absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
+                            isSelected 
+                              ? 'bg-primary-foreground text-primary' 
+                              : 'bg-primary text-primary-foreground'
+                          }`}
+                          data-testid={`badge-count-${dateString}`}
+                        >
+                          {count}
+                        </div>
+                      )}
                     </button>
                   );
                 })}
