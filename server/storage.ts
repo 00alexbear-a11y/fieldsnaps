@@ -127,10 +127,19 @@ export interface IStorage {
   getSubscriptionByStripeId(stripeSubscriptionId: string): Promise<Subscription | undefined>;
   createSubscriptionEvent(data: InsertSubscriptionEvent): Promise<SubscriptionEvent>;
   getSubscriptionEvents(subscriptionId: string): Promise<SubscriptionEvent[]>;
+  
+  // PKCE OAuth Storage (in-memory for native app OAuth)
+  storePKCEVerifier(state: string, verifier: string, expiresInMs?: number): Promise<void>;
+  getPKCEVerifier(state: string): Promise<string | undefined>;
+  deletePKCEVerifier(state: string): Promise<void>;
+  cleanupExpiredPKCE(): Promise<void>;
 }
 
 export class DbStorage implements IStorage {
   private objectStorageService = new ObjectStorageService();
+  
+  // In-memory storage for PKCE verifiers (temporary, expires after 10 minutes)
+  private pkceStore = new Map<string, { verifier: string; expiresAt: number }>();
 
   // User operations (required for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
@@ -1017,6 +1026,51 @@ export class DbStorage implements IStorage {
     return await db.select().from(subscriptionEvents)
       .where(eq(subscriptionEvents.subscriptionId, subscriptionId))
       .orderBy(subscriptionEvents.createdAt);
+  }
+
+  // PKCE OAuth Storage (in-memory)
+  async storePKCEVerifier(state: string, verifier: string, expiresInMs: number = 600000): Promise<void> {
+    // Default 10 minute expiration
+    const expiresAt = Date.now() + expiresInMs;
+    this.pkceStore.set(state, { verifier, expiresAt });
+    
+    // Cleanup expired entries when storing new ones
+    this.cleanupExpiredPKCE();
+  }
+
+  async getPKCEVerifier(state: string): Promise<string | undefined> {
+    const entry = this.pkceStore.get(state);
+    
+    if (!entry) {
+      return undefined;
+    }
+    
+    // Check if expired
+    if (Date.now() > entry.expiresAt) {
+      this.pkceStore.delete(state);
+      return undefined;
+    }
+    
+    return entry.verifier;
+  }
+
+  async deletePKCEVerifier(state: string): Promise<void> {
+    this.pkceStore.delete(state);
+  }
+
+  async cleanupExpiredPKCE(): Promise<void> {
+    const now = Date.now();
+    const expiredKeys: string[] = [];
+    
+    for (const [key, entry] of this.pkceStore.entries()) {
+      if (now > entry.expiresAt) {
+        expiredKeys.push(key);
+      }
+    }
+    
+    for (const key of expiredKeys) {
+      this.pkceStore.delete(key);
+    }
   }
 
   // Seed predefined trade tags
