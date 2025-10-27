@@ -18,7 +18,7 @@ class TokenManager {
   /**
    * Store tokens securely in iOS Keychain
    */
-  async storeTokens(accessToken: string, refreshToken: string): Promise<void> {
+  async storeTokens(accessToken: string, refreshToken: string, expiresIn?: number): Promise<void> {
     try {
       console.log('[TokenManager] Storing tokens in iOS Keychain');
       
@@ -26,6 +26,9 @@ class TokenManager {
       await SecureStorage.set(REFRESH_TOKEN_KEY, refreshToken);
 
       console.log('[TokenManager] ✅ Tokens stored successfully');
+      if (expiresIn) {
+        console.log('[TokenManager] Access token expires in:', expiresIn, 'seconds');
+      }
     } catch (error) {
       console.error('[TokenManager] Failed to store tokens:', error);
       throw error;
@@ -298,3 +301,6 @@ class TokenManager {
 
 // Export singleton instance
 export const tokenManager = new TokenManager();
+
+// Also export the class for direct instantiation if needed
+export { TokenManager };

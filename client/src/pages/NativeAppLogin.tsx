@@ -4,7 +4,7 @@ import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { authenticateWithReplit } from '@/lib/nativeOAuth';
-import { TokenManager } from '@/lib/tokenManager';
+import { tokenManager } from '@/lib/tokenManager';
 
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
@@ -33,8 +33,8 @@ export default function NativeAppLogin() {
       console.log('[Login] ✅ Authentication successful');
       console.log('[Login] 💾 Storing tokens in Keychain');
       
-      // Store tokens in iOS Keychain via TokenManager
-      await TokenManager.storeTokens(
+      // Store tokens in iOS Keychain via tokenManager
+      await tokenManager.storeTokens(
         result.access_token,
         result.refresh_token,
         result.expires_in
