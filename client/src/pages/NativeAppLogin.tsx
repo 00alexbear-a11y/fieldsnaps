@@ -3,25 +3,13 @@ import { Button } from '@/components/ui/button';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
-import { buildReplitAuthUrl, openOAuthInBrowser } from '@/lib/nativeOAuth';
-import { getApiBaseUrl } from '@/lib/apiUrl';
-
-// Get server URL based on platform
-const getServerUrl = () => {
-  const baseUrl = getApiBaseUrl();
-  
-  // If baseUrl is empty (web platform), use current origin
-  if (!baseUrl) {
-    return window.location.origin;
-  }
-  
-  // Native platform - use the configured API base URL (production server)
-  return baseUrl;
-};
+import { authenticateWithReplit } from '@/lib/nativeOAuth';
+import { TokenManager } from '@/lib/tokenManager';
 
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricSupported);
@@ -35,9 +23,38 @@ export default function NativeAppLogin() {
   };
 
   const handleSignIn = async () => {
-    const serverUrl = getServerUrl();
-    const authUrl = buildReplitAuthUrl(serverUrl);
-    await openOAuthInBrowser(authUrl);
+    try {
+      setIsAuthenticating(true);
+      console.log('[Login] 🚀 Starting OAuth authentication');
+      
+      // Authenticate using new PKCE flow with ASWebAuthenticationSession
+      const result = await authenticateWithReplit();
+      
+      console.log('[Login] ✅ Authentication successful');
+      console.log('[Login] 💾 Storing tokens in Keychain');
+      
+      // Store tokens in iOS Keychain via TokenManager
+      await TokenManager.storeTokens(
+        result.access_token,
+        result.refresh_token,
+        result.expires_in
+      );
+      
+      console.log('[Login] ✅ Tokens stored successfully');
+      console.log('[Login] 🎉 Login complete, redirecting...');
+      
+      // Redirect based on user state
+      if (result.user.needsCompanySetup) {
+        window.location.href = '/onboarding/company-setup';
+      } else {
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('[Login] ❌ Authentication failed:', error);
+      alert('Authentication failed. Please try again.');
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
 
   return (
@@ -98,10 +115,11 @@ export default function NativeAppLogin() {
           size="default"
           className="w-full"
           onClick={handleSignIn}
+          disabled={isAuthenticating}
           data-testid="button-login"
         >
           <LogIn className="w-4 h-4 mr-2" />
-          Sign In with Replit
+          {isAuthenticating ? 'Authenticating...' : 'Sign In with Replit'}
         </Button>
 
         <p className="text-xs text-muted-foreground text-center px-4 pt-2">
