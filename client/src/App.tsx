@@ -32,6 +32,7 @@ import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { useIsNativeApp } from "./hooks/usePlatform";
+import { useDevAutoLogin } from "./hooks/useDevAutoLogin";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
@@ -41,6 +42,10 @@ import { isNativePlatform } from './lib/nativeNavigation';
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
   const [location, setLocation] = useLocation();
+  
+  // Auto-login in development mode (tree-shaken from production)
+  useDevAutoLogin();
+  
   const { isAuthenticated, isLoading } = useAuth();
   const isNativeApp = useIsNativeApp();
   
