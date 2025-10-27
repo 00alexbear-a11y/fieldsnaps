@@ -36,9 +36,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { isOAuthCallback, parseOAuthCallback, closeBrowser } from './lib/nativeOAuth';
 import { isNativePlatform } from './lib/nativeNavigation';
-import { tokenManager } from './lib/tokenManager';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -173,78 +171,10 @@ export default function App() {
     }
   }, []);
 
-  // Handle deep linking for native apps (OAuth callbacks)
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) {
-      // Only set up deep link listener for native platforms
-      return;
-    }
-
-    console.log('[Deep Link] Setting up app URL listener for OAuth callbacks');
-
-    let listenerHandle: any = null;
-
-    // Set up the listener
-    const setupListener = async () => {
-      listenerHandle = await CapacitorApp.addListener('appUrlOpen', async (event) => {
-        const url = event.url;
-        console.log('[Deep Link] App opened with URL:', url);
-
-        // Check if this is an OAuth callback
-        if (isOAuthCallback(url)) {
-          console.log('[Deep Link] OAuth callback detected');
-          
-          // Note: Safari View Controller is dismissed by native AppDelegate.swift
-          // Browser.close() from JavaScript doesn't work reliably on iOS
-          try {
-            await closeBrowser();
-            console.log('[Deep Link] Browser close attempted (handled by native code)');
-          } catch (error) {
-            console.log('[Deep Link] Browser close error (expected on iOS):', error);
-          }
-          
-          // Parse callback parameters
-          const params = parseOAuthCallback(url);
-          console.log('[Deep Link] Callback params:', params);
-
-          // Save JWT tokens to iOS Keychain
-          if (params.access_token && params.refresh_token) {
-            console.log('[Deep Link] Saving JWT tokens to iOS Keychain...');
-            try {
-              await tokenManager.storeTokens(params.access_token, params.refresh_token);
-              console.log('[Deep Link] ✅ Tokens saved successfully to iOS Keychain');
-            } catch (error) {
-              console.error('[Deep Link] ❌ Failed to save tokens:', error);
-              window.location.href = '/login';
-              return;
-            }
-          } else if (params.session_id) {
-            // Fallback: If server still returns session_id (shouldn't happen after migration)
-            console.warn('[Deep Link] ⚠️ Received session_id instead of JWT tokens - auth may not work correctly');
-          }
-
-          // Check if user needs company setup
-          if (params.needs_company_setup === 'true') {
-            console.log('[Deep Link] New user needs company setup, redirecting...');
-            window.location.replace('/onboarding/company-setup');
-          } else {
-            // Reload to trigger auth check with new session
-            console.log('[Deep Link] OAuth callback successful, reloading to apply session...');
-            window.location.reload();
-          }
-        }
-      });
-    };
-
-    setupListener();
-
-    // Cleanup listener on unmount
-    return () => {
-      if (listenerHandle) {
-        listenerHandle.remove();
-      }
-    };
-  }, []);
+  // Note: OAuth deep link handling is now obsolete with ASWebAuthenticationSession.
+  // ASWebAuthenticationSession handles the entire OAuth flow internally and returns
+  // the authorization code directly to the app without using deep links.
+  // The NativeAppLogin component handles the complete OAuth flow including token storage.
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('onboarding_complete', 'true');
