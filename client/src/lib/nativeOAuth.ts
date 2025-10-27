@@ -1,21 +1,21 @@
 /**
- * Native OAuth Helper
+ * Native OAuth Helper with PKCE
  * 
  * Handles OAuth authentication flows for native iOS/Android apps using
- * Capacitor's Browser plugin to open authentication in the system browser
- * (Safari/Chrome) instead of the in-app WebView.
+ * ASWebAuthenticationSession (iOS) for automatic Safari dismissal.
  * 
  * Flow:
  * 1. User clicks "Sign In"
- * 2. App opens Safari with OAuth URL
- * 3. User authenticates in Safari
- * 4. Server redirects to custom URL scheme: com.fieldsnaps.app://callback?code=...
- * 5. iOS/Android opens the app via deep link
- * 6. App listener (in App.tsx) captures the callback and completes login
+ * 2. App calls /api/native/oauth/start to get authorization URL with PKCE
+ * 3. App opens ASWebAuthenticationSession with OAuth URL
+ * 4. User authenticates and taps "Allow"
+ * 5. Safari AUTOMATICALLY DISMISSES and returns authorization code
+ * 6. App exchanges code for JWT tokens via /api/native/oauth/exchange
+ * 7. Tokens stored in iOS Keychain, user logged in
  */
 
-import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import ASWebAuth from './asWebAuth';
 
 /**
  * Deep link URL scheme for this app
@@ -29,117 +29,146 @@ export const APP_URL_SCHEME = 'com.fieldsnaps.app';
 export const OAUTH_CALLBACK_PATH = 'callback';
 
 /**
- * Get the appropriate redirect URI based on platform
- * - Native (iOS/Android): Uses custom URL scheme for deep linking
- * - Web: Uses current origin
+ * Get the server URL based on environment
  */
-export function getOAuthRedirectUri(): string {
+function getServerUrl(): string {
   if (Capacitor.isNativePlatform()) {
-    return `${APP_URL_SCHEME}://${OAUTH_CALLBACK_PATH}`;
+    // Production server for native apps
+    return 'https://fieldsnaps.replit.app';
   }
-  // Web platform uses the current origin
-  return `${window.location.origin}/auth/callback`;
+  // Web uses current origin
+  return window.location.origin;
 }
 
 /**
- * Open a URL in the system browser (Safari/Chrome) for OAuth authentication.
- * On native platforms, this opens Safari which can later redirect back to the app.
- * On web, this just navigates to the URL normally.
+ * Authenticate user using Replit OAuth with PKCE
  * 
- * @param url - The full OAuth URL to open
+ * This function:
+ * 1. Calls backend to initiate PKCE flow
+ * 2. Opens ASWebAuthenticationSession
+ * 3. Exchanges authorization code for tokens
+ * 
+ * @returns User data and JWT tokens
  */
-export async function openOAuthInBrowser(url: string): Promise<void> {
-  console.log('[Native OAuth] Opening URL in browser:', url);
+export async function authenticateWithReplit(): Promise<{
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: {
+    id: string;
+    email: string;
+    displayName?: string;
+    profilePicture?: string;
+    companyId?: string;
+    needsCompanySetup: boolean;
+  };
+}> {
+  const serverUrl = getServerUrl();
   
-  if (Capacitor.isNativePlatform()) {
-    try {
-      // Open in system browser (Safari on iOS, Chrome on Android)
-      await Browser.open({ url });
-      console.log('[Native OAuth] Browser opened successfully');
-    } catch (error) {
-      console.error('[Native OAuth] Failed to open browser:', error);
-      throw error;
-    }
-  } else {
-    // Web platform - just navigate normally
-    window.location.href = url;
+  console.log('[Native OAuth] 🚀 Starting PKCE OAuth flow');
+  
+  // Step 1: Call backend to get authorization URL with PKCE
+  console.log('[Native OAuth] 📞 Calling /api/native/oauth/start');
+  
+  const startResponse = await fetch(`${serverUrl}/api/native/oauth/start`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      redirect_uri: `${APP_URL_SCHEME}://${OAUTH_CALLBACK_PATH}`,
+    }),
+  });
+  
+  if (!startResponse.ok) {
+    throw new Error('Failed to start OAuth flow');
   }
-}
-
-/**
- * Close the system browser (if still open).
- * This is called after handling a deep link callback to ensure
- * the Safari view is dismissed.
- * 
- * Note: This only works reliably on iOS. On Android, the browser
- * may remain open.
- */
-export async function closeBrowser(): Promise<void> {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      await Browser.close();
-      console.log('[Native OAuth] Browser closed');
-    } catch (error) {
-      // Browser might already be closed, this is fine
-      console.log('[Native OAuth] Browser close attempted:', error);
-    }
+  
+  const { authorization_url, state } = await startResponse.json();
+  
+  console.log('[Native OAuth] ✅ Got authorization URL');
+  console.log('[Native OAuth] 📦 State:', state);
+  
+  // Step 2: Open ASWebAuthenticationSession
+  console.log('[Native OAuth] 🌐 Opening ASWebAuthenticationSession');
+  
+  const authResult = await ASWebAuth.authenticate({
+    url: authorization_url,
+    callbackScheme: APP_URL_SCHEME,
+  });
+  
+  console.log('[Native OAuth] ✅ Authentication completed, Safari dismissed automatically');
+  console.log('[Native OAuth] 📦 Callback URL:', authResult.url);
+  
+  // Step 3: Parse callback parameters
+  const params = authResult.params || {};
+  const code = params.code;
+  const returnedState = params.state;
+  
+  if (!code || !returnedState) {
+    throw new Error('No authorization code received');
   }
-}
-
-/**
- * Build a dev login URL for native platforms.
- * This opens the dev login endpoint in Safari, which then redirects back to the app.
- * 
- * @param serverUrl - The backend server URL (from config or environment)
- * @returns The full dev login URL with redirect parameter
- */
-export function buildDevLoginUrl(serverUrl: string): string {
-  const redirectUri = getOAuthRedirectUri();
-  return `${serverUrl}/api/dev-login?redirect_uri=${encodeURIComponent(redirectUri)}`;
-}
-
-/**
- * Build a Replit Auth URL for native platforms.
- * This opens the Replit OAuth flow in Safari, which then redirects back to the app.
- * 
- * @param serverUrl - The backend server URL
- * @returns The full Replit Auth URL with redirect parameter
- */
-export function buildReplitAuthUrl(serverUrl: string): string {
-  const redirectUri = getOAuthRedirectUri();
-  return `${serverUrl}/api/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
-}
-
-/**
- * Parse OAuth callback parameters from a deep link URL
- * Extracts query parameters like code, state, error, etc.
- * 
- * @param url - The deep link URL (e.g., "com.fieldsnaps.app://callback?code=abc123")
- * @returns Object containing parsed parameters
- */
-export function parseOAuthCallback(url: string): Record<string, string> {
-  try {
-    const urlObj = new URL(url);
-    const params: Record<string, string> = {};
-    
-    urlObj.searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    
-    console.log('[Native OAuth] Parsed callback params:', params);
-    return params;
-  } catch (error) {
-    console.error('[Native OAuth] Failed to parse callback URL:', url, error);
-    return {};
+  
+  console.log('[Native OAuth] 🔑 Received authorization code');
+  console.log('[Native OAuth] 📦 State matches:', returnedState === state);
+  
+  // Step 4: Exchange authorization code for JWT tokens
+  console.log('[Native OAuth] 🔄 Exchanging code for tokens');
+  
+  const exchangeResponse = await fetch(`${serverUrl}/api/native/oauth/exchange`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      code,
+      state: returnedState,
+    }),
+  });
+  
+  if (!exchangeResponse.ok) {
+    throw new Error('Failed to exchange authorization code');
   }
+  
+  const tokens = await exchangeResponse.json();
+  
+  console.log('[Native OAuth] ✅ Tokens received successfully');
+  console.log('[Native OAuth] 👤 User ID:', tokens.user.id);
+  console.log('[Native OAuth] 🎫 Access token expires in:', tokens.expires_in, 'seconds');
+  
+  return tokens;
 }
 
 /**
- * Check if a URL is an OAuth callback deep link
- * 
- * @param url - The URL to check
- * @returns true if this is an OAuth callback for this app
+ * Dev login for testing (bypasses OAuth)
  */
-export function isOAuthCallback(url: string): boolean {
-  return url.startsWith(`${APP_URL_SCHEME}://${OAUTH_CALLBACK_PATH}`);
+export async function devLogin(): Promise<{
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: any;
+}> {
+  const serverUrl = getServerUrl();
+  
+  console.log('[Dev Login] 🔧 Using dev login endpoint');
+  
+  const response = await fetch(`${serverUrl}/api/dev-login?redirect_uri=${APP_URL_SCHEME}://${OAUTH_CALLBACK_PATH}`);
+  
+  if (!response.ok) {
+    throw new Error('Dev login failed');
+  }
+  
+  // Dev login redirects, so we need to handle it differently
+  // For now, just return mock tokens
+  return {
+    access_token: 'dev-token',
+    refresh_token: 'dev-refresh-token',
+    expires_in: 3600,
+    user: {
+      id: 'dev-user-local',
+      email: 'dev@fieldsnaps.local',
+      displayName: 'Dev User',
+      needsCompanySetup: false,
+    },
+  };
 }
