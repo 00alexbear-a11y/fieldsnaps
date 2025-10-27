@@ -300,6 +300,7 @@ export async function setupAuth(app: Express) {
 
               // Check for custom redirect URI (native app deep link) from state
               if (customRedirectUri) {
+                console.log('[Auth Callback] 🎫 Generating JWT tokens for native app (company joined)');
                 // Generate JWT tokens for native app
                 const tokens = await generateTokenPair({
                   id: dbUser.id,
@@ -309,7 +310,7 @@ export async function setupAuth(app: Express) {
                 });
                 
                 const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
-                console.log('[Auth] Redirecting native app with JWT tokens after company join');
+                console.log('[Auth Callback] 🚀 Redirecting to deep link:', `${customRedirectUri}?access_token=***&refresh_token=***&expires_in=${tokens.expiresIn}`);
                 return res.redirect(redirectUrl);
               }
 
@@ -325,6 +326,7 @@ export async function setupAuth(app: Express) {
           // New user without company and no invite - redirect to company setup
           // For native apps, include this in the deep link
           if (customRedirectUri) {
+            console.log('[Auth Callback] 🎫 Generating JWT tokens for native app (new user, needs company)');
             // Generate JWT tokens for native app
             const tokens = await generateTokenPair({
               id: dbUser.id,
@@ -334,14 +336,16 @@ export async function setupAuth(app: Express) {
             });
             
             const redirectUrl = `${customRedirectUri}?needs_company_setup=true&access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
-            console.log('[Auth] New user needs company setup, redirecting with JWT tokens');
+            console.log('[Auth Callback] 🚀 Redirecting to deep link (with company setup flag):', `${customRedirectUri}?needs_company_setup=true&access_token=***&refresh_token=***&expires_in=${tokens.expiresIn}`);
             return res.redirect(redirectUrl);
           }
+          console.log('[Auth Callback] 🌐 New user needs company setup, redirecting to web onboarding');
           return res.redirect("/onboarding/company-setup");
         }
 
         // Check for custom redirect URI (native app deep link) from state
         if (customRedirectUri) {
+          console.log('[Auth Callback] 🎫 Generating JWT tokens for native app (existing user)');
           // Generate JWT tokens for native app
           const tokens = await generateTokenPair({
             id: dbUser.id,
@@ -351,9 +355,12 @@ export async function setupAuth(app: Express) {
           });
           
           const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
-          console.log('[Auth] Redirecting native app with JWT tokens');
+          console.log('[Auth Callback] 🚀 Redirecting to deep link:', `${customRedirectUri}?access_token=***&refresh_token=***&expires_in=${tokens.expiresIn}`);
           return res.redirect(redirectUrl);
         }
+
+        console.log('[Auth Callback] 🌐 User has company, redirecting to web app home');
+
 
         // User has company - redirect to app
         return res.redirect("/");
