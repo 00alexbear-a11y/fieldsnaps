@@ -60,6 +60,7 @@ export default function ToDos() {
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
+  const [showDetailsSection, setShowDetailsSection] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -589,27 +590,8 @@ export default function ToDos() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
-        <div className="flex items-center justify-between px-4 h-14">
+        <div className="flex items-center px-4 h-14">
           <h1 className="text-xl font-bold">Tasks</h1>
-          <Button
-            onClick={() => {
-              setEditingTodo(null);
-              form.reset({
-                title: "",
-                projectId: filterProject !== "all" ? filterProject : "",
-                assignedTo: "",
-                dueDate: "",
-              });
-              setSelectedPhotoId(null);
-              setSelectedPhotoUrl(null);
-              setShowAddDialog(true);
-            }}
-            size="icon"
-            className="h-10 w-10"
-            data-testid="button-add-todo"
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
         </div>
 
         {/* Tabs */}
@@ -866,10 +848,219 @@ export default function ToDos() {
         </SheetContent>
       </Sheet>
 
-      {/* Add/Edit Todo Dialog */}
-      <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
+      {/* Floating Action Button */}
+      <Button
+        onClick={() => {
+          setEditingTodo(null);
+          setShowDetailsSection(false);
+          form.reset({
+            title: "",
+            projectId: filterProject !== "all" ? filterProject : "",
+            assignedTo: "",
+            dueDate: "",
+          });
+          setSelectedPhotoId(null);
+          setSelectedPhotoUrl(null);
+          setShowAddDialog(true);
+        }}
+        size="icon"
+        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full shadow-lg"
+        data-testid="button-add-todo-fab"
+      >
+        <Plus className="w-6 h-6" />
+      </Button>
+
+      {/* Quick Add Sheet (Bottom Sheet) */}
+      <Sheet open={showAddDialog} onOpenChange={(open) => {
         if (!open) {
           setShowAddDialog(false);
+          setShowDetailsSection(false);
+          setEditingTodo(null);
+          setSelectedPhotoId(null);
+          setSelectedPhotoUrl(null);
+          form.reset({
+            title: "",
+            projectId: "",
+            assignedTo: "",
+            dueDate: "",
+          });
+        }
+      }}>
+        <SheetContent side="bottom" className="h-auto max-h-[90vh] flex flex-col p-0">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col max-h-[90vh]">
+            {/* Main Title Input Section - Fixed at top */}
+            <div className="flex-shrink-0 p-6 pb-4">
+              <SheetHeader className="mb-4">
+                <SheetTitle>New Task</SheetTitle>
+              </SheetHeader>
+              
+              <div className="space-y-2">
+                <Input
+                  {...form.register("title")}
+                  placeholder="What needs to be done?"
+                  className="text-base h-12"
+                  autoFocus
+                  data-testid="input-todo-title"
+                />
+                {form.formState.errors.title && (
+                  <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
+                )}
+              </div>
+
+              {/* Add Details Toggle Button */}
+              {!showDetailsSection && (
+                <button
+                  type="button"
+                  onClick={() => setShowDetailsSection(true)}
+                  className="mt-3 text-sm text-primary hover:underline"
+                  data-testid="button-show-details"
+                >
+                  Add Details
+                </button>
+              )}
+            </div>
+
+            {/* Expandable Details Section - Scrollable middle */}
+            {showDetailsSection && (
+              <div className="flex-1 px-6 pb-4 space-y-4 border-t pt-4 overflow-y-auto min-h-0">
+                {/* Photo */}
+                <div>
+                  <Label className="text-sm text-muted-foreground">Photo</Label>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCameraClick}
+                      className="flex-1 h-11"
+                      data-testid="button-camera"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Camera
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-1 h-11"
+                      data-testid="button-album"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Album
+                    </Button>
+                  </div>
+                  
+                  {uploadPhotoMutation.isPending && (
+                    <div className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                      <span>Uploading...</span>
+                    </div>
+                  )}
+
+                  {selectedPhotoUrl && !uploadPhotoMutation.isPending && (
+                    <div className="mt-3 relative rounded-lg overflow-hidden border">
+                      <img
+                        src={selectedPhotoUrl}
+                        alt="Selected photo"
+                        className="w-full h-32 object-cover"
+                        data-testid="img-preview-photo"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => {
+                          setSelectedPhotoId(null);
+                          setSelectedPhotoUrl(null);
+                        }}
+                        data-testid="button-remove-photo"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Assign To */}
+                <div>
+                  <Label htmlFor="assignedTo" className="text-sm text-muted-foreground">Assign to</Label>
+                  <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
+                    <SelectTrigger id="assignedTo" className="h-11 mt-2" data-testid="select-todo-assignee">
+                      <SelectValue placeholder="Select team member" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {members.map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Due Date */}
+                <div>
+                  <Label htmlFor="dueDate" className="text-sm text-muted-foreground">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    {...form.register("dueDate")}
+                    className="h-11 mt-2"
+                    data-testid="input-due-date"
+                  />
+                </div>
+
+                {/* Project */}
+                <div>
+                  <Label htmlFor="projectId" className="text-sm text-muted-foreground">Project</Label>
+                  <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
+                    <SelectTrigger id="projectId" className="h-11 mt-2" data-testid="select-todo-project">
+                      <SelectValue placeholder="None" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((project) => (
+                        <SelectItem key={project.id} value={project.id}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {/* Footer Buttons - Sticky at bottom */}
+            <div className="flex-shrink-0 flex gap-3 p-6 pt-4 border-t bg-background">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowAddDialog(false);
+                  setShowDetailsSection(false);
+                }}
+                className="flex-1 h-12"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={createMutation.isPending}
+                className="flex-1 h-12"
+                data-testid="button-submit-todo"
+              >
+                {createMutation.isPending ? (
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                ) : null}
+                Create
+              </Button>
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Edit Todo Dialog (Keep as Dialog for editing) */}
+      <Dialog open={showEditDialog} onOpenChange={(open) => {
+        if (!open) {
           setShowEditDialog(false);
           setEditingTodo(null);
           setSelectedPhotoId(null);
@@ -884,7 +1075,7 @@ export default function ToDos() {
       }}>
         <DialogContent className="max-w-md max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{editingTodo ? "Edit Task" : "New Task"}</DialogTitle>
+            <DialogTitle>Edit Task</DialogTitle>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto space-y-4 pr-2">
@@ -949,9 +1140,9 @@ export default function ToDos() {
 
             {/* Title */}
             <div>
-              <Label htmlFor="title">Task *</Label>
+              <Label htmlFor="title-edit">Task *</Label>
               <Input
-                id="title"
+                id="title-edit"
                 {...form.register("title")}
                 placeholder="What needs to be done?"
                 className="mt-2"
@@ -964,9 +1155,9 @@ export default function ToDos() {
 
             {/* Assign To */}
             <div>
-              <Label htmlFor="assignedTo">Assign to</Label>
+              <Label htmlFor="assignedTo-edit">Assign to</Label>
               <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
-                <SelectTrigger id="assignedTo" className="mt-2" data-testid="select-todo-assignee">
+                <SelectTrigger id="assignedTo-edit" className="mt-2" data-testid="select-todo-assignee">
                   <SelectValue placeholder="Select team member" />
                 </SelectTrigger>
                 <SelectContent>
@@ -981,9 +1172,9 @@ export default function ToDos() {
 
             {/* Due Date */}
             <div>
-              <Label htmlFor="dueDate">Due Date</Label>
+              <Label htmlFor="dueDate-edit">Due Date</Label>
               <Input
-                id="dueDate"
+                id="dueDate-edit"
                 type="date"
                 {...form.register("dueDate")}
                 className="mt-2"
@@ -993,9 +1184,9 @@ export default function ToDos() {
 
             {/* Project */}
             <div>
-              <Label htmlFor="projectId">Project</Label>
+              <Label htmlFor="projectId-edit">Project</Label>
               <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
-                <SelectTrigger id="projectId" className="mt-2" data-testid="select-todo-project">
+                <SelectTrigger id="projectId-edit" className="mt-2" data-testid="select-todo-project">
                   <SelectValue placeholder="None" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1012,7 +1203,6 @@ export default function ToDos() {
 
             <DialogFooter className="flex-shrink-0">
               <Button type="button" variant="outline" onClick={() => {
-                setShowAddDialog(false);
                 setShowEditDialog(false);
                 setEditingTodo(null);
               }}>
@@ -1020,13 +1210,13 @@ export default function ToDos() {
               </Button>
               <Button 
                 type="submit" 
-                disabled={createMutation.isPending || updateMutation.isPending}
+                disabled={updateMutation.isPending}
                 data-testid="button-submit-todo"
               >
-                {createMutation.isPending || updateMutation.isPending ? (
+                {updateMutation.isPending ? (
                   <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
                 ) : null}
-                {editingTodo ? "Update" : "Create"}
+                Update
               </Button>
             </DialogFooter>
           </form>
