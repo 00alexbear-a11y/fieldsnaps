@@ -4,3 +4,7 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Local environment files (never commit these!)
+.env.local
+.env.*.local
