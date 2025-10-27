@@ -864,7 +864,8 @@ export default function ToDos() {
           setShowAddDialog(true);
         }}
         size="icon"
-        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full shadow-lg"
+        className="!fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full shadow-lg"
+        style={{ position: 'fixed', bottom: '5rem', right: '1rem' }}
         data-testid="button-add-todo-fab"
       >
         <Plus className="w-6 h-6" />
