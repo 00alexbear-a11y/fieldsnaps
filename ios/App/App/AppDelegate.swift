@@ -34,47 +34,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        // DIAGNOSTIC: Log deep link trigger
-        print("🔗 [AppDelegate] Deep link received: \(url.absoluteString)")
-        
-        // DIAGNOSTIC: Check window and root view controller
-        print("🔍 [AppDelegate] window exists: \(window != nil)")
-        
-        guard let rootVC = window?.rootViewController else {
-            print("❌ [AppDelegate] No root view controller found")
-            return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
-        }
-        
-        print("✅ [AppDelegate] Found root view controller: \(type(of: rootVC))")
-        
-        // Traverse view hierarchy to find topmost presented view controller (Safari)
-        var topController = rootVC
-        while let presented = topController.presentedViewController {
-            topController = presented
-        }
-        
-        // If we found a presented view controller (Safari), dismiss it
-        if topController != rootVC {
-            print("🚀 [AppDelegate] Dismissing presented view controller: \(type(of: topController))")
-            
-            DispatchQueue.main.async {
-                topController.dismiss(animated: true) {
-                    print("✅ [AppDelegate] Safari dismissed successfully")
-                    
-                    // CRITICAL: Forward to Capacitor AFTER dismissal completes
-                    // This ensures the appUrlOpen event fires after Safari is gone
-                    _ = ApplicationDelegateProxy.shared.application(app, open: url, options: options)
-                }
-            }
-            
-            // Return true immediately to indicate we handled the URL
-            return true
-            
-        } else {
-            print("⚠️ [AppDelegate] No presented view controller to dismiss")
-            // No Safari to dismiss, forward immediately
-            return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
-        }
+        // Note: ASWebAuthenticationSession handles OAuth callbacks automatically.
+        // No manual Safari dismissal needed - it dismisses itself!
+        // Just forward to Capacitor for any other deep links
+        return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
