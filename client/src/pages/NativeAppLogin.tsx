@@ -6,18 +6,6 @@ import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { authenticateWithReplit } from '@/lib/nativeOAuth';
 import { tokenManager } from '@/lib/tokenManager';
 
-// Helper to create mock JWT tokens for dev testing
-function createMockJWT(payload: any): string {
-  // Create a simple mock JWT (header.payload.signature)
-  // Note: This is NOT cryptographically signed, just for dev testing
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const headerB64 = btoa(JSON.stringify(header));
-  const payloadB64 = btoa(JSON.stringify(payload));
-  const signature = 'mock-signature-for-dev-testing-only';
-  
-  return `${headerB64}.${payloadB64}.${signature}`;
-}
-
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
@@ -43,43 +31,15 @@ export default function NativeAppLogin() {
       setIsAuthenticating(true);
       console.log('[DevLogin] 🚀 Using Dev Login (bypassing OAuth)');
       
-      // Create mock JWT tokens for testing
-      // These are simple base64-encoded JWTs with far-future expiration
-      const mockAccessToken = createMockJWT({
-        sub: 'dev-user-123',
-        email: 'dev@fieldsnaps.app',
-        displayName: 'Dev User',
-        type: 'access',
-        exp: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
-        iat: Math.floor(Date.now() / 1000)
-      });
-
-      const mockRefreshToken = createMockJWT({
-        sub: 'dev-user-123',
-        email: 'dev@fieldsnaps.app',
-        type: 'refresh',
-        exp: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
-        iat: Math.floor(Date.now() / 1000)
-      });
-      
-      console.log('[DevLogin] 💾 Storing mock tokens in Keychain');
-      
-      // Store tokens in iOS Keychain
-      await tokenManager.storeTokens(
-        mockAccessToken,
-        mockRefreshToken,
-        365 * 24 * 60 * 60 // 1 year in seconds
-      );
-      
-      console.log('[DevLogin] ✅ Dev login successful');
-      console.log('[DevLogin] 🎉 Redirecting to app...');
-      
-      // Go straight to the app
-      window.location.href = '/';
+      // Call backend dev-login endpoint which:
+      // 1. Creates dev user with admin subscription
+      // 2. Creates dev company with active subscription
+      // 3. Creates a session and redirects to home
+      console.log('[DevLogin] 📡 Calling /api/dev-login...');
+      window.location.href = '/api/dev-login';
     } catch (error) {
       console.error('[DevLogin] ❌ Dev login failed:', error);
       alert('Dev login failed. Check console for details.');
-    } finally {
       setIsAuthenticating(false);
     }
   };

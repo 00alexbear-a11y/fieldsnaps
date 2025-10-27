@@ -633,15 +633,25 @@ export async function setupAuth(app: Express) {
         const devCompany = await storage.createCompany({
           name: 'Dev Company',
           ownerId: dbUser.id,
+          subscriptionStatus: 'active', // Give dev company active subscription
         });
         
-        // Update user with company
+        // Update user with company and active subscription
         await storage.updateUser(dbUser.id, {
           companyId: devCompany.id,
           role: 'owner',
+          subscriptionStatus: 'admin', // Give dev user admin access to all features
         });
         
-        console.log('[Dev Login] Dev company created successfully');
+        console.log('[Dev Login] Dev company created with active subscription');
+      } else if (dbUser) {
+        // Ensure existing dev user has admin subscription
+        if (dbUser.subscriptionStatus !== 'admin') {
+          await storage.updateUser(dbUser.id, {
+            subscriptionStatus: 'admin',
+          });
+          console.log('[Dev Login] Updated dev user to admin subscription');
+        }
       }
 
       // Return JWT tokens for native app or redirect for web
