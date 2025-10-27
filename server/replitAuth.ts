@@ -180,18 +180,21 @@ export async function setupAuth(app: Express) {
     const redirectUri = req.query.redirect_uri as string;
     let stateData: any = {};
     
+    console.log('[Auth Login] 🔐 OAuth flow initiated');
+    console.log('[Auth Login] redirect_uri from query:', redirectUri || 'NOT PROVIDED');
+    
     if (redirectUri) {
       // Validate redirect URI to prevent open redirect attacks
       const requestOrigin = `${req.protocol}://${req.get('host')}`;
       if (!isValidRedirectUri(redirectUri, requestOrigin)) {
-        console.error('[Auth] Invalid redirect_uri rejected:', redirectUri);
+        console.error('[Auth Login] ❌ Invalid redirect_uri rejected:', redirectUri);
         return res.status(400).json({ error: 'Invalid redirect_uri parameter' });
       }
       
       // Encode redirect_uri into OAuth state parameter instead of session
       // This works across Safari View Controller boundary
       stateData.redirect_uri = redirectUri;
-      console.log('[Auth] Encoding custom redirect URI into state:', redirectUri);
+      console.log('[Auth Login] ✅ redirect_uri validated:', redirectUri);
     }
     
     // Strip port from hostname for strategy lookup
@@ -206,8 +209,13 @@ export async function setupAuth(app: Express) {
     // If we have state data, encode it as JSON in the state parameter
     if (Object.keys(stateData).length > 0) {
       authOptions.state = Buffer.from(JSON.stringify(stateData)).toString('base64');
+      console.log('[Auth Login] 📦 Encoded state parameter:', authOptions.state);
+      console.log('[Auth Login] 📦 State data:', JSON.stringify(stateData));
+    } else {
+      console.log('[Auth Login] ⚠️ No state data to encode (no redirect_uri)');
     }
     
+    console.log('[Auth Login] 🚀 Redirecting to OAuth provider...');
     passport.authenticate(`replitauth:${strategyHost}`, authOptions)(req, res, next);
   });
 
