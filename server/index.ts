@@ -1,10 +1,59 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { billingService } from "./billing";
 
 const app = express();
+
+// Enable CORS for Capacitor WebView requests
+// Capacitor uses capacitor://localhost origin, which needs CORS headers
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+    
+    // Allow Capacitor/Ionic WebView origins (exact protocol match)
+    if (origin.startsWith('capacitor://') || origin.startsWith('ionic://')) {
+      return callback(null, true);
+    }
+    
+    // Parse origin and validate localhost/127.0.0.1 strictly
+    try {
+      const url = new URL(origin);
+      
+      // Allow exact localhost/127.0.0.1 hosts (not subdomains)
+      if ((url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+          (url.protocol === 'http:' || url.protocol === 'https:')) {
+        return callback(null, true);
+      }
+      
+      // Allow production domains (exact match)
+      const allowedOrigins = [
+        'https://fieldsnaps.replit.app',
+        process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null,
+      ].filter(Boolean);
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // Invalid URL, reject
+      return callback(new Error('Invalid origin'));
+    }
+    
+    // Allow all origins in development
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 
 // Stripe webhook endpoint - MUST be before express.json() to preserve raw body
 app.post('/api/webhooks/stripe', 
