@@ -178,6 +178,8 @@ export async function setupAuth(app: Express) {
     
     // Check for custom redirect_uri (for native apps using deep linking)
     const redirectUri = req.query.redirect_uri as string;
+    let stateData: any = {};
+    
     if (redirectUri) {
       // Validate redirect URI to prevent open redirect attacks
       const requestOrigin = `${req.protocol}://${req.get('host')}`;
@@ -186,17 +188,27 @@ export async function setupAuth(app: Express) {
         return res.status(400).json({ error: 'Invalid redirect_uri parameter' });
       }
       
-      // Store validated custom redirect URI in session for use after auth callback
-      (req.session as any).customRedirectUri = redirectUri;
-      console.log('[Auth] Stored custom redirect URI:', redirectUri);
+      // Encode redirect_uri into OAuth state parameter instead of session
+      // This works across Safari View Controller boundary
+      stateData.redirect_uri = redirectUri;
+      console.log('[Auth] Encoding custom redirect URI into state:', redirectUri);
     }
     
     // Strip port from hostname for strategy lookup
     const strategyHost = req.hostname.split(':')[0];
-    passport.authenticate(`replitauth:${strategyHost}`, {
+    
+    // Build authentication options with custom state if needed
+    const authOptions: any = {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
-    })(req, res, next);
+    };
+    
+    // If we have state data, encode it as JSON in the state parameter
+    if (Object.keys(stateData).length > 0) {
+      authOptions.state = Buffer.from(JSON.stringify(stateData)).toString('base64');
+    }
+    
+    passport.authenticate(`replitauth:${strategyHost}`, authOptions)(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
