@@ -1,8 +1,10 @@
 import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
-import { Toaster } from "@/components/ui/toaster";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+
+// Lazy-load Toaster to prevent Safari dispatcher error
+const Toaster = lazy(() => import("@/components/ui/toaster").then(m => ({ default: m.Toaster })));
 import Camera from "./pages/Camera";
 import Projects from "./pages/Projects";
 import ProjectPhotos from "./pages/ProjectPhotos";
@@ -193,7 +195,9 @@ export default function App() {
         <AppContent />
         <SyncStatusNotifier />
         <ServiceWorkerUpdate />
-        <Toaster />
+        <Suspense fallback={null}>
+          <Toaster />
+        </Suspense>
       </QueryClientProvider>
     </ErrorBoundary>
   );
