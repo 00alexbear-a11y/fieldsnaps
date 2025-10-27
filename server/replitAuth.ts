@@ -220,26 +220,39 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    console.log('[Auth Callback] 🔄 OAuth callback received');
+    
     // Decode state parameter to extract redirect_uri (for native apps)
     let customRedirectUri: string | undefined;
     const stateParam = req.query.state as string;
     
+    console.log('[Auth Callback] 📦 Raw state parameter:', stateParam || 'NOT PROVIDED');
+    
     if (stateParam) {
       try {
-        const stateData = JSON.parse(Buffer.from(stateParam, 'base64').toString('utf-8'));
+        const decodedState = Buffer.from(stateParam, 'base64').toString('utf-8');
+        console.log('[Auth Callback] 🔓 Decoded state string:', decodedState);
+        
+        const stateData = JSON.parse(decodedState);
+        console.log('[Auth Callback] 📋 Parsed state data:', JSON.stringify(stateData));
+        
         if (stateData.redirect_uri) {
           // Validate redirect URI from state
           const requestOrigin = `${req.protocol}://${req.get('host')}`;
           if (isValidRedirectUri(stateData.redirect_uri, requestOrigin)) {
             customRedirectUri = stateData.redirect_uri;
-            console.log('[Auth Callback] Decoded redirect_uri from state:', customRedirectUri);
+            console.log('[Auth Callback] ✅ Decoded redirect_uri from state:', customRedirectUri);
           } else {
-            console.error('[Auth Callback] Invalid redirect_uri in state:', stateData.redirect_uri);
+            console.error('[Auth Callback] ❌ Invalid redirect_uri in state:', stateData.redirect_uri);
           }
+        } else {
+          console.log('[Auth Callback] ⚠️ No redirect_uri in state data');
         }
       } catch (error) {
-        console.error('[Auth Callback] Failed to decode state parameter:', error);
+        console.error('[Auth Callback] ❌ Failed to decode state parameter:', error);
       }
+    } else {
+      console.log('[Auth Callback] ⚠️ No state parameter provided in callback');
     }
     
     // Strip port from hostname for strategy lookup
