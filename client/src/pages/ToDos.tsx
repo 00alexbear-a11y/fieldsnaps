@@ -16,7 +16,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay } from "date-fns";
+import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay, startOfWeek, endOfWeek } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useKeyboardManager } from "@/hooks/useKeyboardManager";
@@ -53,6 +53,7 @@ export default function ToDos() {
   const [filterCompleted, setFilterCompleted] = useState<string>('active');
   const [filterCreator, setFilterCreator] = useState<string>('all'); // 'all' or 'me'
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [calendarMode, setCalendarMode] = useState<'week' | 'month'>('month');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
@@ -674,6 +675,28 @@ export default function ToDos() {
       {/* Content */}
       {view === 'calendar' ? (
         <div className="p-4 space-y-6">
+          {/* Calendar Header with Week/Month Toggle */}
+          <div className="flex justify-end gap-1 mb-2">
+            <Button
+              variant={calendarMode === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCalendarMode('week')}
+              className="h-8 px-3"
+              data-testid="button-calendar-week"
+            >
+              Week
+            </Button>
+            <Button
+              variant={calendarMode === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCalendarMode('month')}
+              className="h-8 px-3"
+              data-testid="button-calendar-month"
+            >
+              Month
+            </Button>
+          </div>
+
           {/* Calendar */}
           <Calendar
             mode="single"
@@ -681,6 +704,9 @@ export default function ToDos() {
             onSelect={(date) => date && setSelectedDate(date)}
             className="rounded-lg border w-full"
             data-testid="calendar-view"
+            fromDate={calendarMode === 'week' ? startOfWeek(selectedDate, { weekStartsOn: 0 }) : undefined}
+            toDate={calendarMode === 'week' ? endOfWeek(selectedDate, { weekStartsOn: 0 }) : undefined}
+            defaultMonth={calendarMode === 'week' ? selectedDate : undefined}
             components={{
               DayContent: ({ date, ...props }) => {
                 const dateString = format(date, 'yyyy-MM-dd');
