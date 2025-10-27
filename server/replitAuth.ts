@@ -212,6 +212,28 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    // Decode state parameter to extract redirect_uri (for native apps)
+    let customRedirectUri: string | undefined;
+    const stateParam = req.query.state as string;
+    
+    if (stateParam) {
+      try {
+        const stateData = JSON.parse(Buffer.from(stateParam, 'base64').toString('utf-8'));
+        if (stateData.redirect_uri) {
+          // Validate redirect URI from state
+          const requestOrigin = `${req.protocol}://${req.get('host')}`;
+          if (isValidRedirectUri(stateData.redirect_uri, requestOrigin)) {
+            customRedirectUri = stateData.redirect_uri;
+            console.log('[Auth Callback] Decoded redirect_uri from state:', customRedirectUri);
+          } else {
+            console.error('[Auth Callback] Invalid redirect_uri in state:', stateData.redirect_uri);
+          }
+        }
+      } catch (error) {
+        console.error('[Auth Callback] Failed to decode state parameter:', error);
+      }
+    }
+    
     // Strip port from hostname for strategy lookup
     const strategyHost = req.hostname.split(':')[0];
     passport.authenticate(`replitauth:${strategyHost}`, async (err: any, user: any) => {
@@ -255,11 +277,8 @@ export async function setupAuth(app: Express) {
               // Clear invite token from session
               delete (req.session as any).inviteToken;
 
-              // Check for custom redirect URI (native app deep link)
-              const customRedirectUri = (req.session as any).customRedirectUri;
+              // Check for custom redirect URI (native app deep link) from state
               if (customRedirectUri) {
-                delete (req.session as any).customRedirectUri;
-                
                 // Generate JWT tokens for native app
                 const tokens = await generateTokenPair({
                   id: dbUser.id,
@@ -269,7 +288,7 @@ export async function setupAuth(app: Express) {
                 });
                 
                 const redirectUrl = `${customRedirectUri}?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}&expires_in=${tokens.expiresIn}`;
-                console.log('[Auth] Redirecting native app with JWT tokens');
+                console.log('[Auth] Redirecting native app with JWT tokens after company join');
                 return res.redirect(redirectUrl);
               }
 
@@ -284,10 +303,7 @@ export async function setupAuth(app: Express) {
         if (dbUser && !dbUser.companyId) {
           // New user without company and no invite - redirect to company setup
           // For native apps, include this in the deep link
-          const customRedirectUri = (req.session as any).customRedirectUri;
           if (customRedirectUri) {
-            delete (req.session as any).customRedirectUri;
-            
             // Generate JWT tokens for native app
             const tokens = await generateTokenPair({
               id: dbUser.id,
@@ -303,11 +319,8 @@ export async function setupAuth(app: Express) {
           return res.redirect("/onboarding/company-setup");
         }
 
-        // Check for custom redirect URI (native app deep link)
-        const customRedirectUri = (req.session as any).customRedirectUri;
+        // Check for custom redirect URI (native app deep link) from state
         if (customRedirectUri) {
-          delete (req.session as any).customRedirectUri;
-          
           // Generate JWT tokens for native app
           const tokens = await generateTokenPair({
             id: dbUser.id,
