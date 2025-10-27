@@ -16,7 +16,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay, startOfWeek, endOfWeek } from "date-fns";
+import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay, startOfWeek, endOfWeek, addDays, addWeeks, subWeeks } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useKeyboardManager } from "@/hooks/useKeyboardManager";
@@ -697,37 +697,110 @@ export default function ToDos() {
             </Button>
           </div>
 
-          {/* Calendar */}
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => date && setSelectedDate(date)}
-            className="rounded-lg border w-full"
-            data-testid="calendar-view"
-            fromDate={calendarMode === 'week' ? startOfWeek(selectedDate, { weekStartsOn: 0 }) : undefined}
-            toDate={calendarMode === 'week' ? endOfWeek(selectedDate, { weekStartsOn: 0 }) : undefined}
-            defaultMonth={calendarMode === 'week' ? selectedDate : undefined}
-            components={{
-              DayContent: ({ date, ...props }) => {
-                const dateString = format(date, 'yyyy-MM-dd');
-                const count = taskCountsByDate.get(dateString) || 0;
-                
-                return (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <span>{date.getDate()}</span>
-                    {count > 0 && (
-                      <div 
-                        className="absolute top-0 right-0 flex items-center justify-center bg-primary text-primary-foreground rounded-full min-w-[18px] h-[18px] px-1 text-[10px] font-semibold"
-                        data-testid={`badge-count-${dateString}`}
-                      >
-                        {count}
+          {/* Calendar - Week or Month View */}
+          {calendarMode === 'week' ? (
+            // Week View - Compact 7-day grid
+            <div className="rounded-lg border overflow-hidden bg-card" data-testid="calendar-week-view">
+              {/* Week Navigation */}
+              <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedDate(subWeeks(selectedDate, 1))}
+                  className="h-8"
+                  data-testid="button-prev-week"
+                >
+                  ← Prev
+                </Button>
+                <span className="text-sm font-medium">
+                  {format(startOfWeek(selectedDate, { weekStartsOn: 0 }), 'MMM d')} - {format(endOfWeek(selectedDate, { weekStartsOn: 0 }), 'MMM d, yyyy')}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedDate(addWeeks(selectedDate, 1))}
+                  className="h-8"
+                  data-testid="button-next-week"
+                >
+                  Next →
+                </Button>
+              </div>
+
+              {/* Week Grid */}
+              <div className="grid grid-cols-7 gap-0">
+                {Array.from({ length: 7 }).map((_, index) => {
+                  const dayDate = addDays(startOfWeek(selectedDate, { weekStartsOn: 0 }), index);
+                  const dateString = format(dayDate, 'yyyy-MM-dd');
+                  const count = taskCountsByDate.get(dateString) || 0;
+                  const isSelected = isSameDay(dayDate, selectedDate);
+                  const isDayToday = isToday(dayDate);
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedDate(dayDate)}
+                      className={`
+                        relative p-4 border-r last:border-r-0 hover-elevate transition-colors
+                        ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-card'}
+                        ${isDayToday && !isSelected ? 'bg-accent' : ''}
+                      `}
+                      data-testid={`day-${dateString}`}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-xs font-medium uppercase">
+                          {format(dayDate, 'EEE')}
+                        </span>
+                        <span className={`text-2xl font-semibold ${isSelected ? '' : 'text-foreground'}`}>
+                          {format(dayDate, 'd')}
+                        </span>
+                        {count > 0 && (
+                          <div 
+                            className={`flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
+                              isSelected 
+                                ? 'bg-primary-foreground text-primary' 
+                                : 'bg-primary text-primary-foreground'
+                            }`}
+                            data-testid={`badge-count-${dateString}`}
+                          >
+                            {count}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              },
-            }}
-          />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            // Month View - Full Calendar
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              className="rounded-lg border w-full"
+              data-testid="calendar-view"
+              components={{
+                DayContent: ({ date, ...props }) => {
+                  const dateString = format(date, 'yyyy-MM-dd');
+                  const count = taskCountsByDate.get(dateString) || 0;
+                  
+                  return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <span>{date.getDate()}</span>
+                      {count > 0 && (
+                        <div 
+                          className="absolute top-0 right-0 flex items-center justify-center bg-primary text-primary-foreground rounded-full min-w-[18px] h-[18px] px-1 text-[10px] font-semibold"
+                          data-testid={`badge-count-${dateString}`}
+                        >
+                          {count}
+                        </div>
+                      )}
+                    </div>
+                  );
+                },
+              }}
+            />
+          )}
 
           {/* Selected Date Header */}
           <div className="text-center">
