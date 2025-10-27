@@ -1,0 +1,71 @@
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/FC481913-1B69-4356-B589-8BA561716010/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f93090c9-0355-4dbe-94b7-3f0b802ff883
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+Reachable via WiFi
+Networking process (0x10d058190) took 1.137324 seconds to launch
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[33051] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 25717181
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"version":"builtin","checksum":"","id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 25717182
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 25717183
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 25717184
+⚡️  To Native ->  CapacitorUpdater current 25717185
+⚡️  TO JS {"bundle":{"checksum":"","status":"success","version":"builtin","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z"},"native":"1.0"}
+⚡️  To Native ->  App addListener ⚡️  [log] - [Capgo] Current bundle: {"checksum":"","status":"success","version":"builtin","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}
+25717186
+⚡️  To Native ->  App addListener 25717187
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  SecureStorage internalGetItem 25717188
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  SecureStorage internalGetItem 25717189
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  To Native ->  ⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+SecureStorage internalRemoveItem 25717190
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 25717191
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 25717192
+⚡️  TO JS undefined
+⚡️  [log] - [Login] 🚀 Starting OAuth authentication
+⚡️  [log] - [Native OAuth] 🚀 Starting PKCE OAuth flow
+⚡️  [log] - [Native OAuth] 📞 Calling /api/native/oauth/start
+⚡️  [log] - [Native OAuth] ✅ Got authorization URL
+⚡️  [log] - [Native OAuth] 📦 State: 0978da76f85d5a31090571861396be8a1994fc9c7efcdae40863c97d7000d17e
+⚡️  [log] - [Native OAuth] 🌐 Opening ASWebAuthenticationSession
+⚡️  [error] - [Login] ❌ Authentication failed: {"code":"UNIMPLEMENTED"}
