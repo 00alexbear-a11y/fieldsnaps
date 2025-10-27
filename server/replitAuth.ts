@@ -9,6 +9,8 @@ import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { emailService } from "./email";
 import { generateTokenPair, verifyAccessToken, refreshAccessToken as refreshJwtAccessToken, revokeRefreshToken } from "./jwtService";
+import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
+import { randomBytes } from "crypto";
 
 // REPLIT_DOMAINS may not be set in local development
 const isProduction = process.env.NODE_ENV === 'production';
@@ -366,6 +368,165 @@ export async function setupAuth(app: Express) {
         return res.redirect("/");
       });
     })(req, res, next);
+  });
+
+  // Native App OAuth with PKCE - Step 1: Start Authorization
+  app.post("/api/native/oauth/start", async (req, res) => {
+    try {
+      console.log('[Native OAuth Start] 🚀 Initiating PKCE flow for native app');
+      
+      // Get custom redirect URI from request body
+      const { redirect_uri } = req.body;
+      
+      if (!redirect_uri) {
+        console.error('[Native OAuth Start] ❌ Missing redirect_uri in request');
+        return res.status(400).json({ error: 'redirect_uri is required' });
+      }
+      
+      // Validate redirect URI (must be custom scheme for native app)
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
+      if (!isValidRedirectUri(redirect_uri, requestOrigin)) {
+        console.error('[Native OAuth Start] ❌ Invalid redirect_uri:', redirect_uri);
+        return res.status(400).json({ error: 'Invalid redirect_uri parameter' });
+      }
+      
+      console.log('[Native OAuth Start] ✅ Validated redirect_uri:', redirect_uri);
+      
+      // Generate PKCE code verifier and challenge
+      const codeVerifier = generateCodeVerifier();
+      const codeChallenge = generateCodeChallenge(codeVerifier);
+      
+      // Generate a unique state parameter
+      const state = randomBytes(32).toString('hex');
+      
+      console.log('[Native OAuth Start] 🔑 Generated PKCE challenge');
+      console.log('[Native OAuth Start] 📦 State parameter:', state);
+      
+      // Store verifier with state (expires in 10 minutes)
+      await storage.storePKCEVerifier(state, codeVerifier, 600000);
+      
+      // Get OIDC configuration
+      const config = await getOidcConfig();
+      const strategyHost = req.hostname.split(':')[0];
+      
+      // Build authorization URL with PKCE
+      const authUrl = new URL(config.serverMetadata().authorization_endpoint!);
+      authUrl.searchParams.set('client_id', process.env.REPL_ID!);
+      authUrl.searchParams.set('redirect_uri', `${requestOrigin}/api/callback`);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('scope', 'openid email profile');
+      authUrl.searchParams.set('state', state);
+      authUrl.searchParams.set('code_challenge', codeChallenge);
+      authUrl.searchParams.set('code_challenge_method', 'S256');
+      
+      // Store redirect_uri in session for callback
+      (req.session as any).native_redirect_uri = redirect_uri;
+      await new Promise<void>((resolve) => req.session.save(() => resolve()));
+      
+      console.log('[Native OAuth Start] 🌐 Authorization URL generated');
+      console.log('[Native OAuth Start] 🚀 Returning authorization URL to app');
+      
+      // Return authorization URL to native app
+      res.json({
+        authorization_url: authUrl.toString(),
+        state
+      });
+      
+    } catch (error) {
+      console.error('[Native OAuth Start] ❌ Error:', error);
+      res.status(500).json({ error: 'Failed to initiate OAuth flow' });
+    }
+  });
+
+  // Native App OAuth with PKCE - Step 2: Exchange Authorization Code
+  app.post("/api/native/oauth/exchange", async (req, res) => {
+    try {
+      console.log('[Native OAuth Exchange] 🔄 Exchanging authorization code for tokens');
+      
+      const { code, state } = req.body;
+      
+      if (!code || !state) {
+        console.error('[Native OAuth Exchange] ❌ Missing code or state parameter');
+        return res.status(400).json({ error: 'code and state are required' });
+      }
+      
+      console.log('[Native OAuth Exchange] 📦 Received state:', state);
+      console.log('[Native OAuth Exchange] 🔑 Received code:', code.substring(0, 10) + '...');
+      
+      // Retrieve stored code verifier
+      const codeVerifier = await storage.getPKCEVerifier(state);
+      
+      if (!codeVerifier) {
+        console.error('[Native OAuth Exchange] ❌ No verifier found for state (expired or invalid)');
+        return res.status(400).json({ error: 'Invalid or expired state parameter' });
+      }
+      
+      console.log('[Native OAuth Exchange] ✅ Retrieved code verifier from storage');
+      
+      // Get OIDC configuration
+      const config = await getOidcConfig();
+      const requestOrigin = `${req.protocol}://${req.get('host')}`;
+      
+      // Exchange authorization code for tokens with Replit
+      console.log('[Native OAuth Exchange] 🔄 Exchanging code with Replit OAuth provider');
+      
+      const tokenResponse = await client.authorizationCodeGrant(
+        config,
+        new URL(`${requestOrigin}/api/callback`),
+        {
+          pkceCodeVerifier: codeVerifier,
+          expectedState: state,
+        },
+        code,
+        state
+      );
+      
+      console.log('[Native OAuth Exchange] ✅ Successfully exchanged code for Replit tokens');
+      
+      // Get user claims
+      const claims = tokenResponse.claims();
+      console.log('[Native OAuth Exchange] 👤 User ID:', claims?.sub);
+      console.log('[Native OAuth Exchange] 📧 Email:', claims?.email);
+      
+      // Upsert user in our database
+      const dbUser = await upsertUser(claims);
+      
+      // Delete used PKCE verifier
+      await storage.deletePKCEVerifier(state);
+      console.log('[Native OAuth Exchange] 🗑️ Cleaned up PKCE verifier');
+      
+      // Generate FieldSnaps JWT tokens
+      console.log('[Native OAuth Exchange] 🎫 Generating FieldSnaps JWT tokens');
+      
+      const jwtTokens = await generateTokenPair({
+        id: dbUser.id,
+        email: dbUser.email,
+        displayName: dbUser.displayName || undefined,
+        profilePicture: dbUser.profilePicture || undefined,
+      });
+      
+      console.log('[Native OAuth Exchange] ✅ JWT tokens generated successfully');
+      console.log('[Native OAuth Exchange] 🚀 Returning tokens to native app');
+      
+      // Return tokens and user info
+      res.json({
+        access_token: jwtTokens.accessToken,
+        refresh_token: jwtTokens.refreshToken,
+        expires_in: jwtTokens.expiresIn,
+        user: {
+          id: dbUser.id,
+          email: dbUser.email,
+          displayName: dbUser.displayName,
+          profilePicture: dbUser.profilePicture,
+          companyId: dbUser.companyId,
+          needsCompanySetup: !dbUser.companyId,
+        }
+      });
+      
+    } catch (error) {
+      console.error('[Native OAuth Exchange] ❌ Error exchanging code:', error);
+      res.status(500).json({ error: 'Failed to exchange authorization code' });
+    }
   });
 
   // Development-only login bypass for iOS simulator testing
