@@ -1,0 +1,57 @@
+Last login: Fri Oct 24 12:35:14 on ttys000
+bearmac@Mac ~ % cd ~/Documents/Projects/FieldSnaps
+npm install && npm run build && npx cap sync
+npx cap open ios
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+npm warn deprecated source-map@0.8.0-beta.0: The work that was done in this beta branch won't be included in future versions
+
+added 1036 packages, and audited 1037 packages in 5s
+
+161 packages are looking for funding
+  run `npm fund` for details
+
+8 vulnerabilities (3 low, 5 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (6) src/App.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3061 modules transformed.
+x Build failed in 1.68s
+error during build:
+client/src/pages/NativeAppLogin.tsx (7:9): "TokenManager" is not exported by "client/src/lib/tokenManager.ts", imported by "client/src/pages/NativeAppLogin.tsx".
+file: /Users/bearmac/Documents/Projects/FieldSnaps/client/src/pages/NativeAppLogin.tsx:7:9
+
+5: import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+6: import { authenticateWithReplit } from '@/lib/nativeOAuth';
+7: import { TokenManager } from '@/lib/tokenManager';
+            ^
+8: 
+9: export default function NativeAppLogin() {
+
+    at getRollupError (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/parseAst.js:396:41)
+    at error (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/parseAst.js:392:42)
+    at Module.error (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:15588:16)
+    at Module.traceVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:16037:29)
+    at ModuleScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:13820:39)
+    at FunctionScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:5283:38)
+    at FunctionBodyScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:5283:38)
+    at ReturnValueScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:5283:38)
+    at FunctionBodyScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:5283:38)
+    at BlockScope.findVariable (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:5283:38)
+✔ Opening the Xcode workspace... in 3.00s
+bearmac@Mac FieldSnaps % 
