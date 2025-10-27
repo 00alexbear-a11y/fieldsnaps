@@ -1,4 +1,4 @@
-import { Fingerprint, LogIn, ArrowRight } from 'lucide-react';
+import { Fingerprint, LogIn, ArrowRight, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWebAuthn } from '@/hooks/useWebAuthn';
 import { useState, useEffect } from 'react';
@@ -6,10 +6,26 @@ import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { authenticateWithReplit } from '@/lib/nativeOAuth';
 import { tokenManager } from '@/lib/tokenManager';
 
+// Helper to create mock JWT tokens for dev testing
+function createMockJWT(payload: any): string {
+  // Create a simple mock JWT (header.payload.signature)
+  // Note: This is NOT cryptographically signed, just for dev testing
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const headerB64 = btoa(JSON.stringify(header));
+  const payloadB64 = btoa(JSON.stringify(payload));
+  const signature = 'mock-signature-for-dev-testing-only';
+  
+  return `${headerB64}.${payloadB64}.${signature}`;
+}
+
 export default function NativeAppLogin() {
   const { authenticateWithBiometric, checkBiometricSupport, isLoading: isWebAuthnLoading } = useWebAuthn();
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  
+  // ONLY show dev login in Vite dev server - NEVER in builds
+  // This is compile-time only and will be tree-shaken out of production
+  const isDevMode = import.meta.env.DEV;
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricSupported);
@@ -19,6 +35,52 @@ export default function NativeAppLogin() {
     const user = await authenticateWithBiometric();
     if (user) {
       window.location.href = '/';
+    }
+  };
+
+  const handleDevLogin = async () => {
+    try {
+      setIsAuthenticating(true);
+      console.log('[DevLogin] 🚀 Using Dev Login (bypassing OAuth)');
+      
+      // Create mock JWT tokens for testing
+      // These are simple base64-encoded JWTs with far-future expiration
+      const mockAccessToken = createMockJWT({
+        sub: 'dev-user-123',
+        email: 'dev@fieldsnaps.app',
+        displayName: 'Dev User',
+        type: 'access',
+        exp: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
+        iat: Math.floor(Date.now() / 1000)
+      });
+
+      const mockRefreshToken = createMockJWT({
+        sub: 'dev-user-123',
+        email: 'dev@fieldsnaps.app',
+        type: 'refresh',
+        exp: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
+        iat: Math.floor(Date.now() / 1000)
+      });
+      
+      console.log('[DevLogin] 💾 Storing mock tokens in Keychain');
+      
+      // Store tokens in iOS Keychain
+      await tokenManager.storeTokens(
+        mockAccessToken,
+        mockRefreshToken,
+        365 * 24 * 60 * 60 // 1 year in seconds
+      );
+      
+      console.log('[DevLogin] ✅ Dev login successful');
+      console.log('[DevLogin] 🎉 Redirecting to app...');
+      
+      // Go straight to the app
+      window.location.href = '/';
+    } catch (error) {
+      console.error('[DevLogin] ❌ Dev login failed:', error);
+      alert('Dev login failed. Check console for details.');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -96,9 +158,37 @@ export default function NativeAppLogin() {
 
       {/* Bottom CTA Section */}
       <div className="p-6 space-y-4 pb-8">
+        {/* DEV LOGIN - Only visible in development mode */}
+        {isDevMode && (
+          <>
+            <Button
+              variant="default"
+              size="lg"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              onClick={handleDevLogin}
+              disabled={isAuthenticating}
+              data-testid="button-dev-login"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              {isAuthenticating ? 'Logging in...' : 'Dev Login (Skip OAuth)'}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-black px-2 text-muted-foreground">
+                  Or use production login
+                </span>
+              </div>
+            </div>
+          </>
+        )}
+        
         {biometricSupported && (
           <Button
-            variant="default"
+            variant="outline"
             size="default"
             className="w-full"
             onClick={handleBiometricLogin}
@@ -111,7 +201,7 @@ export default function NativeAppLogin() {
         )}
         
         <Button
-          variant={biometricSupported ? "outline" : "default"}
+          variant={biometricSupported && !isDevMode ? "outline" : "default"}
           size="default"
           className="w-full"
           onClick={handleSignIn}
@@ -123,9 +213,11 @@ export default function NativeAppLogin() {
         </Button>
 
         <p className="text-xs text-muted-foreground text-center px-4 pt-2">
-          {biometricSupported 
-            ? 'Secure authentication with Face ID, Touch ID, or your account'
-            : 'Sign in to get started with your free trial'}
+          {isDevMode 
+            ? 'Dev Login gives instant access for testing. Use production login for real accounts.'
+            : biometricSupported 
+              ? 'Secure authentication with Face ID, Touch ID, or your account'
+              : 'Sign in to get started with your free trial'}
         </p>
       </div>
     </div>
