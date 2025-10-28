@@ -46,6 +46,7 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **LazyImage Authentication Fix**: Fixed crossOrigin timing bug where attribute was set after src, causing authenticated image loads to fail. Now sets crossOrigin='use-credentials' before src assignment for proper credential handling.
 - **O(n²) → O(n) Photo Rendering**: Optimized ProjectPhotos.tsx photo index lookups using Map-based caching. For 100 photos: reduced from 10,000 operations to 200 operations (50x faster). Eliminated nested findIndex() calls in date-grouped photo rendering.
 - **iPhone X+ Display Support**: Added `viewport-fit=cover` to meta viewport tag, enabling proper safe-area support for notch and Dynamic Island on modern iPhones.
+- **iOS Safe-Area Button Fix**: Fixed camera and annotation editor buttons being cut off by iPhone home indicator in fullscreen Safari. Replaced inline `env(safe-area-inset-bottom)` styles (not honored by Safari) with CSS utility classes (pb-safe-2, pb-safe-4) in index.css. Affected components: Camera.tsx controls/action rail, PhotoAnnotationEditor.tsx tools/action rail. Architect approved as production-ready.
 - **Virtualization Discovery**: Identified that PhotoGrid.tsx component is unused legacy code. Future virtualization work should target ProjectPhotos.tsx with date-grouped structure using container-based ResizeObserver (not window dimensions) to prevent overflow issues.
 
 **4 Quick Wins (Completed Oct 28, 2025)**:
