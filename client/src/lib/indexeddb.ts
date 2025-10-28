@@ -486,25 +486,53 @@ class IndexedDBManager {
   }
 
   /**
-   * Add item to sync queue
+   * Add item to sync queue with deterministic ID for atomic deduplication and upsert
+   * ID format: ${type}:${localId}:${action} ensures uniqueness and prevents race conditions
+   * If item exists, updates data while preserving createdAt timestamp (upsert behavior)
    */
   async addToSyncQueue(item: Omit<SyncQueueItem, 'id' | 'createdAt'>): Promise<SyncQueueItem> {
     const db = await this.init();
-    const id = crypto.randomUUID();
-
-    const queueItem: SyncQueueItem = {
-      ...item,
-      id,
-      createdAt: Date.now(),
-    };
+    // Deterministic ID prevents duplicate entries atomically
+    const id = `${item.type}:${item.localId}:${item.action}`;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORES.SYNC_QUEUE], 'readwrite');
       const store = transaction.objectStore(STORES.SYNC_QUEUE);
-      const request = store.add(queueItem);
-
-      request.onsuccess = () => resolve(queueItem);
-      request.onerror = () => reject(request.error);
+      
+      // Check if item already exists (atomic within transaction)
+      const getRequest = store.get(id);
+      
+      getRequest.onsuccess = () => {
+        const existing = getRequest.result;
+        
+        if (existing) {
+          // Item exists - update with new data while preserving createdAt (upsert)
+          const updatedItem: SyncQueueItem = {
+            ...item,
+            id,
+            createdAt: existing.createdAt, // Preserve original timestamp
+            retryCount: existing.retryCount, // Preserve retry count
+            lastAttempt: existing.lastAttempt, // Preserve last attempt time
+          };
+          
+          console.log(`[IndexedDB] Queue item already exists: ${id}, updating with latest data`);
+          const putRequest = store.put(updatedItem);
+          putRequest.onsuccess = () => resolve(updatedItem);
+          putRequest.onerror = () => reject(putRequest.error);
+        } else {
+          // Item doesn't exist, add it
+          const newItem: SyncQueueItem = {
+            ...item,
+            id,
+            createdAt: Date.now(),
+          };
+          const addRequest = store.add(newItem);
+          addRequest.onsuccess = () => resolve(newItem);
+          addRequest.onerror = () => reject(addRequest.error);
+        }
+      };
+      
+      getRequest.onerror = () => reject(getRequest.error);
     });
   }
 
@@ -524,6 +552,22 @@ class IndexedDBManager {
         const items = request.result.sort((a, b) => a.createdAt - b.createdAt);
         resolve(items);
       };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Get sync queue size (count of items)
+   */
+  async getQueueSize(): Promise<number> {
+    const db = await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORES.SYNC_QUEUE], 'readonly');
+      const store = transaction.objectStore(STORES.SYNC_QUEUE);
+      const request = store.count();
+
+      request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
   }
