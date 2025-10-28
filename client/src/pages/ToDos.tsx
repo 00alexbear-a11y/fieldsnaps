@@ -64,7 +64,9 @@ export default function ToDos() {
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const [showDetailsSection, setShowDetailsSection] = useState(false);
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const notesTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle photo attachment from camera
   useEffect(() => {
@@ -119,6 +121,11 @@ export default function ToDos() {
       window.history.replaceState({}, '', '/todos');
     }
   }, [location]);
+
+  // Reset notes editing state when switching tasks
+  useEffect(() => {
+    setIsEditingNotes(false);
+  }, [selectedTodoForDetails?.id]);
 
   // Fetch todos
   const { data: allTodos = [], isLoading } = useQuery<TodoWithDetails[]>({
@@ -878,7 +885,16 @@ export default function ToDos() {
       />
 
       {/* Task Details Drawer */}
-      <Sheet open={showDetailsDrawer} onOpenChange={setShowDetailsDrawer} data-testid="sheet-task-details">
+      <Sheet 
+        open={showDetailsDrawer} 
+        onOpenChange={(open) => {
+          setShowDetailsDrawer(open);
+          if (!open) {
+            setIsEditingNotes(false);
+          }
+        }} 
+        data-testid="sheet-task-details"
+      >
         <SheetContent side="bottom" className="h-[85vh] flex flex-col">
           <SheetHeader>
             <SheetTitle>Task Details</SheetTitle>
@@ -923,29 +939,50 @@ export default function ToDos() {
             
             <div className="pt-4 border-t">
               <h3 className="text-sm font-semibold mb-2">Notes</h3>
-              <Textarea
-                value={selectedTodoForDetails?.description || ''}
-                onChange={(e) => {
-                  if (selectedTodoForDetails) {
-                    setSelectedTodoForDetails({
-                      ...selectedTodoForDetails,
-                      description: e.target.value
-                    });
-                  }
-                }}
-                onBlur={() => {
-                  if (selectedTodoForDetails) {
-                    updateMutation.mutate({
-                      id: selectedTodoForDetails.id,
-                      data: { description: selectedTodoForDetails.description || '' },
-                      silent: true
-                    });
-                  }
-                }}
-                placeholder="Tap to add notes..."
-                className="min-h-[120px] resize-none"
-                data-testid="textarea-task-notes-inline"
-              />
+              {isEditingNotes ? (
+                <Textarea
+                  ref={notesTextareaRef}
+                  value={selectedTodoForDetails?.description || ''}
+                  onChange={(e) => {
+                    if (selectedTodoForDetails) {
+                      setSelectedTodoForDetails({
+                        ...selectedTodoForDetails,
+                        description: e.target.value
+                      });
+                    }
+                  }}
+                  onBlur={() => {
+                    if (selectedTodoForDetails) {
+                      updateMutation.mutate({
+                        id: selectedTodoForDetails.id,
+                        data: { description: selectedTodoForDetails.description || '' },
+                        silent: true
+                      });
+                    }
+                    setIsEditingNotes(false);
+                  }}
+                  placeholder="Tap to add notes..."
+                  className="min-h-[120px] resize-none"
+                  data-testid="textarea-task-notes-inline"
+                />
+              ) : (
+                <div
+                  onClick={() => {
+                    setIsEditingNotes(true);
+                    setTimeout(() => {
+                      notesTextareaRef.current?.focus();
+                    }, 0);
+                  }}
+                  className="min-h-[120px] p-3 rounded-md border bg-background cursor-text hover-elevate"
+                  data-testid="div-task-notes-display"
+                >
+                  {selectedTodoForDetails?.description ? (
+                    <p className="whitespace-pre-wrap">{selectedTodoForDetails.description}</p>
+                  ) : (
+                    <p className="text-muted-foreground">Tap to add notes...</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
