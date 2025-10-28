@@ -58,6 +58,12 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **Photo Grid Virtualization**: Implemented @tanstack/react-virtual in ProjectPhotos.tsx to prevent app freezes with large photo collections (500+ photos). Only renders visible rows using container-based ResizeObserver with dynamic row heights (60px headers, 200px photo rows). Preserves all existing functionality including select mode, tags, LazyImage, and sync badges. Uses overscan: 10 for smooth scrolling. Architect approved as production-ready. **Impact: Mobile Performance 6.5/10 → 9/10**
 - **Global Error Toast Notifications**: Added QueryCache and MutationCache error handlers to queryClient.ts using TanStack Query v5 API. Network errors show "Network Error" toast, mutation errors show "Operation Failed" toast. Excludes 401 auth errors (handled elsewhere). Complements existing SyncStatusNotifier (sync errors) and Camera error handling (capture failures). Architect approved with no regressions detected. **Impact: Error Handling 6/10 → 8/10**
 
+**Blocked Improvements (Require Manual vite.config.ts Edit)**:
+- **Console.log Cleanup**: Architect recommends adding `drop: ['console', 'debugger']` to Vite/Esbuild build config instead of manual removal (130+ logs across 25 files would require 40-50 tool calls). Best solution: Add to vite.config.ts build options. **Blocked Impact: Dead Code 9/10 → 10/10**
+- **Sourcemap Security**: Add `sourcemap: false` to vite.config.ts build section to prevent source code exposure. **Blocked Impact: Security 7/10 → 9/10**  
+- **Bundle Analyzer**: Add rollup-plugin-visualizer to vite.config.ts plugins for bundle analysis. **Blocked Impact: Bundle Size 7.5/10 → 8/10**
+- **Manual Chunk Splitting**: Configure manual chunks in vite.config.ts rollupOptions for better code splitting. **Blocked Impact: Bundle Size 8/10 → 9/10**
+
 ## External Dependencies
 
 ### Frontend

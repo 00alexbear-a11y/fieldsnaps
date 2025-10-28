@@ -89,7 +89,6 @@ class SyncManager {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data.type === 'SYNC_PHOTOS') {
-          console.log('[Sync] Received sync request from SW');
           this.syncNow();
         }
       });
@@ -105,7 +104,6 @@ class SyncManager {
         const registration = await navigator.serviceWorker.ready;
         // Type assertion for Background Sync API
         await (registration as any).sync.register('sync-photos');
-        console.log('[Sync] Background sync registered');
       } catch (error) {
         console.error('[Sync] Failed to register background sync:', error);
         // Fallback: sync immediately
@@ -123,7 +121,6 @@ class SyncManager {
    */
   async syncNow(): Promise<SyncResult> {
     if (this.syncInProgress) {
-      console.log('[Sync] Sync already in progress, skipping');
       return {
         success: false,
         synced: 0,
@@ -149,7 +146,6 @@ class SyncManager {
       const queueItems = await idb.getPendingSyncItems();
       
       if (queueItems.length === 0) {
-        console.log('[Sync] No items to sync');
         return result;
       }
 
@@ -166,8 +162,6 @@ class SyncManager {
       const projectBatches = Math.ceil(projects.length / BATCH_SIZE);
       const photoBatches = Math.ceil(photos.length / BATCH_SIZE);
       const totalBatches = projectBatches + photoBatches;
-      
-      console.log(`[Sync] Processing ${projects.length} projects, ${photos.length} photos (${totalBatches} batches)`);
 
       // Shared batch counter for monotonic progress
       let batchCounter = { current: 0 };
@@ -178,8 +172,6 @@ class SyncManager {
       // Then process photos in batches
       await this.processBatch(photos, result, totalItems, totalBatches, batchCounter);
 
-      console.log(`[Sync] Complete: ${result.synced} synced, ${result.failed} failed`);
-      
       // Emit sync completion event with result
       if (result.failed > 0) {
         this.emitEvent({
@@ -225,8 +217,6 @@ class SyncManager {
     for (let i = 0; i < items.length; i += BATCH_SIZE) {
       const batch = items.slice(i, i + BATCH_SIZE);
       batchCounter.current++; // Increment for this batch
-      
-      console.log(`[Sync] Processing batch ${batchCounter.current}/${totalBatches} (${batch.length} items)`);
       
       // Emit progress event BEFORE batch (shows items completed so far)
       this.emitEvent({
