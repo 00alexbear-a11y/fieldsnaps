@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useOfflineFirstPhotos } from "@/hooks/useOfflineFirstPhotos";
 import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -88,6 +89,9 @@ export default function ProjectPhotos() {
     photosPerPage: 1 as 1 | 2 | 3 | 4,
   });
   const { toast } = useToast();
+  
+  // Ref for virtualization parent container
+  const parentRef = useRef<HTMLElement>(null);
 
   const { data: project } = useQuery<Project>({
     queryKey: ["/api/projects", projectId],
@@ -190,6 +194,57 @@ export default function ProjectPhotos() {
       photos,
     }));
   }, [filteredPhotos]);
+
+  // Flatten photosByDate into virtualization-friendly rows
+  type VirtualRow = 
+    | { type: 'header'; date: string; photos: Photo[] }
+    | { type: 'photo-row'; photos: Photo[]; rowIndex: number; dateKey: string };
+
+  const flattenedRows = useMemo<VirtualRow[]>(() => {
+    const rows: VirtualRow[] = [];
+    
+    photosByDate.forEach(({ date, photos: datePhotos }) => {
+      // Add date header row
+      rows.push({ type: 'header', date, photos: datePhotos });
+      
+      // Split photos into rows based on columnCount
+      for (let i = 0; i < datePhotos.length; i += columnCount) {
+        const photosInRow = datePhotos.slice(i, i + columnCount);
+        rows.push({ 
+          type: 'photo-row', 
+          photos: photosInRow, 
+          rowIndex: Math.floor(i / columnCount),
+          dateKey: date
+        });
+      }
+    });
+    
+    return rows;
+  }, [photosByDate, columnCount]);
+
+  // Photo index map for O(1) lookups when opening viewer
+  const photoIndexMap = useMemo(() => {
+    return new Map(filteredPhotos.map((p, idx) => [p.id, idx]));
+  }, [filteredPhotos]);
+
+  // Virtualizer for smooth scrolling with large photo counts
+  const rowVirtualizer = useVirtualizer({
+    count: flattenedRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: (index) => {
+      const row = flattenedRows[index];
+      if (row.type === 'header') {
+        return 60; // Estimated header height
+      }
+      // Estimate photo row height (square aspect ratio + gap)
+      // Height = width / columnCount + gap
+      return 200; // Will be measured dynamically
+    },
+    overscan: 10, // Render extra rows for smooth scrolling
+    measureElement: (element) => {
+      return element?.getBoundingClientRect().height ?? 0;
+    },
+  });
 
   const { data: annotations = [] } = useQuery<any[]>({
     queryKey: ["/api/photos", selectedPhoto?.id, "annotations"],
@@ -1300,7 +1355,7 @@ export default function ProjectPhotos() {
         </div>
       </div>
 
-      <main className="flex-1 p-4 overflow-y-auto">
+      <main ref={parentRef} className="flex-1 p-4 overflow-y-auto">
         {activeTab === 'tasks' ? (
           // Tasks View with filters matching main To-Do page
           <div className="max-w-screen-sm mx-auto space-y-4">
@@ -1553,140 +1608,174 @@ export default function ProjectPhotos() {
               </div>
             )}
             
-            <div id="photo-grid" className="space-y-8">
-            {/* Build photo index map once for O(1) lookups instead of O(n) findIndex */}
-            {(() => {
-              const photoIndexMap = new Map(
-                filteredPhotos.map((p, idx) => [p.id, idx])
-              );
-              
-              return photosByDate.map(({ date, photos: datePhotos }) => (
-              <div key={date} data-testid={`date-group-${date}`}>
-                {/* Date Header with Checkbox */}
-                <div className="flex items-center gap-3 mb-4">
-                  {isSelectMode && (
-                    <Checkbox
-                      checked={isDateFullySelected(datePhotos)}
-                      onCheckedChange={() => toggleDateSelection(datePhotos)}
-                      data-testid={`checkbox-date-${date}`}
-                      className="w-5 h-5"
-                    />
-                  )}
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {date}
-                  </h2>
-                </div>
+            {/* Virtualized Photo Grid */}
+            <div
+              id="photo-grid"
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const row = flattenedRows[virtualRow.index];
                 
-                {/* Photos Grid */}
-                <div className="photo-grid-container" style={getGridStyle()}>
-                  {datePhotos.map((photo) => {
-                    const photoIndex = photoIndexMap.get(photo.id) ?? -1;
-                    const isSelected = selectedPhotoIds.has(photo.id);
-                    return (
-                      <div
-                        key={photo.id}
-                        ref={(el) => {
-                          if (el) {
-                            el.style.setProperty('view-transition-name', `photo-${photo.id}`);
-                          }
-                        }}
-                        className={`photo-grid-item relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
-                          isSelectMode && isSelected ? 'ring-4 ring-primary' : ''
-                        }`}
-                        onClick={() => {
-                          if (isSelectMode) {
-                            togglePhotoSelection(photo.id);
-                          } else {
-                            setViewerPhotoIndex(photoIndex);
-                          }
-                        }}
-                        data-testid={`photo-${photo.id}`}
-                      >
+                if (row.type === 'header') {
+                  // Render date header row
+                  return (
+                    <div
+                      key={virtualRow.key}
+                      data-index={virtualRow.index}
+                      ref={rowVirtualizer.measureElement}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                      data-testid={`date-group-${row.date}`}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
                         {isSelectMode && (
-                          <div className="absolute top-2 left-2 z-10">
-                            <Checkbox
-                              checked={isSelected}
-                              onCheckedChange={() => togglePhotoSelection(photo.id)}
-                              data-testid={`checkbox-photo-${photo.id}`}
-                              className="w-6 h-6 bg-white/90 backdrop-blur-sm border-2"
-                              onClick={(e) => e.stopPropagation()}
+                          <Checkbox
+                            checked={isDateFullySelected(row.photos)}
+                            onCheckedChange={() => toggleDateSelection(row.photos)}
+                            data-testid={`checkbox-date-${row.date}`}
+                            className="w-5 h-5"
+                          />
+                        )}
+                        <h2 className="text-lg font-semibold text-foreground">
+                          {row.date}
+                        </h2>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Render photo row
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={rowVirtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    <div className="photo-grid-container" style={getGridStyle()}>
+                      {row.photos.map((photo) => {
+                        const photoIndex = photoIndexMap.get(photo.id) ?? -1;
+                        const isSelected = selectedPhotoIds.has(photo.id);
+                        return (
+                          <div
+                            key={photo.id}
+                            ref={(el) => {
+                              if (el) {
+                                el.style.setProperty('view-transition-name', `photo-${photo.id}`);
+                              }
+                            }}
+                            className={`photo-grid-item relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover-elevate active-elevate-2 animate-scale-in touch-feedback ${
+                              isSelectMode && isSelected ? 'ring-4 ring-primary' : ''
+                            }`}
+                            onClick={() => {
+                              if (isSelectMode) {
+                                togglePhotoSelection(photo.id);
+                              } else {
+                                setViewerPhotoIndex(photoIndex);
+                              }
+                            }}
+                            data-testid={`photo-${photo.id}`}
+                          >
+                            {isSelectMode && (
+                              <div className="absolute top-2 left-2 z-10">
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={() => togglePhotoSelection(photo.id)}
+                                  data-testid={`checkbox-photo-${photo.id}`}
+                                  className="w-6 h-6 bg-white/90 backdrop-blur-sm border-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </div>
+                            )}
+                            
+                            {/* Tag indicators on left side */}
+                            {photo.tags && photo.tags.length > 0 && (
+                              <div 
+                                className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 z-10"
+                                data-testid={`tag-indicators-${photo.id}`}
+                              >
+                                {photo.tags.slice(0, 2).map((tag, idx) => (
+                                  <div
+                                    key={tag.id}
+                                    className="w-1 flex-1 rounded-full"
+                                    style={{ backgroundColor: tag.color }}
+                                    title={tag.name}
+                                    data-testid={`tag-bar-${photo.id}-${idx}`}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* +N badge if more than 2 tags */}
+                            {photo.tags && photo.tags.length > 2 && (
+                              <div 
+                                className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full z-10"
+                                data-testid={`tag-overflow-badge-${photo.id}`}
+                              >
+                                +{photo.tags.length - 2}
+                              </div>
+                            )}
+                            
+                            {/* Sync status badge - bottom right corner */}
+                            {(photo as any).syncStatus && (photo as any).syncStatus !== 'synced' && (
+                              <div 
+                                className={`absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full backdrop-blur-sm z-10 ${
+                                  (photo as any).syncStatus === 'pending' 
+                                    ? 'bg-orange-500/80 text-white' 
+                                    : (photo as any).syncStatus === 'syncing'
+                                    ? 'bg-blue-500/80 text-white'
+                                    : 'bg-red-500/80 text-white' // error
+                                }`}
+                                data-testid={`sync-status-${photo.id}`}
+                              >
+                                {(photo as any).syncStatus === 'pending' && (
+                                  <>
+                                    <Upload className="w-3 h-3" />
+                                    <span>Pending</span>
+                                  </>
+                                )}
+                                {(photo as any).syncStatus === 'syncing' && (
+                                  <>
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    <span>Uploading</span>
+                                  </>
+                                )}
+                                {(photo as any).syncStatus === 'error' && (
+                                  <>
+                                    <AlertCircle className="w-3 h-3" />
+                                    <span>Failed</span>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            
+                            <LazyImage
+                              src={photo.url}
+                              alt={photo.caption || "Photo"}
+                              className="w-full h-full object-cover"
                             />
                           </div>
-                        )}
-                        
-                        {/* Tag indicators on left side */}
-                        {photo.tags && photo.tags.length > 0 && (
-                          <div 
-                            className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 z-10"
-                            data-testid={`tag-indicators-${photo.id}`}
-                          >
-                            {photo.tags.slice(0, 2).map((tag, idx) => (
-                              <div
-                                key={tag.id}
-                                className="w-1 flex-1 rounded-full"
-                                style={{ backgroundColor: tag.color }}
-                                title={tag.name}
-                                data-testid={`tag-bar-${photo.id}-${idx}`}
-                              />
-                            ))}
-                          </div>
-                        )}
-                        
-                        {/* +N badge if more than 2 tags */}
-                        {photo.tags && photo.tags.length > 2 && (
-                          <div 
-                            className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full z-10"
-                            data-testid={`tag-overflow-badge-${photo.id}`}
-                          >
-                            +{photo.tags.length - 2}
-                          </div>
-                        )}
-                        
-                        {/* Sync status badge - bottom right corner */}
-                        {(photo as any).syncStatus && (photo as any).syncStatus !== 'synced' && (
-                          <div 
-                            className={`absolute bottom-2 right-2 flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full backdrop-blur-sm z-10 ${
-                              (photo as any).syncStatus === 'pending' 
-                                ? 'bg-orange-500/80 text-white' 
-                                : (photo as any).syncStatus === 'syncing'
-                                ? 'bg-blue-500/80 text-white'
-                                : 'bg-red-500/80 text-white' // error
-                            }`}
-                            data-testid={`sync-status-${photo.id}`}
-                          >
-                            {(photo as any).syncStatus === 'pending' && (
-                              <>
-                                <Upload className="w-3 h-3" />
-                                <span>Pending</span>
-                              </>
-                            )}
-                            {(photo as any).syncStatus === 'syncing' && (
-                              <>
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                                <span>Uploading</span>
-                              </>
-                            )}
-                            {(photo as any).syncStatus === 'error' && (
-                              <>
-                                <AlertCircle className="w-3 h-3" />
-                                <span>Failed</span>
-                              </>
-                            )}
-                          </div>
-                        )}
-                        
-                        <LazyImage
-                          src={photo.url}
-                          alt={photo.caption || "Photo"}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ));
-            })()}
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
