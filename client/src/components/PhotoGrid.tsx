@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Upload, Image as ImageIcon, X, Edit, Send, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Comment } from "@shared/schema";
+import { Grid } from "react-window";
+import LazyImage from "@/components/LazyImage";
 
 type Photo = {
   id: string;
@@ -51,6 +53,42 @@ type PhotoGridProps = {
   onDelete: (id: string) => void;
   onAnnotate?: (photoId: string, annotations: Annotation[]) => void;
 };
+
+// Hook to calculate responsive column count
+function useResponsiveColumns(viewSize: "small" | "medium" | "large") {
+  const [columnCount, setColumnCount] = useState(2);
+
+  useEffect(() => {
+    const calculateColumns = () => {
+      const width = window.innerWidth;
+      
+      if (viewSize === "small") {
+        if (width >= 1024) return 6; // lg
+        if (width >= 768) return 4;  // md
+        return 3; // mobile
+      } else if (viewSize === "medium") {
+        if (width >= 1024) return 4; // lg
+        if (width >= 768) return 3;  // md
+        return 2; // mobile
+      } else { // large
+        if (width >= 1024) return 3; // lg
+        if (width >= 768) return 2;  // md
+        return 1; // mobile
+      }
+    };
+
+    setColumnCount(calculateColumns());
+
+    const handleResize = () => {
+      setColumnCount(calculateColumns());
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [viewSize]);
+
+  return columnCount;
+}
 
 // Wrapper component that fetches annotations before rendering editor
 function AnnotationEditorWithData({ 
@@ -109,6 +147,9 @@ export function PhotoGrid({ photos, onUpload, onDelete, onAnnotate }: PhotoGridP
   const [showMentions, setShowMentions] = useState(false);
   const [mentionSearch, setMentionSearch] = useState("");
   const [selectedMentions, setSelectedMentions] = useState<string[]>([]);
+  
+  // Calculate responsive columns
+  const columnCount = useResponsiveColumns(viewSize);
 
   // Fetch team members for @mentions
   const { data: teamMembers = [] } = useQuery<any[]>({
@@ -197,17 +238,87 @@ export function PhotoGrid({ photos, onUpload, onDelete, onAnnotate }: PhotoGridP
     setSelectedMentions([]);
   };
 
-  const getGridColumns = () => {
-    switch (viewSize) {
-      case "small":
-        return "grid-cols-3 md:grid-cols-4 lg:grid-cols-6";
-      case "medium":
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
-      case "large":
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-      default:
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
-    }
+  // Calculate grid dimensions for virtualization
+  const gridDimensions = useMemo(() => {
+    const gap = 16; // gap-4 = 1rem = 16px
+    const containerWidth = window.innerWidth - 32; // Account for padding
+    const columnWidth = (containerWidth - (gap * (columnCount - 1))) / columnCount;
+    const rowHeight = columnWidth + 100; // Square image + card content (~100px for caption, date, tags)
+    const rowCount = Math.ceil(photos.length / columnCount);
+
+    return {
+      columnWidth: Math.floor(columnWidth),
+      rowHeight: Math.floor(rowHeight),
+      rowCount,
+      containerWidth: Math.floor(containerWidth),
+    };
+  }, [columnCount, photos.length]);
+
+  // Cell renderer for virtualized grid
+  const Cell = ({ columnIndex, rowIndex, style }: any) => {
+    const photoIndex = rowIndex * columnCount + columnIndex;
+    if (photoIndex >= photos.length) return null;
+
+    const photo = photos[photoIndex];
+
+    return (
+      <div style={{...style, padding: '8px'}} data-testid={`photo-cell-${photo.id}`}>
+        <Card
+          className="overflow-hidden hover-elevate cursor-pointer group h-full"
+          onClick={() => setSelectedPhoto(photo)}
+          data-testid={`photo-${photo.id}`}
+        >
+          <div className="aspect-square bg-muted relative overflow-hidden">
+            <LazyImage
+              src={photo.url}
+              alt={photo.caption || "Project photo"}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+              <Button
+                size="icon"
+                variant="secondary"
+                className="h-8 w-8 border-2 border-primary/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAnnotatingPhoto(photo);
+                }}
+                data-testid={`button-quick-edit-${photo.id}`}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="destructive"
+                className="h-8 w-8"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(photo.id);
+                }}
+                data-testid={`button-delete-photo-${photo.id}`}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <CardContent className="p-3">
+            <p className="text-sm font-medium truncate">{photo.caption}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {photo.date}
+            </p>
+            {photo.tags && (
+              <div className="flex gap-1 mt-2 flex-wrap">
+                {photo.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
   };
 
   return (
@@ -244,73 +355,16 @@ export function PhotoGrid({ photos, onUpload, onDelete, onAnnotate }: PhotoGridP
           </TabsList>
 
           <TabsContent value={viewSize} className="mt-4">
-            <div className={`grid ${getGridColumns()} gap-4`}>
-              {photos.map((photo) => (
-                <Card
-                  key={photo.id}
-                  className="overflow-hidden hover-elevate cursor-pointer group"
-                  onClick={() => setSelectedPhoto(photo)}
-                  data-testid={`photo-${photo.id}`}
-                >
-                  <div className="aspect-square bg-muted relative">
-                    <img
-                      src={photo.url}
-                      alt={photo.caption || "Project photo"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback to placeholder only if image fails to load
-                        e.currentTarget.style.display = "none";
-                        e.currentTarget.nextElementSibling?.classList.remove("hidden");
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center hidden">
-                      <ImageIcon className="h-12 w-12 text-primary/60" />
-                    </div>
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 border-2 border-primary/20"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAnnotatingPhoto(photo);
-                        }}
-                        data-testid={`button-quick-edit-${photo.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="h-8 w-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(photo.id);
-                        }}
-                        data-testid={`button-delete-photo-${photo.id}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <CardContent className="p-3">
-                    <p className="text-sm font-medium truncate">{photo.caption}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {photo.date}
-                    </p>
-                    {photo.tags && (
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {photo.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Grid
+              columnCount={columnCount}
+              columnWidth={gridDimensions.columnWidth}
+              height={Math.min(window.innerHeight - 300, gridDimensions.rowHeight * gridDimensions.rowCount)}
+              rowCount={gridDimensions.rowCount}
+              rowHeight={gridDimensions.rowHeight}
+              width={gridDimensions.containerWidth}
+            >
+              {Cell}
+            </Grid>
           </TabsContent>
         </Tabs>
       )}

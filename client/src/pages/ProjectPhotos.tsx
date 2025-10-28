@@ -1554,7 +1554,13 @@ export default function ProjectPhotos() {
             )}
             
             <div id="photo-grid" className="space-y-8">
-            {photosByDate.map(({ date, photos: datePhotos }) => (
+            {/* Build photo index map once for O(1) lookups instead of O(n) findIndex */}
+            {(() => {
+              const photoIndexMap = new Map(
+                filteredPhotos.map((p, idx) => [p.id, idx])
+              );
+              
+              return photosByDate.map(({ date, photos: datePhotos }) => (
               <div key={date} data-testid={`date-group-${date}`}>
                 {/* Date Header with Checkbox */}
                 <div className="flex items-center gap-3 mb-4">
@@ -1574,7 +1580,7 @@ export default function ProjectPhotos() {
                 {/* Photos Grid */}
                 <div className="photo-grid-container" style={getGridStyle()}>
                   {datePhotos.map((photo) => {
-                    const photoIndex = filteredPhotos.findIndex(p => p.id === photo.id);
+                    const photoIndex = photoIndexMap.get(photo.id) ?? -1;
                     const isSelected = selectedPhotoIds.has(photo.id);
                     return (
                       <div
@@ -1679,7 +1685,8 @@ export default function ProjectPhotos() {
                   })}
                 </div>
               </div>
-            ))}
+            ));
+            })()}
             </div>
           </div>
         )}

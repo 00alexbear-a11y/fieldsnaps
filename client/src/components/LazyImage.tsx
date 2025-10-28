@@ -50,8 +50,8 @@ export default function LazyImage({ src, thumbnailSrc, alt, className = '' }: La
       
       setIsLoadingFullRes(true);
       const fullImg = new Image();
-      fullImg.src = src;
       fullImg.crossOrigin = 'use-credentials';
+      fullImg.src = src;
       fullImg.onload = () => {
         setCurrentSrc(src);
         setIsLoadingFullRes(false);
