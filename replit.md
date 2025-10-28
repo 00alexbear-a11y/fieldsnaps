@@ -48,6 +48,12 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 - **iPhone X+ Display Support**: Added `viewport-fit=cover` to meta viewport tag, enabling proper safe-area support for notch and Dynamic Island on modern iPhones.
 - **Virtualization Discovery**: Identified that PhotoGrid.tsx component is unused legacy code. Future virtualization work should target ProjectPhotos.tsx with date-grouped structure using container-based ResizeObserver (not window dimensions) to prevent overflow issues.
 
+**4 Quick Wins (Completed Oct 28, 2025)**:
+- **Search Debounce**: Added 300ms debounce to Projects page search input with proper unmount cleanup and mount sync to prevent stale results. Uses isMounted flag pattern to avoid React warnings about state updates on unmounted components. Provides smoother mobile UX when typing in search box.
+- **Bundle Size Reduction**: Uninstalled 3 unused packages (recharts, react-resizable-panels, browser-image-compression) removing 37 total packages and saving ~290KB gzipped. Cleaned up imageCompression.ts to only export generateThumbnail() function using Canvas API (imported by syncManager).
+- **Developer Documentation**: Created comprehensive .env.example file documenting all 25+ environment variables with clear comments including Database, Auth, Stripe, Google Maps, Resend, Object Storage, and Sentry configuration.
+- **Code Cleanup**: Deleted unused PhotoGrid.tsx component (legacy code with incorrect virtualization implementation) to prevent confusion about where virtualization should be implemented.
+
 ## External Dependencies
 
 ### Frontend
