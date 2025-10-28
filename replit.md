@@ -42,6 +42,12 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 
 **OAuth for Native Apps**: Uses Capacitor Browser plugin with custom URL schemes (`com.fieldsnaps.app://callback`) and backend redirect URI validation for security. Safari View Controller dismissal is handled natively in `AppDelegate.swift` by detecting deep link URL opens and programmatically dismissing any presented view controller. This approach is required because `Browser.close()` from JavaScript doesn't work reliably on iOS due to SFSafariViewController limitations.
 
+**Week 1 Performance & Mobile Optimizations (Oct 28, 2025)**:
+- **LazyImage Authentication Fix**: Fixed crossOrigin timing bug where attribute was set after src, causing authenticated image loads to fail. Now sets crossOrigin='use-credentials' before src assignment for proper credential handling.
+- **O(n²) → O(n) Photo Rendering**: Optimized ProjectPhotos.tsx photo index lookups using Map-based caching. For 100 photos: reduced from 10,000 operations to 200 operations (50x faster). Eliminated nested findIndex() calls in date-grouped photo rendering.
+- **iPhone X+ Display Support**: Added `viewport-fit=cover` to meta viewport tag, enabling proper safe-area support for notch and Dynamic Island on modern iPhones.
+- **Virtualization Discovery**: Identified that PhotoGrid.tsx component is unused legacy code. Future virtualization work should target ProjectPhotos.tsx with date-grouped structure using container-based ResizeObserver (not window dimensions) to prevent overflow issues.
+
 ## External Dependencies
 
 ### Frontend
