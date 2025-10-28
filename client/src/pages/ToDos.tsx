@@ -756,7 +756,7 @@ export default function ToDos() {
                       </div>
                       {count > 0 && (
                         <div 
-                          className={`absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
+                          className={`absolute bottom-[14px] left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
                             isSelected 
                               ? 'bg-primary-foreground text-primary' 
                               : 'bg-primary text-primary-foreground'
