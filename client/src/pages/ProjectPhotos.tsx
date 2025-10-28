@@ -1193,7 +1193,7 @@ export default function ProjectPhotos() {
 
   return (
     <>
-      <div className="h-screen flex flex-col overflow-auto pb-20">
+      <div className="h-screen flex flex-col overflow-hidden pb-20">
         <header className="border-b p-4 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between gap-2">
           {/* Tag Filter Dropdown on left */}
