@@ -912,6 +912,15 @@ export default function ToDos() {
                 </div>
               )}
             </div>
+            
+            {selectedTodoForDetails?.description && (
+              <div className="pt-4 border-t">
+                <h3 className="text-sm font-semibold mb-2">Notes</h3>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-task-notes">
+                  {selectedTodoForDetails.description}
+                </p>
+              </div>
+            )}
           </div>
           
           <SheetFooter className="flex-row gap-3 sm:gap-3">
