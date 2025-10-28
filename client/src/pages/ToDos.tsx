@@ -307,17 +307,20 @@ export default function ToDos() {
 
   // Update todo mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<CreateTodoForm> }) => {
+    mutationFn: async ({ id, data, silent }: { id: string; data: Partial<CreateTodoForm>; silent?: boolean }) => {
       return apiRequest('PATCH', `/api/todos/${id}`, data);
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
-      toast({ title: "Task updated!" });
-      setShowEditDialog(false);
-      setEditingTodo(null);
-      form.reset();
-      setSelectedPhotoId(null);
-      setSelectedPhotoUrl(null);
+      // Only show toast for explicit edits (not inline background saves)
+      if (!variables.silent) {
+        toast({ title: "Task updated!" });
+        setShowEditDialog(false);
+        setEditingTodo(null);
+        form.reset();
+        setSelectedPhotoId(null);
+        setSelectedPhotoUrl(null);
+      }
     },
     onError: () => {
       toast({ title: "Failed to update task", variant: "destructive" });
@@ -918,14 +921,32 @@ export default function ToDos() {
               )}
             </div>
             
-            {selectedTodoForDetails?.description && (
-              <div className="pt-4 border-t">
-                <h3 className="text-sm font-semibold mb-2">Notes</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-task-notes">
-                  {selectedTodoForDetails.description}
-                </p>
-              </div>
-            )}
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-semibold mb-2">Notes</h3>
+              <Textarea
+                value={selectedTodoForDetails?.description || ''}
+                onChange={(e) => {
+                  if (selectedTodoForDetails) {
+                    setSelectedTodoForDetails({
+                      ...selectedTodoForDetails,
+                      description: e.target.value
+                    });
+                  }
+                }}
+                onBlur={() => {
+                  if (selectedTodoForDetails) {
+                    updateMutation.mutate({
+                      id: selectedTodoForDetails.id,
+                      data: { description: selectedTodoForDetails.description || '' },
+                      silent: true
+                    });
+                  }
+                }}
+                placeholder="Tap to add notes..."
+                className="min-h-[120px] resize-none"
+                data-testid="textarea-task-notes-inline"
+              />
+            </div>
           </div>
           
           <SheetFooter className="flex-row gap-3 sm:gap-3">
