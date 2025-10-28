@@ -1,6 +1,7 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryFunction, QueryCache, MutationCache } from "@tanstack/react-query";
 import { tokenManager } from "./tokenManager";
 import { getApiUrl } from "./apiUrl";
+import { toast } from "@/hooks/use-toast";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -63,6 +64,32 @@ export const getQueryFn: <T>(options: {
   };
 
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      // Show toast for query errors (except 401 auth errors handled elsewhere)
+      if (error instanceof Error && !error.message.includes('401')) {
+        toast({
+          title: 'Network Error',
+          description: error.message || 'Failed to load data. Please check your connection.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      // Show toast for mutation errors (except 401 auth errors handled elsewhere)
+      if (error instanceof Error && !error.message.includes('401')) {
+        toast({
+          title: 'Operation Failed',
+          description: error.message || 'Something went wrong. Please try again.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
