@@ -15,6 +15,7 @@ const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
 const MAX_RETRY_DELAY = 60000; // 1 minute
 const BATCH_SIZE = 10; // Process up to 10 items concurrently
+const MAX_QUEUE_SIZE = 500; // Maximum number of items in sync queue (prevents unbounded growth)
 
 interface SyncResult {
   success: boolean;
@@ -45,7 +46,6 @@ export interface SyncEvent {
 type SyncEventListener = (event: SyncEvent) => void;
 
 class SyncManager {
-  private isSyncing = false;
   private syncInProgress = false;
   private listeners: Set<SyncEventListener> = new Set();
 
@@ -292,17 +292,24 @@ class SyncManager {
       return false;
     }
 
-    // Calculate retry delay with exponential backoff
-    // Only apply delay if we've already retried (retryCount > 0) and we're offline
-    if (item.lastAttempt && item.retryCount > 0 && !navigator.onLine) {
-      const delay = Math.min(
+    // Calculate retry delay with exponential backoff and jitter
+    // Apply delay if we've already retried (retryCount > 0) - for both online and offline failures
+    if (item.lastAttempt && item.retryCount > 0) {
+      // Exponential backoff: 1s, 2s, 4s, 8s, 16s, ...up to 60s
+      const baseDelay = Math.min(
         INITIAL_RETRY_DELAY * Math.pow(2, item.retryCount),
         MAX_RETRY_DELAY
       );
+      
+      // Add jitter (±25% randomness) to prevent thundering herd
+      // Formula: baseDelay * (0.75 + random(0.5)) = baseDelay * [0.75 to 1.25]
+      const jitter = 0.75 + Math.random() * 0.5;
+      const delay = Math.floor(baseDelay * jitter);
+      
       const timeSinceLastAttempt = Date.now() - item.lastAttempt;
       
       if (timeSinceLastAttempt < delay) {
-        console.log(`[Sync] Waiting for retry delay: ${delay - timeSinceLastAttempt}ms`);
+        console.log(`[Sync] Waiting for retry delay: ${delay - timeSinceLastAttempt}ms (retry ${item.retryCount}/${MAX_RETRY_COUNT})`);
         return false;
       }
     }
@@ -736,6 +743,15 @@ class SyncManager {
    * Queue a project for sync
    */
   async queueProjectSync(projectId: string, action: 'create' | 'update' | 'delete'): Promise<void> {
+    // Check queue size before adding
+    const queueSize = await idb.getQueueSize();
+    if (queueSize >= MAX_QUEUE_SIZE) {
+      const error = `Sync queue full (${queueSize}/${MAX_QUEUE_SIZE} items). Please wait for sync to complete or clear failed items.`;
+      console.error('[Sync]', error);
+      throw new Error(error);
+    }
+    
+    // Add to queue (deduplication handled atomically by deterministic ID in IndexedDB)
     await idb.addToSyncQueue({
       type: 'project',
       localId: projectId,
@@ -744,10 +760,14 @@ class SyncManager {
       retryCount: 0,
     });
 
-    // If online, sync immediately. Otherwise use background sync
+    // If online and not currently syncing, trigger sync. Otherwise use background sync
     if (navigator.onLine) {
-      console.log('[Sync] Online - syncing immediately');
-      this.syncNow();
+      if (this.syncInProgress) {
+        console.log('[Sync] Sync already in progress, item queued for next sync');
+      } else {
+        console.log('[Sync] Online - syncing immediately');
+        this.syncNow();
+      }
     } else {
       console.log('[Sync] Offline - registering background sync');
       await this.registerBackgroundSync();
@@ -760,6 +780,15 @@ class SyncManager {
   async queuePhotoSync(photoId: string, projectId: string, action: 'create' | 'delete'): Promise<void> {
     console.log('[Sync] Queuing photo for sync:', { photoId, projectId, action, online: navigator.onLine });
     
+    // Check queue size before adding
+    const queueSize = await idb.getQueueSize();
+    if (queueSize >= MAX_QUEUE_SIZE) {
+      const error = `Sync queue full (${queueSize}/${MAX_QUEUE_SIZE} items). Please wait for sync to complete or clear failed items.`;
+      console.error('[Sync]', error);
+      throw new Error(error);
+    }
+    
+    // Add to queue (deduplication handled atomically by deterministic ID in IndexedDB)
     await idb.addToSyncQueue({
       type: 'photo',
       localId: photoId,
@@ -771,10 +800,14 @@ class SyncManager {
 
     console.log('[Sync] Photo added to queue successfully');
 
-    // If online, sync immediately. Otherwise use background sync
+    // If online and not currently syncing, trigger sync. Otherwise use background sync
     if (navigator.onLine) {
-      console.log('[Sync] Online - syncing immediately');
-      this.syncNow();
+      if (this.syncInProgress) {
+        console.log('[Sync] Sync already in progress, item queued for next sync');
+      } else {
+        console.log('[Sync] Online - syncing immediately');
+        this.syncNow();
+      }
     } else {
       console.log('[Sync] Offline - registering background sync');
       await this.registerBackgroundSync();
@@ -794,8 +827,16 @@ class SyncManager {
       return null;
     }
 
-    // Add to queue and get the created item
-    await idb.addToSyncQueue({
+    // Check queue size before adding
+    const queueSize = await idb.getQueueSize();
+    if (queueSize >= MAX_QUEUE_SIZE) {
+      const error = `Sync queue full (${queueSize}/${MAX_QUEUE_SIZE} items). Cannot upload photo.`;
+      console.error('[Sync]', error);
+      throw new Error(error);
+    }
+
+    // Add to queue (or get existing item if already queued - atomic deduplication)
+    const item = await idb.addToSyncQueue({
       type: 'photo',
       localId: photoId,
       projectId,
@@ -803,26 +844,16 @@ class SyncManager {
       data: {},
       retryCount: 0,
     });
-
-    // Get the queue item that was just added
-    const allItems = await idb.getPendingSyncItems();
-    const item = allItems.find(i => i.localId === photoId && i.type === 'photo');
     
-    if (!item) {
-      console.error('[Sync] Could not find queue item for photo:', photoId);
-      return null;
-    }
-
     // Sync the photo immediately
     const success = await this.syncPhoto(item);
-    
     if (!success) {
       console.error('[Sync] Photo upload failed');
       return null;
     }
 
     // Remove from queue after successful sync
-    await idb.removeFromSyncQueue(photoId);
+    await idb.removeFromSyncQueue(item.id);
 
     // Get the updated photo with server ID
     const photo = await idb.getPhoto(photoId);
