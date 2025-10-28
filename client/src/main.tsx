@@ -6,6 +6,8 @@ import { nativeSplashScreen } from './lib/nativeSplashScreen';
 import App from "./App";
 import "./index.css";
 import { registerServiceWorker } from "./lib/registerServiceWorker";
+import { syncManager } from "./lib/syncManager";
+import { indexedDB } from "./lib/indexeddb";
 
 // Initialize Capacitor app
 const initializeApp = async () => {
@@ -76,6 +78,13 @@ const initializeApp = async () => {
 initializeApp().then(() => {
   createRoot(document.getElementById("root")!).render(<App />);
   
+  // Expose syncManager and idb globally for testing
+  if (import.meta.env.DEV) {
+    (window as any).syncManager = syncManager;
+    (window as any).idb = indexedDB;
+    console.log('[App] Test globals exposed: window.syncManager, window.idb');
+  }
+  
   // Hide splash screen after app renders
   if (Capacitor.isNativePlatform()) {
     setTimeout(() => {
@@ -85,6 +94,13 @@ initializeApp().then(() => {
 }).catch((error) => {
   console.error('[App] Initialization failed:', error);
   createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Expose globals even on error (for testing)
+  if (import.meta.env.DEV) {
+    (window as any).syncManager = syncManager;
+    (window as any).idb = indexedDB;
+    console.log('[App] Test globals exposed: window.syncManager, window.idb');
+  }
   
   // Hide splash screen even on initialization error
   if (Capacitor.isNativePlatform()) {
