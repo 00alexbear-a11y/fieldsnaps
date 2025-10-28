@@ -1,0 +1,534 @@
+I need you to audit the FieldSnaps codebase and give me a score /10 for each of these 12 categories. 
+For each category:
+1. Give current score /10
+2. List specific issues found
+3. Recommend what to clean up or improve
+4. Indicate estimated impact (High/Medium/Low)
+
+IMPORTANT: Do NOT remove features or functionality. Only flag:
+- Duplicate code
+- Unused files
+- Failed fixes or commented-out code
+- Inefficient patterns
+- Files in wrong locations
+- Code that hurts mobile/offline performance
+
+Start with Category 1.
+📋 THE 12 CATEGORIES
+CATEGORY 1: File Organization & Structure 📁
+What to Check:
+
+Are files organized by feature/function (not by type)?
+Is the folder structure logical and no more than 3-4 levels deep?
+Are similar files grouped together?
+Are file names descriptive and consistent?
+Ask Replit AI:
+
+Category 1 - File Organization & Structure (/10):
+
+Analyze the project structure and score based on:
+- Are files organized by feature (e.g., /features/camera, /features/gallery)?
+- Or are they organized by type (e.g., /components, /hooks, /utils)?
+- Maximum folder depth (should be ≤4 levels)
+- File naming consistency
+- Are there files in weird/random locations?
+- Are there "misc" or "temp" folders with orphaned files?
+
+Give me:
+✓ Current score /10
+✓ Folder structure overview
+✓ Files in wrong locations (list them)
+✓ Recommended reorganization
+Scoring Guide:
+
+9-10/10: Feature-based folders, max 3 levels deep, all files have clear homes
+6-8/10: Mostly organized, a few misplaced files, slightly deep nesting
+3-5/10: Mix of organization styles, 5+ level nesting, some orphaned files
+1-2/10: Chaotic, files scattered, no clear structure
+CATEGORY 2: Duplicate Code & Files 🔄
+What to Check:
+
+Are there multiple files doing the same thing?
+Are there copy-pasted code blocks?
+Are there backup files (file.old.tsx, file-backup.tsx)?
+Are there multiple versions of components?
+Ask Replit AI:
+
+Category 2 - Duplicate Code & Files (/10):
+
+Find and list:
+- Files with similar/identical code (e.g., Button.tsx and Button2.tsx)
+- Copy-pasted functions across multiple files
+- Backup files (*.old.*, *.backup.*, *.copy.*)
+- Multiple versions of same component
+- Repeated logic that should be in shared utility
+
+For each duplicate:
+✓ File names/locations
+✓ What they do
+✓ Which one to keep vs delete
+✓ Estimated lines of code that can be removed
+
+Score /10 (10 = no duplicates, 1 = duplicates everywhere)
+Scoring Guide:
+
+9-10/10: Zero or minimal duplication, DRY principles followed
+6-8/10: Some duplication (2-3 instances), but minor
+3-5/10: Moderate duplication (5-10 instances), clear cleanup needed
+1-2/10: Heavy duplication throughout codebase
+CATEGORY 3: Dead Code & Unused Files 🗑️
+What to Check:
+
+Are there files not imported anywhere?
+Are there commented-out code blocks?
+Are there unused functions/components?
+Are there "TODO" or "FIX" comments from failed attempts?
+Ask Replit AI:
+
+Category 3 - Dead Code & Unused Files (/10):
+
+Identify:
+- Files that are never imported (check the entire codebase)
+- Large blocks of commented-out code (>10 lines)
+- Functions/components exported but never used
+- TODOs or FIXMEs related to abandoned features
+- Old API endpoints or routes no longer used
+- Test files for deleted features
+
+For each item:
+✓ File path
+✓ Why it's unused
+✓ Safe to delete? (Yes/No)
+✓ Lines of code that can be removed
+
+Score /10 (10 = no dead code, 1 = lots of dead code)
+Scoring Guide:
+
+9-10/10: No unused files, minimal commented code (<50 lines total)
+6-8/10: 1-3 unused files, some commented code
+3-5/10: 5-10 unused files, blocks of commented code
+1-2/10: 10+ unused files, commented code everywhere
+CATEGORY 4: Bundle Size & Dependencies 📦
+What to Check:
+
+What's the current bundle size?
+Are there unused dependencies in package.json?
+Are there heavy dependencies that could be replaced?
+Are dependencies up to date?
+Ask Replit AI:
+
+Category 4 - Bundle Size & Dependencies (/10):
+
+Analyze:
+1. Run: npm ls --all | wc -l (how many total dependencies?)
+2. Check package.json - which packages are installed?
+3. Which packages are NOT imported anywhere in the codebase?
+4. Which packages are >100KB that could be replaced with lighter alternatives?
+5. Are there multiple packages doing similar things (e.g., 3 date libraries)?
+6. Are there dev dependencies in "dependencies" instead of "devDependencies"?
+
+Give me:
+✓ Total dependencies count
+✓ Unused packages (can be removed)
+✓ Heavy packages (>100KB) with lighter alternatives
+✓ Duplicate functionality packages
+✓ Current main bundle size (if available)
+✓ Target bundle size (<200KB for mobile)
+
+Score /10 (10 = lean dependencies, 1 = bloated)
+Scoring Guide:
+
+9-10/10: <50 dependencies, all necessary, bundle <200KB
+6-8/10: 50-100 dependencies, 1-2 unused, bundle 200-400KB
+3-5/10: 100-200 dependencies, 5+ unused, bundle >400KB
+1-2/10: 200+ dependencies, many unused, bundle >1MB
+CATEGORY 5: Mobile Performance Optimization 📱
+What to Check:
+
+Are images compressed before upload?
+Are large lists virtualized?
+Are expensive operations memoized?
+Are there unnecessary re-renders?
+Ask Replit AI:
+
+Category 5 - Mobile Performance Optimization (/10):
+
+Check the codebase for:
+1. Image handling: Do we compress images? Generate thumbnails?
+2. Lists: Do we virtualize lists with >50 items? Or render all at once?
+3. Memoization: Are expensive computations wrapped in useMemo?
+4. Callbacks: Are functions passed to children wrapped in useCallback?
+5. Lazy loading: Are routes/heavy components lazy loaded?
+6. Inline functions: Are there functions defined inside render (bad)?
+
+For each issue:
+✓ File and line number
+✓ What's inefficient
+✓ Recommended fix (from Guide items #1-25)
+✓ Impact: High/Medium/Low
+
+Score /10 (10 = fully optimized, 1 = not optimized)
+Scoring Guide:
+
+9-10/10: All optimizations in place (Guide items #1-25)
+6-8/10: Most optimizations present, 2-3 missing
+3-5/10: Some optimizations, but many missing
+1-2/10: No performance optimizations applied
+CATEGORY 6: Memory Management 🧠
+What to Check:
+
+Are event listeners cleaned up?
+Are timers/intervals cleared?
+Are fetch requests aborted on unmount?
+Are resources (camera, GPS) released?
+Ask Replit AI:
+
+Category 6 - Memory Management (/10):
+
+Search for memory leak patterns:
+1. useEffect with event listeners - do they have cleanup (return function)?
+2. setInterval/setTimeout - are they cleared?
+3. fetch calls - do they use AbortController?
+4. Camera usage - is camera stopped when leaving camera view?
+5. Large arrays/objects - are they nullified when done?
+6. Blob URLs - are they revoked with URL.revokeObjectURL()?
+
+For each potential leak:
+✓ File and line number
+✓ What resource isn't cleaned up
+✓ Recommended fix (from Guide items #26-45)
+✓ Risk level: High/Medium/Low
+
+Score /10 (10 = perfect cleanup, 1 = leaks everywhere)
+Scoring Guide:
+
+9-10/10: All resources cleaned up properly
+6-8/10: Most cleanup present, 1-2 potential leaks
+3-5/10: Some cleanup missing, 3-5 potential leaks
+1-2/10: No cleanup, many memory leaks
+CATEGORY 7: Offline Capability 📶
+What to Check:
+
+Does the app detect online/offline status?
+Are failed requests queued for retry?
+Can users capture photos offline?
+Is there offline storage (IndexedDB)?
+Ask Replit AI:
+
+Category 7 - Offline Capability (/10):
+
+Analyze offline readiness:
+1. Is there an online/offline status indicator?
+2. Do we listen to window 'online'/'offline' events?
+3. When API calls fail, are they queued for retry?
+4. Can users capture photos without internet?
+5. Is there local storage for offline data (IndexedDB)?
+6. Do we show helpful messages when offline?
+7. Do we sync data when connection restored?
+
+For each gap:
+✓ What offline scenario isn't handled
+✓ Where to add offline logic
+✓ Recommended approach (from Guide item #99)
+✓ Priority: High/Medium/Low
+
+Score /10 (10 = fully offline-capable, 1 = breaks without internet)
+Scoring Guide:
+
+9-10/10: Full offline support with queue and sync
+6-8/10: Basic offline detection, limited functionality
+3-5/10: Some offline handling, but breaks easily
+1-2/10: No offline support, app unusable without internet
+CATEGORY 8: Code Quality & Maintainability ✨
+What to Check:
+
+Are components under 250 lines?
+Is there proper separation of concerns?
+Are there consistent naming conventions?
+Is the code readable and well-structured?
+Ask Replit AI:
+
+Category 8 - Code Quality & Maintainability (/10):
+
+Review code quality:
+1. Component size - list components over 250 lines (should be split)
+2. Function length - list functions over 50 lines (should be refactored)
+3. Naming consistency - are variables camelCase, components PascalCase?
+4. Separation of concerns - are logic and UI mixed in same component?
+5. Nesting depth - are there 5+ levels of nested ifs/loops?
+6. Magic numbers - are there hardcoded values (should be constants)?
+7. Console.logs - are there debug logs left in code?
+
+For each issue:
+✓ File and line number
+✓ What needs refactoring
+✓ Recommended action
+✓ Effort: High/Medium/Low
+
+Score /10 (10 = clean code, 1 = messy code)
+Scoring Guide:
+
+9-10/10: All components <250 lines, clean structure, consistent naming
+6-8/10: Most components clean, 2-3 need refactoring
+3-5/10: Many large components, inconsistent patterns
+1-2/10: Large monolithic components, hard to read
+CATEGORY 9: TypeScript & Type Safety 🔷
+What to Check:
+
+Is strict mode enabled?
+Are there 'any' types (bad)?
+Do all functions have return types?
+Are props interfaces defined?
+Ask Replit AI:
+
+Category 9 - TypeScript & Type Safety (/10):
+
+Check TypeScript usage:
+1. Is "strict": true in tsconfig.json?
+2. Search for ': any' - how many times is 'any' used? (should be 0)
+3. Do functions declare return types? Or inferred?
+4. Are component props typed with interfaces?
+5. Do we use type guards for external data (API responses)?
+6. Are there @ts-ignore or @ts-expect-error comments? (bad)
+
+For each type issue:
+✓ File and line number
+✓ What's not typed properly
+✓ Recommended fix (from Guide items #46-50)
+
+Score /10 (10 = fully typed, 1 = lots of 'any')
+Scoring Guide:
+
+9-10/10: Strict mode on, zero 'any' types, explicit return types
+6-8/10: Mostly typed, 1-5 'any' instances
+3-5/10: Some typing, 10-20 'any' instances
+1-2/10: Minimal typing, 'any' everywhere
+CATEGORY 10: Error Handling ⚠️
+What to Check:
+
+Are there error boundaries?
+Do async functions have try/catch?
+Are errors logged properly?
+Are user-friendly error messages shown?
+Ask Replit AI:
+
+Category 10 - Error Handling (/10):
+
+Analyze error handling:
+1. Do we have ErrorBoundary components wrapping major sections?
+2. Do async/await functions use try/catch blocks?
+3. Do fetch calls handle network errors?
+4. When errors occur, do users see helpful messages?
+5. Are errors logged (console.error or error tracking service)?
+6. Do we handle specific error cases (permission denied, offline, etc.)?
+
+For each gap:
+✓ Where error handling is missing
+✓ What error scenario isn't handled
+✓ Recommended implementation (from Guide item #65)
+✓ Risk: High/Medium/Low
+
+Score /10 (10 = comprehensive error handling, 1 = none)
+Scoring Guide:
+
+9-10/10: Error boundaries, try/catch everywhere, helpful messages
+6-8/10: Some error handling, but not comprehensive
+3-5/10: Minimal error handling, many unhandled cases
+1-2/10: No error handling, app crashes on errors
+CATEGORY 11: iOS-Specific Best Practices 🍎
+What to Check:
+
+Are safe area insets used?
+Are Capacitor plugins used (not web APIs)?
+Are permissions in Info.plist?
+Does app handle app lifecycle events?
+Ask Replit AI:
+
+Category 11 - iOS-Specific Best Practices (/10):
+
+Check iOS integration:
+1. Do we use env(safe-area-inset-*) in CSS for notched devices?
+2. Are we using Capacitor plugins (@capacitor/*) or web APIs?
+3. Are permissions declared in ios/App/App/Info.plist? (camera, location, photos)
+4. Do we listen to App.addListener('appStateChange') for background/foreground?
+5. Do we handle iOS keyboard (hide when done)?
+6. Is viewport meta tag correct (viewport-fit=cover)?
+7. Do we stop camera/GPS when app backgrounds?
+
+For each iOS issue:
+✓ What's missing or wrong
+✓ Where to fix it
+✓ Recommended approach (from Guide items #76-85, #101-115)
+✓ Impact: High/Medium/Low
+
+Score /10 (10 = iOS-optimized, 1 = not iOS-aware)
+Scoring Guide:
+
+9-10/10: All iOS best practices implemented
+6-8/10: Most iOS features handled, 2-3 missing
+3-5/10: Basic iOS support, many gaps
+1-2/10: No iOS-specific optimizations
+CATEGORY 12: Build Configuration ⚙️
+What to Check:
+
+Are environment variables used?
+Is production build optimized?
+Are source maps configured?
+Are console.logs removed in production?
+Ask Replit AI:
+
+Category 12 - Build Configuration (/10):
+
+Review build setup:
+1. Do we use environment variables (.env files)?
+2. Is vite.config.ts (or webpack) optimized for production?
+3. Are console.logs stripped in production builds?
+4. Are source maps disabled for production?
+5. Is code minified and compressed?
+6. Do we have different configs for dev/staging/prod?
+7. Are icons and splash screens generated for all sizes?
+
+For each config issue:
+✓ What's not configured properly
+✓ Where to fix (which config file)
+✓ Recommended settings (from Guide items #86-90)
+
+Score /10 (10 = production-ready build, 1 = dev config only)
+Scoring Guide:
+
+9-10/10: Full production config, optimized builds, env vars
+6-8/10: Basic production config, some optimization
+3-5/10: Minimal config, not optimized
+1-2/10: Dev config only, no production setup
+📊 COMPREHENSIVE SCORECARD SUMMARY
+After Replit AI scores all 12 categories, ask it to generate this:
+
+Now generate a summary scorecard:
+
+┌─────────────────────────────────────────┬──────────┬──────────┐
+│ CATEGORY                                │ SCORE    │ PRIORITY │
+├─────────────────────────────────────────┼──────────┼──────────┤
+│ 1. File Organization & Structure        │  __/10   │   ___    │
+│ 2. Duplicate Code & Files               │  __/10   │   ___    │
+│ 3. Dead Code & Unused Files             │  __/10   │   ___    │
+│ 4. Bundle Size & Dependencies           │  __/10   │   ___    │
+│ 5. Mobile Performance Optimization      │  __/10   │   ___    │
+│ 6. Memory Management                    │  __/10   │   ___    │
+│ 7. Offline Capability                   │  __/10   │   ___    │
+│ 8. Code Quality & Maintainability       │  __/10   │   ___    │
+│ 9. TypeScript & Type Safety             │  __/10   │   ___    │
+│ 10. Error Handling                      │  __/10   │   ___    │
+│ 11. iOS-Specific Best Practices         │  __/10   │   ___    │
+│ 12. Build Configuration                 │  __/10   │   ___    │
+├─────────────────────────────────────────┼──────────┼──────────┤
+│ OVERALL CODEBASE HEALTH                 │  __/10   │          │
+└─────────────────────────────────────────┴──────────┴──────────┘
+
+**Top 5 Issues to Fix First:**
+1. [Category] - [Specific issue] - [Impact: High]
+2. [Category] - [Specific issue] - [Impact: High]
+3. [Category] - [Specific issue] - [Impact: Medium]
+4. [Category] - [Specific issue] - [Impact: Medium]
+5. [Category] - [Specific issue] - [Impact: Medium]
+
+**Quick Wins (Easy fixes with high impact):**
+- [Specific action] - Estimated time: 15 min
+- [Specific action] - Estimated time: 30 min
+- [Specific action] - Estimated time: 1 hour
+
+**Estimated Cleanup Impact:**
+- Files that can be deleted: X files
+- Lines of code to remove: X lines
+- Bundle size reduction: X KB
+- Performance improvement: X%
+🎯 HOW TO EXECUTE THE CLEANUP
+After getting the scorecard, paste this:
+
+Based on this scorecard, create a cleanup plan:
+
+Phase 1 - Safe Deletions (Do First):
+- List all files safe to delete (unused, duplicates, backups)
+- Create a checklist I can execute
+
+Phase 2 - Code Refactoring:
+- List refactoring needed (split large components, extract utilities)
+- Prioritize by impact vs effort
+
+Phase 3 - Performance Optimization:
+- List performance improvements needed
+- Reference Guide item numbers for each fix
+
+Phase 4 - Mobile & Offline:
+- List mobile/offline enhancements needed
+- Priority order
+
+IMPORTANT: 
+- Do NOT suggest removing incomplete features (only failed fixes)
+- Do NOT break existing functionality
+- Group changes by risk level (Low/Medium/High)
+- For High risk changes, suggest testing plan
+🔍 BONUS: SPECIFIC CLEANUP PROMPTS
+After the scorecard, use these targeted prompts:
+
+For Duplicate Cleanup:
+
+Show me all duplicate files side-by-side. For each pair:
+1. File A path and line count
+2. File B path and line count
+3. Differences between them
+4. Which one to keep (and why)
+5. How to merge them if needed
+For Dead Code Cleanup:
+
+Generate a bash script I can run to delete all unused files safely:
+- Check each file is truly unused (no imports)
+- Move to /trash folder first (not permanent delete)
+- Log each deletion
+- Provide rollback instructions
+For Dependency Cleanup:
+
+For each unused package in package.json:
+1. Package name and size
+2. Why it was added (if you can tell from code)
+3. Last time it was imported (search results)
+4. Safe to remove? (Yes/No/Maybe)
+5. If Maybe, what to check first
+For Performance Audit:
+
+Find all performance anti-patterns in the codebase:
+- Functions defined inside render
+- Missing useMemo for expensive operations
+- Missing useCallback for functions passed to children
+- Lists that should be virtualized
+- Images that should be lazy loaded
+
+For each, show:
+- Current code (snippet)
+- Optimized version
+- Expected performance gain
+📈 INTERPRETING THE SCORES
+Overall Codebase Health:
+
+85-100: Production-ready, well-maintained
+70-84: Good shape, minor cleanup needed
+55-69: Moderate technical debt, cleanup recommended
+40-54: Significant issues, cleanup required
+Below 40: Major refactoring needed
+Priority Matrix:
+
+Score Range	Action	Timeline
+1-3	Critical - Fix immediately	This week
+4-6	High - Fix soon	Next 2 weeks
+7-8	Medium - Schedule fix	Next month
+9-10	Low - Monitor	As needed
+💾 SAVE YOUR AUDIT
+After completing the audit, save it:
+
+Create a markdown file called CODEBASE_AUDIT_[DATE].md with:
+1. All 12 category scores and findings
+2. Summary scorecard
+3. Cleanup plan with priorities
+4. Estimated effort and impact
+5. Risk assessment for each change
+
+This will be my baseline. I'll re-run this audit after cleanup to measure improvement.
