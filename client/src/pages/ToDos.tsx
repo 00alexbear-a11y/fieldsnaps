@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useForm } from "react-hook-form";
@@ -26,6 +27,7 @@ import type { ToDo, Project } from "@shared/schema";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
   projectId: z.string().optional(),
   assignedTo: z.string().optional(),
   dueDate: z.string().optional(),
@@ -85,6 +87,7 @@ export default function ToDos() {
             const formData = JSON.parse(savedFormData);
             form.reset({
               title: formData.title || '',
+              description: formData.description || '',
               projectId: formData.projectId || '',
               assignedTo: formData.assignedTo || '',
               dueDate: formData.dueDate || '',
@@ -94,6 +97,7 @@ export default function ToDos() {
           } else {
             form.reset({
               title: "",
+              description: "",
               projectId: photo.projectId || "",
               assignedTo: "",
               dueDate: "",
@@ -410,6 +414,7 @@ export default function ToDos() {
     setEditingTodo(todo);
     form.reset({
       title: todo.title,
+      description: todo.description || "",
       projectId: todo.projectId || "",
       assignedTo: todo.assignedTo || "",
       dueDate: todo.dueDate ? (typeof todo.dueDate === 'string' ? todo.dueDate : todo.dueDate.toISOString().split('T')[0]) : "",
@@ -963,6 +968,7 @@ export default function ToDos() {
           setShowDetailsSection(false);
           form.reset({
             title: "",
+            description: "",
             projectId: filterProject !== "all" ? filterProject : "",
             assignedTo: "",
             dueDate: "",
@@ -989,6 +995,7 @@ export default function ToDos() {
           setSelectedPhotoUrl(null);
           form.reset({
             title: "",
+            description: "",
             projectId: "",
             assignedTo: "",
             dueDate: "",
@@ -1090,6 +1097,18 @@ export default function ToDos() {
                   )}
                 </div>
 
+                {/* Notes */}
+                <div>
+                  <Label htmlFor="description" className="text-sm text-muted-foreground">Notes</Label>
+                  <Textarea
+                    id="description"
+                    {...form.register("description")}
+                    placeholder="Add context, measurements, or follow-up details..."
+                    className="mt-2 min-h-[80px]"
+                    data-testid="textarea-todo-notes"
+                  />
+                </div>
+
                 {/* Assign To */}
                 <div>
                   <Label htmlFor="assignedTo" className="text-sm text-muted-foreground">Assign to</Label>
@@ -1176,6 +1195,7 @@ export default function ToDos() {
           setSelectedPhotoUrl(null);
           form.reset({
             title: "",
+            description: "",
             projectId: "",
             assignedTo: "",
             dueDate: "",
@@ -1260,6 +1280,18 @@ export default function ToDos() {
               {form.formState.errors.title && (
                 <p className="text-sm text-destructive mt-1">{form.formState.errors.title.message}</p>
               )}
+            </div>
+
+            {/* Notes */}
+            <div>
+              <Label htmlFor="description-edit">Notes</Label>
+              <Textarea
+                id="description-edit"
+                {...form.register("description")}
+                placeholder="Add context, measurements, or follow-up details..."
+                className="mt-2 min-h-[80px]"
+                data-testid="textarea-todo-notes"
+              />
             </div>
 
             {/* Assign To */}
