@@ -5,17 +5,21 @@ import { useEffect, useState, lazy, Suspense } from "react";
 
 // Lazy-load Toaster to prevent Safari dispatcher error
 const Toaster = lazy(() => import("@/components/ui/toaster").then(m => ({ default: m.Toaster })));
-import Camera from "./pages/Camera";
+
+// Lazy-load the 4 largest pages (2228, 1730, 1548, 1393 lines respectively)
+const ProjectPhotos = lazy(() => import("./pages/ProjectPhotos"));
+const Camera = lazy(() => import("./pages/Camera"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ToDos = lazy(() => import("./pages/ToDos"));
+
+// Eager-load smaller, frequently-used pages
 import Projects from "./pages/Projects";
-import ProjectPhotos from "./pages/ProjectPhotos";
 import PhotoEdit from "./pages/PhotoEdit";
 import PhotoView from "./pages/PhotoView";
-import Settings from "./pages/Settings";
 import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
-import ToDos from "./pages/ToDos";
 import Login from "./pages/Login";
 import NativeAppLogin from "./pages/NativeAppLogin";
 import Landing from "./pages/Landing";
@@ -23,7 +27,7 @@ import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
 import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
 import SyncBanner from "./components/SyncBanner";
@@ -145,22 +149,24 @@ function AppContent() {
       {showSyncBanner && <SyncBanner />}
       
       <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
-        <Switch>
-          <Route path="/camera" component={Camera} />
-          <Route path="/projects" component={Projects} />
-          <Route path="/projects/:id" component={ProjectPhotos} />
-          <Route path="/photo/:id/edit" component={PhotoEdit} />
-          <Route path="/photo/:id/view" component={PhotoView} />
-          <Route path="/my-tasks" component={MyTasks} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/sync-status" component={SyncStatus} />
-          <Route path="/trash" component={Trash} />
-          <Route path="/map" component={Map} />
-          <Route path="/todos" component={ToDos} />
-          <Route path="/billing/success" component={BillingSuccess} />
-          <Route path="/share/:token" component={ShareView} />
-          <Route component={NotFound} />
-        </Switch>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+          <Switch>
+            <Route path="/camera" component={Camera} />
+            <Route path="/projects" component={Projects} />
+            <Route path="/projects/:id" component={ProjectPhotos} />
+            <Route path="/photo/:id/edit" component={PhotoEdit} />
+            <Route path="/photo/:id/view" component={PhotoView} />
+            <Route path="/my-tasks" component={MyTasks} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/sync-status" component={SyncStatus} />
+            <Route path="/trash" component={Trash} />
+            <Route path="/map" component={Map} />
+            <Route path="/todos" component={ToDos} />
+            <Route path="/billing/success" component={BillingSuccess} />
+            <Route path="/share/:token" component={ShareView} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
       </main>
       <BottomNav />
     </div>

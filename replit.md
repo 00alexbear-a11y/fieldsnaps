@@ -34,7 +34,9 @@ The application includes a bottom navigation, a camera interface with a three-zo
 The fullscreen photo viewer includes optimized bottom controls with a 3-column grid layout for centering, simplified controls (Back button, centered action group), and an Edit Menu consolidating Tag, Rename, Comment, and "Use as Icon" actions. It features responsive labels, accessibility considerations (aria-labels, `inert` attribute), and safe-area support for iOS home indicator compatibility.
 
 ### System Design Choices
-The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, and database indexing. 
+The build philosophy prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage utilizes IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, database indexing, and code-splitting for large components.
+
+**Code-Splitting & Bundle Optimization**: The 4 largest pages (ProjectPhotos, Camera, Settings, ToDos) are lazy-loaded using React.lazy() with Suspense boundaries, reducing the main bundle from 920KB to 718KB (22% smaller, 264KB → 212KB gzipped). These pages only load when users navigate to them. Dependencies have been audited and 61+ unused packages removed for cleaner codebase and faster install times.
 
 **OAuth for Native Apps**: Uses Capacitor Browser plugin with custom URL schemes (`com.fieldsnaps.app://callback`) and backend redirect URI validation for security. Safari View Controller dismissal is handled natively in `AppDelegate.swift` by detecting deep link URL opens and programmatically dismissing any presented view controller. This approach is required because `Browser.close()` from JavaScript doesn't work reliably on iOS due to SFSafariViewController limitations.
 
