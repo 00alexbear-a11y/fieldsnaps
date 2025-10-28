@@ -1549,7 +1549,7 @@ export default function Camera() {
       </div>
 
       {/* Controls Row - Zoom, Tags */}
-      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 border-t border-white/10" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0.5rem))' }}>
+      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 pb-safe-2 border-t border-white/10">
         <div className="flex items-center justify-center gap-4">
           {/* Zoom controls */}
           <div className="flex gap-1">
@@ -1636,7 +1636,7 @@ export default function Camera() {
       </div>
 
       {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
-      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 bg-black/50 backdrop-blur-md border-t border-white/10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 bg-black/50 backdrop-blur-md border-t border-white/10">
         {/* Back */}
         <Button
           variant="ghost"
