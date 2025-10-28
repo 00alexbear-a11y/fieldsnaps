@@ -1629,11 +1629,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.url = objectPath;
       }
       
-      // Handle annotations
-      if (req.body.annotations !== undefined) {
-        updateData.annotations = req.body.annotations || null;
-      }
-      
       // Handle caption
       if (req.body.caption !== undefined) {
         updateData.caption = req.body.caption;
@@ -1643,6 +1638,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.projectId !== undefined) {
         updateData.projectId = req.body.projectId;
       }
+      
+      // Note: annotations are stored in IndexedDB on the frontend, not in the database
+      // The photoAnnotations table is used for server-side annotation storage if needed
       
       const validated = insertPhotoSchema.partial().parse(updateData);
       const updated = await storage.updatePhoto(req.params.id, validated);
