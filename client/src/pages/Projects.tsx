@@ -351,29 +351,30 @@ export default function Projects() {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
-      <div className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white dark:bg-black">
-        <img 
-          src={logoPath} 
-          alt="FieldSnaps" 
-          className="h-9 w-auto object-contain"
-          data-testid="img-fieldsnaps-logo"
-        />
-        <div className="flex items-center gap-2">
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <Button 
-                className="h-12"
-                data-testid="button-create-project"
-                onClick={() => {
-                  if (!canWrite) {
-                    setUpgradeModalOpen(true);
-                  } else {
-                    setDialogOpen(true);
-                  }
-                }}
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                New Project
-              </Button>
+      <div className="sticky top-0 z-50 bg-white dark:bg-black">
+        <div className="flex items-center justify-between p-4">
+          <img 
+            src={logoPath} 
+            alt="FieldSnaps" 
+            className="h-9 w-auto object-contain"
+            data-testid="img-fieldsnaps-logo"
+          />
+          <div className="flex items-center gap-2">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Button 
+                  className="h-12"
+                  data-testid="button-create-project"
+                  onClick={() => {
+                    if (!canWrite) {
+                      setUpgradeModalOpen(true);
+                    } else {
+                      setDialogOpen(true);
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  New Project
+                </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Project</DialogTitle>
@@ -426,20 +427,38 @@ export default function Projects() {
               </DialogContent>
             </Dialog>
             
-            <Button 
-              size="icon" 
-              variant="outline" 
-              className="h-12 w-12" 
-              onClick={() => setLocation('/settings')}
-              data-testid="button-settings"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="h-12 w-12" 
+                onClick={() => setLocation('/settings')}
+                data-testid="button-settings"
+              >
+                <Settings className="w-5 h-5" />
+              </Button>
+          </div>
+        </div>
+        
+        {/* Show Completed Toggle - Moved to top for better accessibility */}
+        <div className="flex items-center justify-between px-4 pb-3">
+          <label 
+            htmlFor="show-completed" 
+            className="text-sm text-muted-foreground cursor-pointer select-none"
+          >
+            Show completed
+          </label>
+          <Switch 
+            id="show-completed" 
+            checked={showCompleted}
+            onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+            className="scale-75"
+            data-testid="switch-show-completed"
+          />
         </div>
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-20 bg-white dark:bg-black">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 bg-white dark:bg-black">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
@@ -536,21 +555,6 @@ export default function Projects() {
                 <SelectItem value="created">Date Created</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex items-center justify-between gap-2 pl-1">
-            <label 
-              htmlFor="show-completed" 
-              className="text-sm text-muted-foreground cursor-pointer select-none"
-            >
-              Show completed
-            </label>
-            <Switch 
-              id="show-completed" 
-              checked={showCompleted}
-              onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
-              className="scale-75"
-              data-testid="switch-show-completed"
-            />
           </div>
         </div>
       </div>
