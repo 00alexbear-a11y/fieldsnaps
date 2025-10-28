@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
@@ -63,7 +63,28 @@ export default function Projects() {
   // Enable keyboard management for form inputs
   useKeyboardManager();
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
+  
+  // Debounce search query for better mobile performance (300ms delay)
+  useEffect(() => {
+    const isMounted = { current: true };
+    const timer = setTimeout(() => {
+      if (isMounted.current) {
+        setDebouncedSearchQuery(searchQuery);
+      }
+    }, 300);
+    
+    return () => {
+      isMounted.current = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+  
+  // Sync debounced value on mount to prevent stale searches
+  useEffect(() => {
+    setDebouncedSearchQuery(searchQuery);
+  }, []);
   const [showCompleted, setShowCompleted] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -114,9 +135,9 @@ export default function Projects() {
       filtered = filtered.filter(project => !project.completed);
     }
     
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    // Apply search filter (uses debounced value for better performance)
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(project => 
         project.name.toLowerCase().includes(query) ||
         (project.address?.toLowerCase()?.includes(query) ?? false) ||
@@ -141,7 +162,7 @@ export default function Projects() {
     });
     
     return sorted;
-  }, [projects, searchQuery, sortBy, showCompleted]);
+  }, [projects, debouncedSearchQuery, sortBy, showCompleted]);
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string }) => {

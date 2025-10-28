@@ -1,64 +1,7 @@
-import imageCompression from 'browser-image-compression';
-
-export interface CompressionOptions {
-  maxWidthOrHeight?: number;
-  maxSizeMB?: number;
-  quality?: number;
-  useWebWorker?: boolean;
-}
-
-export interface CompressionResult {
-  file: File;
-  originalSize: number;
-  compressedSize: number;
-  compressionRatio: number;
-}
-
-const defaultOptions: CompressionOptions = {
-  maxWidthOrHeight: 1920,
-  maxSizeMB: 1,
-  quality: 0.85,
-  useWebWorker: true,
-};
-
-export async function compressImage(
-  file: File,
-  options: CompressionOptions = {}
-): Promise<CompressionResult> {
-  const originalSize = file.size;
-  
-  const mergedOptions = {
-    ...defaultOptions,
-    ...options,
-  };
-
-  try {
-    const compressedFile = await imageCompression(file, {
-      maxSizeMB: mergedOptions.maxSizeMB!,
-      maxWidthOrHeight: mergedOptions.maxWidthOrHeight!,
-      useWebWorker: mergedOptions.useWebWorker!,
-      initialQuality: mergedOptions.quality!,
-    });
-
-    const compressedSize = compressedFile.size;
-    const compressionRatio = ((originalSize - compressedSize) / originalSize) * 100;
-
-    return {
-      file: compressedFile,
-      originalSize,
-      compressedSize,
-      compressionRatio,
-    };
-  } catch (error) {
-    console.error('Image compression failed:', error);
-    return {
-      file,
-      originalSize,
-      compressedSize: originalSize,
-      compressionRatio: 0,
-    };
-  }
-}
+/**
+ * Thumbnail generation using Canvas API (no external dependencies)
+ * Used by syncManager for creating photo thumbnails
+ */
 
 export async function generateThumbnail(
   file: File,
@@ -131,18 +74,4 @@ export async function generateThumbnail(
     
     reader.readAsDataURL(file);
   });
-}
-
-export async function compressAndGenerateThumbnail(
-  file: File
-): Promise<{ compressed: CompressionResult; thumbnail: Blob }> {
-  const [compressed, thumbnail] = await Promise.all([
-    compressImage(file),
-    generateThumbnail(file),
-  ]);
-
-  return {
-    compressed,
-    thumbnail,
-  };
 }
