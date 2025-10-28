@@ -267,11 +267,18 @@ export function PhotoAnnotationEditor({
     redrawCanvas();
   }, [annotations, selectedAnnotation, tempAnnotation]);
 
-  // Scroll controls to the left on mount
+  // Scroll controls to the left on mount - use requestAnimationFrame to ensure DOM is fully laid out
   useEffect(() => {
-    if (controlsScrollRef.current) {
-      controlsScrollRef.current.scrollLeft = 0;
-    }
+    const scrollToStart = () => {
+      if (controlsScrollRef.current) {
+        controlsScrollRef.current.scrollLeft = 0;
+      }
+    };
+    
+    // Use double requestAnimationFrame to ensure layout is complete
+    requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToStart);
+    });
   }, []);
 
   const addToHistory = (newAnnotations: Annotation[]) => {
