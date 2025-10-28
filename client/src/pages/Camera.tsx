@@ -198,17 +198,22 @@ export default function Camera() {
     }
   }, [tags]);
 
-  // Clear session photos on mount for fresh camera session
+  // Clear session photos on mount for fresh camera session (unless preserving session)
   useEffect(() => {
-    sessionPhotosRef.current = [];
-    setSessionPhotos([]);
+    const urlParams = new URLSearchParams(window.location.search);
+    const preserveSession = urlParams.get('preserveSession') === 'true';
     
-    // Clean up all camera session data from localStorage
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('camera-session-')) {
-        localStorage.removeItem(key);
-      }
-    });
+    if (!preserveSession) {
+      sessionPhotosRef.current = [];
+      setSessionPhotos([]);
+      
+      // Clean up all camera session data from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('camera-session-')) {
+          localStorage.removeItem(key);
+        }
+      });
+    }
   }, []);
 
   const previousProjectRef = useRef<string>('');

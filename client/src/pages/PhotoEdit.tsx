@@ -257,11 +257,11 @@ export default function PhotoEdit() {
       if (shouldCreateTodo) {
         setTodoDialogOpen(true);
       } else {
-        // Return to camera with project context
+        // Return to camera with project context and preserve session
         if (projectId) {
-          setLocation(`/camera?projectId=${projectId}`);
+          setLocation(`/camera?projectId=${projectId}&preserveSession=true`);
         } else {
-          setLocation('/camera');
+          setLocation('/camera?preserveSession=true');
         }
       }
     } catch (error) {
@@ -283,11 +283,11 @@ export default function PhotoEdit() {
       URL.revokeObjectURL(photoUrlRef.current);
       photoUrlRef.current = null;
     }
-    // Return to camera with project context
+    // Return to camera with project context and preserve session
     if (projectId) {
-      setLocation(`/camera?projectId=${projectId}`);
+      setLocation(`/camera?projectId=${projectId}&preserveSession=true`);
     } else {
-      setLocation('/camera');
+      setLocation('/camera?preserveSession=true');
     }
   };
 
@@ -309,7 +309,7 @@ export default function PhotoEdit() {
         duration: 1500,
       });
 
-      // Return to camera with project context
+      // Return to camera with project context (don't preserve session since photo was deleted)
       if (projectId) {
         setLocation(`/camera?projectId=${projectId}`);
       } else {
