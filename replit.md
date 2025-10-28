@@ -38,6 +38,8 @@ The build philosophy prioritizes simplicity and an invisible interface. The PWA 
 
 **Code-Splitting & Bundle Optimization**: The 4 largest pages (ProjectPhotos, Camera, Settings, ToDos) are lazy-loaded using React.lazy() with Suspense boundaries, reducing the main bundle from 920KB to 718KB (22% smaller, 264KB → 212KB gzipped). These pages only load when users navigate to them. Dependencies have been audited and 61+ unused packages removed for cleaner codebase and faster install times.
 
+**Phase 3 Sync Hardening (Completed)**: Offline sync system hardened with queue size limits (MAX_QUEUE_SIZE=500), single-flight locks (syncInProgress), exponential backoff with jitter (±25%), atomic deduplication using deterministic IDs (`${type}:${localId}:${action}`), and upsert logic that preserves createdAt/retryCount while updating data. Backoff formula: baseDelay * (0.75 + random(0.5)). Architect reviewed and approved as production-ready.
+
 **OAuth for Native Apps**: Uses Capacitor Browser plugin with custom URL schemes (`com.fieldsnaps.app://callback`) and backend redirect URI validation for security. Safari View Controller dismissal is handled natively in `AppDelegate.swift` by detecting deep link URL opens and programmatically dismissing any presented view controller. This approach is required because `Browser.close()` from JavaScript doesn't work reliably on iOS due to SFSafariViewController limitations.
 
 ## External Dependencies
