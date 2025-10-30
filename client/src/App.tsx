@@ -185,13 +185,13 @@ export default function App() {
     }
   }, []);
 
-  // Initialize status bar for native apps (transparent with light content)
+  // Initialize status bar for native apps (transparent with dark content)
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       // Set status bar to overlay the webview (transparent)
       nativeStatusBar.setOverlay(true);
-      // Use light style (dark text) for light backgrounds
-      nativeStatusBar.setLight();
+      // Use dark style (dark text/icons) for light backgrounds
+      nativeStatusBar.setDark();
     }
   }, []);
 
