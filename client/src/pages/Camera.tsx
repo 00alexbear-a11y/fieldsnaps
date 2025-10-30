@@ -742,11 +742,22 @@ export default function Camera() {
       const lastPoint = path[path.length - 2];
       const currentPoint = path[path.length - 1];
       
-      ctx.strokeStyle = '#FF0000';
-      ctx.lineWidth = 8;
+      // Match edit mode pen: Medium size (8) with 4.5x scale = 36px
+      const scaledPenWidth = 36;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
+      // Draw black outline first (like edit mode)
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = scaledPenWidth + 6; // 42px for outline
+      ctx.beginPath();
+      ctx.moveTo(lastPoint.x, lastPoint.y);
+      ctx.lineTo(currentPoint.x, currentPoint.y);
+      ctx.stroke();
+      
+      // Draw red stroke on top
+      ctx.strokeStyle = '#FF0000';
+      ctx.lineWidth = scaledPenWidth; // 36px
       ctx.beginPath();
       ctx.moveTo(lastPoint.x, lastPoint.y);
       ctx.lineTo(currentPoint.x, currentPoint.y);
