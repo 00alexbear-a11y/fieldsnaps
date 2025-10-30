@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useOfflineFirstPhotos } from "@/hooks/useOfflineFirstPhotos";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -1764,11 +1764,29 @@ export default function ProjectPhotos() {
                               </div>
                             )}
                             
-                            <LazyImage
-                              src={photo.url}
-                              alt={photo.caption || "Photo"}
-                              className="w-full h-full object-cover"
-                            />
+                            {/* Render video or image based on mediaType */}
+                            {photo.mediaType === 'video' ? (
+                              <>
+                                <video
+                                  src={photo.url}
+                                  className="w-full h-full object-cover"
+                                  preload="metadata"
+                                  crossOrigin="use-credentials"
+                                />
+                                {/* Play icon overlay for videos */}
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                                  <div className="rounded-full bg-white/90 backdrop-blur-sm p-3">
+                                    <Play className="w-8 h-8 text-primary fill-primary" />
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <LazyImage
+                                src={photo.url}
+                                alt={photo.caption || "Photo"}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
                           </div>
                         );
                       })}
