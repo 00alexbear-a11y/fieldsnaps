@@ -50,11 +50,15 @@ export default function BottomNav() {
   }
 
   return (
-    <nav
-      className="fixed bottom-4 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md safe-area-inset-bottom"
-      data-testid="nav-bottom"
-    >
-      <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe-2">
+    <>
+      {/* Background fill to prevent content from showing at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 h-28 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none" />
+      
+      <nav
+        className="fixed bottom-4 left-0 right-0 z-50 bg-transparent"
+        data-testid="nav-bottom"
+      >
+        <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);
@@ -98,5 +102,6 @@ export default function BottomNav() {
         })}
       </div>
     </nav>
+    </>
   );
 }
