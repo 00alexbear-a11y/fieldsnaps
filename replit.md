@@ -20,7 +20,7 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 ### Mobile UI Improvements (Oct 28, 2025)
 - **Camera Mode**: Removed border line between controls, reduced bottom padding from pb-safe-8 to pb-safe-4 on action rail and from pb-safe-6 to pb-safe-4 on zoom/tag controls to bring buttons closer to thumb reach zone.
 - **Edit Mode**: Reduced bottom padding from pb-safe-8 to pb-safe-4 on save/cancel action rail for easier thumb access.
-- **Projects Page**: Moved "Show Completed" toggle from bottom search bar to top section under New Project button for better accessibility. Increased bottom padding from pb-20 to pb-40 to ensure solid background when scrolling up.
+- **Projects Page**: Moved "Show Completed" toggle from bottom search bar to top section under New Project button for better accessibility. Increased bottom padding from pb-20 to pb-52 to prevent content bleed-through. Raised bottom navigation from bottom-2 to bottom-4 with pb-safe-2 for better thumb reach. Search bar now uses safe-area-aware positioning `calc(env(safe-area-inset-bottom) + 8rem)` to guarantee ~2.5rem gap above nav across all iPhone models.
 
 ## System Architecture
 
