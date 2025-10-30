@@ -1554,7 +1554,7 @@ export default function Camera() {
       </div>
 
       {/* Controls Row - Zoom, Tags */}
-      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 pb-safe-4 mb-16">
+      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 pb-safe-4 mb-2">
         <div className="flex items-center justify-center gap-4">
           {/* Zoom controls */}
           <div className="flex gap-1">
