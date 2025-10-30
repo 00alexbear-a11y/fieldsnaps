@@ -17,6 +17,11 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 
 ## Recent Changes
 
+### Video Display Support (Oct 30, 2025)
+- **Project Grid**: Videos now appear in ProjectPhotos grid with play icon overlay. Video thumbnails render with `<video>` elements using `preload="metadata"` for instant thumbnails without autoplay. Play icon overlay uses white/90 background with iOS Blue primary color.
+- **Fullscreen Viewer**: PhotoGestureViewer displays videos with custom play/pause controls that preserve touch-swipe navigation. Video element uses `playsInline` to prevent iOS fullscreen takeover. Custom play button overlay (pointer-events-none wrapper with clickable button) appears only when video is paused. Touch handlers on both video and button ensure swipe gestures work from any touch point. Video state resets on navigation to prevent stale playback state.
+- **Touch Navigation**: Videos support same swipe-to-navigate and long-press-to-delete gestures as photos. Tap anywhere on video to play/pause. All touch interactions work reliably on iOS Safari without native controls interfering with gesture recognition.
+
 ### Mobile UI Improvements (Oct 30, 2025)
 - **Camera Mode**: Removed border line between controls. Removed pb-safe-4 padding and added mb-0.5 margin to zoom/tag controls to sit immediately above bottom buttons. Added mb-16 margin to main action buttons (Back/Video/Camera/Edit) to push them UP into thumb-friendly zone. This creates a tight, compact control cluster for one-handed operation.
 - **Edit Mode**: Removed pb-safe-6 padding and added mb-0.5 margin to annotation tool controls (color picker, size, text, arrow, line, circle, pen, measure, undo, delete) to sit immediately above bottom buttons. Added mb-16 margin to save/cancel action rail to push buttons UP into thumb-friendly zone. Matches camera mode spacing pattern for consistent UX.
