@@ -757,6 +757,15 @@ export default function Camera() {
   const handleAnnotationTouchEnd = () => {
     setIsDrawing(false);
     drawingPathRef.current = [];
+    
+    // Clear the annotation canvas after each stroke
+    const canvas = annotationCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
   };
 
   const startRecording = async () => {
