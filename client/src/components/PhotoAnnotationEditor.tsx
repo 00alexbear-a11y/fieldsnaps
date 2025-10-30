@@ -2124,7 +2124,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Upper Controls Row - Annotation Tools (matches camera zoom/tag controls) */}
-      <div className="flex-shrink-0 bg-black/50 backdrop-blur-md px-4 py-2 pb-safe-6 mb-0.5 border-t border-white/10 pointer-events-auto relative" style={{ zIndex: 1000 }}>
+      <div className="flex-shrink-0 bg-black/50 backdrop-blur-md px-4 py-2 mb-0.5 border-t border-white/10 pointer-events-auto relative" style={{ zIndex: 1000 }}>
         <div ref={controlsScrollRef} className="flex items-center justify-start gap-4 overflow-x-auto overflow-y-visible scrollbar-hide pointer-events-auto">
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
