@@ -44,6 +44,7 @@ import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isNativePlatform } from './lib/nativeNavigation';
+import { nativeStatusBar } from './lib/nativeStatusBar';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -181,6 +182,16 @@ export default function App() {
     const onboardingComplete = localStorage.getItem('onboarding_complete');
     if (!onboardingComplete) {
       setShowOnboarding(true);
+    }
+  }, []);
+
+  // Initialize status bar for native apps (transparent with light content)
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      // Set status bar to overlay the webview (transparent)
+      nativeStatusBar.setOverlay(true);
+      // Use light style (dark text) for light backgrounds
+      nativeStatusBar.setLight();
     }
   }, []);
 
