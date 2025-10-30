@@ -530,7 +530,7 @@ export default function Projects() {
       </div>
 
       {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
-      <div className="fixed bottom-20 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40">
+      <div className="fixed bottom-24 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40">
         <div className="relative max-w-screen-sm mx-auto space-y-2">
           <div className="flex gap-2">
             <div className="relative flex-1">
