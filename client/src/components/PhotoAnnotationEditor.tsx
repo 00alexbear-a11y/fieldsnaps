@@ -2316,7 +2316,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Bottom Action Rail - Cancel and Save (matches camera Back/Video/Camera/Edit buttons) */}
-      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 bg-black/50 backdrop-blur-md pointer-events-auto">
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-10 bg-black/50 backdrop-blur-md pointer-events-auto">
         <Button
           variant="ghost"
           size="icon"
