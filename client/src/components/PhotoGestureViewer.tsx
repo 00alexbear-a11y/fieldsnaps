@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush, Image, Tag, MoreHorizontal } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Trash2, Share2, MessageSquare, Send, Pencil, Brush, Image, Tag, MoreHorizontal, Play } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,7 @@ interface Photo {
   id: string;
   url: string;
   caption?: string | null;
+  mediaType?: string;
 }
 
 interface PhotoGestureViewerProps {
@@ -70,10 +71,12 @@ export function PhotoGestureViewer({
   const [newComment, setNewComment] = useState("");
   const [showCaptionDialog, setShowCaptionDialog] = useState(false);
   const [editedCaption, setEditedCaption] = useState("");
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Gesture state for swipe navigation
   const gestureStateRef = useRef({
@@ -231,6 +234,30 @@ export function PhotoGestureViewer({
     }
   };
 
+  // Video control functions
+  const toggleVideoPlayback = useCallback(() => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsVideoPlaying(true);
+      }
+    }
+  }, [isVideoPlaying]);
+
+  // Reset video state when switching photos
+  useEffect(() => {
+    // Always reset playing state when navigating
+    setIsVideoPlaying(false);
+    
+    // Pause video if it exists and is playing
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [currentIndex]);
+
   const handleDeleteClick = async () => {
     // On iOS: use native confirmation dialog
     if (Capacitor.isNativePlatform()) {
@@ -336,23 +363,59 @@ export function PhotoGestureViewer({
         </div>
       </div>
 
-      {/* Photo Container */}
+      {/* Photo/Video Container */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden pointer-events-none"
+        className="flex-1 flex items-center justify-center overflow-hidden pointer-events-none relative"
       >
-        <img
-          ref={imageRef}
-          src={photoUrl}
-          alt={currentPhoto.caption || "Photo"}
-          crossOrigin="use-credentials"
-          className="max-w-full max-h-full object-contain pointer-events-auto"
-          draggable={false}
-          data-testid="photo-viewer-image"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        />
+        {currentPhoto.mediaType === 'video' ? (
+          <>
+            <video
+              ref={videoRef}
+              src={photoUrl}
+              playsInline
+              crossOrigin="use-credentials"
+              className="max-w-full max-h-full object-contain pointer-events-auto"
+              data-testid="photo-viewer-video"
+              onClick={toggleVideoPlayback}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onPlay={() => setIsVideoPlaying(true)}
+              onPause={() => setIsVideoPlaying(false)}
+              onEnded={() => setIsVideoPlaying(false)}
+            />
+            {/* Custom play button overlay - only shows when paused */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {!isVideoPlaying && (
+                <button
+                  onClick={toggleVideoPlayback}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  className="rounded-full bg-white/90 backdrop-blur-sm p-4 pointer-events-auto"
+                  data-testid="button-video-toggle"
+                  aria-label="Play video"
+                >
+                  <Play className="w-12 h-12 text-primary fill-primary" />
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <img
+            ref={imageRef}
+            src={photoUrl}
+            alt={currentPhoto.caption || "Photo"}
+            crossOrigin="use-credentials"
+            className="max-w-full max-h-full object-contain pointer-events-auto"
+            draggable={false}
+            data-testid="photo-viewer-image"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          />
+        )}
       </div>
 
       {/* Navigation Arrows - Centered vertically on sides */}
