@@ -739,28 +739,33 @@ export default function Camera() {
     const ctx = canvas.getContext('2d');
     if (ctx && drawingPathRef.current.length > 1) {
       const path = drawingPathRef.current;
-      const lastPoint = path[path.length - 2];
-      const currentPoint = path[path.length - 1];
+      
+      // Clear canvas and redraw entire path to avoid gaps at corners
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Match edit mode pen: Medium size (8) with 4.5x scale = 36px
       const scaledPenWidth = 36;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
-      // Draw black outline first (like edit mode)
+      // Draw black outline for entire path
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = scaledPenWidth + 6; // 42px for outline
       ctx.beginPath();
-      ctx.moveTo(lastPoint.x, lastPoint.y);
-      ctx.lineTo(currentPoint.x, currentPoint.y);
+      ctx.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y);
+      }
       ctx.stroke();
       
-      // Draw red stroke on top
+      // Draw red stroke on top for entire path
       ctx.strokeStyle = '#FF0000';
       ctx.lineWidth = scaledPenWidth; // 36px
       ctx.beginPath();
-      ctx.moveTo(lastPoint.x, lastPoint.y);
-      ctx.lineTo(currentPoint.x, currentPoint.y);
+      ctx.moveTo(path[0].x, path[0].y);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y);
+      }
       ctx.stroke();
     }
   };
