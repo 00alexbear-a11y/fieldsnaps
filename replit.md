@@ -18,7 +18,7 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 ## Recent Changes
 
 ### Mobile UI Improvements (Oct 30, 2025)
-- **Camera Mode**: Removed border line between controls. Added mb-16 margin to both zoom/tag controls and main action buttons (Back/Video/Camera/Edit) to push buttons UP into thumb-friendly zone.
+- **Camera Mode**: Removed border line between controls. Added mb-2 margin to zoom/tag controls to sit just above bottom buttons, and mb-16 margin to main action buttons (Back/Video/Camera/Edit) to push them UP into thumb-friendly zone.
 - **Edit Mode**: Added mb-16 margin to save/cancel action rail to push buttons UP for easier thumb access.
 - **Projects Page**: Moved "Show Completed" toggle from bottom search bar to top section under New Project button for better accessibility. Raised bottom navigation from bottom-2 to bottom-4 with pb-safe-2 for better thumb reach. Search bar positioned at bottom-20 to sit just above the navigation. Added semi-transparent white background fill (h-28, z-30, pointer-events-none) at the bottom to prevent project content from showing through while keeping interactive elements clickable.
 
