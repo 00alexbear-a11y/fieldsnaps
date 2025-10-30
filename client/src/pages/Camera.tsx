@@ -743,7 +743,7 @@ export default function Camera() {
       const currentPoint = path[path.length - 1];
       
       ctx.strokeStyle = '#FF0000';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 8;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
