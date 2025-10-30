@@ -51,10 +51,10 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-2 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md safe-area-inset-bottom"
+      className="fixed bottom-4 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md safe-area-inset-bottom"
       data-testid="nav-bottom"
     >
-      <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe">
+      <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);

@@ -458,7 +458,7 @@ export default function Projects() {
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 bg-white dark:bg-black">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-52 bg-white dark:bg-black">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
@@ -530,7 +530,7 @@ export default function Projects() {
       </div>
 
       {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40">
+      <div className="fixed left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 8rem)' }}>
         <div className="relative max-w-screen-sm mx-auto space-y-2">
           <div className="flex gap-2">
             <div className="relative flex-1">
