@@ -1764,18 +1764,27 @@ export default function ProjectPhotos() {
                               </div>
                             )}
                             
-                            {/* Render video or image based on mediaType */}
+                            {/* Render video thumbnail or image based on mediaType */}
                             {photo.mediaType === 'video' ? (
                               <>
-                                <video
-                                  src={photo.url}
-                                  className="w-full h-full object-cover"
-                                  preload="metadata"
-                                  crossOrigin="use-credentials"
-                                />
+                                {/* Display static thumbnail if available, fallback to video element */}
+                                {photo.thumbnailUrl ? (
+                                  <LazyImage
+                                    src={photo.thumbnailUrl}
+                                    alt={photo.caption || "Video"}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <video
+                                    src={photo.url}
+                                    className="w-full h-full object-cover"
+                                    preload="metadata"
+                                    crossOrigin="use-credentials"
+                                  />
+                                )}
                                 {/* Play icon overlay for videos */}
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
-                                  <div className="rounded-full bg-white/90 backdrop-blur-sm p-3">
+                                  <div className="rounded-full bg-white/10 p-3">
                                     <Play className="w-8 h-8 text-primary fill-primary" />
                                   </div>
                                 </div>

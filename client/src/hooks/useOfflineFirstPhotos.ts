@@ -59,10 +59,18 @@ export function useOfflineFirstPhotos(projectId: string) {
           const blobUrl = createPhotoUrl(p);
           newBlobUrls.set(p.id, blobUrl);
 
+          // Create thumbnail URL from thumbnailBlob if available (for videos)
+          let thumbnailUrl: string | null = null;
+          if (p.thumbnailBlob) {
+            thumbnailUrl = URL.createObjectURL(p.thumbnailBlob);
+            newBlobUrls.set(`${p.id}-thumb`, thumbnailUrl);
+          }
+
           return {
             id: p.serverId || p.id, // Use serverId if available
             projectId: projectId,
             url: blobUrl, // Use blob URL for local photos
+            thumbnailUrl, // Use blob URL for thumbnail if available
             mediaType: p.mediaType,
             caption: p.caption || null,
             width: p.width || null,
@@ -122,8 +130,10 @@ export function useOfflineFirstPhotos(projectId: string) {
       // Transform URLs to use backend proxy routes for proper CORS support
       const serverPhotosWithStatus: PhotoWithStatus[] = serverPhotos.map(p => ({
         ...p,
-        url: getPhotoImageUrl(p.id, p.url),
-        thumbnailUrl: p.thumbnailUrl ? getPhotoThumbnailUrl(p.id, p.thumbnailUrl) : undefined,
+        // Videos always use raw URL (for <video> element playback)
+        // Photos use proxy URL (for CORS support)
+        url: p.mediaType === 'video' ? p.url : getPhotoImageUrl(p.id, p.url),
+        thumbnailUrl: p.thumbnailUrl ? getPhotoThumbnailUrl(p.id, p.thumbnailUrl) : null,
         syncStatus: 'synced' as const,
         isLocal: false,
       }));
