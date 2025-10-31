@@ -17,6 +17,17 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 
 ## Recent Changes
 
+### iOS 26 "Liquid Glass" Camera Interface Redesign (Oct 31, 2025)
+- **Top Bar Navigation**: Clean top bar with back button (left) and flip camera button (right), both using frosted glass (bg-black/30, backdrop-blur-sm) with rounded-full styling and white/80 icons. Positioned with pt-safe-2 for iPhone notch support.
+- **Swipe-Down Gesture**: Native iOS-style swipe-down-to-dismiss gesture. Tracks touch starting in top 20% of screen, provides real-time visual feedback with translateY transform, dismisses camera when swiped down >100px or with velocity >0.5px/ms. Smooth 300ms spring-back animation if not dismissed.
+- **Liquid Glass Zoom Controls**: Floating zoom pills (0.5×, 1×, 2×, 3×) on left side with enhanced frosted glass (bg-black/30, backdrop-blur-xl, border-white/10, shadow-2xl). Active zoom shows white background with black text. Refined spacing (gap-1.5) and padding for precision tapping.
+- **Single Circular Thumbnail**: Bottom-left circular thumbnail (14×14, up from 12×12) showing most recent photo/video with enhanced border (border-white/60) and ring-1 ring-black/10 for depth. Photo count badge and tag indicator overlay on thumbnail. Tap to view/edit.
+- **Mode Carousel Styling**: Enhanced text styling with tracking-tight, font-medium at 15px. Active mode uses font-semibold, scale-110, and text-white. Inactive modes use text-white/70 with smooth hover/active states. Gap increased to 6 for better touch targets.
+- **Bottom Controls Background**: Gradient background (from-black/50 via-black/30 to-transparent) with backdrop-blur-md creates subtle separation from viewfinder while maintaining see-through effect. Enhanced padding (pt-5, pb-safe-6) for better visual rhythm.
+- **Utility Button**: Quick actions button (tags & to-do) styled with bg-white/15, backdrop-blur-xl, border-white/20, shadow-2xl. Uses Sheet component for bottom drawer with frosted black background (bg-black/95, backdrop-blur-md).
+- **Capture Buttons**: Photo mode shows white circular button (20×20) with white inner circle. Video mode shows red button with square stop icon when recording. All buttons use hover:scale-105, active:scale-95 with shadow-lg for tactile feedback.
+- **Design Philosophy**: Minimal, one-handed operation. Single natural tap target (center capture button). Frosted glass elements float above camera preview. All interactive elements sized for thumb reach. Consistent 250ms transitions with haptic feedback on mode switches.
+
 ### Enhanced Video Quality & Carousel Transitions (Oct 31, 2025)
 - **Video Recording Quality**: Increased bitrate from 2.5 Mbps to 10 Mbps (4x improvement) for professional construction documentation. Videos now record at industry-standard quality (8-10 Mbps for 1080p) providing clear detail for dispute resolution and compliance.
 - **Carousel Photo Viewer**: Implemented Apple Photos-style carousel with smooth sliding transitions. All photos/videos render in a horizontal track using CSS flexbox. GPU-accelerated transitions via `translate3d()` with 300ms cubic-bezier easing matching iOS timing standards.
