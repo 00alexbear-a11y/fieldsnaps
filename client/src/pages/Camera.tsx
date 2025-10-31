@@ -1625,7 +1625,10 @@ export default function Camera() {
           
           {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above black bottom menu) */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-60 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10"
+              style={{ bottom: '180px' }}
+            >
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
