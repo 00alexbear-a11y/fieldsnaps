@@ -30,7 +30,6 @@ import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import Onboarding from "./components/Onboarding";
-import SyncBanner from "./components/SyncBanner";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
@@ -59,7 +58,6 @@ function AppContent() {
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
   
-  const showSyncBanner = location === '/projects';
   
   // Disable swipe back on main pages to prevent blank white screen
   const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
@@ -145,9 +143,6 @@ function AppContent() {
       
       {/* Show payment notification for past_due users */}
       <PaymentNotification />
-      
-      {/* Show sync banner only on Projects page */}
-      {showSyncBanner && <SyncBanner />}
       
       <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
         <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
