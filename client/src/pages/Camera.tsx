@@ -1015,11 +1015,6 @@ export default function Camera() {
         });
         
         haptics.success();
-        toast({
-          title: '✓ Video Saved',
-          description: 'Video recorded successfully',
-          duration: 2000,
-        });
         
         syncManager.queuePhotoSync(savedPhoto.id, selectedProject, 'create').catch(err => {
           console.error('[Camera] Sync queue error:', err);
@@ -1055,11 +1050,6 @@ export default function Camera() {
       renderFrame();
       
       haptics.medium();
-      toast({
-        title: '● Recording',
-        description: 'Tap annotations to draw',
-        duration: 2000,
-      });
       
     } catch (error) {
       console.error('Recording start error:', error);
@@ -1167,11 +1157,6 @@ export default function Camera() {
       URL.revokeObjectURL(compressionResult.url);
 
       haptics.success();
-      toast({
-        title: '✓ Captured',
-        description: `${QUALITY_PRESETS.find(p => p.value === selectedQuality)?.label} quality`,
-        duration: 1500,
-      });
 
       sessionPhotosRef.current = [savedPhoto, ...sessionPhotosRef.current].slice(0, 10);
       setSessionPhotos([...sessionPhotosRef.current]);
@@ -1189,11 +1174,6 @@ export default function Camera() {
         } else {
           // Upload failed or offline - navigate without photoId
           console.log('[Camera] Photo upload failed, navigating to todos without photoId');
-          toast({
-            title: 'Photo saved locally',
-            description: 'Will upload when online',
-            duration: 2000,
-          });
           setLocation('/todos');
         }
         return; // Early return to prevent button animation
@@ -1205,12 +1185,7 @@ export default function Camera() {
         console.log('[Camera] Photo queued for sync successfully');
       } catch (err) {
         console.error('[Camera] Sync queue error:', err);
-        toast({
-          title: 'Photo Saved Locally',
-          description: 'Photo saved but needs manual sync. Check sync status in settings.',
-          variant: 'default',
-          duration: 4000,
-        });
+        // Silent - user doesn't need notification if working correctly
       }
 
       // Invalidate photos query to trigger refresh in ProjectPhotos page
@@ -1351,11 +1326,6 @@ export default function Camera() {
       sessionPhotosRef.current = sessionPhotosRef.current.filter(p => p.id !== photoId);
       setSessionPhotos([...sessionPhotosRef.current]);
 
-      toast({
-        title: 'Photo deleted',
-        description: 'Photo removed from local storage',
-        duration: 2000,
-      });
     } catch (error) {
       console.error('[Camera] Failed to delete photo:', error);
       toast({
