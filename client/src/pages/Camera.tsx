@@ -1702,12 +1702,21 @@ export default function Camera() {
             Video
           </button>
           <button
-            onClick={() => switchCameraMode('photo')}
-            disabled={isTransitioning || isRecording}
+            onClick={() => {
+              if (sessionPhotos.length > 0) {
+                const photo = sessionPhotos[0];
+                if (photo.mediaType === 'video') {
+                  setLocation(`/photo/${photo.id}/view`);
+                } else {
+                  setLocation(`/photo/${photo.id}/edit`);
+                }
+              }
+            }}
+            disabled={isTransitioning || isRecording || sessionPhotos.length === 0}
             className={`transition-all duration-250 ${
-              cameraMode === 'photo'
-                ? 'text-white/70'
-                : 'hover:text-white/90 active:text-white/95'
+              sessionPhotos.length === 0
+                ? 'text-white/40 opacity-50'
+                : 'text-white/70 hover:text-white/90 active:text-white/95'
             } disabled:opacity-50`}
             data-testid="button-mode-edit"
           >
