@@ -98,6 +98,11 @@ export default function Camera() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   
+  // Swipe-down gesture refs (using refs to avoid re-renders during gesture)
+  const swipeStartY = useRef<number | null>(null);
+  const swipeStartTime = useRef<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   const sessionPhotosRef = useRef<LocalPhoto[]>([]);
   const [sessionPhotos, setSessionPhotos] = useState<LocalPhoto[]>([]);
   const thumbnailUrlsRef = useRef<Map<string, string>>(new Map());
@@ -790,6 +795,51 @@ export default function Camera() {
     }
   };
 
+  // Swipe-down gesture handlers for dismissing camera (iOS-style)
+  const handleContainerTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Only handle single-touch swipes (not pinch) - Allow from anywhere on preview
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      swipeStartY.current = touch.clientY;
+      swipeStartTime.current = Date.now();
+    }
+  };
+
+  const handleContainerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (swipeStartY.current !== null && e.touches.length === 1 && containerRef.current) {
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - swipeStartY.current;
+      
+      // Only allow downward swipes
+      if (deltaY > 0) {
+        const offset = Math.min(deltaY, 200); // Cap at 200px
+        // Use direct DOM manipulation to avoid re-renders
+        containerRef.current.style.transform = `translateY(${offset}px)`;
+        containerRef.current.style.transition = 'none';
+      }
+    }
+  };
+
+  const handleContainerTouchEnd = () => {
+    if (swipeStartY.current !== null && containerRef.current) {
+      const currentTransform = containerRef.current.style.transform;
+      const offset = parseFloat(currentTransform.match(/translateY\((\d+)px\)/)?.[1] || '0');
+      const swipeDuration = Date.now() - swipeStartTime.current;
+      const velocity = offset / swipeDuration; // px/ms
+      
+      // Dismiss if swiped down more than 100px or fast swipe (>0.5 px/ms)
+      if (offset > 100 || velocity > 0.5) {
+        setLocation('/'); // Go back
+      } else {
+        // Animate back to normal position
+        containerRef.current.style.transition = 'transform 0.3s ease-out';
+        containerRef.current.style.transform = 'translateY(0px)';
+      }
+      
+      swipeStartY.current = null;
+    }
+  };
+
   // Mode switching with subtle transition delay
   const switchCameraMode = async (newMode: CameraMode) => {
     if (cameraMode === newMode || isTransitioning || isRecording) return;
@@ -1410,6 +1460,45 @@ export default function Camera() {
 
   const selectedProjectData = projects.find(p => p.id === selectedProject);
 
+  return (
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col"
+      style={{ 
+        height: '100dvh', 
+        minHeight: '100vh'
+      }}
+      onTouchStart={handleContainerTouchStart}
+      onTouchMove={handleContainerTouchMove}
+      onTouchEnd={handleContainerTouchEnd}
+    >
+      {/* Camera Viewfinder */}
+      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
+          {/* Top Bar - iOS Style with Back Button (44px touch targets) */}
+          <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-2">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation('/')}
+                className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
+                data-testid="button-back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={switchCamera}
+                className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
+                data-testid="button-switch-camera"
+              >
+                <SwitchCamera className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+
           {/* Loading and Error states */}
           {(!isActive || isCameraLoading) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
@@ -1487,17 +1576,17 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Floating Zoom Controls - iOS Style (Center-Left) */}
+          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 bg-black/40 backdrop-blur-md rounded-full px-2 py-3 shadow-lg">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2 py-2.5 shadow-2xl border border-white/10">
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
                   onClick={() => switchZoomLevel(camera.zoomLevel)}
-                  className={`text-xs font-medium px-2 py-1 rounded-full transition-all ${
+                  className={`text-xs font-semibold px-2.5 py-1.5 rounded-full transition-all duration-200 ${
                     zoomLevel === camera.zoomLevel
-                      ? 'bg-white text-black'
-                      : 'text-white hover:bg-white/20'
+                      ? 'bg-white text-black shadow-md'
+                      : 'text-white/90 hover:bg-white/15 active:bg-white/25'
                   }`}
                   data-testid={`button-zoom-${camera.zoomLevel}x`}
                 >
@@ -1529,7 +1618,7 @@ export default function Camera() {
                     setLocation(`/photo/${photo.id}/edit`);
                   }
                 }}
-                className="absolute bottom-4 left-4 z-20 w-12 h-12 rounded-full overflow-hidden border-2 border-white/50 shadow-lg hover-elevate active-elevate-2 backdrop-blur-sm"
+                className="absolute bottom-4 left-4 z-20 w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10"
                 data-testid="thumbnail-last-photo"
               >
                 {isVideo ? (
@@ -1582,18 +1671,18 @@ export default function Camera() {
           })()}
       </div>
 
-      {/* iOS 26-Style Bottom Controls */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-3 pb-safe-6 pt-4 px-6">
-        {/* Mode Carousel */}
-        <div className="flex items-center gap-4 text-white/60 text-sm font-medium">
+      {/* iOS 26-Style Bottom Controls with Liquid Glass Background */}
+      <div className="flex-shrink-0 flex flex-col items-center gap-3 pb-safe-6 pt-5 px-6 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
+        {/* Mode Carousel with Enhanced Styling */}
+        <div className="flex items-center gap-6 text-white/70 text-[15px] font-medium tracking-tight">
           <button
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'photo'}
-            className={`transition-all ${
+            className={`transition-all duration-250 ${
               cameraMode === 'photo'
-                ? 'text-white scale-110'
-                : 'hover:text-white/80'
+                ? 'text-white font-semibold scale-110'
+                : 'hover:text-white/90 active:text-white/95'
             } disabled:opacity-50`}
             data-testid="button-mode-photo"
           >
@@ -1603,10 +1692,10 @@ export default function Camera() {
             onClick={() => switchCameraMode('video')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'video'}
-            className={`transition-all ${
+            className={`transition-all duration-250 ${
               cameraMode === 'video'
-                ? 'text-white scale-110'
-                : 'hover:text-white/80'
+                ? 'text-white font-semibold scale-110'
+                : 'hover:text-white/90 active:text-white/95'
             } disabled:opacity-50`}
             data-testid="button-mode-video"
           >
@@ -1615,10 +1704,10 @@ export default function Camera() {
           <button
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
-            className={`transition-all ${
+            className={`transition-all duration-250 ${
               cameraMode === 'photo'
-                ? 'text-white/60'
-                : 'hover:text-white/80'
+                ? 'text-white/70'
+                : 'hover:text-white/90 active:text-white/95'
             } disabled:opacity-50`}
             data-testid="button-mode-edit"
           >
@@ -1662,15 +1751,15 @@ export default function Camera() {
             </button>
           )}
           
-          {/* Utility Button - Tags & To-Do */}
+          {/* Utility Button - Tags & To-Do (Liquid Glass) */}
           {!isAttachMode && (
             <Sheet>
               <SheetTrigger asChild>
                 <button
-                  className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40 transition-all flex items-center justify-center text-white shadow-lg"
+                  className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/25 active:bg-white/35 transition-all flex items-center justify-center text-white shadow-2xl border border-white/20"
                   data-testid="button-utility"
                 >
-                  <CheckSquare className="w-6 h-6" />
+                  <CheckSquare className="w-5 h-5" />
                 </button>
               </SheetTrigger>
               <SheetContent side="bottom" className="bg-black/95 backdrop-blur-md border-white/10">
