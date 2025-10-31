@@ -498,4 +498,10 @@
   .pb-safe-8 {
     padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0rem));
   }
+
+  /* Hide Replit dev banner */
+  [data-replit-dev-banner],
+  #replit-dev-banner {
+    display: none !important;
+  }
 }
