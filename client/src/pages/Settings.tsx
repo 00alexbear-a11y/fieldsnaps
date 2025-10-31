@@ -547,33 +547,6 @@ export default function Settings() {
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 pb-24 pt-4 space-y-6 max-w-screen-sm mx-auto">
 
-      {/* Appearance */}
-      <Card className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Appearance</h2>
-        
-        <label
-          htmlFor="dark-mode"
-          className="flex items-center justify-between min-h-11 cursor-pointer"
-        >
-          <div className="flex items-center space-x-3">
-            {isDark ? (
-              <Moon className="w-5 h-5 text-muted-foreground" />
-            ) : (
-              <Sun className="w-5 h-5 text-muted-foreground" />
-            )}
-            <span className="font-medium">
-              Dark Mode
-            </span>
-          </div>
-          <Switch
-            id="dark-mode"
-            checked={isDark}
-            onCheckedChange={toggleTheme}
-            data-testid="switch-dark-mode"
-          />
-        </label>
-      </Card>
-
       {/* Camera Quality */}
       <Card className="p-4 space-y-4">
         <div className="flex items-center gap-3">
