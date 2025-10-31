@@ -1369,7 +1369,7 @@ export default function Camera() {
 
     return (
       <div className="flex flex-col h-screen bg-background">
-        <div className="flex items-center justify-between px-4 py-6 border-b border-border">
+        <div className="flex items-center justify-between px-4 pt-safe-3 pb-3 border-b border-border">
           <Button
             variant="ghost"
             size="icon"

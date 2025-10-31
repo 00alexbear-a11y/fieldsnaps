@@ -105,7 +105,7 @@ export default function PhotoView() {
   return (
     <div className="relative h-screen bg-black">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent p-4">
+      <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent pt-safe-2 pb-4 px-4">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
