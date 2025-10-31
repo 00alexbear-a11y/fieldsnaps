@@ -1662,77 +1662,81 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Single Circular Thumbnail - Bottom Left (iOS Style) */}
-          {sessionPhotos.length > 0 && !isRecording && (() => {
-            const photo = sessionPhotos[0]; // Most recent photo
-            const url = thumbnailUrlsRef.current.get(photo.id);
-            if (!url) return null;
-            
-            const photoTags = photo.pendingTagIds
-              ?.map(tagId => tags.find(t => t.id === tagId))
-              .filter(Boolean) as Tag[] | undefined;
-            
-            const isVideo = photo.mediaType === 'video';
-            const photoCount = sessionPhotos.length;
-            
-            return (
-              <button
-                onClick={() => {
-                  // Navigate to project photos to view all session photos
-                  setLocation(`/project/${selectedProject}/photos`);
-                }}
-                className="absolute bottom-4 left-4 z-20 w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10"
-                data-testid="thumbnail-last-photo"
-              >
-                {isVideo ? (
-                  <video
-                    src={url}
-                    className="w-full h-full object-cover"
-                    muted
-                  />
-                ) : (
-                  <img
-                    src={url}
-                    alt="Last photo"
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                
-                {/* Video Play Icon */}
-                {isVideo && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
-                    <div className="w-6 h-6 rounded-full bg-white/90 flex items-center justify-center">
-                      <Play className="w-3 h-3 text-black fill-black ml-0.5" />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Photo Count Badge */}
-                {photoCount > 1 && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-md">
-                    {photoCount}
-                  </div>
-                )}
-                
-                {/* Tag Indicator */}
-                {photoTags && photoTags.length > 0 && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white shadow-sm"
-                    style={{ backgroundColor: (() => {
-                      const tagColorMap: Record<string, string> = {
-                        red: '#ef4444',
-                        orange: '#f97316',
-                        yellow: '#eab308',
-                        blue: '#3b82f6',
-                        gray: '#6b7280',
-                      };
-                      return tagColorMap[photoTags[0].color] || '#6b7280';
-                    })() }}
-                  />
-                )}
-              </button>
-            );
-          })()}
       </div>
+
+      {/* Single Circular Thumbnail - Bottom Left (iOS Style) */}
+      {sessionPhotos.length > 0 && !isRecording && (() => {
+        const photo = sessionPhotos[0]; // Most recent photo
+        const url = thumbnailUrlsRef.current.get(photo.id);
+        if (!url) return null;
+        
+        const photoTags = photo.pendingTagIds
+          ?.map(tagId => tags.find(t => t.id === tagId))
+          .filter(Boolean) as Tag[] | undefined;
+        
+        const isVideo = photo.mediaType === 'video';
+        const photoCount = sessionPhotos.length;
+        
+        return (
+          <button
+            onClick={() => {
+              // Navigate to project photos to view all session photos
+              setLocation(`/project/${selectedProject}/photos`);
+            }}
+            className="fixed left-4 z-30 w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10"
+            style={{ 
+              bottom: 'calc(env(safe-area-inset-bottom) + 172px)'
+            }}
+            data-testid="thumbnail-last-photo"
+          >
+            {isVideo ? (
+              <video
+                src={url}
+                className="w-full h-full object-cover"
+                muted
+              />
+            ) : (
+              <img
+                src={url}
+                alt="Last photo"
+                className="w-full h-full object-cover"
+              />
+            )}
+            
+            {/* Video Play Icon */}
+            {isVideo && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                <div className="w-6 h-6 rounded-full bg-white/90 flex items-center justify-center">
+                  <Play className="w-3 h-3 text-black fill-black ml-0.5" />
+                </div>
+              </div>
+            )}
+            
+            {/* Photo Count Badge */}
+            {photoCount > 1 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-md">
+                {photoCount}
+              </div>
+            )}
+            
+            {/* Tag Indicator */}
+            {photoTags && photoTags.length > 0 && (
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white shadow-sm"
+                style={{ backgroundColor: (() => {
+                  const tagColorMap: Record<string, string> = {
+                    red: '#ef4444',
+                    orange: '#f97316',
+                    yellow: '#eab308',
+                    blue: '#3b82f6',
+                    gray: '#6b7280',
+                  };
+                  return tagColorMap[photoTags[0].color] || '#6b7280';
+                })() }}
+              />
+            )}
+          </button>
+        );
+      })()}
 
       {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above black bottom menu) */}
       {!isRecording && availableCameras.length > 1 && (
