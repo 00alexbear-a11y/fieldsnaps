@@ -97,10 +97,24 @@ export default function Projects() {
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{
+    pending: number;
+    projects: number;
+    photos: number;
+  } | null>(null);
   const { toast } = useToast();
 
   // Offline-first: load from IndexedDB immediately, fetch from server in background
   const { projects: projectsWithCounts, isLoading: projectsLoading, isOnline, hasLocalData } = useOfflineFirstProjects();
+
+  // Load sync status on mount and when online status changes
+  useEffect(() => {
+    const loadSyncStatus = async () => {
+      const status = await syncManager.getSyncStatus();
+      setSyncStatus(status);
+    };
+    loadSyncStatus();
+  }, [isOnline]);
 
   // For backward compatibility, extract projects
   const projects = useMemo(() => 
@@ -352,16 +366,17 @@ export default function Projects() {
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black">
-      {/* Top Navigation Bar - Sticky with glassmorphism */}
+      {/* Top Navigation Bar - Sticky */}
       <div className="sticky top-0 z-50 bg-white dark:bg-black">
-        <div className="flex items-center justify-between px-4 pt-safe-3 pb-3">
-          <img 
-            src={logoPath} 
-            alt="FieldSnaps" 
-            className="h-9 w-auto object-contain"
-            data-testid="img-fieldsnaps-logo"
-          />
-          <div className="flex items-center gap-2">
+        <div className="px-4 pt-safe-3 pb-3 space-y-1">
+          <div className="flex items-center justify-between">
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-9 w-auto object-contain"
+              data-testid="img-fieldsnaps-logo"
+            />
+            <div className="flex items-center gap-2">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <Button 
                   className="h-12"
@@ -454,7 +469,13 @@ export default function Projects() {
               >
                 <Settings className="w-5 h-5" />
               </Button>
+            </div>
           </div>
+          {syncStatus && syncStatus.pending > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
+            </p>
+          )}
         </div>
         
         {/* Show Completed Toggle - Moved to top for better accessibility */}
