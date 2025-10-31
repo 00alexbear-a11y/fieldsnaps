@@ -27,6 +27,7 @@ export interface LocalPhoto {
   retryCount: number;
   annotations?: string | null; // JSON string of annotations
   pendingTagIds?: string[]; // Tags selected but not yet synced to server
+  unitLabel?: string; // Unit stamp for multi-unit construction sites
   isForTodo?: boolean; // True if photo was captured via the To-Do button
   createdAt: number;
   updatedAt: number;

@@ -1496,8 +1496,6 @@ export default function Camera() {
     );
   }
 
-  const selectedProjectData = projects.find(p => p.id === selectedProject);
-
   return (
     <div 
       ref={containerRef}
