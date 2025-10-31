@@ -110,6 +110,7 @@ export default function Camera() {
   const cameraSessionIdRef = useRef<number>(0);
   const userSelectedZoomRef = useRef<0.5 | 1 | 2 | 3 | null>(null);
   const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const modeTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -283,6 +284,9 @@ export default function Camera() {
     return () => {
       if (startCameraTimeoutRef.current) {
         clearTimeout(startCameraTimeoutRef.current);
+      }
+      if (modeTransitionTimeoutRef.current) {
+        clearTimeout(modeTransitionTimeoutRef.current);
       }
       stopCamera();
       // Ensure status bar is shown when component unmounts
@@ -789,14 +793,20 @@ export default function Camera() {
   const switchCameraMode = async (newMode: CameraMode) => {
     if (cameraMode === newMode || isTransitioning || isRecording) return;
     
+    // Clear any existing transition timeout
+    if (modeTransitionTimeoutRef.current) {
+      clearTimeout(modeTransitionTimeoutRef.current);
+    }
+    
     haptics.light();
     setIsTransitioning(true);
     
     // 250ms transition delay for intentional feel
-    await new Promise(resolve => setTimeout(resolve, 250));
-    
-    setCameraMode(newMode);
-    setIsTransitioning(false);
+    modeTransitionTimeoutRef.current = setTimeout(() => {
+      setCameraMode(newMode);
+      setIsTransitioning(false);
+      modeTransitionTimeoutRef.current = null;
+    }, 250);
   };
 
   const startRecording = async () => {
@@ -1703,6 +1713,7 @@ export default function Camera() {
             size="sm"
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'photo'}
             className={`px-6 py-1 rounded-full text-xs transition-all ${
               cameraMode === 'photo'
                 ? 'bg-white text-black'
@@ -1717,6 +1728,7 @@ export default function Camera() {
             size="sm"
             onClick={() => switchCameraMode('video')}
             disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'video'}
             className={`px-6 py-1 rounded-full text-xs transition-all ${
               cameraMode === 'video'
                 ? 'bg-white text-black'
