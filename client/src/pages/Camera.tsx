@@ -29,6 +29,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from '@/components/ui/sheet';
 import { useMutation } from '@tanstack/react-query';
 
@@ -1409,20 +1410,6 @@ export default function Camera() {
 
   const selectedProjectData = projects.find(p => p.id === selectedProject);
 
-  return (
-    <div className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
-      {/* Dominant Viewfinder - Extended to top of screen */}
-      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
-          {/* Flip Camera Button - Centered at top, semi-transparent */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={switchCamera}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 h-10 w-10 bg-black/30 text-white/60 hover:bg-black/40 hover:text-white/80 backdrop-blur-sm border border-white/10"
-            data-testid="button-switch-camera"
-          >
-            <SwitchCamera className="w-5 h-5" />
-          </Button>
           {/* Loading and Error states */}
           {(!isActive || isCameraLoading) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black">
@@ -1500,335 +1487,263 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Horizontal Photo Preview Strip - Overlaid at bottom */}
-          {sessionPhotos.length > 0 && !isRecording && (
-            <div className="absolute bottom-0 left-0 right-0 z-20 overflow-x-auto scrollbar-hide bg-black/30 backdrop-blur-sm">
-              <div className="flex gap-2 p-2">
-              {sessionPhotos.slice(0, 5).map((photo) => {
-                const url = thumbnailUrlsRef.current.get(photo.id);
-                if (!url) return null;
-                
-                const photoTags = photo.pendingTagIds
-                  ?.map(tagId => tags.find(t => t.id === tagId))
-                  .filter(Boolean) as Tag[] | undefined;
-                
-                const tagColorMap: Record<string, string> = {
-                  red: '#ef4444',
-                  orange: '#f97316',
-                  yellow: '#eab308',
-                  blue: '#3b82f6',
-                  gray: '#6b7280',
-                };
-                
-                const isVideo = photo.mediaType === 'video';
-                const isForTodo = photo.isForTodo;
-                
-                return (
-                  <div
-                    key={photo.id}
-                    className="relative flex-shrink-0 group"
-                    data-testid={`thumbnail-${photo.id}`}
-                  >
-                    <button
-                      onClick={() => {
-                        if (isVideo) {
-                          setLocation(`/photo/${photo.id}/view`);
-                        } else {
-                          setLocation(`/photo/${photo.id}/edit`);
-                        }
-                      }}
-                      className="block w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/30 hover-elevate active-elevate-2"
-                    >
-                      {isVideo ? (
-                        <video
-                          src={url}
-                          className="w-full h-full object-cover"
-                          muted
-                        />
-                      ) : (
-                        <img
-                          src={url}
-                          alt="Thumbnail"
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      
-                      {isVideo && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
-                          <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-                            <Play className="w-4 h-4 text-black fill-black ml-0.5" />
-                          </div>
-                        </div>
-                      )}
-                    </button>
-                    
-                    {photoTags && photoTags.length > 0 && (
-                      <div 
-                        className="absolute top-0 left-0 bottom-0 flex flex-col gap-0.5 p-1 pointer-events-none"
-                        data-testid={`tag-indicators-${photo.id}`}
-                      >
-                        {photoTags.slice(0, 2).map((tag) => (
-                          <div
-                            key={tag.id}
-                            className="w-1 flex-1 rounded-full"
-                            style={{ backgroundColor: tagColorMap[tag.color] || '#6b7280' }}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    
-                    {photoTags && photoTags.length > 2 && (
-                      <div 
-                        className="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1 py-0.5 rounded-full pointer-events-none"
-                        data-testid={`tag-overflow-badge-${photo.id}`}
-                      >
-                        +{photoTags.length - 2}
-                      </div>
-                    )}
-                    
-                    {/* To-Do Badge - Top Right (only for photos captured via To-Do button) */}
-                    {isForTodo && (
-                      <div 
-                        className="absolute top-1 right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-lg pointer-events-none"
-                        data-testid={`badge-for-todo-${photo.id}`}
-                      >
-                        <CheckSquare className="w-4 h-4 text-white" />
-                      </div>
-                    )}
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePhoto(photo.id);
-                      }}
-                      className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                      data-testid={`button-delete-thumbnail-${photo.id}`}
-                    >
-                      <X className="w-3 h-3 text-white" />
-                    </button>
-                  </div>
-                );
-              })}
-              </div>
+          {/* Floating Zoom Controls - iOS Style (Center-Left) */}
+          {!isRecording && availableCameras.length > 1 && (
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 bg-black/40 backdrop-blur-md rounded-full px-2 py-3 shadow-lg">
+              {availableCameras.map((camera) => (
+                <button
+                  key={camera.deviceId}
+                  onClick={() => switchZoomLevel(camera.zoomLevel)}
+                  className={`text-xs font-medium px-2 py-1 rounded-full transition-all ${
+                    zoomLevel === camera.zoomLevel
+                      ? 'bg-white text-black'
+                      : 'text-white hover:bg-white/20'
+                  }`}
+                  data-testid={`button-zoom-${camera.zoomLevel}x`}
+                >
+                  {camera.zoomLevel}×
+                </button>
+              ))}
             </div>
           )}
-      </div>
 
-      {/* Controls Row - Zoom, Tags */}
-      <div className="flex-shrink-0 z-20 bg-black/50 backdrop-blur-md px-4 py-2 mb-0.5">
-        <div className="flex items-center justify-center gap-4">
-          {/* Zoom controls */}
-          <div className="flex gap-1">
-            {availableCameras.map((camera) => (
-              <Button
-                key={camera.deviceId}
-                variant="ghost"
-                size="sm"
-                onClick={() => switchZoomLevel(camera.zoomLevel)}
-                className={`h-8 px-2 text-xs ${
-                  zoomLevel === camera.zoomLevel
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white'
-                }`}
-                data-testid={`button-zoom-${camera.zoomLevel}x`}
-              >
-                {camera.zoomLevel}x
-              </Button>
-            ))}
-          </div>
-          
-          {/* Auto-tag Dropdown */}
-          {tags.length > 0 && !isRecording && (() => {
-            const tagColorMap: Record<string, string> = {
-              red: '#ef4444',
-              orange: '#f97316',
-              yellow: '#eab308',
-              blue: '#3b82f6',
-              gray: '#6b7280',
-            };
-            const selectedTag = selectedTags.length > 0 ? tags.find(t => t.id === selectedTags[0]) : null;
-            const borderColor = selectedTag ? tagColorMap[selectedTag.color] || '#6b7280' : 'rgba(255, 255, 255, 0.2)';
+          {/* Single Circular Thumbnail - Bottom Left (iOS Style) */}
+          {sessionPhotos.length > 0 && !isRecording && (() => {
+            const photo = sessionPhotos[0]; // Most recent photo
+            const url = thumbnailUrlsRef.current.get(photo.id);
+            if (!url) return null;
+            
+            const photoTags = photo.pendingTagIds
+              ?.map(tagId => tags.find(t => t.id === tagId))
+              .filter(Boolean) as Tag[] | undefined;
+            
+            const isVideo = photo.mediaType === 'video';
+            const photoCount = sessionPhotos.length;
             
             return (
-              <Select
-                value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
-                onValueChange={(v) => {
-                  if (v && v !== 'none') {
-                    setSelectedTags([v]);
+              <button
+                onClick={() => {
+                  if (isVideo) {
+                    setLocation(`/photo/${photo.id}/view`);
                   } else {
-                    setSelectedTags([]);
+                    setLocation(`/photo/${photo.id}/edit`);
                   }
                 }}
+                className="absolute bottom-4 left-4 z-20 w-12 h-12 rounded-full overflow-hidden border-2 border-white/50 shadow-lg hover-elevate active-elevate-2 backdrop-blur-sm"
+                data-testid="thumbnail-last-photo"
               >
-                <SelectTrigger
-                  className="w-24 bg-white/10 text-white h-8 text-xs"
-                  style={{ borderColor, borderWidth: '2px' }}
-                  data-testid="select-auto-tag"
-                >
-                  <SelectValue placeholder="No tag" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No tag</SelectItem>
-                  {tags.map((tag) => {
-                    return (
-                      <SelectItem 
-                        key={tag.id} 
-                        value={tag.id}
-                        style={{ color: tagColorMap[tag.color] || '#6b7280' }}
-                      >
-                        {tag.name}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                {isVideo ? (
+                  <video
+                    src={url}
+                    className="w-full h-full object-cover"
+                    muted
+                  />
+                ) : (
+                  <img
+                    src={url}
+                    alt="Last photo"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                
+                {/* Video Play Icon */}
+                {isVideo && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                    <div className="w-6 h-6 rounded-full bg-white/90 flex items-center justify-center">
+                      <Play className="w-3 h-3 text-black fill-black ml-0.5" />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Photo Count Badge */}
+                {photoCount > 1 && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-md">
+                    {photoCount}
+                  </div>
+                )}
+                
+                {/* Tag Indicator */}
+                {photoTags && photoTags.length > 0 && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white shadow-sm"
+                    style={{ backgroundColor: (() => {
+                      const tagColorMap: Record<string, string> = {
+                        red: '#ef4444',
+                        orange: '#f97316',
+                        yellow: '#eab308',
+                        blue: '#3b82f6',
+                        gray: '#6b7280',
+                      };
+                      return tagColorMap[photoTags[0].color] || '#6b7280';
+                    })() }}
+                  />
+                )}
+              </button>
             );
           })()}
-          
-          {/* To-Do Button - Capture & Create To-Do */}
-          {selectedProject && !isRecording && !isAttachMode && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => captureAndEdit('todo')}
-              disabled={isCapturing}
-              className="h-8 px-3 bg-white/10 text-white hover:bg-white/20 disabled:opacity-50"
-              data-testid="button-todo"
-            >
-              <CheckSquare className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
       </div>
 
-      {/* Mode Switcher */}
-      <div className="flex-shrink-0 flex justify-center py-2 bg-black/50 backdrop-blur-md">
-        <div className="flex bg-white/10 rounded-full p-1 relative">
-          {/* Transition Overlay */}
-          {isTransitioning && (
-            <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse z-10" />
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
+      {/* iOS 26-Style Bottom Controls */}
+      <div className="flex-shrink-0 flex flex-col items-center gap-3 pb-safe-6 pt-4 px-6">
+        {/* Mode Carousel */}
+        <div className="flex items-center gap-4 text-white/60 text-sm font-medium">
+          <button
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'photo'}
-            className={`px-6 py-1 rounded-full text-xs transition-all ${
+            className={`transition-all ${
               cameraMode === 'photo'
-                ? 'bg-white text-black'
-                : 'text-white hover:bg-white/10'
+                ? 'text-white scale-110'
+                : 'hover:text-white/80'
             } disabled:opacity-50`}
             data-testid="button-mode-photo"
           >
             Photo
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
+          </button>
+          <button
             onClick={() => switchCameraMode('video')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'video'}
-            className={`px-6 py-1 rounded-full text-xs transition-all ${
+            className={`transition-all ${
               cameraMode === 'video'
-                ? 'bg-white text-black'
-                : 'text-white hover:bg-white/10'
+                ? 'text-white scale-110'
+                : 'hover:text-white/80'
             } disabled:opacity-50`}
             data-testid="button-mode-video"
           >
             Video
-          </Button>
+          </button>
+          <button
+            onClick={() => switchCameraMode('photo')}
+            disabled={isTransitioning || isRecording}
+            className={`transition-all ${
+              cameraMode === 'photo'
+                ? 'text-white/60'
+                : 'hover:text-white/80'
+            } disabled:opacity-50`}
+            data-testid="button-mode-edit"
+          >
+            Edit
+          </button>
         </div>
-      </div>
 
-      {/* Bottom Action Rail - Mode-Specific Buttons */}
-      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 mb-16 bg-black/50 backdrop-blur-md">
-        {/* Back */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            const params = new URLSearchParams(window.location.search);
-            const projectId = params.get('projectId');
-            if (projectId) {
-              setLocation(`/projects/${projectId}`);
-            } else {
-              setLocation('/projects');
-            }
-          }}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white"
-          data-testid="button-back"
-        >
-          <ArrowLeft className="w-6 h-6" />
-          <span className="text-[10px]">Back</span>
-        </Button>
-        
-        {/* Photo Mode Buttons */}
-        {cameraMode === 'photo' && (
-          <>
-            {/* Camera - Quick Capture */}
-            <Button
-              variant="ghost"
-              size="icon"
+        {/* Central Control Row */}
+        <div className="flex items-center justify-center w-full gap-4">
+          {/* Spacer for visual balance */}
+          <div className="w-12 h-12" />
+          
+          {/* Central Capture Button - Adapts to Mode */}
+          {cameraMode === 'photo' && (
+            <button
               onClick={quickCapture}
               disabled={isCapturing || !selectedProject}
-              className="flex flex-col gap-1 w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 scale-110"
-              data-testid="button-quick-capture"
+              className="w-20 h-20 rounded-full bg-white border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg"
+              data-testid="button-capture"
             >
-              <CameraIcon className="w-8 h-8" />
-              <span className="text-[10px]">Capture</span>
-            </Button>
-
-            {/* Edit Mode - Capture & Edit (only in Camera Tab, not in Photo Attachment Mode) */}
-            {!isAttachMode && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => captureAndEdit()}
-                disabled={isCapturing || !selectedProject}
-                className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-                data-testid="button-edit-mode"
-              >
-                <Edit className="w-6 h-6" />
-                <span className="text-[10px]">Edit</span>
-              </Button>
-            )}
-            {isAttachMode && <div className="w-16 h-16" />}
-          </>
-        )}
-        
-        {/* Video Mode Buttons */}
-        {cameraMode === 'video' && (
-          <>
-            <div className="w-16 h-16" />
-            {/* Video Record/Stop */}
-            <Button
-              variant="ghost"
-              size="icon"
+              <div className="w-full h-full rounded-full bg-white" />
+            </button>
+          )}
+          
+          {cameraMode === 'video' && (
+            <button
               onClick={isRecording ? stopRecording : startRecording}
               disabled={!selectedProject}
-              className={`flex flex-col gap-1 w-20 h-20 rounded-full scale-110 ${
-                isRecording 
-                  ? 'bg-red-600 hover:bg-red-700 text-white' 
-                  : 'bg-red-600 hover:bg-red-700 text-white'
-              } disabled:opacity-50`}
-              data-testid="button-video-record"
+              className={`w-20 h-20 rounded-full border-4 border-white/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 shadow-lg ${
+                isRecording ? 'bg-red-600' : 'bg-red-600'
+              }`}
+              data-testid="button-capture"
             >
               {isRecording ? (
-                <>
+                <div className="w-full h-full flex items-center justify-center">
                   <div className="w-8 h-8 rounded-sm bg-white" />
-                  <span className="text-[10px]">Stop</span>
-                </>
+                </div>
               ) : (
-                <>
-                  <div className="w-8 h-8 rounded-full border-4 border-white" />
-                  <span className="text-[10px]">Record</span>
-                </>
+                <div className="w-full h-full rounded-full bg-red-600" />
               )}
-            </Button>
-            <div className="w-16 h-16" />
-          </>
-        )}
+            </button>
+          )}
+          
+          {/* Utility Button - Tags & To-Do */}
+          {!isAttachMode && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 active:bg-white/40 transition-all flex items-center justify-center text-white shadow-lg"
+                  data-testid="button-utility"
+                >
+                  <CheckSquare className="w-6 h-6" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="bg-black/95 backdrop-blur-md border-white/10">
+                <SheetHeader>
+                  <SheetTitle className="text-white">Quick Actions</SheetTitle>
+                  <SheetDescription className="text-white/60">
+                    Add tags or create a to-do
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-3 mt-6">
+                  {/* Tags */}
+                  {tags.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <label className="text-white/80 text-sm">Auto-tag photos</label>
+                      <Select
+                        value={selectedTags.length > 0 ? selectedTags[0] : 'none'}
+                        onValueChange={(v) => {
+                          if (v && v !== 'none') {
+                            setSelectedTags([v]);
+                          } else {
+                            setSelectedTags([]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger
+                          className="bg-white/10 text-white border-white/20"
+                          data-testid="select-auto-tag"
+                        >
+                          <SelectValue placeholder="No tag" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No tag</SelectItem>
+                          {tags.map((tag) => (
+                            <SelectItem key={tag.id} value={tag.id}>
+                              {tag.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  
+                  {/* To-Do Button */}
+                  {selectedProject && !isRecording && (
+                    <Button
+                      onClick={() => captureAndEdit('todo')}
+                      disabled={isCapturing}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      data-testid="button-todo"
+                    >
+                      <CheckSquare className="w-4 h-4 mr-2" />
+                      Capture & Create To-Do
+                    </Button>
+                  )}
+                  
+                  {!isAttachMode && (
+                    <Button
+                      onClick={() => captureAndEdit()}
+                      disabled={isCapturing || isRecording || !selectedProject}
+                      variant="outline"
+                      className="w-full border-white/20 text-white hover:bg-white/10"
+                      data-testid="button-edit"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Capture & Edit
+                    </Button>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+          {isAttachMode && <div className="w-12 h-12" />}
+        </div>
       </div>
 
       {/* Composite Canvas - Hidden */}
