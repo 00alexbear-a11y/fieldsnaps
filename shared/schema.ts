@@ -130,6 +130,9 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
+  // Multi-unit support for construction sites
+  unitCount: integer("unit_count").default(1).notNull(), // Number of units/apartments in project
+  unitLabels: text("unit_labels").array().$type<string[]>(), // Custom unit labels (e.g., ["Unit 1", "Unit 2", "Penthouse"])
   // Legacy field for backwards compatibility
   userId: varchar("user_id").references(() => users.id), // Optional - allows offline use
 }, (table) => [
@@ -153,6 +156,7 @@ export const photos = pgTable("photos", {
   height: integer("height"), // Original photo height in pixels
   photographerId: varchar("photographer_id").references(() => users.id), // Who took the photo
   photographerName: varchar("photographer_name"), // Cached name for offline display
+  unitLabel: varchar("unit_label", { length: 100 }), // Which unit/apartment this photo belongs to (e.g., "Unit 15")
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
 }, (table) => [
