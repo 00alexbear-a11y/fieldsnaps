@@ -523,8 +523,8 @@ export default function Settings() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="px-4 pb-24 pt-safe-4 space-y-6 max-w-screen-sm mx-auto">
-        <div className="flex flex-col items-center space-y-4 pb-2">
+      <div className="px-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
+        <div className="flex flex-col items-center space-y-4 pb-2 pt-4">
         <img 
           src={logoPath} 
           alt="FieldSnaps" 

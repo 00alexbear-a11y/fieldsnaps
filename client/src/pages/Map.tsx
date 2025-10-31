@@ -252,7 +252,7 @@ export default function Map() {
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-safe-3 pb-3 border-b border-border">
+      <div className="flex items-center justify-between px-4 h-14 border-b border-border">
         <h1 className="text-xl font-semibold" data-testid="text-page-title">Project Map</h1>
         {projectsWithCoords.length > 0 && (
           <div className="text-sm text-muted-foreground" data-testid="text-project-count">
