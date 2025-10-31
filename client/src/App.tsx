@@ -137,16 +137,6 @@ function AppContent() {
 
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
-      {/* Status bar filler - matches page background color */}
-      <div 
-        className={`fixed top-0 left-0 right-0 z-50 pointer-events-none ${
-          location.startsWith('/camera') 
-            ? 'bg-black' 
-            : 'bg-white dark:bg-black'
-        }`}
-        style={{ height: 'env(safe-area-inset-top, 0px)' }}
-      />
-      
       {/* Universal swipe-back gesture (disabled on main pages) */}
       <SwipeBackGesture disabled={disableSwipeBack} />
       

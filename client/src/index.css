@@ -483,6 +483,17 @@
   }
 
   /* iOS Safe Area Utilities - adds base padding PLUS safe-area-inset */
+  
+  /* Top safe area - for headers that need to sit below notch */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0rem);
+  }
+  
+  .pt-safe-3 {
+    padding-top: calc(0.75rem + env(safe-area-inset-top, 0rem));
+  }
+  
+  /* Bottom safe area - for elements above home indicator */
   .pb-safe-2 {
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0rem));
   }
