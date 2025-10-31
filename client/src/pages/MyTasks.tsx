@@ -86,8 +86,8 @@ export default function MyTasks() {
 
   return (
     <div className="h-screen flex flex-col overflow-auto pb-20">
-      <header className="border-b px-4 h-20 bg-background sticky top-0 z-10">
-        <div className="flex items-center gap-4 h-full">
+      <header className="border-b px-4 py-3 bg-background sticky top-0 z-10">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -100,7 +100,7 @@ export default function MyTasks() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 pt-8 pb-4 space-y-6">
+      <main className="flex-1 p-4 space-y-6">
         {isLoading ? (
           <div className="text-center py-12">Loading tasks...</div>
         ) : (
