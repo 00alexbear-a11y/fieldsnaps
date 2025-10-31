@@ -83,6 +83,7 @@ export default function Camera() {
   const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
@@ -782,6 +783,20 @@ export default function Camera() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
+  };
+
+  // Mode switching with subtle transition delay
+  const switchCameraMode = async (newMode: CameraMode) => {
+    if (cameraMode === newMode || isTransitioning || isRecording) return;
+    
+    haptics.light();
+    setIsTransitioning(true);
+    
+    // 250ms transition delay for intentional feel
+    await new Promise(resolve => setTimeout(resolve, 250));
+    
+    setCameraMode(newMode);
+    setIsTransitioning(false);
   };
 
   const startRecording = async () => {
@@ -1676,7 +1691,45 @@ export default function Camera() {
         </div>
       </div>
 
-      {/* Bottom Action Rail - 4 Buttons: Back, Video, Camera, Edit */}
+      {/* Mode Switcher */}
+      <div className="flex-shrink-0 flex justify-center py-2 bg-black/50 backdrop-blur-md">
+        <div className="flex bg-white/10 rounded-full p-1 relative">
+          {/* Transition Overlay */}
+          {isTransitioning && (
+            <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse z-10" />
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => switchCameraMode('photo')}
+            disabled={isTransitioning || isRecording}
+            className={`px-6 py-1 rounded-full text-xs transition-all ${
+              cameraMode === 'photo'
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-white/10'
+            } disabled:opacity-50`}
+            data-testid="button-mode-photo"
+          >
+            Photo
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => switchCameraMode('video')}
+            disabled={isTransitioning || isRecording}
+            className={`px-6 py-1 rounded-full text-xs transition-all ${
+              cameraMode === 'video'
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-white/10'
+            } disabled:opacity-50`}
+            data-testid="button-mode-video"
+          >
+            Video
+          </Button>
+        </div>
+      </div>
+
+      {/* Bottom Action Rail - Mode-Specific Buttons */}
       <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 mb-16 bg-black/50 backdrop-blur-md">
         {/* Back */}
         <Button
@@ -1698,58 +1751,71 @@ export default function Camera() {
           <span className="text-[10px]">Back</span>
         </Button>
         
-        {/* Video Record/Stop */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={!selectedProject}
-          className={`flex flex-col gap-1 w-16 h-16 rounded-full ${
-            isRecording 
-              ? 'bg-red-600 hover:bg-red-700 text-white' 
-              : 'bg-white/10 hover:bg-white/20 text-white'
-          } disabled:opacity-50`}
-          data-testid="button-video-record"
-        >
-          {isRecording ? (
-            <>
-              <div className="w-6 h-6 rounded-sm bg-white" />
-              <span className="text-[10px]">Stop</span>
-            </>
-          ) : (
-            <>
-              <Video className="w-6 h-6" />
-              <span className="text-[10px]">Video</span>
-            </>
-          )}
-        </Button>
-        
-        {/* Camera - Quick Capture */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={quickCapture}
-          disabled={isCapturing || isRecording || !selectedProject}
-          className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-          data-testid="button-quick-capture"
-        >
-          <CameraIcon className="w-6 h-6" />
-          <span className="text-[10px]">Camera</span>
-        </Button>
+        {/* Photo Mode Buttons */}
+        {cameraMode === 'photo' && (
+          <>
+            {/* Camera - Quick Capture */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={quickCapture}
+              disabled={isCapturing || !selectedProject}
+              className="flex flex-col gap-1 w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 scale-110"
+              data-testid="button-quick-capture"
+            >
+              <CameraIcon className="w-8 h-8" />
+              <span className="text-[10px]">Capture</span>
+            </Button>
 
-        {/* Edit Mode - Capture & Edit (only in Camera Tab, not in Photo Attachment Mode) */}
-        {!isAttachMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => captureAndEdit()}
-            disabled={isCapturing || isRecording || !selectedProject}
-            className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
-            data-testid="button-edit-mode"
-          >
-            <Edit className="w-6 h-6" />
-            <span className="text-[10px]">Edit</span>
-          </Button>
+            {/* Edit Mode - Capture & Edit (only in Camera Tab, not in Photo Attachment Mode) */}
+            {!isAttachMode && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => captureAndEdit()}
+                disabled={isCapturing || !selectedProject}
+                className="flex flex-col gap-1 w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50"
+                data-testid="button-edit-mode"
+              >
+                <Edit className="w-6 h-6" />
+                <span className="text-[10px]">Edit</span>
+              </Button>
+            )}
+            {isAttachMode && <div className="w-16 h-16" />}
+          </>
+        )}
+        
+        {/* Video Mode Buttons */}
+        {cameraMode === 'video' && (
+          <>
+            <div className="w-16 h-16" />
+            {/* Video Record/Stop */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={!selectedProject}
+              className={`flex flex-col gap-1 w-20 h-20 rounded-full scale-110 ${
+                isRecording 
+                  ? 'bg-red-600 hover:bg-red-700 text-white' 
+                  : 'bg-red-600 hover:bg-red-700 text-white'
+              } disabled:opacity-50`}
+              data-testid="button-video-record"
+            >
+              {isRecording ? (
+                <>
+                  <div className="w-8 h-8 rounded-sm bg-white" />
+                  <span className="text-[10px]">Stop</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-8 h-8 rounded-full border-4 border-white" />
+                  <span className="text-[10px]">Record</span>
+                </>
+              )}
+            </Button>
+            <div className="w-16 h-16" />
+          </>
         )}
       </div>
 
