@@ -118,6 +118,7 @@ export default function Camera() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   const [selectedUnitLabel, setSelectedUnitLabel] = useState<string | null>(null);
+  const [showFlash, setShowFlash] = useState(false);
   
   // Swipe-down gesture refs (using refs to avoid re-renders during gesture)
   const swipeStartY = useRef<number | null>(null);
@@ -866,6 +867,12 @@ export default function Camera() {
 
   // Swipe-down gesture handlers for dismissing camera (iOS-style)
   const handleContainerTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Disable swipe gestures during video recording to prevent interference with annotations
+    if (isRecording) {
+      e.preventDefault();
+      return;
+    }
+    
     // Only handle single-touch swipes (not pinch) - Allow from anywhere on preview
     if (e.touches.length === 1) {
       const touch = e.touches[0];
@@ -875,6 +882,12 @@ export default function Camera() {
   };
 
   const handleContainerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Disable swipe gestures during video recording to prevent interference with annotations
+    if (isRecording) {
+      e.preventDefault();
+      return;
+    }
+    
     if (swipeStartY.current !== null && e.touches.length === 1 && containerRef.current) {
       const touch = e.touches[0];
       const deltaY = touch.clientY - swipeStartY.current;
@@ -890,6 +903,11 @@ export default function Camera() {
   };
 
   const handleContainerTouchEnd = () => {
+    // Disable swipe gestures during video recording to prevent interference with annotations
+    if (isRecording) {
+      return;
+    }
+    
     if (swipeStartY.current !== null && containerRef.current) {
       const currentTransform = containerRef.current.style.transform;
       const offset = parseFloat(currentTransform.match(/translateY\((\d+)px\)/)?.[1] || '0');
@@ -1110,6 +1128,11 @@ export default function Camera() {
     }
 
     haptics.light();
+    
+    // Trigger flash animation
+    setShowFlash(true);
+    setTimeout(() => setShowFlash(false), 200);
+    
     setIsCapturing(true);
 
     try {
@@ -1226,6 +1249,11 @@ export default function Camera() {
     }
 
     haptics.light();
+    
+    // Trigger flash animation
+    setShowFlash(true);
+    setTimeout(() => setShowFlash(false), 200);
+    
     setIsCapturing(true);
 
     try {
@@ -1602,6 +1630,15 @@ export default function Camera() {
             onTouchEnd={handleAnnotationTouchEnd}
             data-testid="annotation-canvas"
           />
+          
+          {/* Photo Flash Overlay */}
+          {showFlash && (
+            <div 
+              className="absolute inset-0 bg-white pointer-events-none animate-flash"
+              style={{ zIndex: 50 }}
+              data-testid="flash-overlay"
+            />
+          )}
           
           {/* Recording Indicator */}
           {isRecording && (

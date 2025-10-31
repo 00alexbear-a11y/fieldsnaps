@@ -436,6 +436,22 @@
     }
   }
 
+  @keyframes flash {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .animate-flash {
+    animation: flash 200ms ease-out;
+  }
+
   /* Touch gesture feedback */
   .touch-feedback {
     -webkit-tap-highlight-color: transparent;
