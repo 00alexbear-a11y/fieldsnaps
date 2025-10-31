@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
@@ -68,6 +69,7 @@ type TodoFormValues = z.infer<typeof todoFormSchema>;
 export default function PhotoEdit() {
   const { id: photoId } = useParams();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -93,9 +95,16 @@ export default function PhotoEdit() {
     defaultValues: {
       title: '',
       description: '',
-      assignedTo: '',
+      assignedTo: user?.id || '',
     },
   });
+  
+  // Update assignedTo when user loads
+  useEffect(() => {
+    if (user?.id && !todoForm.getValues('assignedTo')) {
+      todoForm.setValue('assignedTo', user.id);
+    }
+  }, [user, todoForm]);
   
   // Todo creation mutation
   const createTodoMutation = useMutation({
