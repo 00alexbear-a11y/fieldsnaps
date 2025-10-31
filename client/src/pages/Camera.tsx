@@ -65,7 +65,7 @@ interface CameraDevice {
   zoomLevel: 0.5 | 1 | 2 | 3;
 }
 
-type CameraMode = 'photo' | 'video';
+type CameraMode = 'photo' | 'video' | 'edit';
 type CameraFacing = 'environment' | 'user';
 
 export default function Camera() {
@@ -1625,7 +1625,7 @@ export default function Camera() {
           
           {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above mode carousel) */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-36 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-48 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
@@ -1729,6 +1729,17 @@ export default function Camera() {
               disabled={isCapturing || !selectedProject}
               className="w-20 h-20 rounded-full bg-white border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg"
               data-testid="button-capture"
+            >
+              <div className="w-full h-full rounded-full bg-white" />
+            </button>
+          )}
+          
+          {cameraMode === 'edit' && (
+            <button
+              onClick={() => captureAndEdit()}
+              disabled={isCapturing || !selectedProject}
+              className="w-20 h-20 rounded-full bg-white border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg"
+              data-testid="button-capture-edit"
             >
               <div className="w-full h-full rounded-full bg-white" />
             </button>
@@ -1848,19 +1859,6 @@ export default function Camera() {
                       Capture & Create To-Do
                     </Button>
                   )}
-                  
-                  {!isAttachMode && (
-                    <Button
-                      onClick={() => captureAndEdit()}
-                      disabled={isCapturing || isRecording || !selectedProject}
-                      variant="outline"
-                      className="w-full border-white/20 text-white hover:bg-white/10"
-                      data-testid="button-edit"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Capture & Edit
-                    </Button>
-                  )}
                 </div>
               </SheetContent>
             </Sheet>
@@ -1897,18 +1895,14 @@ export default function Camera() {
             PHOTO
           </button>
           <button
-            onClick={() => {
-              if (sessionPhotos.length > 0) {
-                // Navigate to session gallery view instead of editing single photo
-                setLocation(`/project/${selectedProject}/photos`);
-              }
-            }}
-            disabled={isTransitioning || isRecording || sessionPhotos.length === 0}
+            onClick={() => switchCameraMode('edit')}
+            disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'edit'}
             className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
-              sessionPhotos.length === 0
-                ? 'text-white/40'
+              cameraMode === 'edit'
+                ? 'bg-white text-black'
                 : 'text-white/70 hover:text-white/90 active:text-white/95'
-            } disabled:cursor-not-allowed`}
+            } disabled:opacity-50`}
             data-testid="button-mode-edit"
           >
             EDIT
