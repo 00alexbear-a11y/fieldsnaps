@@ -1510,8 +1510,12 @@ export default function Camera() {
     >
       {/* Camera Viewfinder */}
       <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
-          {/* Top Bar - iOS Style with Black Background */}
-          <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-4 bg-gradient-to-b from-black/60 via-black/40 to-transparent backdrop-blur-md">
+          {/* Top Bar - iOS Style with Conditional Black Background */}
+          <div className={`absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-4 ${
+            cameraMode === 'photo' 
+              ? 'bg-black' 
+              : 'bg-gradient-to-b from-black/60 via-black/40 to-transparent backdrop-blur-md'
+          }`}>
             <div className="flex items-center justify-between">
               <Button
                 variant="ghost"
@@ -1621,7 +1625,7 @@ export default function Camera() {
           
           {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Centered above mode carousel) */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-56 z-20 flex flex-col gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2 py-2.5 shadow-2xl border border-white/10">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-40 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
@@ -1715,7 +1719,7 @@ export default function Camera() {
       </div>
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-3 pt-4 px-6 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
+      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-3 pt-4 px-6 mb-16 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
         {/* Mode Carousel with Enhanced Styling */}
         <div className="flex items-center gap-6 text-white/70 text-[15px] font-medium tracking-tight">
           <button
