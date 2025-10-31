@@ -1510,12 +1510,8 @@ export default function Camera() {
     >
       {/* Camera Viewfinder */}
       <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
-          {/* Top Bar - iOS Style with Conditional Black Background */}
-          <div className={`absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-4 ${
-            cameraMode === 'photo' 
-              ? 'bg-black' 
-              : 'bg-gradient-to-b from-black/60 via-black/40 to-transparent backdrop-blur-md'
-          }`}>
+          {/* Top Bar - iOS Style with Black Background */}
+          <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-4 bg-black">
             <div className="flex items-center justify-between">
               <Button
                 variant="ghost"
