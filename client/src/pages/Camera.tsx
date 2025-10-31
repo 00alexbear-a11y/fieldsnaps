@@ -1623,29 +1623,6 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above black bottom menu) */}
-          {!isRecording && availableCameras.length > 1 && (
-            <div 
-              className="absolute left-1/2 -translate-x-1/2 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10"
-              style={{ bottom: '140px' }}
-            >
-              {availableCameras.map((camera) => (
-                <button
-                  key={camera.deviceId}
-                  onClick={() => switchZoomLevel(camera.zoomLevel)}
-                  className={`text-xs font-semibold px-2.5 py-1.5 rounded-full transition-all duration-200 ${
-                    zoomLevel === camera.zoomLevel
-                      ? 'bg-white text-black shadow-md'
-                      : 'text-white/90 hover:bg-white/15 active:bg-white/25'
-                  }`}
-                  data-testid={`button-zoom-${camera.zoomLevel}x`}
-                >
-                  {camera.zoomLevel}×
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Single Circular Thumbnail - Bottom Left (iOS Style) */}
           {sessionPhotos.length > 0 && !isRecording && (() => {
             const photo = sessionPhotos[0]; // Most recent photo
@@ -1717,6 +1694,29 @@ export default function Camera() {
             );
           })()}
       </div>
+
+      {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above black bottom menu) */}
+      {!isRecording && availableCameras.length > 1 && (
+        <div 
+          className="fixed left-1/2 -translate-x-1/2 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10"
+          style={{ bottom: '200px' }}
+        >
+          {availableCameras.map((camera) => (
+            <button
+              key={camera.deviceId}
+              onClick={() => switchZoomLevel(camera.zoomLevel)}
+              className={`text-xs font-semibold px-2.5 py-1.5 rounded-full transition-all duration-200 ${
+                zoomLevel === camera.zoomLevel
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-white/90 hover:bg-white/15 active:bg-white/25'
+              }`}
+              data-testid={`button-zoom-${camera.zoomLevel}x`}
+            >
+              {camera.zoomLevel}×
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
       <div className="flex-shrink-0 flex flex-col items-center gap-4 pb-safe-6 pt-8 px-6 mb-0 bg-black">
