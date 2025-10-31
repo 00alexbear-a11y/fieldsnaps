@@ -522,19 +522,30 @@ export default function Settings() {
   };
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="px-4 pb-24 pt-safe-3 space-y-6 max-w-screen-sm mx-auto">
-        <div className="flex flex-col items-center space-y-2 pb-2">
-        <img 
-          src={logoPath} 
-          alt="FieldSnaps" 
-          className="h-8 w-auto object-contain"
-          data-testid="img-fieldsnaps-logo"
-        />
-        <h1 className="text-lg font-medium text-muted-foreground" data-testid="text-settings-title">
-          Settings
-        </h1>
+    <div className="flex flex-col h-full bg-white dark:bg-black">
+      {/* Sticky Header - matches Projects page */}
+      <div className="sticky top-0 z-50 bg-white dark:bg-black border-b border-border">
+        <div className="flex items-center justify-between px-4 pt-safe-3 pb-3">
+          <img 
+            src={logoPath} 
+            alt="FieldSnaps" 
+            className="h-9 w-auto object-contain"
+            data-testid="img-fieldsnaps-logo"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            data-testid="button-theme-toggle"
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
         </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 pb-24 pt-4 space-y-6 max-w-screen-sm mx-auto">
 
       {/* Appearance */}
       <Card className="p-4 space-y-4">
@@ -1540,6 +1551,7 @@ export default function Settings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </div>
       </div>
     </div>
   );
