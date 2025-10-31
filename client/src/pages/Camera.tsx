@@ -1672,7 +1672,7 @@ export default function Camera() {
       </div>
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-3 pb-safe-6 pt-5 px-6 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
+      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-3 pt-4 px-6 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
         {/* Mode Carousel with Enhanced Styling */}
         <div className="flex items-center gap-6 text-white/70 text-[15px] font-medium tracking-tight">
           <button
