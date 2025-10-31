@@ -599,10 +599,6 @@ export default function ToDos() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
-        <div className="flex items-center px-4 h-20">
-          <h1 className="text-xl font-bold">Tasks</h1>
-        </div>
-
         {/* Tabs */}
         <Tabs value={view} onValueChange={(v) => setView(v as any)} className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 h-11">
@@ -682,7 +678,7 @@ export default function ToDos() {
 
       {/* Content */}
       {view === 'calendar' ? (
-        <div className="px-4 pt-8 pb-4 space-y-6">
+        <div className="p-4 space-y-6">
           {/* Calendar Header with Week/Month Toggle */}
           <div className="flex justify-end gap-1 mb-2">
             <Button
@@ -842,7 +838,7 @@ export default function ToDos() {
           )}
         </div>
       ) : (
-        <div className="max-w-2xl mx-auto px-4 pt-8 pb-4 space-y-6">
+        <div className="max-w-2xl mx-auto p-4 space-y-6">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
