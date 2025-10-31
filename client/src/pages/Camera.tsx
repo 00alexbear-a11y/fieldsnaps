@@ -1623,9 +1623,9 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Centered above mode carousel) */}
+          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above mode carousel) */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-40 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-36 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
@@ -1659,11 +1659,8 @@ export default function Camera() {
             return (
               <button
                 onClick={() => {
-                  if (isVideo) {
-                    setLocation(`/photo/${photo.id}/view`);
-                  } else {
-                    setLocation(`/photo/${photo.id}/edit`);
-                  }
+                  // Navigate to project photos to view all session photos
+                  setLocation(`/project/${selectedProject}/photos`);
                 }}
                 className="absolute bottom-4 left-4 z-20 w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10"
                 data-testid="thumbnail-last-photo"
@@ -1718,61 +1715,10 @@ export default function Camera() {
           })()}
       </div>
 
-      {/* iOS 26-Style Bottom Controls with Liquid Glass Background */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-3 pt-4 px-6 mb-16 bg-gradient-to-t from-black/50 via-black/30 to-transparent backdrop-blur-md">
-        {/* Mode Carousel with Enhanced Styling */}
-        <div className="flex items-center gap-6 text-white/70 text-[15px] font-medium tracking-tight">
-          <button
-            onClick={() => switchCameraMode('photo')}
-            disabled={isTransitioning || isRecording}
-            aria-pressed={cameraMode === 'photo'}
-            className={`transition-all duration-250 ${
-              cameraMode === 'photo'
-                ? 'text-white font-semibold scale-110'
-                : 'hover:text-white/90 active:text-white/95'
-            } disabled:opacity-50`}
-            data-testid="button-mode-photo"
-          >
-            Photo
-          </button>
-          <button
-            onClick={() => switchCameraMode('video')}
-            disabled={isTransitioning || isRecording}
-            aria-pressed={cameraMode === 'video'}
-            className={`transition-all duration-250 ${
-              cameraMode === 'video'
-                ? 'text-white font-semibold scale-110'
-                : 'hover:text-white/90 active:text-white/95'
-            } disabled:opacity-50`}
-            data-testid="button-mode-video"
-          >
-            Video
-          </button>
-          <button
-            onClick={() => {
-              if (sessionPhotos.length > 0) {
-                const photo = sessionPhotos[0];
-                if (photo.mediaType === 'video') {
-                  setLocation(`/photo/${photo.id}/view`);
-                } else {
-                  setLocation(`/photo/${photo.id}/edit`);
-                }
-              }
-            }}
-            disabled={isTransitioning || isRecording || sessionPhotos.length === 0}
-            className={`transition-all duration-250 ${
-              sessionPhotos.length === 0
-                ? 'text-white/40 opacity-50'
-                : 'text-white/70 hover:text-white/90 active:text-white/95'
-            } disabled:opacity-50`}
-            data-testid="button-mode-edit"
-          >
-            Edit
-          </button>
-        </div>
-
-        {/* Central Control Row */}
-        <div className="flex items-center justify-center w-full gap-4">
+      {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
+      <div className="flex-shrink-0 flex flex-col items-center gap-4 pb-safe-6 pt-8 px-6 mb-0 bg-black">
+        {/* Central Control Row - Bottom Position */}
+        <div className="flex items-center justify-center w-full gap-8">
           {/* Spacer for visual balance */}
           <div className="w-12 h-12" />
           
@@ -1920,6 +1866,53 @@ export default function Camera() {
             </Sheet>
           )}
           {isAttachMode && <div className="w-12 h-12" />}
+        </div>
+
+        {/* Mode Carousel - Apple Style Pill (Above Capture Button) */}
+        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-full px-4 py-2.5 border border-white/10">
+          <button
+            onClick={() => switchCameraMode('video')}
+            disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'video'}
+            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+              cameraMode === 'video'
+                ? 'bg-white text-black'
+                : 'text-white/70 hover:text-white/90 active:text-white/95'
+            } disabled:opacity-50`}
+            data-testid="button-mode-video"
+          >
+            VIDEO
+          </button>
+          <button
+            onClick={() => switchCameraMode('photo')}
+            disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'photo'}
+            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+              cameraMode === 'photo'
+                ? 'bg-white text-black'
+                : 'text-white/70 hover:text-white/90 active:text-white/95'
+            } disabled:opacity-50`}
+            data-testid="button-mode-photo"
+          >
+            PHOTO
+          </button>
+          <button
+            onClick={() => {
+              if (sessionPhotos.length > 0) {
+                // Navigate to session gallery view instead of editing single photo
+                setLocation(`/project/${selectedProject}/photos`);
+              }
+            }}
+            disabled={isTransitioning || isRecording || sessionPhotos.length === 0}
+            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+              sessionPhotos.length === 0
+                ? 'text-white/40'
+                : 'text-white/70 hover:text-white/90 active:text-white/95'
+            } disabled:cursor-not-allowed`}
+            data-testid="button-mode-edit"
+          >
+            EDIT
+          </button>
         </div>
       </div>
 
