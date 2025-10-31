@@ -1623,9 +1623,9 @@ export default function Camera() {
             </div>
           )}
           
-          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above mode carousel) */}
+          {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above black bottom menu) */}
           {!isRecording && availableCameras.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-28 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-60 z-20 flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
               {availableCameras.map((camera) => (
                 <button
                   key={camera.deviceId}
@@ -1867,12 +1867,12 @@ export default function Camera() {
         </div>
 
         {/* Mode Carousel - Apple Style Pill (Above Capture Button) */}
-        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl rounded-full px-4 py-2.5 border border-white/10">
+        <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-xl rounded-full px-3 py-2 border border-white/10">
           <button
             onClick={() => switchCameraMode('video')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'video'}
-            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
               cameraMode === 'video'
                 ? 'bg-white text-black'
                 : 'text-white/70 hover:text-white/90 active:text-white/95'
@@ -1885,7 +1885,7 @@ export default function Camera() {
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'photo'}
-            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
               cameraMode === 'photo'
                 ? 'bg-white text-black'
                 : 'text-white/70 hover:text-white/90 active:text-white/95'
@@ -1898,7 +1898,7 @@ export default function Camera() {
             onClick={() => switchCameraMode('edit')}
             disabled={isTransitioning || isRecording}
             aria-pressed={cameraMode === 'edit'}
-            className={`px-6 py-2 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
               cameraMode === 'edit'
                 ? 'bg-white text-black'
                 : 'text-white/70 hover:text-white/90 active:text-white/95'
