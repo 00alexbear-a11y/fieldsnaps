@@ -89,6 +89,7 @@ export default function Projects() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
+  const [unitCount, setUnitCount] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -165,7 +166,7 @@ export default function Projects() {
   }, [projects, debouncedSearchQuery, sortBy, showCompleted]);
 
   const createMutation = useMutation({
-    mutationFn: async (data: { name: string; description?: string; address?: string }) => {
+    mutationFn: async (data: { name: string; description?: string; address?: string; unitCount?: number }) => {
       const res = await apiRequest("POST", "/api/projects", data);
       return await res.json();
     },
@@ -176,6 +177,7 @@ export default function Projects() {
       setName("");
       setDescription("");
       setAddress("");
+      setUnitCount(1);
       toast({ title: "Project created successfully" });
     },
     onError: (error: any) => {
@@ -247,7 +249,7 @@ export default function Projects() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createMutation.mutate({ name, description, address });
+    createMutation.mutate({ name, description, address, unitCount });
   };
 
   const handleDeleteProject = async (project: Project) => {
@@ -403,6 +405,22 @@ export default function Projects() {
                       placeholder="Job site address"
                       data-testid="input-project-address"
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor="unitCount">Number of Units</Label>
+                    <Input
+                      id="unitCount"
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={unitCount}
+                      onChange={(e) => setUnitCount(parseInt(e.target.value) || 1)}
+                      placeholder="1 for single-site projects"
+                      data-testid="input-project-unit-count"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Set to 1 for single-site projects. For multi-unit buildings, specify the number of units to enable unit labels in camera.
+                    </p>
                   </div>
                   <div>
                     <Label htmlFor="description">Description (optional)</Label>
