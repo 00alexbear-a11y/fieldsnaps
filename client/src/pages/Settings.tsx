@@ -214,9 +214,7 @@ export default function Settings() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('logo', file);
-      const res = await apiRequest('POST', '/api/companies/pdf-logo', formData, {
-        headers: {},
-      });
+      const res = await apiRequest('POST', '/api/companies/pdf-logo', formData);
       return await res.json();
     },
     onSuccess: () => {
@@ -525,7 +523,7 @@ export default function Settings() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-4 pb-24 space-y-6 max-w-screen-sm mx-auto">
+      <div className="px-4 pb-24 pt-safe-4 space-y-6 max-w-screen-sm mx-auto">
         <div className="flex flex-col items-center space-y-4 pb-2">
         <img 
           src={logoPath} 
