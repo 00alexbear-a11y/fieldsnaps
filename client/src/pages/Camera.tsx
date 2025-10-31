@@ -1327,10 +1327,10 @@ export default function Camera() {
         setLocation(`/todos?photoId=${savedPhoto.id}`);
       } else if (mode === 'todo') {
         // Camera Tab To-Do mode: navigate to edit page with createTodo flag
-        setLocation(`/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}`);
+        setLocation(`/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}&preserveSession=true`);
       } else {
-        // Normal capture: navigate to edit page
-        setLocation(`/photo/${savedPhoto.id}/edit`);
+        // Normal capture: navigate to edit page with preserveSession flag
+        setLocation(`/photo/${savedPhoto.id}/edit?preserveSession=true&projectId=${selectedProject}`);
       }
 
     } catch (error) {
@@ -1708,7 +1708,7 @@ export default function Camera() {
               <button
                 onClick={() => {
                   // Navigate to project photos to view all session photos
-                  setLocation(`/project/${selectedProject}/photos`);
+                  setLocation(`/projects/${selectedProject}`);
                 }}
                 className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10 flex-shrink-0"
                 data-testid="thumbnail-last-photo"
