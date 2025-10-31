@@ -1474,8 +1474,8 @@ export default function Camera() {
     >
       {/* Camera Viewfinder */}
       <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
-          {/* Top Bar - iOS Style with Back Button (44px touch targets) */}
-          <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-2">
+          {/* Top Bar - iOS Style with Black Background */}
+          <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-4 bg-gradient-to-b from-black/60 via-black/40 to-transparent backdrop-blur-md">
             <div className="flex items-center justify-between">
               <Button
                 variant="ghost"
