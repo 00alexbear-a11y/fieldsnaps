@@ -222,7 +222,7 @@ export default function Trash() {
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between pt-safe-3 pb-3 px-4 border-b">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
