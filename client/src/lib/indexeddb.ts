@@ -9,6 +9,7 @@ export interface LocalPhoto {
   id: string;
   projectId: string;
   blob: Blob;
+  thumbnailBlob?: Blob; // Thumbnail for videos (extracted first frame) or compressed thumbnail for photos
   mediaType: 'photo' | 'video'; // Distinguish between photos and videos
   // url is NOT stored - create on-demand from blob using createPhotoUrl()
   caption?: string;

@@ -472,10 +472,18 @@ class SyncManager {
         
         // Create FormData for multipart upload
         const formData = new FormData();
-        formData.append('photo', photo.blob, `photo-${photo.id}.jpg`);
+        // Use correct file extension based on media type
+        const fileExtension = photo.mediaType === 'video' ? 'webm' : 'jpg';
+        const fileName = `${photo.mediaType}-${photo.id}.${fileExtension}`;
+        formData.append('photo', photo.blob, fileName);
         
-        // Generate thumbnail for photos (skip for videos)
-        if (photo.mediaType === 'photo') {
+        // Add thumbnail for videos (if extracted) or generate for photos
+        if (photo.thumbnailBlob) {
+          // Use pre-extracted thumbnail (for videos)
+          formData.append('thumbnail', photo.thumbnailBlob, `thumb-${photo.id}.jpg`);
+          console.log('[Sync] Using pre-extracted thumbnail:', photo.thumbnailBlob.size, 'bytes');
+        } else if (photo.mediaType === 'photo') {
+          // Generate thumbnail for photos on-the-fly
           try {
             const file = new File([photo.blob], `photo-${photo.id}.jpg`, { type: photo.blob.type });
             const thumbnailBlob = await generateThumbnail(file, 200);

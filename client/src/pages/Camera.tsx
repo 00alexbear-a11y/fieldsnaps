@@ -839,6 +839,16 @@ export default function Camera() {
       mediaRecorder.onstop = async () => {
         const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
         
+        // Extract thumbnail from video
+        let thumbnailBlob: Blob | undefined;
+        try {
+          const { extractVideoThumbnail } = await import('@/lib/videoUtils');
+          thumbnailBlob = await extractVideoThumbnail(blob, 400, 400);
+        } catch (error) {
+          console.error('[Camera] Failed to extract video thumbnail:', error);
+          // Continue without thumbnail if extraction fails
+        }
+        
         const project = projects.find(p => p.id === selectedProject);
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
@@ -848,6 +858,7 @@ export default function Camera() {
         const savedPhoto = await idb.savePhoto({
           projectId: selectedProject,
           blob: blob,
+          thumbnailBlob,
           mediaType: 'video',
           quality: selectedQuality,
           caption: autoCaption,
