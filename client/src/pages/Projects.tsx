@@ -354,7 +354,7 @@ export default function Projects() {
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
       <div className="sticky top-0 z-50 bg-white dark:bg-black">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 pt-safe-3 pb-3">
           <img 
             src={logoPath} 
             alt="FieldSnaps" 

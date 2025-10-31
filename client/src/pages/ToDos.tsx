@@ -598,7 +598,7 @@ export default function ToDos() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b pt-safe">
         {/* Tabs */}
         <Tabs value={view} onValueChange={(v) => setView(v as any)} className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 h-11">

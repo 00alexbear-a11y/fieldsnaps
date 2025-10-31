@@ -86,7 +86,7 @@ export default function MyTasks() {
 
   return (
     <div className="h-screen flex flex-col overflow-auto pb-20">
-      <header className="border-b px-4 py-3 bg-background sticky top-0 z-10">
+      <header className="border-b px-4 pt-safe-3 pb-3 bg-background sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
