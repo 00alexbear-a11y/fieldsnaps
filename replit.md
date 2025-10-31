@@ -17,6 +17,13 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 
 ## Recent Changes
 
+### Enhanced Video Quality & Carousel Transitions (Oct 31, 2025)
+- **Video Recording Quality**: Increased bitrate from 2.5 Mbps to 10 Mbps (4x improvement) for professional construction documentation. Videos now record at industry-standard quality (8-10 Mbps for 1080p) providing clear detail for dispute resolution and compliance.
+- **Carousel Photo Viewer**: Implemented Apple Photos-style carousel with smooth sliding transitions. All photos/videos render in a horizontal track using CSS flexbox. GPU-accelerated transitions via `translate3d()` with 300ms cubic-bezier easing matching iOS timing standards.
+- **Real-Time Drag Tracking**: Photos/videos follow finger during swipe gestures with instant visual feedback via `dragOffset` state. Transitions disable during drag and re-enable on release for natural feel.
+- **Velocity-Based Navigation**: Fast flicks (>0.5 px/ms) trigger navigation even with shorter distances. Distance threshold set to 30% screen width or 100px minimum for reliable gesture detection.
+- **Performance**: Zero bundle size increase (pure CSS transforms). Uses `willChange: transform` optimization during drag. All photos pre-rendered in carousel for instant navigation.
+
 ### Video Display Support (Oct 30, 2025)
 - **Project Grid**: Videos now appear in ProjectPhotos grid with play icon overlay. Video thumbnails render with `<video>` elements using `preload="metadata"` for instant thumbnails without autoplay. Play icon overlay uses white/90 background with iOS Blue primary color.
 - **Fullscreen Viewer**: PhotoGestureViewer displays videos with custom play/pause controls that preserve touch-swipe navigation. Video element uses `playsInline` to prevent iOS fullscreen takeover. Custom play button overlay (pointer-events-none wrapper with clickable button) appears only when video is paused. Touch handlers on both video and button ensure swipe gestures work from any touch point. Video state resets on navigation to prevent stale playback state.
