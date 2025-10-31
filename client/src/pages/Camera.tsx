@@ -45,6 +45,8 @@ interface Project {
   description?: string;
   address?: string;
   completed?: boolean;
+  unitCount?: number;
+  unitLabels?: string[];
 }
 
 interface Photo {
@@ -97,6 +99,7 @@ export default function Camera() {
   
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
+  const [selectedUnitLabel, setSelectedUnitLabel] = useState<string | null>(null);
   
   // Swipe-down gesture refs (using refs to avoid re-renders during gesture)
   const swipeStartY = useRef<number | null>(null);
@@ -177,6 +180,26 @@ export default function Camera() {
     [allProjectsWithCounts]
   );
 
+  // Get current project and generate unit labels
+  const selectedProjectData = useMemo(() => 
+    projects.find(p => p.id === selectedProject),
+    [projects, selectedProject]
+  );
+
+  const unitLabels = useMemo(() => {
+    if (!selectedProjectData || !selectedProjectData.unitCount || selectedProjectData.unitCount <= 1) {
+      return [];
+    }
+    
+    // Use stored custom labels if available, otherwise auto-generate
+    if (selectedProjectData.unitLabels && selectedProjectData.unitLabels.length > 0) {
+      return selectedProjectData.unitLabels;
+    }
+    
+    // Fallback: Generate unit labels: "Unit 1", "Unit 2", etc.
+    return Array.from({ length: selectedProjectData.unitCount }, (_, i) => `Unit ${i + 1}`);
+  }, [selectedProjectData]);
+
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
     queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`, {
@@ -193,7 +216,19 @@ export default function Camera() {
 
   useEffect(() => {
     setSelectedTags([]);
+    // Reset unit stamp when project changes or when project has no units
+    setSelectedUnitLabel(null);
   }, [selectedProject]);
+
+  // Clear stamp when unitCount becomes <= 1 OR when selected label is no longer valid
+  useEffect(() => {
+    if (unitLabels.length === 0) {
+      setSelectedUnitLabel(null);
+    } else if (selectedUnitLabel && !unitLabels.includes(selectedUnitLabel)) {
+      // Current selection is no longer valid (e.g., unit names changed)
+      setSelectedUnitLabel(null);
+    }
+  }, [unitLabels, selectedUnitLabel]);
 
   useEffect(() => {
     if (selectedTags.length > 0) {
@@ -942,6 +977,7 @@ export default function Camera() {
           syncStatus: 'pending',
           retryCount: 0,
           pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
+          unitLabel: selectedUnitLabel || undefined,
         });
         
         haptics.success();
@@ -1091,6 +1127,7 @@ export default function Camera() {
         syncStatus: 'pending',
         retryCount: 0,
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
+        unitLabel: selectedUnitLabel || undefined,
       });
 
       URL.revokeObjectURL(compressionResult.url);
@@ -1221,6 +1258,7 @@ export default function Camera() {
         syncStatus: 'pending',
         retryCount: 0,
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
+        unitLabel: selectedUnitLabel || undefined,
         isForTodo: mode === 'todo',
       });
 
@@ -1569,6 +1607,13 @@ export default function Camera() {
             </div>
           )}
           
+          {/* Unit Stamp Badge - Only show when unit is selected */}
+          {selectedUnitLabel && !isRecording && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm border border-white/20">
+              {selectedUnitLabel}
+            </div>
+          )}
+          
           {/* Zoom Indicator */}
           {pinchStartDistanceRef.current !== null && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-black/60 backdrop-blur-md text-white px-6 py-3 rounded-full text-2xl font-semibold">
@@ -1804,6 +1849,38 @@ export default function Camera() {
                           {tags.map((tag) => (
                             <SelectItem key={tag.id} value={tag.id}>
                               {tag.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  
+                  {/* Unit Stamp Selector - Only show when project has multiple units */}
+                  {unitLabels.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <label className="text-white/80 text-sm">Unit Stamp</label>
+                      <Select
+                        value={selectedUnitLabel || 'none'}
+                        onValueChange={(v) => {
+                          if (v && v !== 'none') {
+                            setSelectedUnitLabel(v);
+                          } else {
+                            setSelectedUnitLabel(null);
+                          }
+                        }}
+                      >
+                        <SelectTrigger
+                          className="bg-white/10 text-white border-white/20"
+                          data-testid="select-unit-stamp"
+                        >
+                          <SelectValue placeholder="No unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No unit</SelectItem>
+                          {unitLabels.map((label) => (
+                            <SelectItem key={label} value={label}>
+                              {label}
                             </SelectItem>
                           ))}
                         </SelectContent>
