@@ -354,7 +354,7 @@ export default function Projects() {
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Top Navigation Bar - Sticky with glassmorphism */}
       <div className="sticky top-0 z-50 bg-white dark:bg-black">
-        <div className="flex items-center justify-between px-4 h-14">
+        <div className="flex items-center justify-between px-4 h-20">
           <img 
             src={logoPath} 
             alt="FieldSnaps" 
@@ -476,7 +476,7 @@ export default function Projects() {
       </div>
 
       {/* Projects List */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-52 bg-white dark:bg-black">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-52 pt-4 bg-white dark:bg-black">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
