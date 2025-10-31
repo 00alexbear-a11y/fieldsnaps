@@ -104,3 +104,9 @@ integrations = ["javascript_object_storage:1.0.0", "javascript_stripe:1.0.0", "j
 
 [objectStorage]
 defaultBucketID = "replit-objstore-5ea22a1a-b30c-48b6-b014-7ef11304d43a"
+
+[userenv]
+
+[userenv.shared]
+TESTING_VITE_STRIPE_PUBLIC_KEY = "sk_test_51SIGf7B2R0DGd4XgTRef2trwJecrLZrXNMoMPjZ9vVy5e38G8W68HJokXq8ZvKsyKJwWfDpQWLI0OpqhBPFIZoli00pBT3aFxf"
+TESTING_STRIPE_SECRET_KEY = "pk_test_51SIGf7B2R0DGd4XgCs9kjYL317OL2cSQ9V2zlYbE0jxiOJ69rB5g0Qgxtqw1jJCZbLXDCgvdZ05pQnhxEXsjeLZo00ZBFKOJOd"
