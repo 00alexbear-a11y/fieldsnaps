@@ -524,22 +524,34 @@ export default function Settings() {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Sticky Header - matches Projects page */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-black border-b border-border">
-        <div className="flex items-center justify-between px-4 pt-safe-3 pb-3">
-          <img 
-            src={logoPath} 
-            alt="FieldSnaps" 
-            className="h-9 w-auto object-contain"
-            data-testid="img-fieldsnaps-logo"
-          />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            data-testid="button-theme-toggle"
-          >
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+      <div className="sticky top-0 z-50 bg-white dark:bg-black">
+        <div className="px-4 pt-safe-3 pb-3 space-y-1">
+          <div className="flex items-center justify-between">
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-9 w-auto object-contain"
+              data-testid="img-fieldsnaps-logo"
+            />
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {isDark ? 'Dark Mode' : 'Light Mode'}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                data-testid="button-theme-toggle"
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+            </div>
+          </div>
+          {syncStatus && syncStatus.pending > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
+            </p>
+          )}
         </div>
       </div>
 

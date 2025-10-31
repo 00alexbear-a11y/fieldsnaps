@@ -59,7 +59,7 @@ function AppContent() {
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
   
-  const showSyncBanner = location === '/' || location === '/settings';
+  const showSyncBanner = location === '/projects';
   
   // Disable swipe back on main pages to prevent blank white screen
   const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
@@ -146,7 +146,7 @@ function AppContent() {
       {/* Show payment notification for past_due users */}
       <PaymentNotification />
       
-      {/* Show sync banner only on Projects list and Settings pages */}
+      {/* Show sync banner only on Projects page */}
       {showSyncBanner && <SyncBanner />}
       
       <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
