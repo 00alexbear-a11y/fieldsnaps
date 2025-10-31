@@ -72,17 +72,21 @@ export function PhotoGestureViewer({
   const [showCaptionDialog, setShowCaptionDialog] = useState(false);
   const [editedCaption, setEditedCaption] = useState("");
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Gesture state for swipe navigation
+  // Gesture state for swipe navigation with velocity tracking
   const gestureStateRef = useRef({
     initialTouch: { x: 0, y: 0 },
+    initialTime: 0,
     moveDistance: 0,
     isGesturing: false,
+    velocity: 0,
   });
   
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -161,8 +165,11 @@ export function PhotoGestureViewer({
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       state.initialTouch = { x: touch.clientX, y: touch.clientY };
+      state.initialTime = Date.now();
       state.moveDistance = 0;
       state.isGesturing = false;
+      state.velocity = 0;
+      setIsDragging(true);
 
       // Start long-press timer for delete
       if (onDelete) {
@@ -184,6 +191,18 @@ export function PhotoGestureViewer({
       const deltaX = touch.clientX - state.initialTouch.x;
       const deltaY = touch.clientY - state.initialTouch.y;
       state.moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // Update drag offset for real-time visual feedback
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal drag - update offset
+        setDragOffset(deltaX);
+        
+        // Calculate velocity (pixels per millisecond)
+        const deltaTime = Date.now() - state.initialTime;
+        if (deltaTime > 0) {
+          state.velocity = deltaX / deltaTime;
+        }
+      }
 
       // Cancel long-press if moved too much
       if (state.moveDistance > 10 && longPressTimerRef.current) {
@@ -207,8 +226,16 @@ export function PhotoGestureViewer({
       const deltaX = touch.clientX - state.initialTouch.x;
       const deltaY = touch.clientY - state.initialTouch.y;
 
-      // Swipe to navigate (horizontal swipe with threshold)
-      if (Math.abs(deltaX) > 100 && Math.abs(deltaY) < 50) {
+      // Determine if swipe should trigger navigation
+      // Velocity-based: fast flick (>0.5 px/ms) even with shorter distance
+      // Distance-based: 30% of screen width or 100px minimum
+      const screenWidth = window.innerWidth;
+      const threshold = Math.max(screenWidth * 0.3, 100);
+      const shouldNavigate = 
+        Math.abs(state.velocity) > 0.5 || // Fast flick
+        Math.abs(deltaX) > threshold;      // Sufficient distance
+      
+      if (shouldNavigate && Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0 && currentIndex > 0) {
           setCurrentIndex(currentIndex - 1);
         } else if (deltaX < 0 && currentIndex < photos.length - 1) {
@@ -217,9 +244,12 @@ export function PhotoGestureViewer({
       }
     }
 
-    // Reset gesture state
+    // Reset drag state
+    setIsDragging(false);
+    setDragOffset(0);
     state.isGesturing = false;
     state.moveDistance = 0;
+    state.velocity = 0;
   }, [currentIndex, photos.length]);
 
   const navigateNext = () => {
@@ -363,59 +393,78 @@ export function PhotoGestureViewer({
         </div>
       </div>
 
-      {/* Photo/Video Container */}
+      {/* Carousel Container */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden pointer-events-none relative"
+        className="flex-1 overflow-hidden pointer-events-none relative"
       >
-        {currentPhoto.mediaType === 'video' ? (
-          <>
-            <video
-              ref={videoRef}
-              src={photoUrl}
-              playsInline
-              crossOrigin="use-credentials"
-              className="max-w-full max-h-full object-contain pointer-events-auto"
-              data-testid="photo-viewer-video"
-              onClick={toggleVideoPlayback}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onPlay={() => setIsVideoPlaying(true)}
-              onPause={() => setIsVideoPlaying(false)}
-              onEnded={() => setIsVideoPlaying(false)}
-            />
-            {/* Custom play button overlay - only shows when paused */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              {!isVideoPlaying && (
-                <button
-                  onClick={toggleVideoPlayback}
+        {/* Carousel Track - slides horizontally */}
+        <div
+          className="h-full flex items-center"
+          style={{
+            transform: `translate3d(calc(-${currentIndex * 100}% + ${dragOffset}px), 0, 0)`,
+            transition: isDragging ? 'none' : 'transform 300ms cubic-bezier(0.4, 0, 0.22, 1)',
+            willChange: isDragging ? 'transform' : 'auto',
+          }}
+        >
+          {photos.map((photo, index) => (
+            <div
+              key={photo.id}
+              className="flex-shrink-0 w-screen h-full flex items-center justify-center"
+            >
+              {photo.mediaType === 'video' ? (
+                <>
+                  <video
+                    ref={index === currentIndex ? videoRef : null}
+                    src={photo.url}
+                    playsInline
+                    crossOrigin="use-credentials"
+                    className="max-w-full max-h-full object-contain pointer-events-auto"
+                    data-testid={`photo-viewer-video-${index}`}
+                    onClick={index === currentIndex ? toggleVideoPlayback : undefined}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onPlay={() => index === currentIndex && setIsVideoPlaying(true)}
+                    onPause={() => index === currentIndex && setIsVideoPlaying(false)}
+                    onEnded={() => index === currentIndex && setIsVideoPlaying(false)}
+                  />
+                  {/* Custom play button overlay - only shows when paused on current video */}
+                  {index === currentIndex && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {!isVideoPlaying && (
+                        <button
+                          onClick={toggleVideoPlayback}
+                          onTouchStart={handleTouchStart}
+                          onTouchMove={handleTouchMove}
+                          onTouchEnd={handleTouchEnd}
+                          className="rounded-full bg-white/90 backdrop-blur-sm p-4 pointer-events-auto"
+                          data-testid="button-video-toggle"
+                          aria-label="Play video"
+                        >
+                          <Play className="w-12 h-12 text-primary fill-primary" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <img
+                  ref={index === currentIndex ? imageRef : null}
+                  src={photo.url}
+                  alt={photo.caption || "Photo"}
+                  crossOrigin="use-credentials"
+                  className="max-w-full max-h-full object-contain pointer-events-auto"
+                  draggable={false}
+                  data-testid={`photo-viewer-image-${index}`}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
-                  className="rounded-full bg-white/90 backdrop-blur-sm p-4 pointer-events-auto"
-                  data-testid="button-video-toggle"
-                  aria-label="Play video"
-                >
-                  <Play className="w-12 h-12 text-primary fill-primary" />
-                </button>
+                />
               )}
             </div>
-          </>
-        ) : (
-          <img
-            ref={imageRef}
-            src={photoUrl}
-            alt={currentPhoto.caption || "Photo"}
-            crossOrigin="use-credentials"
-            className="max-w-full max-h-full object-contain pointer-events-auto"
-            draggable={false}
-            data-testid="photo-viewer-image"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          />
-        )}
+          ))}
+        </div>
       </div>
 
       {/* Navigation Arrows - Centered vertically on sides */}

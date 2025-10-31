@@ -825,7 +825,7 @@ export default function Camera() {
       
       const mediaRecorder = new MediaRecorder(compositeStream, {
         mimeType: 'video/webm;codecs=vp8,opus',
-        videoBitsPerSecond: 2500000
+        videoBitsPerSecond: 10000000
       });
       
       recordedChunksRef.current = [];
