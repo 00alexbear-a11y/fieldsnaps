@@ -85,8 +85,26 @@ export default function Camera() {
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [showProjectSelection, setShowProjectSelection] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
-  const [cameraMode, setCameraMode] = useState<CameraMode>('photo');
+  const [cameraMode, setCameraMode] = useState<CameraMode>(() => {
+    // Check if we should preserve session from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const preserveSession = urlParams.get('preserveSession') === 'true';
+    
+    if (preserveSession) {
+      const savedMode = sessionStorage.getItem('camera-mode') as CameraMode | null;
+      if (savedMode && ['photo', 'video', 'edit'].includes(savedMode)) {
+        return savedMode;
+      }
+    }
+    
+    // Default to photo on fresh session
+    return 'photo';
+  });
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isReturningFromEdit, setIsReturningFromEdit] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('preserveSession') === 'true';
+  });
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>('environment');
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<0.5 | 1 | 2 | 3>(1);
@@ -258,6 +276,22 @@ export default function Camera() {
       });
     }
   }, []);
+
+  // Save camera mode to sessionStorage whenever it changes
+  useEffect(() => {
+    sessionStorage.setItem('camera-mode', cameraMode);
+  }, [cameraMode]);
+
+  // Smooth transition when returning from edit
+  useEffect(() => {
+    if (isReturningFromEdit) {
+      // Brief delay to ensure camera is ready, then fade in
+      const timer = setTimeout(() => {
+        setIsReturningFromEdit(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isReturningFromEdit]);
 
   const previousProjectRef = useRef<string>('');
   const currentProjectRef = useRef<string>('');
@@ -1499,7 +1533,9 @@ export default function Camera() {
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-0 w-full bg-black overflow-hidden flex flex-col"
+      className={`fixed inset-0 w-full bg-black overflow-hidden flex flex-col transition-opacity duration-300 ${
+        isReturningFromEdit ? 'opacity-0' : 'opacity-100'
+      }`}
       style={{ 
         height: '100dvh', 
         minHeight: '100vh'
