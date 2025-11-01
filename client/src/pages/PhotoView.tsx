@@ -96,14 +96,14 @@ export default function PhotoView() {
 
   if (!mediaUrl) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black">
+      <div className="flex items-center justify-center h-dvh bg-black">
         <div className="text-white">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-screen bg-black">
+    <div className="relative h-dvh bg-black">
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent pt-safe-2 pb-4 px-4">
         <div className="flex items-center justify-between">
@@ -111,7 +111,7 @@ export default function PhotoView() {
             variant="ghost"
             size="icon"
             onClick={handleBack}
-            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
+            className="min-touch rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
             data-testid="button-back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -121,7 +121,7 @@ export default function PhotoView() {
             variant="ghost"
             size="icon"
             onClick={handleDelete}
-            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
+            className="min-touch rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
             data-testid="button-delete"
           >
             <Trash2 className="w-5 h-5" />

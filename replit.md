@@ -35,6 +35,51 @@ The application includes a bottom navigation, a comprehensive camera interface, 
 ### System Design Choices
 The build philosophy emphasizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage leverages IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, database indexing, and code-splitting for large components. The offline sync system is hardened with queue size limits, single-flight locks, exponential backoff with jitter, atomic deduplication, and upsert logic. OAuth for native apps uses the Capacitor Browser plugin with custom URL schemes. Critical performance enhancements include `crossOrigin='use-credentials'`, O(n) photo rendering with Map-based caching, `viewport-fit=cover` for iPhone X+ devices, and comprehensive CSS utilities for iOS safe-area handling (`.pt-safe`, `.pt-safe-2`, `.pt-safe-3`, `.pb-safe-*`) applied consistently across all page headers to prevent content overlap with iPhone notch. Virtualization with `@tanstack/react-virtual` is implemented for large photo collections, and global error toast notifications are managed via TanStack Query. Sync status is displayed inline within Settings and Projects headers (below logo) showing pending upload counts when items await sync; no overlay components are used to prevent notch interference.
 
+### Responsive Design System
+FieldSnaps implements a CSS-first responsive design system that automatically adapts to any screen size without device detection. The system uses modern web standards and Apple's Human Interface Guidelines to ensure flawless performance across iPhone SE → Pro Max, iPads (portrait/landscape), and Android devices.
+
+**Core Principles:**
+1. **Mobile-First CSS**: All layouts use relative units and flexbox/grid instead of fixed pixel positioning
+2. **Dynamic Viewport Units**: Uses `100dvh` instead of `100vh` to adapt to browser UI showing/hiding on mobile
+3. **Safe-Area Awareness**: Comprehensive utilities handle notches, Dynamic Island, and home indicators on all device orientations
+4. **Touch Target Standards**: All interactive elements meet or exceed 44×44px minimum (iOS WCAG AAA standard)
+5. **Zero Device Detection**: No JavaScript device sniffing - pure CSS adaptation via media queries and env() variables
+
+**Safe-Area Utilities** (`client/src/index.css`):
+- `.pt-safe`, `.pt-safe-2`, `.pt-safe-3`, `.pt-safe-4`: Top padding with safe-area-inset-top (for headers below notch/Dynamic Island)
+- `.pb-safe`, `.pb-safe-2`, `.pb-safe-4`, `.pb-safe-6`, `.pb-safe-8`: Bottom padding with safe-area-inset-bottom (for controls above home indicator)
+- `.pl-safe`, `.pr-safe`: Left/right padding for landscape mode on notched devices
+- `.p-safe`: All sides safe-area padding for full-screen views
+- Applied consistently on Camera, PhotoAnnotationEditor, BottomNav, and all page headers
+
+**Touch Target Utilities**:
+- `.min-touch`: Enforces 44×44px minimum for iOS compliance
+- `.min-touch-android`: Enforces 48×48px minimum for Material Design compliance
+- Applied to all buttons in Camera.tsx (zoom controls, mode selector, shutter), PhotoAnnotationEditor.tsx (tool palette, color/size pickers), PhotoView.tsx (navigation), and BottomNav.tsx
+
+**Dynamic Viewport Height**:
+- `.h-dvh`, `.min-h-dvh`, `.max-h-dvh`: Adapts to browser UI (address bar, tab bar) showing/hiding
+- Replaces problematic `100vh` which doesn't account for mobile browser chrome
+- Used in Camera.tsx and PhotoAnnotationEditor.tsx for full-screen layouts
+
+**Responsive Breakpoints** (`client/src/index.css`):
+- **Landscape mode** (`@media (orientation: landscape) and (max-height: 600px)`): Reduces vertical padding to maximize content space
+- **Tablet portrait** (`@media (min-width: 768px)`): Increases touch targets to 48×48px for larger screens
+- **Desktop** (`@media (min-width: 1024px)`): Returns to standard 44×44px since mouse is more precise
+
+**Flexbox Layout Patterns**:
+- Camera.tsx: `h-dvh flex flex-col` container → `flex-1` video container → `flex-shrink-0` bottom controls with safe-area
+- PhotoAnnotationEditor.tsx: Same pattern for canvas container and tool palettes
+- Zoom controls moved inside bottom container (no more hard-coded `bottom: 260px`)
+
+**Testing Approach**:
+- CSS-only responsive design works automatically across all devices
+- Test with Chrome DevTools device emulation (iPhone SE, 12 Pro, 14 Pro Max, iPad)
+- Verify safe-area handling: Set "Show Safe Area" in simulator, check notch/home indicator clearance
+- Confirm touch targets: All buttons ≥44×44px, 8px spacing between interactive elements
+- Validate landscape mode: Rotate device, ensure layouts adapt without breaking
+- No device-specific code paths means: build once, works everywhere
+
 ## External Dependencies
 
 ### Frontend

@@ -2081,7 +2081,7 @@ export function PhotoAnnotationEditor({
   };
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col" style={{ height: '100dvh', minHeight: '100vh' }}>
+    <div className="fixed inset-0 h-dvh bg-black flex flex-col">
       {/* Canvas Container - Takes up available space */}
       <div className="relative flex-1 min-h-0 w-full flex items-center justify-center pointer-events-none">
         {/* Canvas - Centered */}
@@ -2129,7 +2129,7 @@ export function PhotoAnnotationEditor({
           {/* Collapsible Color Picker */}
           <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {colorPickerExpanded && (
-              <div className="fixed left-4 bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ bottom: '100px', zIndex: 9999 }}>
+              <div className="fixed left-4 bottom-32 pb-safe bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ zIndex: 9999 }}>
                 <div className="flex flex-col gap-2">
                   {colors.map((color) => (
                     <button
@@ -2150,7 +2150,7 @@ export function PhotoAnnotationEditor({
                           redrawCanvas();
                         }
                       }}
-                      className={`w-10 h-10 rounded-full border-2 hover-elevate transition-all ${
+                      className={`min-touch rounded-full border-2 hover-elevate transition-all ${
                         selectedColor === color.value ? 'border-white ring-2 ring-white/50' : 'border-white/40'
                       }`}
                       style={{ backgroundColor: color.value }}
@@ -2170,7 +2170,7 @@ export function PhotoAnnotationEditor({
                 setColorPickerExpanded(!colorPickerExpanded);
                 setSizePickerExpanded(false);
               }}
-              className="h-10 w-10 rounded-full border-2 border-white/40 hover:bg-white/10 transition-all flex-shrink-0 pointer-events-auto cursor-pointer"
+              className="min-touch rounded-full border-2 border-white/40 hover:bg-white/10 transition-all flex-shrink-0 pointer-events-auto cursor-pointer"
               style={{ backgroundColor: selectedColor, zIndex: 1001 }}
               data-testid="button-color-picker"
               aria-label="Color picker"
@@ -2180,7 +2180,7 @@ export function PhotoAnnotationEditor({
           {/* Collapsible Size Selector */}
           <div className="relative flex-shrink-0" style={{ zIndex: 1002 }}>
             {sizePickerExpanded && (
-              <div className="fixed left-20 bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ bottom: '100px', zIndex: 9999 }}>
+              <div className="fixed left-20 bottom-32 pb-safe bg-black/90 backdrop-blur-md rounded-2xl p-3 shadow-2xl pointer-events-auto border border-white/20" style={{ zIndex: 9999 }}>
                 <div className="flex flex-col gap-2">
                   {strokeSizes.map((size) => (
                     <button
@@ -2214,7 +2214,7 @@ export function PhotoAnnotationEditor({
                 setSizePickerExpanded(!sizePickerExpanded);
                 setColorPickerExpanded(false);
               }}
-              className={`h-10 w-10 rounded-full text-xs font-semibold transition-all flex-shrink-0 pointer-events-auto cursor-pointer ${
+              className={`min-touch rounded-full text-xs font-semibold transition-all flex-shrink-0 pointer-events-auto cursor-pointer ${
                 strokeWidth === strokeSizes[0].value
                   ? 'bg-white text-black'
                   : strokeWidth === strokeSizes[1].value
@@ -2234,7 +2234,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTextDialogOpen(true)}
             data-testid="button-tool-text"
-            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+            className="min-touch text-white hover:bg-white/10 flex-shrink-0"
             aria-label="Add text"
           >
             <Type className="w-5 h-5" />
@@ -2244,7 +2244,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "arrow" ? null : "arrow")}
             data-testid="button-tool-arrow"
-            className={`h-10 w-10 flex-shrink-0 ${tool === "arrow" ? "" : "text-white hover:bg-white/10"}`}
+            className={`min-touch flex-shrink-0 ${tool === "arrow" ? "" : "text-white hover:bg-white/10"}`}
             aria-label="Arrow tool"
           >
             <ArrowUpRight className="w-5 h-5" />
@@ -2254,7 +2254,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "line" ? null : "line")}
             data-testid="button-tool-line"
-            className={`h-10 w-10 flex-shrink-0 ${tool === "line" ? "" : "text-white hover:bg-white/10"}`}
+            className={`min-touch flex-shrink-0 ${tool === "line" ? "" : "text-white hover:bg-white/10"}`}
             aria-label="Line tool"
           >
             <Minus className="w-5 h-5" />
@@ -2264,7 +2264,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "circle" ? null : "circle")}
             data-testid="button-tool-circle"
-            className={`h-10 w-10 flex-shrink-0 ${tool === "circle" ? "" : "text-white hover:bg-white/10"}`}
+            className={`min-touch flex-shrink-0 ${tool === "circle" ? "" : "text-white hover:bg-white/10"}`}
             aria-label="Circle tool"
           >
             <Circle className="w-5 h-5" />
@@ -2274,7 +2274,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setTool(tool === "pen" ? null : "pen")}
             data-testid="button-tool-pen"
-            className={`h-10 w-10 flex-shrink-0 ${tool === "pen" ? "" : "text-white hover:bg-white/10"}`}
+            className={`min-touch flex-shrink-0 ${tool === "pen" ? "" : "text-white hover:bg-white/10"}`}
             aria-label="Pen tool"
           >
             <Pen className="w-5 h-5" />
@@ -2284,7 +2284,7 @@ export function PhotoAnnotationEditor({
             size="icon"
             onClick={() => setMeasurementDialogOpen(true)}
             data-testid="button-tool-measurement"
-            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+            className="min-touch text-white hover:bg-white/10 flex-shrink-0"
             aria-label="Tape measure"
           >
             <Ruler className="w-5 h-5" />
@@ -2295,7 +2295,7 @@ export function PhotoAnnotationEditor({
             onClick={handleUndo}
             disabled={historyIndex === 0}
             data-testid="button-undo"
-            className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0 disabled:opacity-30"
+            className="min-touch text-white hover:bg-white/10 flex-shrink-0 disabled:opacity-30"
             aria-label="Undo"
           >
             <Undo className="w-5 h-5" />
@@ -2306,7 +2306,7 @@ export function PhotoAnnotationEditor({
               size="icon"
               onClick={handleDeleteSelected}
               data-testid="button-delete-annotation"
-              className="h-10 w-10 text-white hover:bg-white/10 flex-shrink-0"
+              className="min-touch text-white hover:bg-white/10 flex-shrink-0"
               aria-label="Delete annotation"
             >
               <Trash2 className="w-5 h-5" />
@@ -2316,7 +2316,7 @@ export function PhotoAnnotationEditor({
       </div>
 
       {/* Bottom Action Rail - Cancel and Save (matches camera Back/Video/Camera/Edit buttons) */}
-      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 mb-16 bg-black/50 backdrop-blur-md pointer-events-auto">
+      <div className="flex-shrink-0 flex items-center justify-around px-8 py-4 pb-safe-4 bg-black/50 backdrop-blur-md pointer-events-auto">
         <Button
           variant="ghost"
           size="icon"
