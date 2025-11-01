@@ -64,6 +64,34 @@ export default function Settings() {
     return 'standard';
   });
   
+  // User settings
+  const { data: userSettings } = useQuery<{ uploadOnWifiOnly: boolean }>({
+    queryKey: ['/api/settings'],
+    enabled: !!user,
+  });
+  
+  // Update settings mutation
+  const updateSettingsMutation = useMutation({
+    mutationFn: async (data: { uploadOnWifiOnly: boolean }) => {
+      const res = await apiRequest('PUT', '/api/settings', data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
+      toast({
+        title: 'Settings updated',
+        description: 'Your upload preferences have been saved',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to update settings',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+  
   // Team management state
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const [showCancellationWarning, setShowCancellationWarning] = useState(false);
@@ -633,6 +661,33 @@ export default function Settings() {
               className="w-4 h-4 text-primary"
             />
           </label>
+        </div>
+      </Card>
+
+      {/* Upload Settings */}
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <Upload className="w-5 h-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Upload Settings</h2>
+        </div>
+        
+        <p className="text-sm text-muted-foreground">
+          Control when photos sync to the cloud
+        </p>
+
+        <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+          <div className="flex-1">
+            <Label htmlFor="wifi-only" className="font-medium">Upload only on WiFi</Label>
+            <p className="text-sm text-muted-foreground mt-1">
+              Save cellular data by uploading only when connected to WiFi
+            </p>
+          </div>
+          <Switch
+            id="wifi-only"
+            checked={userSettings?.uploadOnWifiOnly ?? true}
+            onCheckedChange={(checked) => updateSettingsMutation.mutate({ uploadOnWifiOnly: checked })}
+            data-testid="switch-upload-wifi-only"
+          />
         </div>
       </Card>
 
@@ -1301,6 +1356,31 @@ export default function Settings() {
           </div>
         </Card>
       )}
+
+      {/* Upload Queue */}
+      <Card 
+        className="p-4 space-y-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
+        onClick={() => setLocation('/upload-queue')}
+        data-testid="card-upload-queue"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Upload Queue</h2>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </div>
+        
+        <p className="text-sm text-muted-foreground">
+          View pending photo uploads and retry failed items
+        </p>
+        
+        {syncStatus && syncStatus.pending > 0 && (
+          <div className="flex items-center space-x-2">
+            <Clock className="w-5 h-5 text-yellow-500 animate-pulse" />
+            <span className="text-sm font-medium" data-testid="text-pending-count">
+              {syncStatus.pending} items pending
+            </span>
+          </div>
+        )}
+      </Card>
 
       {/* Sync Status */}
       <Card 

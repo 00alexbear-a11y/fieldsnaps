@@ -809,6 +809,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Settings routes
+  app.get('/api/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const settings = await storage.getUserSettings(userId);
+      return res.json(settings);
+    } catch (error) {
+      console.error("Error fetching user settings:", error);
+      return res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.put('/api/settings', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const settings = await storage.updateUserSettings(userId, req.body);
+      return res.json(settings);
+    } catch (error) {
+      console.error("Error updating user settings:", error);
+      return res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
   // Projects - protected routes
   app.get("/api/projects", isAuthenticated, async (req: any, res) => {
     try {
