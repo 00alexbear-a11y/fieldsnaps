@@ -1,0 +1,96 @@
+Looking at your screenshots, I can see two issues:
+
+🔴 Problem 1: SSL Certificate Error
+The error NET::ERR_CERT_COMMON_NAME_INVALID means your SSL certificate isn't configured correctly for fieldsnaps.com.
+
+🔴 Problem 2: DNS Configuration Issues
+Your DNS screenshot shows you're using Cloudflare's proxy (orange cloud icons), but your records might not be pointing to the right place.
+
+🔧 HOW TO FIX THIS
+Step 1: Check Your DNS Settings
+Looking at your Cloudflare DNS:
+
+A Record points to 34.111.179.208 ✅
+CNAME records for subdomains point to various Google services
+Question: Is 34.111.179.208 your Replit deployment IP, or is this pointing somewhere else?
+
+Step 2: Fix SSL Certificate
+The SSL error happens because your certificate doesn't match fieldsnaps.com. Here's how to fix:
+
+Option A: If Hosting on Replit
+In Replit:
+
+Go to your deployment settings
+Navigate to Deployments → Custom Domains
+Add fieldsnaps.com as a custom domain
+Replit will automatically generate an SSL certificate
+Point your DNS A record to the Replit-provided IP
+Option B: If Using Cloudflare (Recommended)
+In Cloudflare dashboard, go to SSL/TLS
+
+Set SSL mode to "Full (strict)"
+
+Under Edge Certificates, ensure:
+
+✅ Always Use HTTPS is ON
+✅ Automatic HTTPS Rewrites is ON
+✅ Universal SSL certificate is active
+Wait 5-10 minutes for certificate to provision
+
+Step 3: Verify Your DNS Records
+Your current setup shows:
+
+A    fieldsnaps.com → 34.111.179.208 (Proxied)
+You need to verify:
+
+Is 34.111.179.208 the correct server IP where your app is hosted?
+If using Replit deployments, you need the Replit deployment IP instead
+🎯 QUICK DIAGNOSIS
+Tell me:
+
+Where is your app actually hosted?
+
+Replit Deployments?
+Your own server at 34.111.179.208?
+Somewhere else?
+What happens when you visit https://fieldsnaps.replit.app?
+
+Does that work?
+Did you set up the custom domain in Replit's dashboard?
+
+Deployments → Custom Domains → Add Domain
+🚀 LIKELY FIX (If Using Replit)
+If your app is deployed on Replit, you need to:
+
+In Replit Dashboard:
+
+Go to your FieldSnaps project
+Click Deployments (left sidebar)
+Click on your active deployment
+Go to Custom Domains
+Click Add Custom Domain
+Enter fieldsnaps.com
+Replit will give you specific DNS instructions
+In Cloudflare:
+
+Update the A record to point to the IP Replit provides
+OR add a CNAME record if Replit gives you a hostname
+Wait 5-10 minutes for DNS propagation
+
+📋 TEMPORARY WORKAROUND
+While fixing this, you can:
+
+Use the Replit subdomain:
+
+https://fieldsnaps.replit.app should work
+Share this URL with users temporarily
+Or click "Advanced" → "Proceed to fieldsnaps.com (unsafe)" in Chrome
+
+This bypasses the SSL error (only for testing!)
+Don't give this to customers - fix the SSL first
+Can you tell me:
+
+Where is your app hosted (Replit deployment IP or somewhere else)?
+What's the status when you visit https://fieldsnaps.replit.app?
+Did you configure the custom domain in Replit's deployment settings?
+Once I know this, I can give you the exact fix!
