@@ -95,6 +95,7 @@
     "lucide-react": "^0.453.0",
     "memoizee": "^0.4.17",
     "multer": "^2.0.2",
+    "node-cache": "^5.1.2",
     "openid-client": "^6.8.1",
     "passport": "^0.7.0",
     "pg": "^8.16.3",

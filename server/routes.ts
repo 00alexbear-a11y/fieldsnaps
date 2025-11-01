@@ -15,6 +15,8 @@ import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
 import { billingService } from "./billing";
 import { emailService } from "./email";
+import { cacheMiddleware, invalidateUserCache, invalidateCachePattern } from "./cache";
+import { fieldFilterMiddleware } from "./fieldFilter";
 
 // Configure multer for file uploads with strict validation
 const ALLOWED_FILE_TYPES = [
@@ -59,9 +61,9 @@ const uploadRateLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false,
   keyGenerator: (req: any) => {
-    // Use authenticated user ID as rate limit key
-    // Fallback to IP for unauthenticated requests (shouldn't happen for upload endpoints)
-    return req.user?.claims?.sub || req.ip || 'anonymous';
+    // Use authenticated user ID as rate limit key (no IP fallback to avoid IPv6 warnings)
+    // Upload endpoints require authentication, so this should always have a value
+    return req.user?.claims?.sub || 'unauthenticated';
   },
   skip: (req: any) => {
     // Skip rate limiting in development mode
@@ -830,7 +832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User Settings routes
-  app.get('/api/settings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/settings', isAuthenticated, cacheMiddleware(300), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const settings = await storage.getUserSettings(userId);
@@ -845,6 +847,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const settings = await storage.updateUserSettings(userId, req.body);
+      
+      // Invalidate settings cache after update
+      invalidateCachePattern(userId, '/api/settings');
+      
       return res.json(settings);
     } catch (error) {
       console.error("Error updating user settings:", error);
@@ -853,7 +859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Projects - protected routes
-  app.get("/api/projects", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects", isAuthenticated, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -870,7 +876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk endpoint to get all projects with photo counts in one query (eliminates N+1)
-  app.get("/api/projects/with-counts", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects/with-counts", isAuthenticated, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -886,7 +892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+  app.get("/api/projects/:id", isAuthenticated, validateUuidParam('id'), fieldFilterMiddleware, cacheMiddleware(60), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -966,6 +972,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const project = await storage.createProject(projectData);
+      
+      // Invalidate projects cache after creation
+      invalidateCachePattern(userId, '/api/projects');
+      
       res.status(201).json(project);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -1021,6 +1031,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updated) {
         return res.status(404).json({ error: "Project not found" });
       }
+      
+      // Invalidate projects cache after update
+      invalidateCachePattern(userId, '/api/projects');
+      
       res.json(updated);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -1050,6 +1064,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updated) {
         return res.status(404).json({ error: "Project not found" });
       }
+      
+      // Invalidate projects cache after toggle
+      invalidateCachePattern(userId, '/api/projects');
+      
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -1079,6 +1097,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ error: "Project not found" });
       }
+      
+      // Invalidate projects cache after deletion
+      invalidateCachePattern(userId, '/api/projects');
+      
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -1295,7 +1317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photos
-  app.get("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), async (req, res) => {
+  app.get("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), fieldFilterMiddleware, cacheMiddleware(30), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -1535,6 +1557,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update project's last activity timestamp
       await storage.updateProject(req.params.projectId, { lastActivityAt: new Date() });
+      
+      // Invalidate projects cache after photo upload (photo counts changed)
+      invalidateCachePattern(userId, '/api/projects');
       
       res.status(201).json(photo);
     } catch (error: any) {
