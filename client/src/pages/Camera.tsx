@@ -140,6 +140,13 @@ export default function Camera() {
   const startCameraTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const modeTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Session ID for tracking photos in current camera session
+  const currentSessionId = useRef<string>(crypto.randomUUID());
+  
+  // Capture session preservation state at mount to avoid re-reading URL at cleanup
+  const urlParams = new URLSearchParams(window.location.search);
+  const shouldPreserveSessionRef = useRef<boolean>(urlParams.get('preserveSession') === 'true');
+  
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -266,6 +273,9 @@ export default function Camera() {
     const preserveSession = urlParams.get('preserveSession') === 'true';
     
     if (!preserveSession) {
+      // Generate new session ID for this camera session
+      currentSessionId.current = crypto.randomUUID();
+      
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
       
@@ -276,6 +286,22 @@ export default function Camera() {
         }
       });
     }
+    
+    // Cleanup function: runs when leaving camera (component unmount)
+    return () => {
+      // Only cleanup if we're not preserving the session
+      // Use ref value captured at mount to avoid re-reading URL during route transition
+      if (!shouldPreserveSessionRef.current && currentSessionId.current) {
+        console.log('[Camera] Cleaning up session photos for session:', currentSessionId.current);
+        
+        // Clean up uploaded photos from this session asynchronously
+        idb.cleanupSessionPhotos(currentSessionId.current).then(result => {
+          console.log(`[Camera] Session cleanup complete:`, result);
+        }).catch(error => {
+          console.error('[Camera] Session cleanup failed:', error);
+        });
+      }
+    };
   }, []);
 
   // Save camera mode to sessionStorage whenever it changes
@@ -1030,6 +1056,8 @@ export default function Camera() {
           retryCount: 0,
           pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
           unitLabel: selectedUnitLabel || undefined,
+          sessionActive: true,
+          sessionId: currentSessionId.current,
         });
         
         haptics.success();
@@ -1175,6 +1203,8 @@ export default function Camera() {
         retryCount: 0,
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
         unitLabel: selectedUnitLabel || undefined,
+        sessionActive: true,
+        sessionId: currentSessionId.current,
       });
 
       URL.revokeObjectURL(compressionResult.url);
@@ -1297,6 +1327,8 @@ export default function Camera() {
         pendingTagIds: selectedTags.length > 0 ? selectedTags : undefined,
         unitLabel: selectedUnitLabel || undefined,
         isForTodo: mode === 'todo',
+        sessionActive: true,
+        sessionId: currentSessionId.current,
       });
 
       console.log('[Camera] Photo saved for edit:', savedPhoto.id);
@@ -1327,9 +1359,11 @@ export default function Camera() {
         setLocation(`/todos?photoId=${savedPhoto.id}`);
       } else if (mode === 'todo') {
         // Camera Tab To-Do mode: navigate to edit page with createTodo flag
+        shouldPreserveSessionRef.current = true; // Preserve session when going to edit
         setLocation(`/photo/${savedPhoto.id}/edit?createTodo=true&projectId=${selectedProject}&preserveSession=true`);
       } else {
         // Normal capture: navigate to edit page with preserveSession flag
+        shouldPreserveSessionRef.current = true; // Preserve session when going to edit
         setLocation(`/photo/${savedPhoto.id}/edit?preserveSession=true&projectId=${selectedProject}`);
       }
 
