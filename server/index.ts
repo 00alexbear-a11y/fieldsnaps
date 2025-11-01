@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { billingService } from "./billing";
+import { initChunkedUpload } from "./chunkedUpload";
 
 const app = express();
 
@@ -243,6 +244,11 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Initialize chunked upload system
+    initChunkedUpload()
+      .then(() => log('Chunked upload system initialized'))
+      .catch((err) => console.error('Chunked upload init failed:', err));
     
     // Seed predefined trade tags on server start
     storage.seedPredefinedTags()

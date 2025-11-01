@@ -17,6 +17,17 @@ import { billingService } from "./billing";
 import { emailService } from "./email";
 import { cacheMiddleware, invalidateUserCache, invalidateCachePattern } from "./cache";
 import { fieldFilterMiddleware } from "./fieldFilter";
+import {
+  initChunkedUpload,
+  initUploadSession,
+  uploadChunk,
+  getUploadStatus,
+  cancelUpload,
+  chunkUpload,
+  assembleChunks,
+  cleanupUploadSession,
+  validateUploadSession
+} from "./chunkedUpload";
 
 // Configure multer for file uploads with strict validation
 const ALLOWED_FILE_TYPES = [
@@ -1564,6 +1575,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('Photo upload error:', error);
+      handleError(res, error);
+    }
+  });
+
+  // ============================================================================
+  // Chunked Upload Endpoints
+  // ============================================================================
+  
+  // Initialize chunked upload session
+  app.post("/api/uploads/chunked/init", isAuthenticated, async (req, res) => {
+    await initUploadSession(req, res);
+  });
+  
+  // Upload individual chunk
+  // CRITICAL: validateUploadSession MUST run before multer to prevent disk space DoS
+  app.post("/api/uploads/chunked/chunk", isAuthenticated, uploadRateLimiter, validateUploadSession, chunkUpload.single('chunk'), async (req, res) => {
+    await uploadChunk(req, res);
+  });
+  
+  // Get upload session status
+  app.get("/api/uploads/chunked/:uploadId/status", isAuthenticated, async (req, res) => {
+    await getUploadStatus(req, res);
+  });
+  
+  // Cancel upload session
+  app.delete("/api/uploads/chunked/:uploadId", isAuthenticated, async (req, res) => {
+    await cancelUpload(req, res);
+  });
+  
+  // Complete chunked upload and create photo (assembles chunks)
+  app.post("/api/uploads/chunked/:uploadId/complete", isAuthenticated, async (req: any, res) => {
+    try {
+      const { uploadId } = req.params;
+      const { projectId, caption, mediaType, width, height } = req.body;
+      const userId = req.user.claims.sub;
+      
+      // Get user with company
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      // Verify project access
+      if (!await verifyProjectCompanyAccess(req, res, projectId)) return;
+      
+      // Assemble chunks into final file
+      const fileBuffer = await assembleChunks(uploadId);
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: fileBuffer,
+        headers: {
+          'Content-Type': mediaType === 'video' ? 'video/mp4' : 'image/jpeg',
+        },
+      });
+      
+      if (!uploadResponse.ok) {
+        throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+      }
+      
+      const objectPath = uploadURL.split('?')[0];
+      
+      // Create photo metadata in database
+      const photographerId = user.companyId || userId;
+      const photographerName = user.company?.name || `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      
+      const validated = insertPhotoSchema.parse({
+        projectId,
+        url: objectPath,
+        mediaType: mediaType || 'photo',
+        caption: caption || `Upload_${Date.now()}`,
+        width: width ? parseInt(width) : undefined,
+        height: height ? parseInt(height) : undefined,
+        photographerId,
+        photographerName,
+      });
+      
+      const photo = await storage.createPhoto(validated);
+      
+      // Auto-set as cover photo if needed
+      const project = await storage.getProject(projectId);
+      if (project && !project.coverPhotoId) {
+        await storage.updateProject(projectId, { coverPhotoId: photo.id });
+      }
+      
+      // Update project activity
+      await storage.updateProject(projectId, { lastActivityAt: new Date() });
+      
+      // Invalidate cache
+      invalidateCachePattern(userId, '/api/projects');
+      
+      // Cleanup chunks
+      await cleanupUploadSession(uploadId);
+      
+      res.status(201).json(photo);
+    } catch (error: any) {
+      console.error('[ChunkedUpload] Complete error:', error);
       handleError(res, error);
     }
   });
