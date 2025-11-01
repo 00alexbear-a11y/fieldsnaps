@@ -52,13 +52,13 @@ export default function BottomNav() {
   return (
     <>
       {/* Background fill to prevent content from showing at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 h-28 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none" />
+      <div className="fixed bottom-0 left-0 right-0 h-28 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none pb-safe" />
       
       <nav
-        className="fixed bottom-4 left-0 right-0 z-50 bg-transparent"
+        className="fixed bottom-4 left-0 right-0 z-50 bg-transparent pb-safe"
         data-testid="nav-bottom"
       >
-        <div className="flex items-center justify-around h-16 max-w-screen-sm mx-auto pb-safe-2">
+        <div className="flex items-center justify-around min-h-[44px] max-w-screen-sm mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);
@@ -68,7 +68,7 @@ export default function BottomNav() {
             <Link key={tab.id} href={tab.path}>
               {isCamera ? (
                 <button
-                  className="flex flex-col items-center justify-center min-w-[88px] h-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  className="flex flex-col items-center justify-center min-w-[88px] min-h-[44px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   data-testid={`button-tab-${tab.id}`}
                 >
                   <div className="flex items-center justify-center w-12 h-12 bg-primary rounded-full shadow-lg hover-elevate active-elevate-2 mb-0.5">
@@ -80,7 +80,7 @@ export default function BottomNav() {
                 </button>
               ) : (
                 <button
-                  className="flex flex-col items-center justify-center min-w-[88px] h-full space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  className="flex flex-col items-center justify-center min-w-[88px] min-h-[44px] space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   data-testid={`button-tab-${tab.id}`}
                 >
                   <Icon
