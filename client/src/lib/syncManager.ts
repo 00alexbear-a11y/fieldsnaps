@@ -10,6 +10,7 @@
 
 import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueItem } from './indexeddb';
 import { generateThumbnail } from './imageCompression';
+import { Network } from '@capacitor/network';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -53,6 +54,47 @@ class SyncManager {
     // Setup network listeners on initialization
     this.setupNetworkListeners();
     this.setupServiceWorkerListener();
+  }
+
+  /**
+   * Check if upload should proceed based on network type and user settings
+   */
+  private async shouldUploadNow(): Promise<{ canUpload: boolean; reason?: string }> {
+    try {
+      // Check network status
+      const networkStatus = await Network.getStatus();
+      
+      if (!networkStatus.connected) {
+        return { canUpload: false, reason: 'No network connection' };
+      }
+
+      // Fetch user settings
+      const response = await fetch('/api/settings', {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        // If settings fetch fails, default to allowing upload
+        console.warn('[Sync] Failed to fetch settings, proceeding with upload');
+        return { canUpload: true };
+      }
+
+      const settings = await response.json();
+      
+      // If user wants WiFi-only and we're on cellular, skip upload
+      if (settings.uploadOnWifiOnly && networkStatus.connectionType !== 'wifi') {
+        return { 
+          canUpload: false, 
+          reason: 'Waiting for WiFi (cellular data saving enabled)' 
+        };
+      }
+
+      return { canUpload: true };
+    } catch (error) {
+      console.error('[Sync] Error checking network/settings:', error);
+      // On error, default to allowing upload
+      return { canUpload: true };
+    }
   }
 
   /**
@@ -126,6 +168,18 @@ class SyncManager {
         synced: 0,
         failed: 0,
         errors: ['Sync already in progress'],
+      };
+    }
+
+    // Check if we should upload now (network + settings check)
+    const { canUpload, reason } = await this.shouldUploadNow();
+    if (!canUpload) {
+      console.log('[Sync] Upload skipped:', reason);
+      return {
+        success: false,
+        synced: 0,
+        failed: 0,
+        errors: [reason || 'Upload not allowed at this time'],
       };
     }
 

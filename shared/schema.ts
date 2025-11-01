@@ -88,6 +88,17 @@ export const users = pgTable("users", {
   index("idx_users_invited_by").on(table.invitedBy),
 ]);
 
+// User settings table
+export const userSettings = pgTable("user_settings", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  uploadOnWifiOnly: boolean("upload_on_wifi_only").default(true).notNull(), // Save cellular data by default
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_user_settings_user_id").on(table.userId),
+]);
+
 // WebAuthn credentials table (for biometric authentication)
 export const credentials = pgTable("credentials", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -347,11 +358,14 @@ export const insertPhotoTagSchema = createInsertSchema(photoTags).omit({ id: tru
 export const insertPdfSchema = createInsertSchema(pdfs).omit({ id: true, createdAt: true });
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEvents).omit({ id: true, createdAt: true });
+export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, createdAt: true, updatedAt: true });
+export const updateUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, userId: true, createdAt: true, updatedAt: true }).partial();
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
+export type UserSettings = typeof userSettings.$inferSelect;
 export type Credential = typeof credentials.$inferSelect;
 export type InsertCredential = z.infer<typeof insertCredentialSchema>;
 export type Project = typeof projects.$inferSelect;
@@ -380,6 +394,8 @@ export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
 export type InsertPdf = z.infer<typeof insertPdfSchema>;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type InsertSubscriptionEvent = z.infer<typeof insertSubscriptionEventSchema>;
+export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
+export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;
 
 // Annotation types for frontend
 export interface Annotation {

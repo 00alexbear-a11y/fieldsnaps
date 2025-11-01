@@ -1,8 +1,9 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
+  UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Pdf, Task, ToDo,
   Subscription, SubscriptionEvent,
@@ -18,6 +19,10 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(userId: string, data: Partial<User>): Promise<User | undefined>;
+  
+  // User Settings operations
+  getUserSettings(userId: string): Promise<UserSettings>;
+  updateUserSettings(userId: string, data: UpdateUserSettings): Promise<UserSettings>;
   
   // Company operations
   getCompany(id: string): Promise<Company | undefined>;
@@ -167,6 +172,36 @@ export class DbStorage implements IStorage {
       .set({ ...data, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
+    return result[0];
+  }
+
+  // User Settings operations
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    // Try to get existing settings
+    const result = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
+    
+    if (result[0]) {
+      return result[0];
+    }
+    
+    // Create default settings if they don't exist
+    const newSettings = await db.insert(userSettings)
+      .values({ userId, uploadOnWifiOnly: true })
+      .returning();
+    
+    return newSettings[0];
+  }
+
+  async updateUserSettings(userId: string, data: UpdateUserSettings): Promise<UserSettings> {
+    // First ensure settings exist
+    await this.getUserSettings(userId);
+    
+    // Update settings
+    const result = await db.update(userSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(userSettings.userId, userId))
+      .returning();
+    
     return result[0];
   }
 
