@@ -1809,6 +1809,17 @@ export default function Camera() {
                   </div>
                 )}
                 
+                {/* Upload Status Badge */}
+                {photo.uploadedAt ? (
+                  <div className="absolute -top-1 -left-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-md border border-white" data-testid="badge-uploaded">
+                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                  </div>
+                ) : (
+                  <div className="absolute -top-1 -left-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center shadow-md border border-white animate-pulse" data-testid="badge-pending">
+                    <Clock className="w-2.5 h-2.5 text-white" />
+                  </div>
+                )}
+                
                 {/* Tag Indicator */}
                 {photoTags && photoTags.length > 0 && (
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white shadow-sm"
