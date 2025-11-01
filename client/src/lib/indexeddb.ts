@@ -29,6 +29,10 @@ export interface LocalPhoto {
   pendingTagIds?: string[]; // Tags selected but not yet synced to server
   unitLabel?: string; // Unit stamp for multi-unit construction sites
   isForTodo?: boolean; // True if photo was captured via the To-Do button
+  // Session management fields for optimized photo flow
+  sessionActive?: boolean; // True if photo is part of active camera session
+  sessionId?: string; // ID of the camera session this photo belongs to
+  uploadedAt?: number; // Timestamp when photo was successfully uploaded
   createdAt: number;
   updatedAt: number;
 }
@@ -307,6 +311,11 @@ class IndexedDBManager {
     photo.updatedAt = Date.now();
     if (serverId) photo.serverId = serverId;
     if (error !== undefined) photo.syncError = error;
+    
+    // Set uploadedAt timestamp when photo is successfully synced
+    if (status === 'synced' && !photo.uploadedAt) {
+      photo.uploadedAt = Date.now();
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORES.PHOTOS], 'readwrite');
@@ -337,6 +346,68 @@ class IndexedDBManager {
 
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
+  /**
+   * Clean up uploaded session photos for a specific session ID
+   * Deletes photos that have been successfully uploaded (uploadedAt is set)
+   * and clears sessionActive flag from remaining photos
+   */
+  async cleanupSessionPhotos(sessionId: string): Promise<{ deleted: number; cleared: number }> {
+    const db = await this.init();
+    
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Get all photos in this session
+        const allPhotos = await this.getAllPhotos();
+        const sessionPhotos = allPhotos.filter(p => p.sessionId === sessionId);
+        
+        let deleted = 0;
+        let cleared = 0;
+        
+        const transaction = db.transaction([STORES.PHOTOS, STORES.THUMBNAILS], 'readwrite');
+        const photoStore = transaction.objectStore(STORES.PHOTOS);
+        const thumbStore = transaction.objectStore(STORES.THUMBNAILS);
+        
+        for (const photo of sessionPhotos) {
+          if (photo.uploadedAt && photo.syncStatus === 'synced') {
+            // Photo has been uploaded - delete it
+            photoStore.delete(photo.id);
+            thumbStore.delete(photo.id);
+            deleted++;
+          } else {
+            // Photo not yet uploaded - just clear session flag
+            photo.sessionActive = false;
+            photoStore.put(photo);
+            cleared++;
+          }
+        }
+        
+        transaction.oncomplete = () => {
+          console.log(`[IndexedDB] Session cleanup: deleted ${deleted} uploaded photos, cleared ${cleared} pending photos`);
+          resolve({ deleted, cleared });
+        };
+        transaction.onerror = () => reject(transaction.error);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Get all photos across all projects (for cleanup and quota management)
+   */
+  async getAllPhotos(): Promise<LocalPhoto[]> {
+    const db = await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORES.PHOTOS], 'readonly');
+      const store = transaction.objectStore(STORES.PHOTOS);
+      const request = store.getAll();
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
     });
   }
 
