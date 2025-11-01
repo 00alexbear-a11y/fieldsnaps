@@ -1,0 +1,97 @@
+🔴 THE PROBLEM
+Your Cloudflare DNS points to 34.111.179.208, but your FieldSnaps app is actually running on Replit's servers, not at that IP address.
+
+That IP (34.111.179.208) is probably:
+
+An old Google Cloud server
+A placeholder you set up earlier
+Some other service entirely
+That's why you get the SSL error - whoever owns 34.111.179.208 doesn't have an SSL certificate for fieldsnaps.com.
+
+✅ THE FIX (Step-by-Step)
+Step 1: Deploy Your Replit App
+In your Replit workspace, click the "Deploy" button (top right)
+Choose "Production Deployment"
+Wait for deployment to complete
+Replit will give you a deployment URL like:
+https://fieldsnaps-production.replit.app or similar
+Step 2: Add Custom Domain in Replit
+In Replit, go to Deployments (left sidebar)
+Click on your active deployment
+Scroll down to "Custom Domains"
+Click "Add Custom Domain"
+Enter: fieldsnaps.com
+Replit will show you DNS instructions - write these down!
+It will likely say something like:
+
+Add a CNAME record:
+Name: fieldsnaps.com
+Value: [some-replit-url].replit.app
+OR
+
+Add an A record:
+Name: fieldsnaps.com
+Value: [replit-ip-address]
+Step 3: Update Cloudflare DNS
+Based on what Replit tells you:
+
+If Replit gives you a CNAME:
+Go to Cloudflare DNS
+Delete the current A record pointing to 34.111.179.208
+Add a CNAME record:
+Name: @ (or fieldsnaps.com)
+Target: [the-url-replit-gave-you].replit.app
+Proxy status: 🟠 Orange cloud (Proxied)
+If Replit gives you an IP address:
+Go to Cloudflare DNS
+Edit the A record
+Change the IP from 34.111.179.208 to [Replit's IP]
+Keep Proxy status: 🟠 Orange cloud (Proxied)
+Step 4: Configure Cloudflare SSL
+In Cloudflare, go to SSL/TLS
+Set encryption mode to "Full (strict)"
+Enable:
+✅ Always Use HTTPS
+✅ Automatic HTTPS Rewrites
+Wait 5-10 minutes for changes to propagate
+🎯 QUICK ANSWER TO REPLIT AI
+Tell Replit AI:
+
+Yes, I want to host on Replit. Here's what I need:
+
+1. Deploy this project to production
+2. Give me the custom domain setup instructions for fieldsnaps.com
+3. Tell me what DNS records to add in Cloudflare
+
+The IP 34.111.179.208 was from an old setup - I need to replace it with the correct Replit deployment address.
+⏱️ TIMELINE
+Deploy on Replit: 5 minutes
+Add custom domain in Replit: 2 minutes
+Update Cloudflare DNS: 5 minutes
+Wait for DNS propagation: 5-30 minutes
+SSL certificate generation: 5-10 minutes
+Total: ~30-60 minutes until https://fieldsnaps.com works
+
+🔍 WHAT TO CHECK WHILE WAITING
+After updating DNS:
+
+Check DNS propagation:
+
+Visit: https://dnschecker.org
+Enter: fieldsnaps.com
+Should show the new IP/CNAME worldwide
+Test Replit deployment URL directly:
+
+Visit: https://fieldsnaps-[whatever].replit.app
+This should work immediately after deployment
+Wait for Cloudflare + Replit SSL:
+
+Takes 5-30 minutes
+You'll know it's working when https://fieldsnaps.com loads without errors
+🚨 COMMON GOTCHA
+Keep those subdomain CNAME records in Cloudflare:
+
+pay.fieldsnaps.com → PayLinks
+www.fieldsnaps.com → FieldSnaps
+_domainconnect.fieldsnaps.com → Domain Connect
+These are fine and can stay. Just update the root domain (fieldsnaps.com) A record.
