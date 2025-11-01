@@ -153,6 +153,7 @@ export const projects = pgTable("projects", {
   index("idx_projects_trash").on(table.deletedAt.desc()).where(sql`${table.deletedAt} IS NOT NULL`),
   index("idx_projects_company_id").on(table.companyId),
   index("idx_projects_created_by").on(table.createdBy),
+  index("idx_projects_user_id").on(table.userId), // Legacy field support for backwards compatibility
 ]);
 
 // Photos table

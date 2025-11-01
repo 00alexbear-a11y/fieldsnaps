@@ -4,6 +4,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema } from "../shared/schema";
 import { z } from "zod";
@@ -46,6 +47,25 @@ const upload = multer({
     } else {
       cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types: ${ALLOWED_FILE_TYPES.join(', ')}`));
     }
+  },
+});
+
+// Rate limiting for upload endpoints - prevents abuse from mobile clients
+// Key by authenticated user ID instead of IP to support multiple workers on same site
+const uploadRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Max 100 uploads per window per user
+  message: 'Too many upload requests, please try again later',
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false,
+  keyGenerator: (req: any) => {
+    // Use authenticated user ID as rate limit key
+    // Fallback to IP for unauthenticated requests (shouldn't happen for upload endpoints)
+    return req.user?.claims?.sub || req.ip || 'anonymous';
+  },
+  skip: (req: any) => {
+    // Skip rate limiting in development mode
+    return process.env.NODE_ENV === 'development';
   },
 });
 
@@ -659,7 +679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/companies/pdf-logo", isAuthenticated, upload.single('logo'), async (req: any, res) => {
+  app.post("/api/companies/pdf-logo", isAuthenticated, uploadRateLimiter, upload.single('logo'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1136,7 +1156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), upload.single('pdf'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/pdfs", isAuthenticated, uploadRateLimiter, validateUuidParam('projectId'), upload.single('pdf'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1407,7 +1427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), upload.fields([
+  app.post("/api/projects/:projectId/photos", isAuthenticated, uploadRateLimiter, validateUuidParam('projectId'), upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 }
   ]), async (req: any, res) => {
@@ -1524,7 +1544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Standalone photo upload (for to-dos and other non-project attachments)
-  app.post("/api/photos/standalone", isAuthenticated, upload.single('photo'), async (req: any, res) => {
+  app.post("/api/photos/standalone", isAuthenticated, uploadRateLimiter, upload.single('photo'), async (req: any, res) => {
     try {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
@@ -2793,5 +2813,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Increase timeout for file uploads to 10 minutes (600,000ms)
+  // Mobile networks on construction sites can be slow
+  httpServer.timeout = 600000; // 10 minutes
+  httpServer.keepAliveTimeout = 610000; // Slightly more than timeout
+  httpServer.headersTimeout = 620000; // Slightly more than keepAliveTimeout
+  
   return httpServer;
 }
