@@ -140,8 +140,17 @@ class IndexedDBManager {
 
   /**
    * Save photo to local storage
+   * Automatically checks storage quota and triggers cleanup if needed
    */
   async savePhoto(photo: Omit<LocalPhoto, 'id' | 'createdAt' | 'updatedAt'>): Promise<LocalPhoto> {
+    // Check storage quota before saving
+    const isLow = await this.isStorageLow(0.8); // Check if above 80%
+    if (isLow) {
+      console.log('[IndexedDB] Storage is running low, triggering auto-cleanup');
+      const deletedCount = await this.autoCleanupOldPhotos(0.7); // Clean down to 70%
+      console.log(`[IndexedDB] Auto-cleanup freed space by deleting ${deletedCount} old photos`);
+    }
+
     const db = await this.init();
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -704,6 +713,79 @@ class IndexedDBManager {
       };
     }
     return { used: 0, quota: 0, available: 0 };
+  }
+
+  /**
+   * Check if storage is running low (above threshold)
+   * @param threshold Percentage threshold (0-1), default 0.8 (80%)
+   */
+  async isStorageLow(threshold: number = 0.8): Promise<boolean> {
+    const stats = await this.getStorageStats();
+    if (stats.quota === 0) return false; // Can't determine
+    
+    const usagePercent = stats.used / stats.quota;
+    return usagePercent >= threshold;
+  }
+
+  /**
+   * Auto-cleanup old uploaded photos to free space
+   * Removes oldest uploaded photos (those with uploadedAt timestamp) until below threshold
+   * @param targetThreshold Target usage percentage (default 0.7 = 70%)
+   * @returns Number of photos deleted
+   */
+  async autoCleanupOldPhotos(targetThreshold: number = 0.7): Promise<number> {
+    console.log('[IndexedDB] Starting auto-cleanup of old uploaded photos');
+    
+    const db = await this.init();
+    let deletedCount = 0;
+
+    // Get all uploaded photos sorted by uploadedAt (oldest first)
+    const uploadedPhotos = await new Promise<LocalPhoto[]>((resolve, reject) => {
+      const transaction = db.transaction(STORES.PHOTOS, 'readonly');
+      const store = transaction.objectStore(STORES.PHOTOS);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const allPhotos = request.result as LocalPhoto[];
+        // Filter to only uploaded photos and sort by uploadedAt (oldest first)
+        const uploaded = allPhotos
+          .filter(p => p.uploadedAt !== null && p.uploadedAt !== undefined)
+          .sort((a, b) => (a.uploadedAt || 0) - (b.uploadedAt || 0));
+        resolve(uploaded);
+      };
+      request.onerror = () => reject(request.error);
+    });
+
+    console.log(`[IndexedDB] Found ${uploadedPhotos.length} uploaded photos available for cleanup`);
+
+    // Delete photos one by one until we're below target threshold
+    for (const photo of uploadedPhotos) {
+      const stats = await this.getStorageStats();
+      if (stats.quota === 0) break; // Can't determine quota
+      
+      const usagePercent = stats.used / stats.quota;
+      if (usagePercent < targetThreshold) {
+        console.log(`[IndexedDB] Storage now at ${(usagePercent * 100).toFixed(1)}%, cleanup complete`);
+        break; // We're below target, stop deleting
+      }
+
+      // Delete this photo
+      await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(STORES.PHOTOS, 'readwrite');
+        const store = transaction.objectStore(STORES.PHOTOS);
+        const request = store.delete(photo.id);
+        
+        request.onsuccess = () => {
+          deletedCount++;
+          console.log(`[IndexedDB] Deleted old photo ${photo.id} (uploaded ${new Date(photo.uploadedAt!).toISOString()})`);
+          resolve();
+        };
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    console.log(`[IndexedDB] Auto-cleanup complete: deleted ${deletedCount} photos`);
+    return deletedCount;
   }
 
   /**

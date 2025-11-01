@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Camera as CameraIcon, X, Check, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo, CheckSquare, Edit } from 'lucide-react';
+import { Camera as CameraIcon, X, Check, Clock, Settings2, PenLine, Video, SwitchCamera, Home, Search, ArrowLeft, Trash2, ChevronUp, ChevronDown, Play, Info, Zap, ListTodo, CheckSquare, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
@@ -1590,6 +1590,38 @@ export default function Camera() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
+              
+              {/* Session Status Indicator */}
+              {sessionPhotos.length > 0 && (() => {
+                const uploadedCount = sessionPhotos.filter(p => p.uploadedAt).length;
+                const pendingCount = sessionPhotos.filter(p => !p.uploadedAt).length; // Count all non-uploaded (pending, syncing, error)
+                
+                return (
+                  <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-sm border border-white/10 rounded-full" data-testid="session-status">
+                    <span className="text-white/90 text-xs font-medium">
+                      {sessionPhotos.length} {sessionPhotos.length === 1 ? 'photo' : 'photos'}
+                    </span>
+                    {uploadedCount > 0 && (
+                      <>
+                        <span className="text-white/40">•</span>
+                        <span className="text-green-400 text-xs font-medium flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          {uploadedCount}
+                        </span>
+                      </>
+                    )}
+                    {pendingCount > 0 && (
+                      <>
+                        <span className="text-white/40">•</span>
+                        <span className="text-yellow-400 text-xs font-medium flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {pendingCount}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
               
               <Button
                 variant="ghost"
