@@ -1,0 +1,233 @@
+🎯 FIELDSNAPS: MOBILE-FIRST ARCHITECTURE IMPROVEMENTS
+Research Context
+Industry leaders (Google Photos, Dropbox, construction apps) follow these patterns:
+
+Photos: Save locally first → Queue upload → Background sync on WiFi
+Auth: Secure tokens + biometrics + email verification
+Billing: Stripe webhooks + customer portal + grace periods
+Offline: Local DB as source of truth, sync queue with conflict resolution
+📸 PHOTO UPLOAD STRATEGY (Fix This First)
+Current Flow (What We Have):
+
+1. User captures photo
+2. Compress (3 quality levels) ✅
+3. Save to IndexedDB ✅
+4. Add to sync queue ✅
+5. Upload immediately (even on cellular) ⚠️
+Industry Standard Flow (What We Need):
+
+1. User captures photo
+2. Save to device FIRST (instant feedback)
+3. Generate thumbnail locally
+4. Compress original
+5. Add to upload queue with metadata:
+   - localPath (device storage)
+   - serverUrl (null until uploaded)
+   - uploadStatus: 'pending' | 'uploading' | 'completed' | 'failed'
+   - networkType: 'wifi' | 'cellular' | 'offline'
+6. Check user setting: "Upload only on WiFi"
+7. If WiFi or setting allows cellular → Upload in background
+8. On success: Update serverUrl, keep local copy for 7 days
+9. Show upload progress in UI
+Backend To-Do:
+
+ Add upload_status and network_type columns to photos table
+ Create /api/photos/upload-url endpoint (presigned S3/blob URL)
+ Add photo upload completion webhook
+ Implement cleanup job (delete device photos older than 7 days if uploaded)
+⚙️ WIFI-ONLY SETTING (User Requested)
+Add to Settings:
+
+Copy// Settings table
+{
+  userId: string,
+  uploadOnWifiOnly: boolean, // DEFAULT: true (save user's data!)
+  autoBackup: boolean,
+  photoQuality: 'quick' | 'standard' | 'detailed'
+}
+Client Logic:
+
+Copyasync function shouldUploadNow(photo: LocalPhoto): boolean {
+  const settings = await getSettings();
+  const networkType = await Network.getStatus();
+  
+  // If user wants WiFi only
+  if (settings.uploadOnWifiOnly && networkType.connectionType !== 'wifi') {
+    return false; // Queue it, don't upload
+  }
+  
+  return true; // Upload now
+}
+Backend To-Do:
+
+ Add user_settings table with upload_wifi_only column
+ Create GET/PUT /api/settings endpoints
+🔐 AUTHENTICATION GAPS (Security Priority)
+Current State:
+
+✅ OAuth (Google, GitHub)
+✅ JWT in Keychain (secure)
+❌ No password reset
+❌ No email verification
+❌ No biometric login option
+❌ Tokens don't expire/rotate
+Industry Standard (What We Need):
+
+1. Password Reset Flow
+User clicks "Forgot Password"
+→ Email with reset link (token valid 1 hour)
+→ User sets new password
+→ Invalidate all sessions
+→ Send confirmation email
+Backend To-Do:
+
+ Create password_reset_tokens table (token, userId, expiresAt)
+ POST /api/auth/forgot-password - Sends email with token
+ POST /api/auth/reset-password - Validates token, updates password
+ Integrate email service (SendGrid/Resend)
+2. Email Verification
+User signs up
+→ Send verification email
+→ User clicks link
+→ Mark email as verified
+→ Allow full access
+Backend To-Do:
+
+ Add email_verified column to users table
+ Create email_verification_tokens table
+ POST /api/auth/verify-email
+ Middleware to check email_verified for protected routes
+3. Biometric Login (Mobile)
+First login: Save JWT in Keychain
+Next login: Use Face ID/Touch ID to unlock Keychain
+→ Retrieve JWT
+→ Auto-login
+Backend To-Do:
+
+ No backend changes needed (client-side only)
+4. Refresh Token Rotation
+Access token: 15 minutes (short-lived)
+Refresh token: 30 days (stored securely)
+→ When access expires, use refresh to get new pair
+→ Old refresh token invalidated
+Backend To-Do:
+
+ Create refresh_tokens table
+ POST /api/auth/refresh endpoint
+ Update JWT middleware to check expiration
+💳 SUBSCRIPTION & BILLING (Missing Entirely)
+What We Need (Stripe Standard):
+
+1. Subscription Plans
+Free: 100 photos/month
+Pro: $9.99/month - Unlimited photos
+Team: $29.99/month - Unlimited + team features
+Backend To-Do:
+
+ Create subscriptions table (userId, stripeSubscriptionId, plan, status, currentPeriodEnd)
+ POST /api/billing/create-checkout-session - Creates Stripe Checkout
+ POST /api/billing/portal - Customer portal for managing subscription
+ Stripe webhook handler: customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed
+ Middleware to check subscription status on photo upload
+2. Usage Tracking
+Track photos uploaded per user per billing cycle
+Enforce limits for Free plan
+Backend To-Do:
+
+ Create usage_tracking table (userId, month, photoCount)
+ Increment counter on photo upload
+ Reset counter on billing cycle renewal
+3. Payment Failed Grace Period
+Payment fails → 3 retry attempts over 10 days
+During grace period: User can still view (not upload)
+After grace period: Downgrade to Free plan
+Backend To-Do:
+
+ Handle invoice.payment_failed webhook
+ Create grace period logic in middleware
+ Send email notifications on payment failure
+📱 TRUE OFFLINE EXPERIENCE (What It Should Look Like)
+Current: 90% there! (Good job!)
+
+✅ Photos save to IndexedDB
+✅ Sync queue with retry
+✅ Works offline
+❌ No visual upload queue/progress
+What Users Should See:
+
+Upload Queue UI (Add to App)
+Settings → Upload Queue
+
+┌─────────────────────────────────┐
+│  Upload Queue (5 pending)       │
+│  ⚙️ Upload only on WiFi: ON    │
+├─────────────────────────────────┤
+│  📷 Foundation_Wall.jpg         │
+│  ⏳ Waiting for WiFi... (2.1MB) │
+├─────────────────────────────────┤
+│  📷 Roof_Inspection.jpg         │
+│  ⏳ Waiting for WiFi... (3.5MB) │
+├─────────────────────────────────┤
+│  📷 Site_Overview.jpg           │
+│  ✅ Uploaded                    │
+└─────────────────────────────────┘
+
+[Retry Failed] [Clear Completed]
+Backend To-Do:
+
+ GET /api/sync/queue-status - Returns pending uploads
+ POST /api/sync/retry-failed - Retries failed items
+🎯 BACKEND TO-DO LIST (Prioritized)
+🔴 CRITICAL (Do First)
+ Add user_settings table with upload_wifi_only (default true)
+ Create password reset flow (password_reset_tokens table + endpoints)
+ Add email_verified to users table + verification flow
+ Create subscriptions table + Stripe integration
+ Stripe webhook handler for subscription events
+ Add upload status tracking to photos table
+🟡 HIGH PRIORITY (Next)
+ Refresh token rotation (refresh_tokens table)
+ Usage tracking for photo limits (usage_tracking table)
+ Email service integration (SendGrid/Resend)
+ Customer portal endpoint for subscription management
+ Photo upload presigned URL endpoint
+ Grace period logic for failed payments
+🟢 MEDIUM PRIORITY (Later)
+ Multi-factor authentication (optional)
+ Audit log table (security events)
+ Team management (invite users, roles)
+ Photo cleanup job (delete old device copies)
+ Conflict resolution for offline edits
+ Rate limiting on API endpoints
+🔍 RESEARCH & IMPLEMENT
+For Replit AI to research further:
+
+Photo Storage Strategy: How do Google Photos, Dropbox, and iCloud handle:
+
+Device vs cloud storage balance
+Upload queue prioritization
+Bandwidth optimization
+Offline Sync Patterns: How do apps like Notion, Todoist handle:
+
+Conflict resolution (two devices edit same item offline)
+Merge strategies
+User communication about conflicts
+Stripe Subscriptions: Best practices for:
+
+Proration (upgrade mid-cycle)
+Failed payment recovery
+Webhook security (signature verification)
+Mobile Security: Current standards for:
+
+Token storage (Keychain vs SecureStorage)
+Biometric authentication UX
+Session management
+✅ WHAT YOU'RE ALREADY DOING WELL
+Offline-first architecture (IndexedDB + sync queue)
+Photo compression (3 quality levels)
+JWT in secure storage
+Exponential backoff on sync retry
+OAuth login integration
+Don't break these! Just enhance with the missing pieces above.
+
+Start with the WiFi-only setting and password reset flow - those are quick wins that users will appreciate immediately.
