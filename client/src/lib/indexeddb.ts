@@ -359,6 +359,27 @@ class IndexedDBManager {
   }
 
   /**
+   * Get all photos for a specific session ID
+   * Returns photos that are part of an active camera session
+   */
+  async getSessionPhotos(sessionId: string): Promise<LocalPhoto[]> {
+    const db = await this.init();
+    
+    return new Promise(async (resolve, reject) => {
+      try {
+        const allPhotos = await this.getAllPhotos();
+        const sessionPhotos = allPhotos
+          .filter(p => p.sessionId === sessionId && p.sessionActive)
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Most recent first
+        
+        resolve(sessionPhotos);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
    * Clean up uploaded session photos for a specific session ID
    * Deletes photos that have been successfully uploaded (uploadedAt is set)
    * and clears sessionActive flag from remaining photos

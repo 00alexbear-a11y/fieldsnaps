@@ -308,6 +308,18 @@ export default function Camera() {
           localStorage.removeItem(key);
         }
       });
+    } else {
+      // Preserve session: Load session photos from IndexedDB
+      console.log('[Camera] Preserving session, loading photos from IndexedDB');
+      idb.getSessionPhotos(currentSessionId.current).then((photos: LocalPhoto[]) => {
+        if (photos && photos.length > 0) {
+          console.log(`[Camera] Loaded ${photos.length} session photos`);
+          sessionPhotosRef.current = photos.slice(0, 10); // Keep max 10
+          setSessionPhotos([...sessionPhotosRef.current]);
+        }
+      }).catch((error: Error) => {
+        console.error('[Camera] Failed to load session photos:', error);
+      });
     }
     
     // Cleanup function: runs when leaving camera (component unmount)
