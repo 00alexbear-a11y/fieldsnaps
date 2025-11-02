@@ -278,11 +278,12 @@ export default function PhotoEdit() {
         setTodoDialogOpen(true);
       } else {
         // Return to camera with project context and preserve session
-        if (projectId) {
-          setLocation(`/camera?projectId=${projectId}&preserveSession=true`);
-        } else {
-          setLocation('/camera?preserveSession=true');
+        // Only include projectId if it's a valid UUID (not null/undefined/string "null")
+        const params = new URLSearchParams({ preserveSession: 'true' });
+        if (projectId && projectId !== 'null' && projectId !== 'undefined') {
+          params.set('projectId', projectId);
         }
+        setLocation(`/camera?${params.toString()}`);
       }
     } catch (error) {
       console.error('[PhotoEdit] Error saving annotations:', error);
@@ -304,11 +305,12 @@ export default function PhotoEdit() {
       photoUrlRef.current = null;
     }
     // Return to camera with project context and preserve session
-    if (projectId) {
-      setLocation(`/camera?projectId=${projectId}&preserveSession=true`);
-    } else {
-      setLocation('/camera?preserveSession=true');
+    // Only include projectId if it's a valid UUID (not null/undefined/string "null")
+    const params = new URLSearchParams({ preserveSession: 'true' });
+    if (projectId && projectId !== 'null' && projectId !== 'undefined') {
+      params.set('projectId', projectId);
     }
+    setLocation(`/camera?${params.toString()}`);
   };
 
   const handleDelete = async () => {
@@ -330,7 +332,8 @@ export default function PhotoEdit() {
       });
 
       // Return to camera with project context (don't preserve session since photo was deleted)
-      if (projectId) {
+      // Only include projectId if it's a valid UUID (not null/undefined/string "null")
+      if (projectId && projectId !== 'null' && projectId !== 'undefined') {
         setLocation(`/camera?projectId=${projectId}`);
       } else {
         setLocation('/camera');
@@ -446,7 +449,8 @@ export default function PhotoEdit() {
                   onClick={() => {
                     setTodoDialogOpen(false);
                     // Navigate back to camera
-                    if (projectId) {
+                    // Only include projectId if it's a valid UUID (not null/undefined/string "null")
+                    if (projectId && projectId !== 'null' && projectId !== 'undefined') {
                       setLocation(`/camera?projectId=${projectId}`);
                     } else {
                       setLocation('/camera');
