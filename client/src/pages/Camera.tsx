@@ -1861,7 +1861,7 @@ export default function Camera() {
 
       {/* Floating Zoom Controls - iOS 26 Style (Above bottom controls, not inside black bar) */}
       {!isRecording && availableCameras.length > 1 && (
-        <div className="flex-shrink-0 flex items-center justify-center pb-4">
+        <div className="flex-shrink-0 flex items-center justify-center pb-2">
           <div className="flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
             {availableCameras.map((camera) => (
               <button
@@ -1882,7 +1882,7 @@ export default function Camera() {
       )}
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-4 pb-safe-2 pt-4 px-6 mb-0 bg-black">
+      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-2 px-6 mb-0 bg-black">
         {/* Central Control Row - Bottom Position */}
         <div className="flex items-center justify-between w-full">
           {/* Thumbnail - Bottom Left (iOS Style) */}
