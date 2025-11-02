@@ -1093,8 +1093,8 @@ export default function Camera() {
       const swipeDuration = Date.now() - previewSwipeStartTime.current;
       const velocity = offset / swipeDuration; // px/ms
       
-      // Dismiss if swiped down more than 150px or fast swipe (>0.5 px/ms)
-      if (offset > 150 || velocity > 0.5) {
+      // Dismiss if swiped down more than 80px or fast swipe (>0.4 px/ms) - easier to trigger
+      if (offset > 80 || velocity > 0.4) {
         closeSessionPreview();
       } else {
         // Animate back to normal position
@@ -1859,10 +1859,9 @@ export default function Camera() {
           
       </div>
 
-      {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-4 pb-safe-6 pt-8 px-6 mb-0 bg-black">
-        {/* Floating Zoom Controls - iOS 26 Liquid Glass Style (Just above controls) */}
-        {!isRecording && availableCameras.length > 1 && (
+      {/* Floating Zoom Controls - iOS 26 Style (Above bottom controls, not inside black bar) */}
+      {!isRecording && availableCameras.length > 1 && (
+        <div className="flex-shrink-0 flex items-center justify-center pb-4">
           <div className="flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-2 shadow-2xl border border-white/10">
             {availableCameras.map((camera) => (
               <button
@@ -1879,7 +1878,11 @@ export default function Camera() {
               </button>
             ))}
           </div>
-        )}
+        </div>
+      )}
+
+      {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
+      <div className="flex-shrink-0 flex flex-col items-center gap-4 pb-safe-6 pt-4 px-6 mb-0 bg-black">
         {/* Central Control Row - Bottom Position */}
         <div className="flex items-center justify-between w-full">
           {/* Thumbnail - Bottom Left (iOS Style) */}
@@ -2192,7 +2195,7 @@ export default function Camera() {
             <div className="grid grid-cols-3 gap-1 pb-4">
               {sessionPhotos.map((photo) => {
                 const thumbnailUrl = thumbnailUrlsRef.current.get(photo.id);
-                const isVideo = photo.mimeType?.startsWith('video/');
+                const isVideo = photo.mediaType === 'video';
                 
                 return (
                   <div
