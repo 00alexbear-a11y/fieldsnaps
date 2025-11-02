@@ -1698,7 +1698,7 @@ export default function Camera() {
   return (
     <div 
       ref={containerRef}
-      className={`fixed inset-0 w-full h-dvh bg-black overflow-hidden flex flex-col transition-opacity duration-300 ${
+      className={`fixed inset-0 w-full h-dvh overflow-hidden flex flex-col transition-opacity duration-300 ${
         isReturningFromEdit ? 'opacity-0' : 'opacity-100'
       }`}
       onTouchStart={handleContainerTouchStart}
