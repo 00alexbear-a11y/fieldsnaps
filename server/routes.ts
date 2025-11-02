@@ -790,6 +790,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Direct-to-cloud upload: Get presigned URL for photo upload
+  // Client uploads directly to object storage, then calls complete endpoint
+  const presignedUploadSessions = new Map<string, {
+    userId: string;
+    projectId: string;
+    objectPath: string;
+    metadata: {
+      caption?: string;
+      mediaType: 'photo' | 'video';
+      width?: number;
+      height?: number;
+      mimeType: string;
+      thumbnailObjectPath?: string;
+    };
+    createdAt: Date;
+  }>();
+
+  app.post("/api/photos/presigned-upload", isAuthenticated, uploadRateLimiter, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { projectId, caption, mediaType, width, height, mimeType } = req.body;
+
+      if (!projectId || !mediaType || !mimeType) {
+        return res.status(400).json({ error: "Missing required fields: projectId, mediaType, mimeType" });
+      }
+
+      // Get user with company
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Verify project access
+      if (!await verifyProjectCompanyAccess(req, res, projectId)) return;
+
+      // Generate presigned upload URL
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = uploadURL.split('?')[0];
+
+      // Create session to track this upload
+      const sessionId = crypto.randomUUID();
+      presignedUploadSessions.set(sessionId, {
+        userId,
+        projectId,
+        objectPath,
+        metadata: {
+          caption,
+          mediaType: mediaType || 'photo',
+          width: width ? parseInt(width) : undefined,
+          height: height ? parseInt(height) : undefined,
+          mimeType,
+        },
+        createdAt: new Date(),
+      });
+
+      // Auto-cleanup old sessions (>1 hour)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      for (const [id, session] of Array.from(presignedUploadSessions.entries())) {
+        if (session.createdAt < oneHourAgo) {
+          presignedUploadSessions.delete(id);
+        }
+      }
+
+      res.json({ 
+        uploadURL, 
+        objectPath,
+        sessionId,
+        message: 'Upload file to uploadURL, then call POST /api/photos/complete-presigned/:sessionId'
+      });
+    } catch (error: any) {
+      console.error("[PresignedUpload] Error generating presigned URL:", error);
+      handleError(res, error);
+    }
+  });
+
+  // Direct-to-cloud upload: Complete presigned upload and create photo record
+  app.post("/api/photos/complete-presigned/:sessionId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { sessionId } = req.params;
+      const userId = req.user.claims.sub;
+
+      // Get session data
+      const session = presignedUploadSessions.get(sessionId);
+      if (!session) {
+        return res.status(404).json({ error: "Upload session not found or expired" });
+      }
+
+      // Verify user owns this session
+      if (session.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      // Get user with company for photographer info
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const objectStorageService = new ObjectStorageService();
+
+      // Set ACL policy for uploaded object
+      const finalObjectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        session.objectPath,
+        {
+          owner: userId,
+          visibility: "private",
+        }
+      );
+
+      // Create photo record
+      const photographerId = user.companyId || userId;
+      
+      // Get photographer name from company or user
+      let photographerName = '';
+      if (user.companyId) {
+        const company = await storage.getCompany(user.companyId);
+        photographerName = company?.name || '';
+      }
+      if (!photographerName) {
+        photographerName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      }
+
+      const validated = insertPhotoSchema.parse({
+        projectId: session.projectId,
+        url: finalObjectPath,
+        mediaType: session.metadata.mediaType,
+        caption: session.metadata.caption || `Upload_${Date.now()}`,
+        width: session.metadata.width,
+        height: session.metadata.height,
+        photographerId,
+        photographerName,
+      });
+
+      const photo = await storage.createPhoto(validated);
+
+      // Auto-set as cover photo if needed
+      const project = await storage.getProject(session.projectId);
+      if (project && !project.coverPhotoId) {
+        await storage.updateProject(session.projectId, { coverPhotoId: photo.id });
+      }
+
+      // Update project activity
+      await storage.updateProject(session.projectId, { lastActivityAt: new Date() });
+
+      // Invalidate cache
+      invalidateCachePattern(userId, '/api/projects');
+
+      // Clean up session
+      presignedUploadSessions.delete(sessionId);
+
+      res.status(201).json(photo);
+    } catch (error: any) {
+      console.error("[PresignedUpload] Complete error:", error);
+      handleError(res, error);
+    }
+  });
+
   // Endpoint for setting ACL policy after photo upload and updating photo URL
   app.put("/api/photos/:photoId/object-url", isAuthenticated, validateUuidParam('photoId'), async (req: any, res) => {
     try {
@@ -1216,6 +1370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filename = req.file.originalname || `pdf_${Date.now()}.pdf`;
       const objectKey = `pdfs/${project.id}/${Date.now()}_${filename}`;
       
+      const objectStorageService = new ObjectStorageService();
       let storageUrl: string;
       try {
         storageUrl = await objectStorageService.uploadFile(
@@ -1641,7 +1796,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create photo metadata in database
       const photographerId = user.companyId || userId;
-      const photographerName = user.company?.name || `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      
+      // Get photographer name from company or user
+      let photographerName = '';
+      if (user.companyId) {
+        const company = await storage.getCompany(user.companyId);
+        photographerName = company?.name || '';
+      }
+      if (!photographerName) {
+        photographerName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      }
       
       const validated = insertPhotoSchema.parse({
         projectId,
