@@ -36,15 +36,30 @@ The architecture emphasizes simplicity and an invisible interface. The PWA infra
 ### Backend Performance Optimizations
 Backend optimizations target mobile networks and high-concurrency scenarios. Compression via Gzip/Brotli reduces API payload sizes (70% reduction). Field filtering via query parameters allows mobile clients to request only needed data. Upload resilience is managed with 10-minute timeouts and per-user rate limiting (100 uploads/15min). Database performance is enhanced with indexes on key tables (photos.projectId, photos.userId, photos.uploadedAt, projects.userId) and in-memory response caching with user-scoped keys and per-endpoint TTLs, with cache invalidation after all mutations.
 
-### Chunked Upload System
-For large files (>20MB), the application uses a chunked upload system with automatic retry logic:
-- Files are split into 10MB chunks on the client
+**Upload Performance Monitoring**: Real-time metrics tracking system monitors all upload methods (multipart, presigned, chunked) with success/failure rates, average duration by file size, retry frequency, error types, and method distribution. Accessible via GET `/api/uploads/metrics` for debugging and performance analysis.
+
+### Intelligent Upload System
+The application uses a 3-tier upload strategy optimized for different file sizes:
+
+**Small Files (<5MB)**: Traditional multipart upload with thumbnail support
+- Simple and efficient for typical photos
+- Backend generates thumbnails inline
+- Full metadata support
+
+**Medium Files (5-20MB)**: Direct-to-cloud presigned URL uploads
+- Bypasses backend for file content (metadata only)
+- Faster uploads with reduced server load
+- Client uploads directly to object storage
+- Backend creates photo record after upload
+
+**Large Files (>20MB)**: Chunked upload with retry logic
+- Files split into 10MB chunks on client
 - Each chunk uploads with 3 retries and exponential backoff (1s to 30s)
 - Query parameter validation prevents disk space DoS attacks
-- Backend assembles chunks, uploads to object storage, and creates photo records atomically
+- Backend assembles chunks, uploads to object storage atomically
 - Automatic cleanup of expired sessions (24h) and orphaned chunks
 - Session-based progress tracking for resumability
-- Note: Thumbnail generation for chunked uploads is intentionally deferred for simplicity (thumbnailUrl is nullable)
+- Note: Thumbnail generation intentionally deferred (thumbnailUrl nullable)
 
 ## External Dependencies
 
