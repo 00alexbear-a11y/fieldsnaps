@@ -113,7 +113,7 @@ export default function Camera() {
     return 'photo';
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isReturningFromEdit, setIsReturningFromEdit] = useState(() => {
+  const [isRestoringSession, setIsRestoringSession] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('preserveSession') === 'true';
   });
@@ -317,8 +317,12 @@ export default function Camera() {
           sessionPhotosRef.current = photos.slice(0, 10); // Keep max 10
           setSessionPhotos([...sessionPhotosRef.current]);
         }
+        // Mark session restoration as complete
+        setIsRestoringSession(false);
       }).catch((error: Error) => {
         console.error('[Camera] Failed to load session photos:', error);
+        // Even on error, allow camera to render
+        setIsRestoringSession(false);
       });
     }
     
@@ -343,17 +347,6 @@ export default function Camera() {
   useEffect(() => {
     sessionStorage.setItem('camera-mode', cameraMode);
   }, [cameraMode]);
-
-  // Smooth transition when returning from edit
-  useEffect(() => {
-    if (isReturningFromEdit) {
-      // Brief delay to ensure camera is ready, then fade in
-      const timer = setTimeout(() => {
-        setIsReturningFromEdit(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isReturningFromEdit]);
 
   const previousProjectRef = useRef<string>('');
   const currentProjectRef = useRef<string>('');
@@ -1708,12 +1701,19 @@ export default function Camera() {
     );
   }
 
+  // Show minimal black screen while restoring session to prevent flash
+  if (isRestoringSession) {
+    return (
+      <div className="fixed inset-0 w-full h-dvh bg-black flex items-center justify-center">
+        <div className="text-white/60 text-sm">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div 
       ref={containerRef}
-      className={`fixed inset-0 w-full h-dvh overflow-hidden flex flex-col transition-opacity duration-300 ${
-        isReturningFromEdit ? 'opacity-0' : 'opacity-100'
-      }`}
+      className="fixed inset-0 w-full h-dvh overflow-hidden flex flex-col"
       onTouchStart={handleContainerTouchStart}
       onTouchMove={handleContainerTouchMove}
       onTouchEnd={handleContainerTouchEnd}
