@@ -346,17 +346,19 @@ export default function Camera() {
       });
     } else {
       // Preserve session: Load session photos from IndexedDB
-      console.log('[Camera] Preserving session, loading photos from IndexedDB');
+      console.log('[Camera] Preserving session, loading photos from IndexedDB for sessionId:', currentSessionId.current);
       idb.getSessionPhotos(currentSessionId.current).then((photos: LocalPhoto[]) => {
         if (photos && photos.length > 0) {
-          console.log(`[Camera] Loaded ${photos.length} session photos`);
+          console.log(`[Camera] SUCCESS: Loaded ${photos.length} session photos:`, photos.map(p => ({ id: p.id, projectId: p.projectId, sessionActive: p.sessionActive })));
           sessionPhotosRef.current = photos.slice(0, 10); // Keep max 10
           setSessionPhotos([...sessionPhotosRef.current]);
+        } else {
+          console.log('[Camera] WARNING: No session photos found for sessionId:', currentSessionId.current);
         }
         // Mark session restoration as complete
         setIsRestoringSession(false);
       }).catch((error: Error) => {
-        console.error('[Camera] Failed to load session photos:', error);
+        console.error('[Camera] ERROR: Failed to load session photos:', error);
         // Even on error, allow camera to render
         setIsRestoringSession(false);
       });
