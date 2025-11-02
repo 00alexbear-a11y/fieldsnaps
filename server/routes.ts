@@ -28,6 +28,7 @@ import {
   cleanupUploadSession,
   validateUploadSession
 } from "./chunkedUpload";
+import { uploadMetrics } from "./uploadMetrics";
 
 // Configure multer for file uploads with strict validation
 const ALLOWED_FILE_TYPES = [
@@ -866,6 +867,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Direct-to-cloud upload: Complete presigned upload and create photo record
   app.post("/api/photos/complete-presigned/:sessionId", isAuthenticated, async (req: any, res) => {
+    const uploadStartTime = Date.now();
+    let fileSize = req.body.fileSize || 0; // Frontend should send file size for metrics
+    
     try {
       const { sessionId } = req.params;
       const userId = req.user.claims.sub;
@@ -937,9 +941,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clean up session
       presignedUploadSessions.delete(sessionId);
 
+      // Track successful presigned upload
+      const uploadDuration = Date.now() - uploadStartTime;
+      uploadMetrics.log({
+        userId,
+        projectId: session.projectId,
+        method: 'presigned',
+        status: 'success',
+        fileSize,
+        duration: uploadDuration,
+      });
+
       res.status(201).json(photo);
     } catch (error: any) {
       console.error("[PresignedUpload] Complete error:", error);
+      
+      // Track failed presigned upload
+      if (req.user?.claims?.sub && fileSize > 0) {
+        const session = presignedUploadSessions.get(req.params.sessionId);
+        uploadMetrics.log({
+          userId: req.user.claims.sub,
+          projectId: session?.projectId || '',
+          method: 'presigned',
+          status: 'failed',
+          fileSize,
+          error: error.message || 'Unknown error',
+        });
+      }
+      
       handleError(res, error);
     }
   });
@@ -1619,6 +1648,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     { name: 'photo', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 }
   ]), async (req: any, res) => {
+    const uploadStartTime = Date.now();
+    let fileSize = 0;
+    let userId = '';
+    let projectId = req.params.projectId;
+    
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -1628,7 +1662,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const photoFile = req.files.photo[0];
       const thumbnailFile = req.files?.thumbnail?.[0];
-      const userId = req.user?.claims?.sub;
+      userId = req.user?.claims?.sub;
+      fileSize = photoFile.size;
       
       // Ensure dev user exists in database (for dev bypass mode)
       if (userId === 'dev-user') {
@@ -1727,9 +1762,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Invalidate projects cache after photo upload (photo counts changed)
       invalidateCachePattern(userId, '/api/projects');
       
+      // Track successful upload
+      const uploadDuration = Date.now() - uploadStartTime;
+      uploadMetrics.log({
+        userId,
+        projectId,
+        method: 'multipart',
+        status: 'success',
+        fileSize,
+        duration: uploadDuration,
+      });
+      
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('Photo upload error:', error);
+      
+      // Track failed upload
+      if (userId && fileSize > 0) {
+        uploadMetrics.log({
+          userId,
+          projectId,
+          method: 'multipart',
+          status: 'failed',
+          fileSize,
+          error: error.message || 'Unknown error',
+        });
+      }
+      
       handleError(res, error);
     }
   });
@@ -1761,6 +1820,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Complete chunked upload and create photo (assembles chunks)
   app.post("/api/uploads/chunked/:uploadId/complete", isAuthenticated, async (req: any, res) => {
+    const uploadStartTime = Date.now();
+    let fileSize = 0;
+    
     try {
       const { uploadId } = req.params;
       const { projectId, caption, mediaType, width, height } = req.body;
@@ -1775,6 +1837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Assemble chunks into final file
       const fileBuffer = await assembleChunks(uploadId);
+      fileSize = fileBuffer.length;
       
       // Upload to object storage
       const objectStorageService = new ObjectStorageService();
@@ -1835,9 +1898,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Cleanup chunks
       await cleanupUploadSession(uploadId);
       
+      // Track successful chunked upload
+      const uploadDuration = Date.now() - uploadStartTime;
+      uploadMetrics.log({
+        userId,
+        projectId,
+        method: 'chunked',
+        status: 'success',
+        fileSize,
+        duration: uploadDuration,
+      });
+      
       res.status(201).json(photo);
     } catch (error: any) {
       console.error('[ChunkedUpload] Complete error:', error);
+      
+      // Track failed chunked upload
+      if (req.user?.claims?.sub && fileSize > 0) {
+        uploadMetrics.log({
+          userId: req.user.claims.sub,
+          projectId: req.body.projectId,
+          method: 'chunked',
+          status: 'failed',
+          fileSize,
+          error: error.message || 'Unknown error',
+        });
+      }
+      
       handleError(res, error);
     }
   });
@@ -3011,6 +3098,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ url: session.url });
     } catch (error: any) {
       console.error("[Billing] Error creating portal session:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================================================
+  // Upload Metrics Endpoints
+  // ============================================================================
+  
+  // Get upload performance metrics
+  app.get("/api/uploads/metrics", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const hoursAgo = req.query.hours ? parseInt(req.query.hours as string) : 24;
+      
+      // Get overall stats
+      const overallStats = uploadMetrics.getStats({ hoursAgo });
+      
+      // Get user-specific stats
+      const userStats = uploadMetrics.getStats({ userId, hoursAgo });
+      
+      // Get recent failures for debugging
+      const recentFailures = uploadMetrics.getRecentFailures(5);
+      
+      res.json({
+        timeRange: `Last ${hoursAgo} hours`,
+        overall: overallStats,
+        user: userStats,
+        recentFailures: recentFailures.map(f => ({
+          method: f.method,
+          fileSize: f.fileSizeMB,
+          error: f.error,
+          timestamp: f.timestamp,
+        })),
+      });
+    } catch (error: any) {
+      console.error('[Metrics] Error getting upload metrics:', error);
       res.status(500).json({ error: error.message });
     }
   });

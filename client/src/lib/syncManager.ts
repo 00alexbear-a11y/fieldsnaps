@@ -633,7 +633,7 @@ class SyncManager {
             
             console.log('[Sync] Direct upload complete, notifying backend...');
             
-            // Step 3: Notify backend to create photo record
+            // Step 3: Notify backend to create photo record (send fileSize for metrics)
             const completeResponse = await fetch(`/api/photos/complete-presigned/${sessionId}`, {
               method: 'POST',
               headers: {
@@ -641,6 +641,9 @@ class SyncManager {
                 'Content-Type': 'application/json',
               },
               credentials: 'include',
+              body: JSON.stringify({
+                fileSize: photo.blob.size, // For upload metrics tracking
+              }),
             });
             
             if (!completeResponse.ok) {
