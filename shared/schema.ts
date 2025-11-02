@@ -345,7 +345,10 @@ export const subscriptionEvents = pgTable("subscription_events", {
 // Zod schemas for validation
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
-export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true });
+export const insertPhotoSchema = createInsertSchema(photos).omit({ id: true, createdAt: true }).extend({
+  // Relax photographerId validation to allow dev user IDs (e.g., "dev-user-local")
+  photographerId: z.string().optional().nullable(),
+});
 export const insertPhotoAnnotationSchema = createInsertSchema(photoAnnotations).omit({ id: true, createdAt: true });
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, createdAt: true });

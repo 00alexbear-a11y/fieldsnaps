@@ -360,8 +360,9 @@ export default function Camera() {
   useEffect(() => {
     currentProjectRef.current = selectedProject;
     
-    // Always start with fresh session - no restoration from localStorage
-    if (previousProjectRef.current && previousProjectRef.current !== selectedProject) {
+    // Only clear session when project changes AND we're not preserving session
+    // This prevents clearing photos when returning from edit mode
+    if (previousProjectRef.current && previousProjectRef.current !== selectedProject && !shouldPreserveSessionRef.current) {
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
     }
