@@ -230,7 +230,8 @@ export default function Camera() {
     const projectId = params.get('projectId');
     const mode = params.get('mode');
     
-    if (projectId && projectId !== selectedProject) {
+    // Only set projectId if it's a valid value (not null/undefined/empty string)
+    if (projectId && projectId !== 'null' && projectId !== 'undefined' && projectId !== selectedProject) {
       console.log('[Camera] Setting project from URL:', projectId);
       setSelectedProject(projectId);
       setShowProjectSelection(false);
