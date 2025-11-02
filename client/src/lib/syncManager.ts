@@ -11,6 +11,7 @@
 import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueItem } from './indexeddb';
 import { generateThumbnail } from './imageCompression';
 import { Network } from '@capacitor/network';
+import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -524,68 +525,129 @@ class SyncManager {
       if (item.action === 'create') {
         console.log('[Sync] Starting photo upload for:', item.localId, 'to project:', serverProjectId);
         
-        // Create FormData for multipart upload
-        const formData = new FormData();
-        // Use correct file extension based on media type
-        const fileExtension = photo.mediaType === 'video' ? 'webm' : 'jpg';
-        const fileName = `${photo.mediaType}-${photo.id}.${fileExtension}`;
-        formData.append('photo', photo.blob, fileName);
+        // Determine if we should use chunked upload (files > 20MB)
+        const useChunkedUpload = shouldUseChunkedUpload(photo.blob.size);
         
-        // Add thumbnail for videos (if extracted) or generate for photos
-        if (photo.thumbnailBlob) {
-          // Use pre-extracted thumbnail (for videos)
-          formData.append('thumbnail', photo.thumbnailBlob, `thumb-${photo.id}.jpg`);
-          console.log('[Sync] Using pre-extracted thumbnail:', photo.thumbnailBlob.size, 'bytes');
-        } else if (photo.mediaType === 'photo') {
-          // Generate thumbnail for photos on-the-fly
+        let data: any;
+        
+        if (useChunkedUpload) {
+          // Use chunked upload for large files
+          console.log('[Sync] Using chunked upload for large file:', photo.blob.size, 'bytes');
+          
           try {
-            const file = new File([photo.blob], `photo-${photo.id}.jpg`, { type: photo.blob.type });
-            const thumbnailBlob = await generateThumbnail(file, 200);
-            formData.append('thumbnail', thumbnailBlob, `thumb-${photo.id}.jpg`);
-            console.log('[Sync] Thumbnail generated:', thumbnailBlob.size, 'bytes');
-          } catch (thumbError) {
-            console.warn('[Sync] Thumbnail generation failed, continuing without thumbnail:', thumbError);
+            // Generate file name (same logic as multipart upload)
+            const fileExtension = photo.mediaType === 'video' ? 'webm' : 'jpg';
+            const fileName = `${photo.mediaType}-${photo.id}.${fileExtension}`;
+            
+            // Upload file in chunks with retry logic
+            const result = await uploadFileChunked({
+              file: photo.blob,
+              fileName,
+              onProgress: (progress) => {
+                console.log(`[Sync] Upload progress: ${progress.toFixed(1)}%`);
+              },
+              onChunkComplete: (chunkIndex, totalChunks) => {
+                console.log(`[Sync] Chunk ${chunkIndex + 1}/${totalChunks} uploaded`);
+              },
+            });
+            
+            console.log('[Sync] All chunks uploaded, completing...');
+            
+            // Complete the upload with metadata (backend assembles chunks and creates photo)
+            const completeResponse = await fetch(`/api/uploads/chunked/${result.uploadId}/complete`, {
+              method: 'POST',
+              headers: {
+                ...this.getSyncHeaders(),
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                projectId: serverProjectId,
+                caption: photo.caption || `Upload_${Date.now()}`,
+                mediaType: photo.mediaType,
+                width: photo.width,
+                height: photo.height,
+              }),
+            });
+            
+            if (!completeResponse.ok) {
+              const errorText = await completeResponse.text();
+              throw new Error(`Failed to complete chunked upload: ${completeResponse.status} - ${errorText}`);
+            }
+            
+            data = await completeResponse.json();
+            console.log('[Sync] Chunked upload complete:', data);
+          } catch (chunkError) {
+            console.error('[Sync] Chunked upload failed:', chunkError);
+            throw chunkError;
           }
-        }
-        
-        if (photo.caption) {
-          formData.append('caption', photo.caption);
-        }
-        if (photo.annotations) {
-          formData.append('annotations', photo.annotations);
-        }
-        // Include mediaType to distinguish photos from videos
-        formData.append('mediaType', photo.mediaType);
-        // Include original dimensions
-        if (photo.width) {
-          formData.append('width', photo.width.toString());
-        }
-        if (photo.height) {
-          formData.append('height', photo.height.toString());
-        }
+        } else {
+          // Use traditional multipart upload for smaller files
+          console.log('[Sync] Using traditional upload for file:', photo.blob.size, 'bytes');
+          
+          // Create FormData for multipart upload
+          const formData = new FormData();
+          // Use correct file extension based on media type
+          const fileExtension = photo.mediaType === 'video' ? 'webm' : 'jpg';
+          const fileName = `${photo.mediaType}-${photo.id}.${fileExtension}`;
+          formData.append('photo', photo.blob, fileName);
+          
+          // Add thumbnail for videos (if extracted) or generate for photos
+          if (photo.thumbnailBlob) {
+            // Use pre-extracted thumbnail (for videos)
+            formData.append('thumbnail', photo.thumbnailBlob, `thumb-${photo.id}.jpg`);
+            console.log('[Sync] Using pre-extracted thumbnail:', photo.thumbnailBlob.size, 'bytes');
+          } else if (photo.mediaType === 'photo') {
+            // Generate thumbnail for photos on-the-fly
+            try {
+              const file = new File([photo.blob], `photo-${photo.id}.jpg`, { type: photo.blob.type });
+              const thumbnailBlob = await generateThumbnail(file, 200);
+              formData.append('thumbnail', thumbnailBlob, `thumb-${photo.id}.jpg`);
+              console.log('[Sync] Thumbnail generated:', thumbnailBlob.size, 'bytes');
+            } catch (thumbError) {
+              console.warn('[Sync] Thumbnail generation failed, continuing without thumbnail:', thumbError);
+            }
+          }
+          
+          if (photo.caption) {
+            formData.append('caption', photo.caption);
+          }
+          if (photo.annotations) {
+            formData.append('annotations', photo.annotations);
+          }
+          // Include mediaType to distinguish photos from videos
+          formData.append('mediaType', photo.mediaType);
+          // Include original dimensions
+          if (photo.width) {
+            formData.append('width', photo.width.toString());
+          }
+          if (photo.height) {
+            formData.append('height', photo.height.toString());
+          }
 
-        // Get headers (without Content-Type for FormData)
-        const headers = this.getSyncHeaders();
-        console.log('[Sync] Upload headers:', headers);
-        console.log('[Sync] Upload URL:', `/api/projects/${serverProjectId}/photos`);
+          // Get headers (without Content-Type for FormData)
+          const headers = this.getSyncHeaders();
+          console.log('[Sync] Upload headers:', headers);
+          console.log('[Sync] Upload URL:', `/api/projects/${serverProjectId}/photos`);
 
-        const response = await fetch(`/api/projects/${serverProjectId}/photos`, {
-          method: 'POST',
-          headers,
-          credentials: 'include',
-          body: formData,
-        });
+          const response = await fetch(`/api/projects/${serverProjectId}/photos`, {
+            method: 'POST',
+            headers,
+            credentials: 'include',
+            body: formData,
+          });
 
-        console.log('[Sync] Upload response status:', response.status);
+          console.log('[Sync] Upload response status:', response.status);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('[Sync] Upload failed:', response.status, errorText);
-          throw new Error(`Server error: ${response.status} - ${errorText}`);
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[Sync] Upload failed:', response.status, errorText);
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+          }
+
+          data = await response.json();
+          console.log('[Sync] Upload successful, server response:', data);
         }
-
-        const data = await response.json();
-        console.log('[Sync] Upload successful, server response:', data);
         
         // Update local photo with server ID and sync status
         await idb.updatePhotoSyncStatus(item.localId, 'synced', data.id);
