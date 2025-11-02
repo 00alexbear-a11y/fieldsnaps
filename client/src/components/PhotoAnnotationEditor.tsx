@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown, Ruler } from "lucide-react";
+import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown, Ruler, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -2082,6 +2082,25 @@ export function PhotoAnnotationEditor({
 
   return (
     <div className="fixed inset-0 h-dvh bg-black flex flex-col">
+      {/* Top Bar - iOS Style with Black Background */}
+      <div className="flex-shrink-0 pt-safe-2 px-4 pb-2 bg-black border-b border-white/10">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCancel}
+            className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
+            data-testid="button-back-edit"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          
+          <span className="text-white/90 text-sm font-medium">Edit Photo</span>
+          
+          <div className="w-11" /> {/* Spacer for centering */}
+        </div>
+      </div>
+      
       {/* Canvas Container - Takes up available space */}
       <div className="relative flex-1 min-h-0 w-full flex items-center justify-center pointer-events-none">
         {/* Canvas - Centered */}
