@@ -671,6 +671,9 @@ class SyncManager {
           const fileName = `${photo.mediaType}-${photo.id}.${fileExtension}`;
           formData.append('photo', photo.blob, fileName);
           
+          // Include projectId (required by backend schema validation)
+          formData.append('projectId', serverProjectId);
+          
           // Add thumbnail for videos (if extracted) or generate for photos
           if (photo.thumbnailBlob) {
             // Use pre-extracted thumbnail (for videos)
