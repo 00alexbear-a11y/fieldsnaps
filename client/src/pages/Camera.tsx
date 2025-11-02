@@ -164,15 +164,19 @@ export default function Camera() {
   const modeTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Session ID for tracking photos in current camera session
-  // Initialize sessionId: restore from sessionStorage if preserving session, otherwise generate new
+  // Initialize sessionId: restore from storage if preserving session, otherwise generate new
   const getInitialSessionId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const preserveSession = urlParams.get('preserveSession') === 'true';
     
     if (preserveSession) {
-      const savedSessionId = sessionStorage.getItem('camera-session-id');
+      // Try sessionStorage first, then localStorage as backup (survives hot-reloads)
+      const savedSessionId = sessionStorage.getItem('camera-session-id') || localStorage.getItem('camera-session-id');
       if (savedSessionId) {
-        console.log('[Camera] Restoring sessionId from sessionStorage:', savedSessionId);
+        console.log('[Camera] Restoring sessionId from storage:', savedSessionId);
+        // Ensure it's in both storage locations
+        sessionStorage.setItem('camera-session-id', savedSessionId);
+        localStorage.setItem('camera-session-id', savedSessionId);
         return savedSessionId;
       }
     }
@@ -180,14 +184,20 @@ export default function Camera() {
     // Generate new sessionId for fresh camera session
     const newSessionId = crypto.randomUUID();
     console.log('[Camera] Generated new sessionId:', newSessionId);
+    // Store in both sessionStorage and localStorage for redundancy
     sessionStorage.setItem('camera-session-id', newSessionId);
+    localStorage.setItem('camera-session-id', newSessionId);
     return newSessionId;
   };
   const currentSessionId = useRef<string>(getInitialSessionId());
   
   // Capture session preservation state at mount to avoid re-reading URL at cleanup
-  const urlParams = new URLSearchParams(window.location.search);
-  const shouldPreserveSessionRef = useRef<boolean>(urlParams.get('preserveSession') === 'true');
+  // Initialize from URL parameter so deep-links to edit with preserveSession=true work correctly
+  const getInitialPreserveFlag = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('preserveSession') === 'true';
+  };
+  const shouldPreserveSessionRef = useRef<boolean>(getInitialPreserveFlag());
   
   const annotationCanvasRef = useRef<HTMLCanvasElement>(null);
   const compositeCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -318,15 +328,18 @@ export default function Camera() {
       // Generate new session ID for fresh camera session
       const newSessionId = crypto.randomUUID();
       currentSessionId.current = newSessionId;
+      // Store in both sessionStorage and localStorage for redundancy
       sessionStorage.setItem('camera-session-id', newSessionId);
+      localStorage.setItem('camera-session-id', newSessionId);
       console.log('[Camera] Fresh session, generated new sessionId:', newSessionId);
       
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
       
-      // Clean up all camera session data from localStorage
+      // Clean up camera session data from localStorage (only when starting fresh session)
+      // Note: We keep camera-session-id in localStorage as backup for hot-reloads
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('camera-session-')) {
+        if (key.startsWith('camera-session-') && key !== 'camera-session-id') {
           localStorage.removeItem(key);
         }
       });
@@ -2286,7 +2299,9 @@ export default function Camera() {
                         <Button
                           onClick={() => {
                             haptics.light();
-                            setLocation(`/edit/${photo.id}?preserveSession=true&projectId=${selectedProject}`);
+                            // Preserve session when navigating to edit
+                            shouldPreserveSessionRef.current = true;
+                            setLocation(`/photo/${photo.id}/edit?preserveSession=true&projectId=${selectedProject}`);
                           }}
                           size="icon"
                           variant="ghost"
