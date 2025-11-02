@@ -1857,29 +1857,29 @@ export default function Camera() {
             </div>
           )}
           
+          {/* Floating Zoom Controls - iOS 26 Style - Positioned inside viewfinder, floating over camera preview */}
+          {!isRecording && availableCameras.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center justify-center">
+              <div className="flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-1 shadow-2xl border border-white/10">
+                {availableCameras.map((camera) => (
+                  <button
+                    key={camera.deviceId}
+                    onClick={() => switchZoomLevel(camera.zoomLevel)}
+                    className={`min-touch text-xs font-semibold px-2.5 py-1.5 rounded-full transition-all duration-200 ${
+                      zoomLevel === camera.zoomLevel
+                        ? 'bg-white text-black shadow-md'
+                        : 'text-white/90 hover:bg-white/15 active:bg-white/25'
+                    }`}
+                    data-testid={`button-zoom-${camera.zoomLevel}x`}
+                  >
+                    {camera.zoomLevel}×
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
       </div>
-
-      {/* Floating Zoom Controls - iOS 26 Style (Above bottom controls, not inside black bar) */}
-      {!isRecording && availableCameras.length > 1 && (
-        <div className="flex-shrink-0 flex items-center justify-center pb-2">
-          <div className="flex flex-row gap-1.5 bg-black/30 backdrop-blur-xl rounded-full px-2.5 py-1 shadow-2xl border border-white/10">
-            {availableCameras.map((camera) => (
-              <button
-                key={camera.deviceId}
-                onClick={() => switchZoomLevel(camera.zoomLevel)}
-                className={`min-touch text-xs font-semibold px-2.5 py-1.5 rounded-full transition-all duration-200 ${
-                  zoomLevel === camera.zoomLevel
-                    ? 'bg-white text-black shadow-md'
-                    : 'text-white/90 hover:bg-white/15 active:bg-white/25'
-                }`}
-                data-testid={`button-zoom-${camera.zoomLevel}x`}
-              >
-                {camera.zoomLevel}×
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
       <div className="flex-shrink-0 flex flex-col items-center gap-2 pt-4 pb-safe-4 px-6 mb-0 bg-black">
