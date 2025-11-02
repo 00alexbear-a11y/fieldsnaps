@@ -516,8 +516,24 @@ class SyncManager {
     // since projects are created server-first in this app
     const serverProjectId = photo.projectId;
     
-    if (!serverProjectId) {
-      console.error('[Sync] Photo missing project ID:', item.localId);
+    // Validate projectId is not empty and is a valid UUID format
+    // Reject string literals "null", "undefined", empty strings, or non-UUID values
+    if (!serverProjectId || serverProjectId === 'null' || serverProjectId === 'undefined' || serverProjectId.trim() === '') {
+      console.error('[Sync] Photo has invalid or missing project ID:', {
+        photoId: item.localId,
+        projectId: serverProjectId,
+        type: typeof serverProjectId
+      });
+      return false;
+    }
+    
+    // Additional UUID format validation (basic check for UUID pattern)
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidPattern.test(serverProjectId)) {
+      console.error('[Sync] Photo has invalid UUID format for project ID:', {
+        photoId: item.localId,
+        projectId: serverProjectId
+      });
       return false;
     }
 
