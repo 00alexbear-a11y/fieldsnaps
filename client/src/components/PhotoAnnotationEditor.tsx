@@ -2103,8 +2103,8 @@ export function PhotoAnnotationEditor({
       
       {/* Canvas Container - Takes up available space */}
       <div className="relative flex-1 min-h-0 w-full flex items-center justify-center pointer-events-none">
-        {/* Canvas - Centered - Full width for edge-to-edge display */}
-        <div className="relative w-full pointer-events-none flex items-center justify-center" style={{ maxHeight: '100%' }}>
+        {/* Canvas - Centered - Matches header padding for consistency */}
+        <div className="relative w-full px-4 pointer-events-none flex items-center justify-center" style={{ maxHeight: '100%' }}>
         <img
           ref={imageRef}
           alt="Photo to annotate"

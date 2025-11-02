@@ -226,6 +226,12 @@ export default function PhotoEdit() {
 
       // Update the photo with the annotated version
       // Preserve sessionActive and sessionId if they exist (for camera session continuity)
+      console.log('[PhotoEdit] Before update - existing photo session data:', { 
+        id: existingPhoto.id,
+        sessionActive: existingPhoto.sessionActive, 
+        sessionId: existingPhoto.sessionId 
+      });
+      
       const updateData: any = {
         blob: annotatedBlob,
         annotations: annotations.length > 0 ? JSON.stringify(annotations) : null,
@@ -239,7 +245,22 @@ export default function PhotoEdit() {
         updateData.sessionId = existingPhoto.sessionId;
       }
       
+      console.log('[PhotoEdit] Update data to save:', { 
+        hasBlob: !!updateData.blob,
+        hasAnnotations: !!updateData.annotations,
+        sessionActive: updateData.sessionActive, 
+        sessionId: updateData.sessionId 
+      });
+      
       await idb.updatePhoto(photoId, updateData);
+      
+      // Verify the photo was updated correctly
+      const verifyPhoto = await idb.getPhoto(photoId);
+      console.log('[PhotoEdit] After update - verified photo session data:', { 
+        id: verifyPhoto?.id,
+        sessionActive: verifyPhoto?.sessionActive, 
+        sessionId: verifyPhoto?.sessionId 
+      });
 
       // Add to sync queue to upload the annotated photo to server
       try {
