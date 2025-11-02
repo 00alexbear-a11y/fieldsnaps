@@ -31,6 +31,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useMutation } from '@tanstack/react-query';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
@@ -92,12 +102,14 @@ export default function Camera() {
     
     if (preserveSession) {
       const savedMode = sessionStorage.getItem('camera-mode') as CameraMode | null;
-      if (savedMode && ['photo', 'video', 'edit'].includes(savedMode)) {
-        return savedMode;
+      // When returning from edit mode, always reset to 'photo' to prevent loops
+      // Only restore 'video' mode if that was active before
+      if (savedMode === 'video') {
+        return 'video';
       }
     }
     
-    // Default to photo on fresh session
+    // Default to photo on fresh session (including when returning from edit)
     return 'photo';
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -119,6 +131,17 @@ export default function Camera() {
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   const [selectedUnitLabel, setSelectedUnitLabel] = useState<string | null>(null);
   const [showFlash, setShowFlash] = useState(false);
+  
+  // Session preview overlay state
+  const [isSessionPreviewOpen, setIsSessionPreviewOpen] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  
+  // Swipe gesture refs for session preview overlay
+  const previewSwipeStartY = useRef<number | null>(null);
+  const previewSwipeStartTime = useRef<number>(0);
+  const previewOverlayRef = useRef<HTMLDivElement>(null);
   
   // Swipe-down gesture refs (using refs to avoid re-renders during gesture)
   const swipeStartY = useRef<number | null>(null);
@@ -953,24 +976,134 @@ export default function Camera() {
     }
   };
 
-  // Mode switching with subtle transition delay
+  // Mode switching with debouncing to prevent rapid switches/loops
   const switchCameraMode = async (newMode: CameraMode) => {
+    // Prevent switching if already in that mode, transitioning, or recording
     if (cameraMode === newMode || isTransitioning || isRecording) return;
     
-    // Clear any existing transition timeout
+    // Clear any existing transition timeout to prevent overlapping switches
     if (modeTransitionTimeoutRef.current) {
       clearTimeout(modeTransitionTimeoutRef.current);
+      modeTransitionTimeoutRef.current = null;
     }
     
     haptics.light();
     setIsTransitioning(true);
     
-    // 250ms transition delay for intentional feel
+    // 250ms transition delay for intentional feel, prevents accidental rapid switches
     modeTransitionTimeoutRef.current = setTimeout(() => {
       setCameraMode(newMode);
       setIsTransitioning(false);
       modeTransitionTimeoutRef.current = null;
     }, 250);
+  };
+
+  // Session preview overlay controls
+  const openSessionPreview = () => {
+    if (sessionPhotos.length === 0) return; // No photos to preview
+    haptics.light();
+    setIsSessionPreviewOpen(true);
+  };
+
+  const closeSessionPreview = () => {
+    haptics.light();
+    setIsSessionPreviewOpen(false);
+  };
+
+  // Delete photo from session preview
+  const deletePhotoFromSession = async (photoId: string) => {
+    try {
+      haptics.medium();
+      
+      // Remove from sessionPhotos state
+      const updatedPhotos = sessionPhotos.filter(p => p.id !== photoId);
+      setSessionPhotos(updatedPhotos);
+      sessionPhotosRef.current = updatedPhotos;
+      
+      // Delete from IndexedDB
+      await idb.deletePhoto(photoId);
+      
+      toast({
+        title: "Photo deleted",
+        description: "The photo has been removed from this session",
+      });
+      
+      // Close overlay if no photos left
+      if (updatedPhotos.length === 0) {
+        closeSessionPreview();
+      }
+    } catch (error) {
+      console.error('[Camera] Failed to delete photo:', error);
+      toast({
+        title: "Delete failed",
+        description: "Could not delete the photo. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Toggle video playback in session preview
+  const toggleVideoPlayback = (videoId: string) => {
+    const videoElement = videoRefs.current.get(videoId);
+    if (!videoElement) return;
+
+    haptics.light();
+    
+    if (playingVideoId === videoId) {
+      // Pause current video
+      videoElement.pause();
+      setPlayingVideoId(null);
+    } else {
+      // Pause any currently playing video
+      if (playingVideoId) {
+        const currentVideo = videoRefs.current.get(playingVideoId);
+        if (currentVideo) currentVideo.pause();
+      }
+      
+      // Play new video
+      videoElement.play().catch(err => {
+        console.error('[Camera] Video play failed:', err);
+      });
+      setPlayingVideoId(videoId);
+    }
+  };
+
+  // Session preview swipe gesture handlers
+  const handlePreviewTouchStart = (e: React.TouchEvent) => {
+    previewSwipeStartY.current = e.touches[0].clientY;
+    previewSwipeStartTime.current = Date.now();
+  };
+
+  const handlePreviewTouchMove = (e: React.TouchEvent) => {
+    if (previewSwipeStartY.current === null || !previewOverlayRef.current) return;
+    
+    const currentY = e.touches[0].clientY;
+    const offset = Math.max(0, currentY - previewSwipeStartY.current); // Only allow downward swipe
+    
+    if (offset > 0) {
+      previewOverlayRef.current.style.transform = `translateY(${offset}px)`;
+      previewOverlayRef.current.style.transition = 'none';
+    }
+  };
+
+  const handlePreviewTouchEnd = () => {
+    if (previewSwipeStartY.current !== null && previewOverlayRef.current) {
+      const currentTransform = previewOverlayRef.current.style.transform;
+      const offset = parseFloat(currentTransform.match(/translateY\((\d+)px\)/)?.[1] || '0');
+      const swipeDuration = Date.now() - previewSwipeStartTime.current;
+      const velocity = offset / swipeDuration; // px/ms
+      
+      // Dismiss if swiped down more than 150px or fast swipe (>0.5 px/ms)
+      if (offset > 150 || velocity > 0.5) {
+        closeSessionPreview();
+      } else {
+        // Animate back to normal position
+        previewOverlayRef.current.style.transition = 'transform 0.3s ease-out';
+        previewOverlayRef.current.style.transform = 'translateY(0px)';
+      }
+      
+      previewSwipeStartY.current = null;
+    }
   };
 
   const startRecording = async () => {
@@ -1765,8 +1898,8 @@ export default function Camera() {
             return (
               <button
                 onClick={() => {
-                  // Navigate to project photos to view all session photos
-                  setLocation(`/projects/${selectedProject}`);
+                  // Open session preview overlay to review all session photos
+                  openSessionPreview();
                 }}
                 className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl hover-elevate active-elevate-2 backdrop-blur-sm ring-1 ring-black/10 flex-shrink-0"
                 data-testid="thumbnail-last-photo"
@@ -2027,6 +2160,155 @@ export default function Camera() {
         className="absolute"
         style={{ top: '-9999px', left: '-9999px' }}
       />
+
+      {/* Session Preview Gallery Overlay */}
+      {isSessionPreviewOpen && (
+        <div 
+          ref={previewOverlayRef}
+          onTouchStart={handlePreviewTouchStart}
+          onTouchMove={handlePreviewTouchMove}
+          onTouchEnd={handlePreviewTouchEnd}
+          className="fixed inset-0 z-[100] flex flex-col bg-black/90 backdrop-blur-2xl"
+          data-testid="overlay-session-preview"
+        >
+          {/* Header with Close Button */}
+          <div className="flex items-center justify-between p-4 pb-safe">
+            <h2 className="text-white text-xl font-semibold tracking-tight">
+              Session Photos ({sessionPhotos.length})
+            </h2>
+            <Button
+              onClick={closeSessionPreview}
+              size="icon"
+              variant="ghost"
+              className="text-white hover:bg-white/10"
+              data-testid="button-close-session-preview"
+            >
+              <X className="w-6 h-6" />
+            </Button>
+          </div>
+
+          {/* Scrollable Grid of Photos/Videos */}
+          <div className="flex-1 overflow-y-auto px-4 pb-safe">
+            <div className="grid grid-cols-3 gap-1 pb-4">
+              {sessionPhotos.map((photo) => {
+                const thumbnailUrl = thumbnailUrlsRef.current.get(photo.id);
+                const isVideo = photo.mimeType?.startsWith('video/');
+                
+                return (
+                  <div
+                    key={photo.id}
+                    className="relative aspect-square bg-black/20 rounded-lg overflow-hidden group"
+                    data-testid={`preview-item-${photo.id}`}
+                  >
+                    {isVideo ? (
+                      <div 
+                        className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                        onClick={() => toggleVideoPlayback(photo.id)}
+                      >
+                        <video
+                          ref={(el) => {
+                            if (el) {
+                              videoRefs.current.set(photo.id, el);
+                            } else {
+                              videoRefs.current.delete(photo.id);
+                            }
+                          }}
+                          src={thumbnailUrl}
+                          className="w-full h-full object-cover"
+                          preload="metadata"
+                          loop
+                          playsInline
+                          onEnded={() => setPlayingVideoId(null)}
+                        />
+                        {playingVideoId !== photo.id && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                            <Play className="w-8 h-8 text-white" fill="white" />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <img
+                        src={thumbnailUrl}
+                        alt="Session photo"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    
+                    {/* Todo Badge */}
+                    {photoIdsWithTasks.has(photo.id) && (
+                      <div className="absolute top-2 left-2">
+                        <CheckSquare className="w-5 h-5 text-blue-400 fill-blue-400/20" />
+                      </div>
+                    )}
+                    
+                    {/* Action Buttons - Show on hover/tap */}
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Edit Button - Only for photos, not videos */}
+                      {!isVideo && (
+                        <Button
+                          onClick={() => {
+                            haptics.light();
+                            setLocation(`/edit/${photo.id}?preserveSession=true&projectId=${selectedProject}`);
+                          }}
+                          size="icon"
+                          variant="ghost"
+                          className="w-8 h-8 bg-blue-500/90 hover:bg-blue-600 text-white"
+                          data-testid={`button-edit-${photo.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
+                      
+                      {/* Delete Button */}
+                      <Button
+                        onClick={() => setPhotoToDelete(photo.id)}
+                        size="icon"
+                        variant="ghost"
+                        className="w-8 h-8 bg-red-500/90 hover:bg-red-600 text-white"
+                        data-testid={`button-delete-${photo.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!photoToDelete} onOpenChange={(open) => !open && setPhotoToDelete(null)}>
+        <AlertDialogContent className="bg-black/95 backdrop-blur-xl border border-white/10">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Photo?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/70">
+              This photo will be permanently deleted from this session. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+              data-testid="button-cancel-delete"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (photoToDelete) {
+                  deletePhotoFromSession(photoToDelete);
+                  setPhotoToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              data-testid="button-confirm-delete"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Upgrade Modal */}
       <UpgradeModal 
