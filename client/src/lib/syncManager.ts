@@ -792,13 +792,18 @@ class SyncManager {
           formData.append('photo', item.data.blob, `photo-${photo.id}.jpg`);
         }
         
-        if (item.data.annotations !== undefined) {
-          formData.append('annotations', item.data.annotations || '');
+        // Include projectId if available (required by backend schema validation)
+        if (photo.projectId) {
+          formData.append('projectId', photo.projectId);
         }
         
+        // Include caption if available
         if (photo.caption) {
           formData.append('caption', photo.caption);
         }
+        
+        // Note: Annotations are stored client-side in IndexedDB, not sent to server
+        // The backend doesn't have an annotations field in the photos table
 
         const response = await fetch(`/api/photos/${photo.serverId}`, {
           method: 'PATCH',
