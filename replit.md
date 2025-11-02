@@ -34,7 +34,17 @@ The application includes a bottom navigation bar, a comprehensive camera interfa
 The architecture emphasizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage leverages IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, database indexing, and code-splitting. The offline sync system is hardened with queue size limits, exponential backoff, and atomic deduplication. OAuth for native apps uses the Capacitor Browser plugin. Critical performance enhancements include `crossOrigin='use-credentials'`, O(n) photo rendering with Map-based caching, `viewport-fit=cover`, and comprehensive CSS utilities for iOS safe-area handling. Virtualization with `@tanstack/react-virtual` is implemented for large photo collections, and global error toast notifications are managed via TanStack Query.
 
 ### Backend Performance Optimizations
-Backend optimizations target mobile networks and high-concurrency scenarios. Compression via Gzip/Brotli reduces API payload sizes. Field filtering via query parameters allows mobile clients to request only needed data. Upload resilience is managed with 10-minute timeouts and per-user rate limiting. Database performance is enhanced with indexes on key tables and in-memory response caching with user-scoped keys and per-endpoint TTLs, with cache invalidation after all mutations.
+Backend optimizations target mobile networks and high-concurrency scenarios. Compression via Gzip/Brotli reduces API payload sizes (70% reduction). Field filtering via query parameters allows mobile clients to request only needed data. Upload resilience is managed with 10-minute timeouts and per-user rate limiting (100 uploads/15min). Database performance is enhanced with indexes on key tables (photos.projectId, photos.userId, photos.uploadedAt, projects.userId) and in-memory response caching with user-scoped keys and per-endpoint TTLs, with cache invalidation after all mutations.
+
+### Chunked Upload System
+For large files (>20MB), the application uses a chunked upload system with automatic retry logic:
+- Files are split into 10MB chunks on the client
+- Each chunk uploads with 3 retries and exponential backoff (1s to 30s)
+- Query parameter validation prevents disk space DoS attacks
+- Backend assembles chunks, uploads to object storage, and creates photo records atomically
+- Automatic cleanup of expired sessions (24h) and orphaned chunks
+- Session-based progress tracking for resumability
+- Note: Thumbnail generation for chunked uploads is intentionally deferred for simplicity (thumbnailUrl is nullable)
 
 ## External Dependencies
 
