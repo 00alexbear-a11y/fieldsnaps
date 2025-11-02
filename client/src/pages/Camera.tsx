@@ -1882,7 +1882,7 @@ export default function Camera() {
       )}
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe px-6 mb-0 bg-black">
+      <div className="flex-shrink-0 flex flex-col items-center gap-2 pb-safe-4 px-6 mb-0 bg-black">
         {/* Central Control Row - Bottom Position */}
         <div className="flex items-center justify-between w-full">
           {/* Thumbnail - Bottom Left (iOS Style) */}
