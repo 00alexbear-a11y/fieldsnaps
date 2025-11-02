@@ -164,7 +164,26 @@ export default function Camera() {
   const modeTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Session ID for tracking photos in current camera session
-  const currentSessionId = useRef<string>(crypto.randomUUID());
+  // Initialize sessionId: restore from sessionStorage if preserving session, otherwise generate new
+  const getInitialSessionId = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const preserveSession = urlParams.get('preserveSession') === 'true';
+    
+    if (preserveSession) {
+      const savedSessionId = sessionStorage.getItem('camera-session-id');
+      if (savedSessionId) {
+        console.log('[Camera] Restoring sessionId from sessionStorage:', savedSessionId);
+        return savedSessionId;
+      }
+    }
+    
+    // Generate new sessionId for fresh camera session
+    const newSessionId = crypto.randomUUID();
+    console.log('[Camera] Generated new sessionId:', newSessionId);
+    sessionStorage.setItem('camera-session-id', newSessionId);
+    return newSessionId;
+  };
+  const currentSessionId = useRef<string>(getInitialSessionId());
   
   // Capture session preservation state at mount to avoid re-reading URL at cleanup
   const urlParams = new URLSearchParams(window.location.search);
@@ -296,8 +315,11 @@ export default function Camera() {
     const preserveSession = urlParams.get('preserveSession') === 'true';
     
     if (!preserveSession) {
-      // Generate new session ID for this camera session
-      currentSessionId.current = crypto.randomUUID();
+      // Generate new session ID for fresh camera session
+      const newSessionId = crypto.randomUUID();
+      currentSessionId.current = newSessionId;
+      sessionStorage.setItem('camera-session-id', newSessionId);
+      console.log('[Camera] Fresh session, generated new sessionId:', newSessionId);
       
       sessionPhotosRef.current = [];
       setSessionPhotos([]);
