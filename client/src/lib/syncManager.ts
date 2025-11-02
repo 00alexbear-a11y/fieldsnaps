@@ -525,8 +525,13 @@ class SyncManager {
       if (item.action === 'create') {
         console.log('[Sync] Starting photo upload for:', item.localId, 'to project:', serverProjectId);
         
-        // Determine if we should use chunked upload (files > 20MB)
-        const useChunkedUpload = shouldUseChunkedUpload(photo.blob.size);
+        // Determine upload strategy based on file size:
+        // - Files > 20MB: Chunked upload (handles very large files with retry)
+        // - Files 5-20MB: Presigned URL (bypasses backend, faster)
+        // - Files < 5MB: Multipart (simplest, includes thumbnail support)
+        const fileSize = photo.blob.size;
+        const useChunkedUpload = shouldUseChunkedUpload(fileSize);
+        const usePresignedUpload = fileSize >= 5 * 1024 * 1024 && fileSize < 20 * 1024 * 1024;
         
         let data: any;
         
@@ -581,9 +586,80 @@ class SyncManager {
             console.error('[Sync] Chunked upload failed:', chunkError);
             throw chunkError;
           }
-        } else {
-          // Use traditional multipart upload for smaller files
-          console.log('[Sync] Using traditional upload for file:', photo.blob.size, 'bytes');
+        } else if (usePresignedUpload) {
+          // Use presigned URL for medium files (5-20MB) - bypasses backend for faster uploads
+          console.log('[Sync] Using presigned upload for file:', photo.blob.size, 'bytes');
+          
+          try {
+            // Step 1: Request presigned upload URL from backend
+            const mimeType = photo.blob.type || (photo.mediaType === 'video' ? 'video/webm' : 'image/jpeg');
+            const initResponse = await fetch('/api/photos/presigned-upload', {
+              method: 'POST',
+              headers: {
+                ...this.getSyncHeaders(),
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                projectId: serverProjectId,
+                caption: photo.caption || `Upload_${Date.now()}`,
+                mediaType: photo.mediaType,
+                width: photo.width,
+                height: photo.height,
+                mimeType,
+              }),
+            });
+            
+            if (!initResponse.ok) {
+              const errorText = await initResponse.text();
+              throw new Error(`Failed to get presigned URL: ${initResponse.status} - ${errorText}`);
+            }
+            
+            const { uploadURL, sessionId } = await initResponse.json();
+            console.log('[Sync] Got presigned URL, uploading directly to cloud...');
+            
+            // Step 2: Upload directly to object storage (bypasses backend!)
+            const uploadResponse = await fetch(uploadURL, {
+              method: 'PUT',
+              body: photo.blob,
+              headers: {
+                'Content-Type': mimeType,
+              },
+            });
+            
+            if (!uploadResponse.ok) {
+              throw new Error(`Direct upload failed: ${uploadResponse.status}`);
+            }
+            
+            console.log('[Sync] Direct upload complete, notifying backend...');
+            
+            // Step 3: Notify backend to create photo record
+            const completeResponse = await fetch(`/api/photos/complete-presigned/${sessionId}`, {
+              method: 'POST',
+              headers: {
+                ...this.getSyncHeaders(),
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+            });
+            
+            if (!completeResponse.ok) {
+              const errorText = await completeResponse.text();
+              throw new Error(`Failed to complete presigned upload: ${completeResponse.status} - ${errorText}`);
+            }
+            
+            data = await completeResponse.json();
+            console.log('[Sync] Presigned upload complete:', data);
+          } catch (presignedError) {
+            console.error('[Sync] Presigned upload failed, falling back to multipart:', presignedError);
+            // Fall through to multipart upload as fallback
+            data = null;
+          }
+        }
+        
+        if (!data) {
+          // Use traditional multipart upload for small files or as fallback
+          console.log('[Sync] Using traditional multipart upload for file:', photo.blob.size, 'bytes');
           
           // Create FormData for multipart upload
           const formData = new FormData();
