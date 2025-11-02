@@ -1706,7 +1706,7 @@ export default function Camera() {
       onTouchEnd={handleContainerTouchEnd}
     >
       {/* Camera Viewfinder */}
-      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto">
+      <div className="relative flex-1 min-h-0 w-full max-w-full mx-auto bg-black">
           {/* Top Bar - iOS Style with Black Background */}
           <div className="absolute top-0 left-0 right-0 z-30 pt-safe-2 px-4 pb-2 bg-black">
             <div className="flex items-center justify-between">
