@@ -226,10 +226,14 @@ export default function PhotoEdit() {
 
       // Update the photo with the annotated version
       // Preserve sessionActive and sessionId if they exist (for camera session continuity)
-      console.log('[PhotoEdit] Before update - existing photo session data:', { 
+      console.log('[PhotoEdit] ========== SESSION DEBUG START ==========');
+      console.log('[PhotoEdit] Before update - existing photo data:', {
         id: existingPhoto.id,
+        projectId: existingPhoto.projectId,
         sessionActive: existingPhoto.sessionActive, 
-        sessionId: existingPhoto.sessionId 
+        sessionId: existingPhoto.sessionId,
+        syncStatus: existingPhoto.syncStatus,
+        serverId: existingPhoto.serverId
       });
       
       const updateData: any = {
@@ -240,13 +244,21 @@ export default function PhotoEdit() {
       // Maintain session flags if photo is part of an active camera session
       if (existingPhoto.sessionActive !== undefined) {
         updateData.sessionActive = existingPhoto.sessionActive;
-      }
-      if (existingPhoto.sessionId) {
-        updateData.sessionId = existingPhoto.sessionId;
+        console.log('[PhotoEdit] Preserving sessionActive:', existingPhoto.sessionActive);
+      } else {
+        console.log('[PhotoEdit] WARNING: existingPhoto.sessionActive is undefined!');
       }
       
-      console.log('[PhotoEdit] Update data to save:', { 
+      if (existingPhoto.sessionId) {
+        updateData.sessionId = existingPhoto.sessionId;
+        console.log('[PhotoEdit] Preserving sessionId:', existingPhoto.sessionId);
+      } else {
+        console.log('[PhotoEdit] WARNING: existingPhoto.sessionId is missing!');
+      }
+      
+      console.log('[PhotoEdit] Full update data:', {
         hasBlob: !!updateData.blob,
+        blobSize: updateData.blob?.size,
         hasAnnotations: !!updateData.annotations,
         sessionActive: updateData.sessionActive, 
         sessionId: updateData.sessionId 
@@ -256,11 +268,14 @@ export default function PhotoEdit() {
       
       // Verify the photo was updated correctly
       const verifyPhoto = await idb.getPhoto(photoId);
-      console.log('[PhotoEdit] After update - verified photo session data:', { 
+      console.log('[PhotoEdit] After update - verified photo:', {
         id: verifyPhoto?.id,
+        projectId: verifyPhoto?.projectId,
         sessionActive: verifyPhoto?.sessionActive, 
-        sessionId: verifyPhoto?.sessionId 
+        sessionId: verifyPhoto?.sessionId,
+        syncStatus: verifyPhoto?.syncStatus
       });
+      console.log('[PhotoEdit] ========== SESSION DEBUG END ==========');
 
       // Add to sync queue to upload the annotated photo to server
       try {
