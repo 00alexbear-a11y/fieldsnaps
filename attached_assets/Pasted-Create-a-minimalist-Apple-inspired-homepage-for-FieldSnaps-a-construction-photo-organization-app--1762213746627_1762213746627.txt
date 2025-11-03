@@ -1,0 +1,139 @@
+Create a minimalist, Apple-inspired homepage for FieldSnaps - a construction photo organization app.
+
+=== DESIGN PHILOSOPHY ===
+- Apple-level simplicity with clean, breathable white space
+- Typography: San Francisco or Inter font (48-72px headlines, 18-20px body)
+- Color palette: Pure white background, charcoal text (#1d1d1f), ONE accent color (construction orange #FF6B35 or slate blue #34495e)
+- Generous padding/margins (80-120px vertical spacing between sections)
+- Maximum content width: 1200px centered
+- NO gradients, NO shadows (except subtle card shadows), NO clutter
+
+=== HERO SECTION ===
+Full viewport height, centered content
+
+**Headline (72px bold)**: 
+"Organize job photos.  
+Separate work from home."
+
+**Subheadline (24px, light weight, muted gray)**:
+"For contractors, project managers, and property owners who need construction documentation they can actually find."
+
+**Hero Visual**:
+Create a clean split-screen mockup:
+- LEFT side (40% width): Blurred/faded iOS camera roll showing chaos - mix of personal photos (kids, food, random screenshots) with construction photos all jumbled
+- RIGHT side (60% width): Sharp, clean FieldSnaps app interface showing organized project folders with professional construction photo thumbnails
+
+**CTA Buttons** (centered, 60px spacing between):
+- Primary: "Start Free Trial" (solid accent color, 16px padding, rounded corners)
+- Secondary: "See How It Works" (outline style, arrow icon →)
+
+=== FEATURES SECTION ===
+Background: Very light gray (#f5f5f7)
+Padding: 120px vertical
+
+**Section Title (48px, centered)**: "Built for the field"
+
+**3 Feature Cards** (equal width, horizontal layout, subtle white cards):
+
+1. **Smart Organization**
+   Icon: 📁 (or folder icon)
+   "Automatically organize by project, date, or custom tags. Never lose a photo again."
+
+2. **Instant Search**
+   Icon: 🔍 (or search icon)
+   "Find any photo in seconds. Search by project name, date, or even what's in the photo."
+
+3. **Private & Secure**
+   Icon: 🔒 (or lock icon)
+   "Your job photos stay separate from personal photos. Cloud backup included."
+
+=== SHOWCASE SECTION ===
+Background: Pure white
+Padding: 120px vertical
+
+**Large App Screenshot** (centered, 80% width):
+Show FieldSnaps mobile app interface displaying a construction project gallery with these photo categories visible:
+- "Framing Progress"
+- "Tile Detail Work"
+- "Landscape Install"
+- "Electrical Rough-In"
+- "Foundation Pour"
+
+Use realistic construction photo thumbnails showing:
+- Wood framing (studs, joists)
+- Detailed tile work (close-up)
+- Landscaping in progress
+- Electrical conduit/wiring
+- Professional finish work
+
+**Caption below (20px, centered, muted)**: 
+"From rough-ins to finish work, keep every detail documented."
+
+=== PRICING SECTION ===
+Background: Very light gray (#f5f5f7)
+Padding: 120px vertical
+
+**Section Title (48px, centered)**: "Simple pricing"
+
+**Single Pricing Card** (centered, max-width 500px, white background):
+- Price: "$19.99" (64px bold)
+- "/user/month" (20px, muted)
+- "No user minimum" (14px, muted, italic)
+- Vertical spacing then list features (18px each):
+  ✓ Unlimited photos
+  ✓ Unlimited projects
+  ✓ Cloud backup & sync
+  ✓ Advanced search
+  ✓ Team sharing
+  ✓ Export & reporting
+
+**Small note below card (14px, gray)**:
+"*$24.99/month when purchased through Apple App Store"
+
+**CTA Button**: "Start Free Trial" (centered below)
+
+=== FINAL CTA SECTION ===
+Background: Solid accent color (full width)
+Padding: 100px vertical
+Text: White
+
+**Headline (56px, bold, centered)**: 
+"Ready to get organized?"
+
+**Subheadline (24px, centered)**: 
+"Start your free trial. No credit card required."
+
+**CTA Button**: "Start Free Trial" (large, white background, dark text)
+
+=== FOOTER ===
+Background: Dark gray (#1d1d1f)
+Text: Light gray
+Padding: 60px vertical
+
+Simple centered layout:
+- "© 2025 FieldSnaps. All rights reserved."
+- Links: Privacy | Terms | Support | Contact
+
+=== TECHNICAL REQUIREMENTS ===
+- Mobile responsive (stack sections vertically on <768px)
+- Smooth scroll behavior
+- Hero CTA buttons should have subtle hover effects (slight scale/shadow)
+- Load hero section first, lazy-load images below fold
+- Optimize all images for web (WebP format)
+- Font loading: System fonts with fallback (San Francisco, -apple-system, Inter, Helvetica)
+
+=== IMAGE PLACEHOLDERS TO GENERATE ===
+For the construction photos in the showcase section, use realistic imagery showing:
+1. Interior framing - wooden studs and joists (bright, well-lit)
+2. Bathroom tile detail - clean grout lines, professional finish
+3. Landscape installation - fresh mulch, new plants, outdoor work
+4. Electrical rough-in - conduit, junction boxes, neat wiring
+5. Detailed finish work - trim, molding, or cabinetry close-ups
+
+All photos should look professional but authentic - like real contractor documentation, not stock photography.
+
+=== BRAND VOICE ===
+- Calm, confident, professional
+- No hype or exclamation marks
+- Short sentences, clear benefits
+- Speak to the pain point: "Can't find that photo from last week's inspection? We fix that."
