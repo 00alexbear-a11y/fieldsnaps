@@ -57,50 +57,24 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-4xl mx-auto space-y-8">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
-              Photo Documentation /<br />
-              Built by a Contractor /<br />
-              For Contractors
-            </h1>
-            <div className="text-lg sm:text-xl text-muted-foreground space-y-4 max-w-3xl mx-auto">
-              <p>
-                When I started my business, I looked at CompanyCam and other tools. 
-                They had great features, but the pricing didn't make sense for a solo 
-                operator. The cheap alternatives were frustrating to use.
-              </p>
-              <p>
-                I wanted professional features without paying for enterprise bloat 
-                or forced user minimums.
-              </p>
-              <p className="font-medium">
-                So I built FieldSnaps - the tool I wish existed when I started.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-lg font-medium">
-              <div>$19.99/month</div>
-              <div className="w-1 h-1 rounded-full bg-muted-foreground" />
-              <div>Unlimited users</div>
-              <div className="w-1 h-1 rounded-full bg-muted-foreground" />
-              <div>No nonsense</div>
-            </div>
-            <div className="flex flex-col items-center gap-3 pt-4">
-              <Button 
-                size="lg" 
-                className="text-lg px-8"
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-start-trial-hero"
-              >
-                Start Free 7-Day Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                No credit card required • Trial starts when you create your first project
-              </p>
-            </div>
-          </div>
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-tight">
+            Organize job photos.<br />
+            Separate work from home.
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            For contractors, project managers, and property owners who need construction documentation they can actually find.
+          </p>
+          <Button 
+            size="lg" 
+            className="text-lg px-8"
+            onClick={() => window.location.href = '/api/login'}
+            data-testid="button-start-trial-hero"
+          >
+            Start Free Trial
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </section>
 
