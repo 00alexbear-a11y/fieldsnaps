@@ -164,26 +164,26 @@ export default function Camera() {
   const modeTransitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Session ID for tracking photos in current camera session
-  // Initialize sessionId: restore from storage if preserving session, otherwise generate new
+  // Initialize sessionId: restore from storage if exists, otherwise generate new
   const getInitialSessionId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const preserveSession = urlParams.get('preserveSession') === 'true';
     
-    if (preserveSession) {
-      // Try sessionStorage first, then localStorage as backup (survives hot-reloads)
-      const savedSessionId = sessionStorage.getItem('camera-session-id') || localStorage.getItem('camera-session-id');
-      if (savedSessionId) {
-        console.log('[Camera] Restoring sessionId from storage:', savedSessionId);
-        // Ensure it's in both storage locations
-        sessionStorage.setItem('camera-session-id', savedSessionId);
-        localStorage.setItem('camera-session-id', savedSessionId);
-        return savedSessionId;
-      }
+    // ALWAYS try to restore existing sessionId first (from either storage location)
+    // This prevents generating new IDs on React re-mounts/Strict Mode double-renders
+    const savedSessionId = sessionStorage.getItem('camera-session-id') || localStorage.getItem('camera-session-id');
+    
+    if (savedSessionId) {
+      console.log('[Camera] Restoring existing sessionId from storage:', savedSessionId);
+      // Ensure it's in both storage locations
+      sessionStorage.setItem('camera-session-id', savedSessionId);
+      localStorage.setItem('camera-session-id', savedSessionId);
+      return savedSessionId;
     }
     
-    // Generate new sessionId for fresh camera session
+    // Only generate new sessionId if none exists in storage
     const newSessionId = crypto.randomUUID();
-    console.log('[Camera] Generated new sessionId:', newSessionId);
+    console.log('[Camera] NO EXISTING SESSION - Generated new sessionId:', newSessionId);
     // Store in both sessionStorage and localStorage for redundancy
     sessionStorage.setItem('camera-session-id', newSessionId);
     localStorage.setItem('camera-session-id', newSessionId);
@@ -326,13 +326,9 @@ export default function Camera() {
     const preserveSession = urlParams.get('preserveSession') === 'true';
     
     if (!preserveSession) {
-      // Generate new session ID for fresh camera session
-      const newSessionId = crypto.randomUUID();
-      currentSessionId.current = newSessionId;
-      // Store in both sessionStorage and localStorage for redundancy
-      sessionStorage.setItem('camera-session-id', newSessionId);
-      localStorage.setItem('camera-session-id', newSessionId);
-      console.log('[Camera] Fresh session, generated new sessionId:', newSessionId);
+      // Clear session photos for fresh camera session
+      // (sessionId already initialized in getInitialSessionId())
+      console.log('[Camera] Fresh session - clearing session photos, using sessionId:', currentSessionId.current);
       
       sessionPhotosRef.current = [];
       setSessionPhotos([]);

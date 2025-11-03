@@ -1,0 +1,265 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+main.tsx:17 [App] Platform: web
+main.tsx:18 [App] Is Native: false
+registerServiceWorker.ts:12 [PWA] Service Worker disabled in development mode
+registerServiceWorker.ts:13 [PWA] To test offline: build with vite build and serve with NODE_ENV=production
+main.tsx:85 [App] Test globals exposed: window.syncManager, window.idb
+usePlatform.ts:10 [Platform Detection - Initial] isNativePlatform(): false getPlatform(): web
+useDevAutoLogin.ts:27 [DevAutoLogin] Automatically logging in as dev user...
+usePlatform.ts:24 [Platform Detection - Poll 1] isNativePlatform(): false getPlatform(): web
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+usePlatform.ts:24 [Platform Detection - Poll 2] isNativePlatform(): false getPlatform(): web
+/projects:1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">Understand this warning
+usePlatform.ts:24 [Platform Detection - Poll 3] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 4] isNativePlatform(): false getPlatform(): web
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+2tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+2tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+usePlatform.ts:24 [Platform Detection - Poll 5] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 6] isNativePlatform(): false getPlatform(): web
+with-counts:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+/api/auth/user:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+usePlatform.ts:24 [Platform Detection - Poll 7] isNativePlatform(): false getPlatform(): web
+useDevAutoLogin.ts:34 [DevAutoLogin] ✅ Auto-login successful
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+usePlatform.ts:24 [Platform Detection - Poll 8] isNativePlatform(): false getPlatform(): web
+useDevAutoLogin.ts:37 [DevAutoLogin] 🔄 Auth query invalidated
+usePlatform.ts:24 [Platform Detection - Poll 9] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 10] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 11] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 12] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 13] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 14] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 15] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 16] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 17] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 18] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 19] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 20] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 21] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 22] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 23] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 24] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 25] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 26] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 27] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: a4175dcc-91f7-4d37-a48a-7d4a47476224
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+Camera.tsx:335 [Camera] Fresh session, generated new sessionId: 8e53ba6e-585c-4c78-99d9-4ca5eca44b98
+Camera.tsx:186 [Camera] Generated new sessionId: 9d98726d-7e17-4255-ac03-629bbf013792
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+2tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+2tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+usePlatform.ts:24 [Platform Detection - Poll 28] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 29] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 30] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: f068386c-1079-49ee-aa7d-2fa45f71eb16
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+usePlatform.ts:24 [Platform Detection - Poll 31] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 32] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: 5c114fc7-23d8-4e7b-81f3-033dfd3e83e1
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+usePlatform.ts:24 [Platform Detection - Poll 33] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 34] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 35] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 36] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 37] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 38] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: 9ce0d38d-a023-4c7b-9db4-d27ffc78e7c3
+Camera.tsx:291 [Camera Tags] Selected project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+Camera.tsx:186 [Camera] Generated new sessionId: bcd4eaf6-550d-4c64-9b2b-3a78cd446c12
+Camera.tsx:291 [Camera Tags] Selected project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+usePlatform.ts:24 [Platform Detection - Poll 39] isNativePlatform(): false getPlatform(): web
+Camera.tsx:551 [Camera] Starting camera session 1
+Camera.tsx:186 [Camera] Generated new sessionId: edc019f9-1280-457e-8d20-d43ff4746b0f
+Camera.tsx:291 [Camera Tags] Selected project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+usePlatform.ts:24 [Platform Detection - Poll 40] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: f6420c51-2fc9-4ab0-961d-10bd2aac2969
+Camera.tsx:291 [Camera Tags] Selected project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(4)
+Camera.tsx:293 [Camera Tags] Should show selector: true
+usePlatform.ts:24 [Platform Detection - Poll 41] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 42] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 43] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 44] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 45] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 46] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 47] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 48] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 49] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 50] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 51] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: ab6c732e-7a23-416a-89fb-9a7deb7cc88d
+usePlatform.ts:24 [Platform Detection - Poll 52] isNativePlatform(): false getPlatform(): web
+Camera.tsx:627 [Camera] Stream set, videoRef dimensions: 0 x 0
+Camera.tsx:631 [Camera] Video play() successful
+Camera.tsx:647 [Camera] Metadata already loaded, dimensions: 1080 x 1920
+Camera.tsx:668 [Camera] isActive set to true, loading overlay should hide
+Camera.tsx:186 [Camera] Generated new sessionId: a573a3ad-a338-49de-b0b7-972fb685f583
+Camera.tsx:186 [Camera] Generated new sessionId: ff40adcf-7ec0-4047-a710-48c5598791ca
+usePlatform.ts:24 [Platform Detection - Poll 53] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: f4b95dc6-f288-463d-8a7c-d8f769cd73bf
+usePlatform.ts:24 [Platform Detection - Poll 54] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 55] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 56] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 57] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 58] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 59] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 60] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 61] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 62] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: 8bf33a94-ed4d-4bf0-a9bc-30e470c228ef
+usePlatform.ts:24 [Platform Detection - Poll 63] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 64] isNativePlatform(): false getPlatform(): web
+Camera.tsx:186 [Camera] Generated new sessionId: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 65] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 66] isNativePlatform(): false getPlatform(): web
+Camera.tsx:1511 [Camera] Photo saved for edit: 3ce02526-675a-404d-9e82-cabe49f1bab5
+syncManager.ts:998 [Sync] Queuing photo for sync: Object
+syncManager.ts:1018 [Sync] Photo added to queue successfully
+syncManager.ts:1025 [Sync] Online - syncing immediately
+Camera.tsx:1515 [Camera] Photo queued for sync successfully
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+2tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+2tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+usePlatform.ts:24 [Platform Detection - Poll 67] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 68] isNativePlatform(): false getPlatform(): web
+syncManager.ts:885 [Sync] Checking for photos with pending tags...
+syncManager.ts:363 [Sync] Processing photo create 3ce02526-675a-404d-9e82-cabe49f1bab5
+syncManager.ts:363 [Sync] Processing photo update 813d2396-4d0c-47c3-8830-15c6f98f9552
+syncManager.ts:542 [Sync] Starting photo upload for: 3ce02526-675a-404d-9e82-cabe49f1bab5 to project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+syncManager.ts:681 [Sync] Using traditional multipart upload for file: 111551 bytes
+syncManager.ts:804 [Sync] Updating photo: fc91254e-c589-449b-a97c-c87303f2fd97
+syncManager.ts:704 [Sync] Thumbnail generated: 4228 bytes
+syncManager.ts:728 [Sync] Upload headers: Object
+syncManager.ts:729 [Sync] Upload URL: /api/projects/3cd8a005-af1a-4350-ad3b-46ff3aae6fca/photos
+usePlatform.ts:24 [Platform Detection - Poll 69] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 70] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 71] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 72] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 73] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 74] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 75] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 76] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 77] isNativePlatform(): false getPlatform(): web
+syncManager.ts:842 [Sync] Photo updated: fc91254e-c589-449b-a97c-c87303f2fd97
+usePlatform.ts:24 [Platform Detection - Poll 78] isNativePlatform(): false getPlatform(): web
+PhotoEdit.tsx:229 [PhotoEdit] ========== SESSION DEBUG START ==========
+PhotoEdit.tsx:230 [PhotoEdit] Before update - existing photo data: Object
+PhotoEdit.tsx:247 [PhotoEdit] Preserving sessionActive: true
+PhotoEdit.tsx:254 [PhotoEdit] Preserving sessionId: 8e53ba6e-585c-4c78-99d9-4ca5eca44b98
+PhotoEdit.tsx:259 [PhotoEdit] Full update data: Object
+indexeddb.ts:239 [IndexedDB] Updating photo: Object
+PhotoEdit.tsx:271 [PhotoEdit] After update - verified photo: Object
+PhotoEdit.tsx:278 [PhotoEdit] ========== SESSION DEBUG END ==========
+PhotoEdit.tsx:293 [PhotoEdit] Successfully queued photo for sync
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:235 [Camera] Setting project from URL: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+Camera.tsx:349 [Camera] Preserving session, loading photos from IndexedDB for sessionId: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:291 [Camera Tags] Selected project: 
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(0)
+Camera.tsx:293 [Camera Tags] Should show selector: false
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+tokenManager.ts:202 [TokenManager] Access token expired or expiring soon, refreshing...
+tokenManager.ts:152 [TokenManager] Refreshing access token...
+2tokenManager.ts:156 [TokenManager] No refresh token available
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+tokenManager.ts:207 [TokenManager] ❌ Token refresh failed, user must login
+tokenManager.ts:220 [TokenManager] Clearing tokens from iOS Keychain
+2tokenManager.ts:225 [TokenManager] ✅ Tokens cleared
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:291 [Camera Tags] Selected project: 3cd8a005-af1a-4350-ad3b-46ff3aae6fca
+Camera.tsx:292 [Camera Tags] Tags loaded: Array(4)
+Camera.tsx:293 [Camera Tags] Should show selector: true
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:356 [Camera] WARNING: No session photos found for sessionId: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 79] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 80] isNativePlatform(): false getPlatform(): web
+Camera.tsx:551 [Camera] Starting camera session 1
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 81] isNativePlatform(): false getPlatform(): web
+Camera.tsx:627 [Camera] Stream set, videoRef dimensions: 0 x 0
+usePlatform.ts:24 [Platform Detection - Poll 82] isNativePlatform(): false getPlatform(): web
+Camera.tsx:631 [Camera] Video play() successful
+Camera.tsx:647 [Camera] Metadata already loaded, dimensions: 1080 x 1920
+Camera.tsx:668 [Camera] isActive set to true, loading overlay should hide
+2Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 83] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 84] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 85] isNativePlatform(): false getPlatform(): web
+syncManager.ts:738 [Sync] Upload response status: 201
+syncManager.ts:747 [Sync] Upload successful, server response: Object
+syncManager.ts:799 [Sync] Photo uploaded: c004894b-67b9-49ee-b42a-db2413d69728
+usePlatform.ts:24 [Platform Detection - Poll 86] isNativePlatform(): false getPlatform(): web
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 87] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 88] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 89] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 90] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 91] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 92] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 93] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 94] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 95] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 96] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 97] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 98] isNativePlatform(): false getPlatform(): web
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+usePlatform.ts:24 [Platform Detection - Poll 99] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:24 [Platform Detection - Poll 100] isNativePlatform(): false getPlatform(): web
+usePlatform.ts:37 [Platform Detection] ⏱️ Polling timeout (10s) - staying on web UI
+Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
+4Camera.tsx:176 [Camera] Restoring sessionId from storage: 27583cb2-cb0f-4b36-b5ea-4789a7befd4f
