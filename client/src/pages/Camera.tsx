@@ -956,6 +956,9 @@ export default function Camera() {
 
   // Swipe-down gesture handlers for dismissing camera (iOS-style)
   const handleContainerTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Don't handle swipes if session preview overlay is open (it has its own handlers)
+    if (isSessionPreviewOpen) return;
+    
     // Disable swipe gestures during video recording to prevent interference with annotations
     if (isRecording) {
       e.preventDefault();
@@ -971,6 +974,9 @@ export default function Camera() {
   };
 
   const handleContainerTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Don't handle swipes if session preview overlay is open (it has its own handlers)
+    if (isSessionPreviewOpen) return;
+    
     // Disable swipe gestures during video recording to prevent interference with annotations
     if (isRecording) {
       e.preventDefault();
@@ -992,6 +998,9 @@ export default function Camera() {
   };
 
   const handleContainerTouchEnd = () => {
+    // Don't handle swipes if session preview overlay is open (it has its own handlers)
+    if (isSessionPreviewOpen) return;
+    
     // Disable swipe gestures during video recording to prevent interference with annotations
     if (isRecording) {
       return;
