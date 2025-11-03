@@ -2231,7 +2231,7 @@ export default function Camera() {
           data-testid="overlay-session-preview"
         >
           {/* Header with Close Button */}
-          <div className="flex items-center justify-between p-4 pb-safe">
+          <div className="flex items-center justify-between pt-safe-4 px-4 pb-4">
             <h2 className="text-white text-xl font-semibold tracking-tight">
               Session Photos ({sessionPhotos.length})
             </h2>
