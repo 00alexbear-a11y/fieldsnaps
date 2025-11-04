@@ -31,7 +31,17 @@ app.use(cors({
         return callback(null, true);
       }
       
-      // Allow production domains (exact match)
+      // Allow production domains
+      // In production, allow any .replit.app domain and .repl.co domains
+      if (process.env.NODE_ENV === 'production') {
+        if (url.hostname.endsWith('.replit.app') || 
+            url.hostname.endsWith('.repl.co') ||
+            url.hostname === 'fieldsnaps.replit.app') {
+          return callback(null, true);
+        }
+      }
+      
+      // Also check specific allowed origins for backwards compatibility
       const allowedOrigins = [
         'https://fieldsnaps.replit.app',
         process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null,
