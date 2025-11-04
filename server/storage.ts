@@ -1,14 +1,14 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Pdf, Task, ToDo,
-  Subscription, SubscriptionEvent,
+  Subscription, SubscriptionEvent, Waitlist,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
-  InsertSubscription, InsertSubscriptionEvent
+  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -138,6 +138,10 @@ export interface IStorage {
   getPKCEVerifier(state: string): Promise<string | undefined>;
   deletePKCEVerifier(state: string): Promise<void>;
   cleanupExpiredPKCE(): Promise<void>;
+  
+  // Waitlist operations
+  addToWaitlist(data: InsertWaitlist): Promise<Waitlist>;
+  getWaitlistEntries(): Promise<Waitlist[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -1129,6 +1133,19 @@ export class DbStorage implements IStorage {
     if (tagsToInsert.length > 0) {
       await db.insert(tags).values(tagsToInsert);
     }
+  }
+
+  // Waitlist operations
+  async addToWaitlist(data: InsertWaitlist): Promise<Waitlist> {
+    const result = await db.insert(waitlist)
+      .values(data)
+      .onConflictDoNothing()
+      .returning();
+    return result[0];
+  }
+
+  async getWaitlistEntries(): Promise<Waitlist[]> {
+    return await db.select().from(waitlist);
   }
 }
 

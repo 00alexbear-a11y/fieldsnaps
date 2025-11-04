@@ -342,6 +342,17 @@ export const subscriptionEvents = pgTable("subscription_events", {
   index("idx_subscription_events_created_at").on(table.createdAt.desc()),
 ]);
 
+// Waitlist table - for pre-launch email collection
+export const waitlist = pgTable("waitlist", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_waitlist_email").on(table.email),
+  index("idx_waitlist_created_at").on(table.createdAt.desc()),
+]);
+
 // Zod schemas for validation
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
@@ -364,6 +375,7 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEvents).omit({ id: true, createdAt: true });
 export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, createdAt: true, updatedAt: true });
 export const updateUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, userId: true, createdAt: true, updatedAt: true }).partial();
+export const insertWaitlistSchema = createInsertSchema(waitlist).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
@@ -384,6 +396,7 @@ export type PhotoTag = typeof photoTags.$inferSelect;
 export type Pdf = typeof pdfs.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type SubscriptionEvent = typeof subscriptionEvents.$inferSelect;
+export type Waitlist = typeof waitlist.$inferSelect;
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
@@ -400,6 +413,7 @@ export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type InsertSubscriptionEvent = z.infer<typeof insertSubscriptionEventSchema>;
 export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
 export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;
+export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
