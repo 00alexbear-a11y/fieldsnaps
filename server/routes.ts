@@ -6,7 +6,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, insertWaitlistSchema } from "../shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
@@ -3231,6 +3231,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Billing] Error getting unified status:", error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Waitlist signup (public endpoint - no authentication required)
+  app.post("/api/waitlist", async (req, res) => {
+    try {
+      const data = insertWaitlistSchema.parse(req.body);
+      const entry = await storage.addToWaitlist(data);
+      res.json({ message: "Successfully added to waitlist", entry });
+    } catch (error: any) {
+      // Check if it's a duplicate email error
+      if (error.code === '23505' || error.message?.includes('unique')) {
+        return res.status(200).json({ message: "Email already on waitlist" });
+      }
+      handleError(res, error);
     }
   });
 
