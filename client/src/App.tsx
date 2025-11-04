@@ -31,7 +31,6 @@ import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
-import Onboarding from "./components/Onboarding";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
@@ -39,7 +38,6 @@ import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { useIsNativeApp } from "./hooks/usePlatform";
-import { useDevAutoLogin } from "./hooks/useDevAutoLogin";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
@@ -52,7 +50,8 @@ function AppContent() {
   const [location, setLocation] = useLocation();
   
   // Auto-login in development mode (tree-shaken from production)
-  useDevAutoLogin();
+  // Disabled auto dev login - user must manually login
+  // useDevAutoLogin();
   
   const { isAuthenticated, isLoading, user } = useAuth();
   const isNativeApp = useIsNativeApp();
@@ -194,15 +193,16 @@ function AppContent() {
 }
 
 export default function App() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  // Onboarding disabled - no feature popups on first visit
+  // const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Check onboarding status
-  useEffect(() => {
-    const onboardingComplete = localStorage.getItem('onboarding_complete');
-    if (!onboardingComplete) {
-      setShowOnboarding(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const onboardingComplete = localStorage.getItem('onboarding_complete');
+  //   if (!onboardingComplete) {
+  //     setShowOnboarding(true);
+  //   }
+  // }, []);
 
   // Initialize status bar for native apps (transparent with dark content)
   useEffect(() => {
@@ -219,15 +219,16 @@ export default function App() {
   // the authorization code directly to the app without using deep links.
   // The NativeAppLogin component handles the complete OAuth flow including token storage.
 
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('onboarding_complete', 'true');
-    setShowOnboarding(false);
-  };
+  // const handleOnboardingComplete = () => {
+  //   localStorage.setItem('onboarding_complete', 'true');
+  //   setShowOnboarding(false);
+  // };
 
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
+        {/* Onboarding disabled - no feature popups */}
+        {/* {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />} */}
         <AppContent />
         <SyncStatusNotifier />
         <ServiceWorkerUpdate />
