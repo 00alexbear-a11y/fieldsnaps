@@ -3,6 +3,33 @@
 ## Overview
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide robust offline photo and video documentation, aiming to enhance efficiency and minimize disputes. Key capabilities include instant media capture, smart compression, auto-timestamping, and efficient project organization. The project emphasizes full offline functionality and touch optimization, with ambitions to evolve into a commercial SaaS product.
 
+## Recent Changes
+
+### Landing Page Redesign (November 2025)
+Complete landing page overhaul with pain-driven messaging based on construction industry research:
+
+**Research-Backed Pain Points Addressed**:
+- Contractors waste 9.1 hours/week searching for photos scattered across devices
+- Sending 20+ photos individually via MMS wastes cellular data (3MB+ per photo)
+- Work not documented = work not billed (revenue protection)
+- Photos mixed with personal camera roll (1,000+ photos)
+
+**New Landing Page Structure**:
+1. **Pain-Driven Hero**: "Stop Wasting 9 Hours a Week Searching for Photos" with specific benefit messaging
+2. **Before/After Comparison**: Visual side-by-side showing old chaos vs FieldSnaps organization
+3. **Three Core Benefits**: Never lose photos, Find in 3 seconds, Share 20+ with one link
+4. **Link-Sharing Spotlight**: Dedicated section highlighting game-changing share feature (60MB saved)
+5. **Social Proof**: Contractor testimonials reinforcing key benefits
+6. **Data-Saving Section**: WiFi-only uploads, smart compression (cellular data protection)
+7. **Revenue Protection**: Timestamp + GPS proof defends against payment disputes
+8. **Tightened Features Grid**: All features maintained but more scannable layout
+
+**Messaging Philosophy**:
+- Pain-first approach vs feature-first
+- Specific numbers (9 hours/week, 60MB data, 3 seconds) vs vague claims
+- Contractor language ("job photos" not "construction images")
+- Conversion-focused CTAs throughout page flow
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
