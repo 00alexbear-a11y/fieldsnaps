@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, insertWaitlistSchema } from "../shared/schema";
 import { z } from "zod";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
@@ -335,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // Create company during onboarding
-  app.post("/api/companies", isAuthenticated, async (req: any, res) => {
+  app.post("/api/companies", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const { name } = req.body;
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -372,7 +372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's company
-  app.get("/api/companies/me", isAuthenticated, async (req: any, res) => {
+  app.get("/api/companies/me", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -393,7 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate invite link (owner only)
-  app.post("/api/companies/invite-link", isAuthenticated, async (req: any, res) => {
+  app.post("/api/companies/invite-link", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -422,7 +422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Revoke invite link (owner only)
-  app.delete("/api/companies/invite-link", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/companies/invite-link", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -480,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Accept invite and join company (authenticated users)
-  app.post("/api/companies/invite/:token/accept", isAuthenticated, async (req: any, res) => {
+  app.post("/api/companies/invite/:token/accept", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const { token } = req.params;
       const userId = req.user.claims.sub;
@@ -544,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Team Management Routes
-  app.get("/api/companies/members", isAuthenticated, async (req: any, res) => {
+  app.get("/api/companies/members", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -560,7 +560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/companies/members/:userId", isAuthenticated, validateUuidParam('userId'), async (req: any, res) => {
+  app.delete("/api/companies/members/:userId", isAuthenticatedAndWhitelisted, validateUuidParam('userId'), async (req: any, res) => {
     try {
       const currentUserId = req.user.claims.sub;
       const currentUser = await storage.getUser(currentUserId);
@@ -610,7 +610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/companies/members/:userId/promote", isAuthenticated, validateUuidParam('userId'), async (req: any, res) => {
+  app.put("/api/companies/members/:userId/promote", isAuthenticatedAndWhitelisted, validateUuidParam('userId'), async (req: any, res) => {
     try {
       const currentUserId = req.user.claims.sub;
       const currentUser = await storage.getUser(currentUserId);
@@ -666,7 +666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     pdfIncludeSignatureLine: z.boolean().optional(),
   });
 
-  app.put("/api/companies/pdf-settings", isAuthenticated, async (req: any, res) => {
+  app.put("/api/companies/pdf-settings", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -693,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/companies/pdf-logo", isAuthenticated, uploadRateLimiter, upload.single('logo'), async (req: any, res) => {
+  app.post("/api/companies/pdf-logo", isAuthenticatedAndWhitelisted, uploadRateLimiter, upload.single('logo'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -756,7 +756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Object Storage routes - Referenced from blueprint:javascript_object_storage
   // Endpoint for serving private objects (photos) with ACL checks
-  app.get("/objects/:objectPath(*)", isAuthenticated, async (req: any, res) => {
+  app.get("/objects/:objectPath(*)", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     const userId = req.user?.claims?.sub;
     const objectStorageService = new ObjectStorageService();
     try {
@@ -780,7 +780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Endpoint for getting presigned upload URL
-  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+  app.post("/api/objects/upload", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
@@ -808,7 +808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     createdAt: Date;
   }>();
 
-  app.post("/api/photos/presigned-upload", isAuthenticated, uploadRateLimiter, async (req: any, res) => {
+  app.post("/api/photos/presigned-upload", isAuthenticatedAndWhitelisted, uploadRateLimiter, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { projectId, caption, mediaType, width, height, mimeType } = req.body;
@@ -866,7 +866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Direct-to-cloud upload: Complete presigned upload and create photo record
-  app.post("/api/photos/complete-presigned/:sessionId", isAuthenticated, async (req: any, res) => {
+  app.post("/api/photos/complete-presigned/:sessionId", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     const uploadStartTime = Date.now();
     let fileSize = req.body.fileSize || 0; // Frontend should send file size for metrics
     
@@ -974,7 +974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Endpoint for setting ACL policy after photo upload and updating photo URL
-  app.put("/api/photos/:photoId/object-url", isAuthenticated, validateUuidParam('photoId'), async (req: any, res) => {
+  app.put("/api/photos/:photoId/object-url", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req: any, res) => {
     try {
       if (!req.body.photoURL) {
         return res.status(400).json({ error: "photoURL is required" });
@@ -1013,7 +1013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // User is authenticated (via JWT or session) - return user data
     try {
       const userId = req.user.claims.sub;
@@ -1026,7 +1026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User Settings routes
-  app.get('/api/settings', isAuthenticated, cacheMiddleware(300), async (req: any, res) => {
+  app.get('/api/settings', isAuthenticatedAndWhitelisted, cacheMiddleware(300), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const settings = await storage.getUserSettings(userId);
@@ -1037,7 +1037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/settings', isAuthenticated, async (req: any, res) => {
+  app.put('/api/settings', isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const settings = await storage.updateUserSettings(userId, req.body);
@@ -1053,7 +1053,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Projects - protected routes
-  app.get("/api/projects", isAuthenticated, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
+  app.get("/api/projects", isAuthenticatedAndWhitelisted, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1070,7 +1070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk endpoint to get all projects with photo counts in one query (eliminates N+1)
-  app.get("/api/projects/with-counts", isAuthenticated, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
+  app.get("/api/projects/with-counts", isAuthenticatedAndWhitelisted, fieldFilterMiddleware, cacheMiddleware(30), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1086,7 +1086,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:id", isAuthenticated, validateUuidParam('id'), fieldFilterMiddleware, cacheMiddleware(60), async (req: any, res) => {
+  app.get("/api/projects/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), fieldFilterMiddleware, cacheMiddleware(60), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1114,7 +1114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", isAuthenticated, async (req: any, res) => {
+  app.post("/api/projects", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const validated = insertProjectSchema.parse(req.body);
       
@@ -1176,7 +1176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+  app.patch("/api/projects/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1235,7 +1235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id/toggle-complete", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/projects/:id/toggle-complete", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1268,7 +1268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+  app.delete("/api/projects/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1302,7 +1302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Project sharing - generate or get share token
-  app.post("/api/projects/:id/share", isAuthenticated, async (req: any, res) => {
+  app.post("/api/projects/:id/share", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1346,7 +1346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PDF Routes
-  app.get("/api/projects/:projectId/pdfs", isAuthenticated, validateUuidParam('projectId'), async (req: any, res) => {
+  app.get("/api/projects/:projectId/pdfs", isAuthenticatedAndWhitelisted, validateUuidParam('projectId'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1372,7 +1372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/pdfs", isAuthenticated, uploadRateLimiter, validateUuidParam('projectId'), upload.single('pdf'), async (req: any, res) => {
+  app.post("/api/projects/:projectId/pdfs", isAuthenticatedAndWhitelisted, uploadRateLimiter, validateUuidParam('projectId'), upload.single('pdf'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1431,7 +1431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pdfs/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+  app.delete("/api/pdfs/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
@@ -1512,7 +1512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photos
-  app.get("/api/projects/:projectId/photos", isAuthenticated, validateUuidParam('projectId'), fieldFilterMiddleware, cacheMiddleware(30), async (req, res) => {
+  app.get("/api/projects/:projectId/photos", isAuthenticatedAndWhitelisted, validateUuidParam('projectId'), fieldFilterMiddleware, cacheMiddleware(30), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -1523,7 +1523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.get("/api/photos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.id);
       if (!authorized) return;
@@ -1539,7 +1539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve photo image with CORS headers for iOS WebView
-  app.get("/api/photos/:id/image", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.get("/api/photos/:id/image", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       // Verify access and get photo in one query (optimization)
       const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
@@ -1568,7 +1568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve photo thumbnail with CORS headers for iOS WebView
-  app.get("/api/photos/:id/thumbnail", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.get("/api/photos/:id/thumbnail", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       // Verify access and get photo in one query (optimization)
       const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
@@ -1644,7 +1644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects/:projectId/photos", isAuthenticated, uploadRateLimiter, validateUuidParam('projectId'), upload.fields([
+  app.post("/api/projects/:projectId/photos", isAuthenticatedAndWhitelisted, uploadRateLimiter, validateUuidParam('projectId'), upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'thumbnail', maxCount: 1 }
   ]), async (req: any, res) => {
@@ -1798,28 +1798,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============================================================================
   
   // Initialize chunked upload session
-  app.post("/api/uploads/chunked/init", isAuthenticated, async (req, res) => {
+  app.post("/api/uploads/chunked/init", isAuthenticatedAndWhitelisted, async (req, res) => {
     await initUploadSession(req, res);
   });
   
   // Upload individual chunk
   // CRITICAL: validateUploadSession MUST run before multer to prevent disk space DoS
-  app.post("/api/uploads/chunked/chunk", isAuthenticated, uploadRateLimiter, validateUploadSession, chunkUpload.single('chunk'), async (req, res) => {
+  app.post("/api/uploads/chunked/chunk", isAuthenticatedAndWhitelisted, uploadRateLimiter, validateUploadSession, chunkUpload.single('chunk'), async (req, res) => {
     await uploadChunk(req, res);
   });
   
   // Get upload session status
-  app.get("/api/uploads/chunked/:uploadId/status", isAuthenticated, async (req, res) => {
+  app.get("/api/uploads/chunked/:uploadId/status", isAuthenticatedAndWhitelisted, async (req, res) => {
     await getUploadStatus(req, res);
   });
   
   // Cancel upload session
-  app.delete("/api/uploads/chunked/:uploadId", isAuthenticated, async (req, res) => {
+  app.delete("/api/uploads/chunked/:uploadId", isAuthenticatedAndWhitelisted, async (req, res) => {
     await cancelUpload(req, res);
   });
   
   // Complete chunked upload and create photo (assembles chunks)
-  app.post("/api/uploads/chunked/:uploadId/complete", isAuthenticated, async (req: any, res) => {
+  app.post("/api/uploads/chunked/:uploadId/complete", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     const uploadStartTime = Date.now();
     let fileSize = 0;
     
@@ -1930,7 +1930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Standalone photo upload (for to-dos and other non-project attachments)
-  app.post("/api/photos/standalone", isAuthenticated, uploadRateLimiter, upload.single('photo'), async (req: any, res) => {
+  app.post("/api/photos/standalone", isAuthenticatedAndWhitelisted, uploadRateLimiter, upload.single('photo'), async (req: any, res) => {
     try {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
@@ -2011,7 +2011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/photos/:id", isAuthenticated, validateUuidParam('id'), upload.single('photo'), async (req: any, res) => {
+  app.patch("/api/photos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), upload.single('photo'), async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       
@@ -2083,7 +2083,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:id", isAuthenticated, validateUuidParam('id'), async (req: any, res) => {
+  app.delete("/api/photos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
       // Security: Verify company access (any team member can delete their company's photos)
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.id);
@@ -2100,7 +2100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photo Annotations
-  app.get("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.get("/api/photos/:photoId/annotations", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2112,7 +2112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/annotations", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.post("/api/photos/:photoId/annotations", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2129,7 +2129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/annotations/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/annotations/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       if (!await verifyAnnotationCompanyAccess(req, res, req.params.id)) return;
       
@@ -2144,7 +2144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Comments
-  app.get("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.get("/api/photos/:photoId/comments", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2156,7 +2156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/comments", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.post("/api/photos/:photoId/comments", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2174,7 +2174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Tasks
-  app.post("/api/tasks", isAuthenticated, async (req, res) => {
+  app.post("/api/tasks", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -2203,7 +2203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/:projectId/tasks", isAuthenticated, validateUuidParam('projectId'), async (req, res) => {
+  app.get("/api/projects/:projectId/tasks", isAuthenticatedAndWhitelisted, validateUuidParam('projectId'), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
@@ -2214,7 +2214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/tasks/my-tasks", isAuthenticated, async (req, res) => {
+  app.get("/api/tasks/my-tasks", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -2228,7 +2228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/tasks/:id", isAuthenticated, async (req, res) => {
+  app.put("/api/tasks/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
       
@@ -2242,7 +2242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/tasks/:id/complete", isAuthenticated, async (req, res) => {
+  app.post("/api/tasks/:id/complete", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
       
@@ -2261,7 +2261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/tasks/:id/restore", isAuthenticated, async (req, res) => {
+  app.post("/api/tasks/:id/restore", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
       
@@ -2275,7 +2275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tasks/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.delete("/api/tasks/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTaskCompanyAccess(req, res, req.params.id)) return;
       
@@ -2290,7 +2290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ToDos Routes
-  app.get("/api/todos", isAuthenticated, async (req, res) => {
+  app.get("/api/todos", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
@@ -2308,7 +2308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.get("/api/todos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
@@ -2322,7 +2322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/todos", isAuthenticated, async (req, res) => {
+  app.post("/api/todos", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
@@ -2359,7 +2359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.patch("/api/todos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
@@ -2420,7 +2420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/todos/:id/complete", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.post("/api/todos/:id/complete", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
@@ -2437,7 +2437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/todos/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.delete("/api/todos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
       
@@ -2452,7 +2452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trash operations - 30-day soft delete
-  app.get("/api/trash/projects", isAuthenticated, async (req, res) => {
+  app.get("/api/trash/projects", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const projects = await storage.getDeletedProjects();
       res.json(projects);
@@ -2461,7 +2461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/trash/photos", isAuthenticated, async (req, res) => {
+  app.get("/api/trash/photos", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const photos = await storage.getDeletedPhotos();
       res.json(photos);
@@ -2470,7 +2470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/projects/:id/restore", isAuthenticated, async (req, res) => {
+  app.post("/api/trash/projects/:id/restore", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const restored = await storage.restoreProject(req.params.id);
       if (!restored) {
@@ -2482,7 +2482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/photos/:id/restore", isAuthenticated, async (req, res) => {
+  app.post("/api/trash/photos/:id/restore", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const restored = await storage.restorePhoto(req.params.id);
       if (!restored) {
@@ -2494,7 +2494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/trash/projects/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/trash/projects/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const deleted = await storage.permanentlyDeleteProject(req.params.id);
       if (!deleted) {
@@ -2506,7 +2506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/trash/photos/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/trash/photos/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const deleted = await storage.permanentlyDeletePhoto(req.params.id);
       if (!deleted) {
@@ -2518,7 +2518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/cleanup", isAuthenticated, async (req, res) => {
+  app.post("/api/trash/cleanup", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       await storage.cleanupOldDeletedItems();
       res.status(204).send();
@@ -2527,7 +2527,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trash/delete-all", isAuthenticated, async (req, res) => {
+  app.post("/api/trash/delete-all", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const result = await storage.permanentlyDeleteAllTrash();
       res.json(result);
@@ -2537,7 +2537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete share - revoke share link
-  app.delete("/api/shares/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/shares/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const deleted = await storage.deleteShare(req.params.id);
       if (!deleted) {
@@ -2550,7 +2550,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Tags - Photo categorization by trade/type
-  app.get("/api/tags", isAuthenticated, async (req, res) => {
+  app.get("/api/tags", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const projectId = req.query.projectId as string | undefined;
       
@@ -2566,7 +2566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/tags", isAuthenticated, async (req: any, res) => {
+  app.post("/api/tags", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const validated = insertTagSchema.parse(req.body);
       
@@ -2582,7 +2582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/tags/:id", isAuthenticated, async (req, res) => {
+  app.put("/api/tags/:id", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       if (!await verifyTagCompanyAccess(req, res, req.params.id)) return;
       
@@ -2597,7 +2597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tags/:id", isAuthenticated, validateUuidParam('id'), async (req, res) => {
+  app.delete("/api/tags/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTagCompanyAccess(req, res, req.params.id)) return;
       
@@ -2612,7 +2612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photo Tags - Associate tags with photos
-  app.get("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.get("/api/photos/:photoId/tags", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2624,7 +2624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/photos/:photoId/tags", isAuthenticated, validateUuidParam('photoId'), async (req, res) => {
+  app.post("/api/photos/:photoId/tags", isAuthenticatedAndWhitelisted, validateUuidParam('photoId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2640,7 +2640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticated, validateUuidParams('photoId', 'tagId'), async (req, res) => {
+  app.delete("/api/photos/:photoId/tags/:tagId", isAuthenticatedAndWhitelisted, validateUuidParams('photoId', 'tagId'), async (req, res) => {
     try {
       const { authorized } = await verifyPhotoCompanyAccess(req, res, req.params.photoId);
       if (!authorized) return;
@@ -2656,7 +2656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Email Test Endpoint (for verifying Resend integration)
-  app.post("/api/test-email", isAuthenticated, async (req: any, res) => {
+  app.post("/api/test-email", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const { email, name } = req.body;
       
@@ -2685,7 +2685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: These routes are ready but dormant until production launch
   
   // Get or create subscription for current user
-  app.post("/api/billing/subscription", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/subscription", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // Check if billing is configured (dormant mode check)
     if (!billingService.isConfigured()) {
       console.log("[Billing] Service not configured - dormant mode");
@@ -2783,7 +2783,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cancel subscription
-  app.post("/api/billing/subscription/cancel", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/subscription/cancel", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // Check if billing is configured (dormant mode check)
     if (!billingService.isConfigured()) {
       console.log("[Billing] Service not configured - dormant mode");
@@ -2829,7 +2829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Reactivate cancelled subscription
-  app.post("/api/billing/subscription/reactivate", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/subscription/reactivate", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // Check if billing is configured (dormant mode check)
     if (!billingService.isConfigured()) {
       console.log("[Billing] Service not configured - dormant mode");
@@ -2997,7 +2997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's subscription status
-  app.get("/api/billing/subscription/status", isAuthenticated, async (req: any, res) => {
+  app.get("/api/billing/subscription/status", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.claims.sub);
       if (!user) {
@@ -3023,7 +3023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create Stripe Checkout session
-  app.post("/api/billing/create-checkout-session", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/create-checkout-session", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
@@ -3066,7 +3066,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create Stripe Customer Portal session
-  app.post("/api/billing/create-portal-session", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/create-portal-session", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.claims.sub);
       if (!user) {
@@ -3107,7 +3107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============================================================================
   
   // Get upload performance metrics
-  app.get("/api/uploads/metrics", isAuthenticated, async (req: any, res) => {
+  app.get("/api/uploads/metrics", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const hoursAgo = req.query.hours ? parseInt(req.query.hours as string) : 24;
@@ -3140,7 +3140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Apple IAP receipt verification endpoint
   // NOT IMPLEMENTED - Placeholder for future StoreKit integration
-  app.post("/api/billing/apple/verify-receipt", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/apple/verify-receipt", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // SECURITY: This endpoint is disabled until proper receipt verification is implemented
     // Enabling this without Apple server validation would allow users to grant themselves
     // paid subscriptions without actually paying
@@ -3169,7 +3169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Google Play purchase verification endpoint
   // NOT IMPLEMENTED - Placeholder for future Play Billing integration
-  app.post("/api/billing/google/verify-purchase", isAuthenticated, async (req: any, res) => {
+  app.post("/api/billing/google/verify-purchase", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // SECURITY: This endpoint is disabled until proper purchase token verification is implemented
     // Enabling this without Google API validation would allow users to grant themselves
     // paid subscriptions without actually paying
@@ -3200,7 +3200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get unified subscription status (works for all payment sources)
-  app.get("/api/billing/subscription/unified-status", isAuthenticated, async (req: any, res) => {
+  app.get("/api/billing/subscription/unified-status", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);

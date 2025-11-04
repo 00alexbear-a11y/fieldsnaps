@@ -1,13 +1,53 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Camera, MapPin, Share2, Cloud, Smartphone, Edit3, ArrowRight, Heart, LogIn } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
   const isDevelopment = isDevModeEnabled();
+  const { toast } = useToast();
+  
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  
+  const waitlistMutation = useMutation({
+    mutationFn: async (data: { email: string; name?: string }) => {
+      return apiRequest('/api/waitlist', 'POST', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "You're on the list!",
+        description: "We'll notify you when FieldSnaps launches.",
+      });
+      setWaitlistOpen(false);
+      setEmail('');
+      setName('');
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: "Please try again later.",
+      });
+    },
+  });
+  
+  const handleWaitlistSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    waitlistMutation.mutate({ email, name: name || undefined });
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -69,10 +109,10 @@ export default function Landing() {
           <Button 
             size="lg" 
             className="text-lg px-8"
-            onClick={() => window.location.href = '/api/login'}
-            data-testid="button-start-trial-hero"
+            onClick={() => setWaitlistOpen(true)}
+            data-testid="button-join-waitlist-hero"
           >
-            Start Free Trial
+            Join Waitlist
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </div>
@@ -256,10 +296,10 @@ export default function Landing() {
               <Button 
                 size="lg" 
                 className="w-full"
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-start-trial-pricing"
+                onClick={() => setWaitlistOpen(true)}
+                data-testid="button-join-waitlist-pricing"
               >
-                Start Free 7-Day Trial
+                Join Waitlist
               </Button>
               <p className="text-center text-sm text-muted-foreground pt-2">
                 Your team grows. Your bill doesn't.
@@ -298,16 +338,15 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <h2 className="text-4xl font-bold">READY TO DOCUMENT LIKE A PRO?</h2>
           <p className="text-lg text-muted-foreground">
-            Start your free 7-day trial. No credit card required. 
-            Your trial begins when you create your first project.
+            Join the waitlist and be the first to know when FieldSnaps launches.
           </p>
           <Button 
             size="lg" 
             className="text-lg px-8"
-            onClick={() => window.location.href = '/api/login'}
-            data-testid="button-start-trial-final"
+            onClick={() => setWaitlistOpen(true)}
+            data-testid="button-join-waitlist-final"
           >
-            Start Free Trial
+            Join Waitlist
           </Button>
           <p className="text-sm text-muted-foreground">
             Questions? Email hello@fieldsnaps.com
@@ -358,6 +397,51 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Waitlist Dialog */}
+      <Dialog open={waitlistOpen} onOpenChange={setWaitlistOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Join the Waitlist</DialogTitle>
+            <DialogDescription>
+              Be the first to know when FieldSnaps launches. We'll send you an email when we're ready!
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleWaitlistSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="waitlist-email">Email</Label>
+              <Input
+                id="waitlist-email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                data-testid="input-waitlist-email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="waitlist-name">Name (optional)</Label>
+              <Input
+                id="waitlist-name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                data-testid="input-waitlist-name"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={waitlistMutation.isPending}
+              data-testid="button-submit-waitlist"
+            >
+              {waitlistMutation.isPending ? 'Joining...' : 'Join Waitlist'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
