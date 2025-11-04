@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle2, Mail } from 'lucide-react';
+import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 export default function Waitlist() {
+  const [, setLocation] = useLocation();
   return (
     <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center px-4">
       <Card className="max-w-md w-full p-8 space-y-6 text-center">
@@ -45,7 +47,7 @@ export default function Waitlist() {
           </p>
           <Button 
             variant="outline" 
-            onClick={() => window.location.href = '/'}
+            onClick={() => setLocation('/')}
             className="w-full"
             data-testid="button-back-home"
           >
