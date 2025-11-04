@@ -76,12 +76,13 @@ function AppContent() {
   const onboardingRoutes = ['/onboarding/company-setup'];
   const isOnboardingRoute = onboardingRoutes.some(route => location.startsWith(route));
 
-  // Redirect authenticated users from landing to dashboard
+  // Redirect authenticated whitelisted users from landing to dashboard
+  // Non-whitelisted users can stay on landing page
   useEffect(() => {
-    if (!isLoading && isAuthenticated && location === '/') {
+    if (!isLoading && isAuthenticated && isWhitelisted && location === '/') {
       setLocation('/projects');
     }
-  }, [isAuthenticated, isLoading, location, setLocation]);
+  }, [isAuthenticated, isWhitelisted, isLoading, location, setLocation]);
 
   // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
@@ -146,11 +147,16 @@ function AppContent() {
     );
   }
 
-  // Authenticated but not whitelisted users get waitlist page
+  // Authenticated but not whitelisted users can see landing and waitlist pages
   if (isAuthenticated && !isWhitelisted) {
     return (
       <main className="min-h-screen bg-white dark:bg-black text-foreground">
-        <Waitlist />
+        <Switch>
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/waitlist" component={Waitlist} />
+          <Route path="/share/:token" component={ShareView} />
+          <Route component={NotFound} />
+        </Switch>
       </main>
     );
   }
