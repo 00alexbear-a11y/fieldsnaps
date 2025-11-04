@@ -851,3 +851,38 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
   next();
 };
+
+// Email whitelist middleware - only allows specific emails to access the app
+// All other authenticated users get a 403 Forbidden response
+export const isWhitelisted: RequestHandler = async (req, res, next) => {
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com'];
+  const userEmail = req.user?.claims?.email;
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  const isDevUser = req.user?.claims?.sub === 'dev-user-local';
+  
+  // Allow dev users in development mode
+  if (isDevelopment && isDevUser) {
+    return next();
+  }
+  
+  if (!userEmail) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+  
+  if (WHITELIST_EMAILS.includes(userEmail)) {
+    return next();
+  }
+  
+  res.status(403).json({ 
+    error: "Access restricted", 
+    message: "You're on the waitlist! We'll notify you when FieldSnaps launches."
+  });
+};
+
+// Combined middleware: authenticated AND whitelisted
+// Use this for all protected routes during pre-launch
+export const isAuthenticatedAndWhitelisted: RequestHandler = async (req, res, next) => {
+  await isAuthenticated(req, res, async () => {
+    await isWhitelisted(req, res, next);
+  });
+};

@@ -24,6 +24,7 @@ import Map from "./pages/Map";
 import Login from "./pages/Login";
 import NativeAppLogin from "./pages/NativeAppLogin";
 import Landing from "./pages/Landing";
+import Waitlist from "./pages/Waitlist";
 import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
 import CompanySetup from "./pages/CompanySetup";
@@ -53,8 +54,12 @@ function AppContent() {
   // Auto-login in development mode (tree-shaken from production)
   useDevAutoLogin();
   
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const isNativeApp = useIsNativeApp();
+  
+  // Email whitelist - only these emails can access the app
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com'];
+  const isWhitelisted = user && user.email && WHITELIST_EMAILS.includes(user.email);
   
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
@@ -65,7 +70,7 @@ function AppContent() {
   const disableSwipeBack = isMainPage;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/share/', '/impact', '/login'];
+  const publicRoutes = ['/share/', '/impact', '/login', '/waitlist'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
   
   // Onboarding routes are authenticated but before full setup
@@ -85,6 +90,13 @@ function AppContent() {
       setLocation('/');
     }
   }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, setLocation]);
+
+  // Redirect non-whitelisted authenticated users to waitlist
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !isWhitelisted && location !== '/waitlist' && !isPublicRoute) {
+      setLocation('/waitlist');
+    }
+  }, [isAuthenticated, isLoading, isWhitelisted, location, isPublicRoute, setLocation]);
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -127,9 +139,19 @@ function AppContent() {
           <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
           <Route path="/impact" component={Impact} />
           <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
+          <Route path="/waitlist" component={Waitlist} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
         </Switch>
+      </main>
+    );
+  }
+
+  // Authenticated but not whitelisted users get waitlist page
+  if (isAuthenticated && !isWhitelisted) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Waitlist />
       </main>
     );
   }
