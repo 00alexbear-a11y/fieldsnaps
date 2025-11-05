@@ -67,6 +67,8 @@ The architecture emphasizes simplicity and an invisible interface. The PWA infra
 ### Backend Performance Optimizations
 Backend optimizations target mobile networks and high-concurrency scenarios. Compression via Gzip/Brotli reduces API payload sizes (70% reduction). Field filtering via query parameters allows mobile clients to request only needed data. Upload resilience is managed with 10-minute timeouts and per-user rate limiting (100 uploads/15min). Database performance is enhanced with indexes on key tables (photos.projectId, photos.userId, photos.uploadedAt, projects.userId) and in-memory response caching with user-scoped keys and per-endpoint TTLs, with cache invalidation after all mutations.
 
+**CORS Architecture**: CORS middleware is scoped to `/api/*` routes only (not applied globally), allowing static assets to serve without CORS headers. This enables custom domains like fieldsnaps.com to load the application without 500 errors. API routes support Capacitor WebView origins (`capacitor://`, `ionic://`), localhost, *.replit.app domains, and *.repl.co domains for cross-origin API requests.
+
 **Upload Performance Monitoring**: Real-time metrics tracking system monitors all upload methods (multipart, presigned, chunked) with success/failure rates, average duration by file size, retry frequency, error types, and method distribution. Accessible via GET `/api/uploads/metrics` for debugging and performance analysis.
 
 ### Intelligent Upload System

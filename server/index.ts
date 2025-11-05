@@ -9,9 +9,9 @@ import { initChunkedUpload } from "./chunkedUpload";
 
 const app = express();
 
-// Enable CORS for Capacitor WebView requests
-// Capacitor uses capacitor://localhost origin, which needs CORS headers
-app.use(cors({
+// Export CORS configuration for use in API routes only
+// Static assets don't need CORS - only API endpoints do
+export const corsConfig = cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) return callback(null, true);
@@ -65,7 +65,7 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-}));
+});
 
 // Enable gzip compression for all responses - reduces payload size by up to 70%
 app.use(compression());

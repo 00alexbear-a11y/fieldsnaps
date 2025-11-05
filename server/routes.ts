@@ -29,6 +29,7 @@ import {
   validateUploadSession
 } from "./chunkedUpload";
 import { uploadMetrics } from "./uploadMetrics";
+import { corsConfig } from "./index";
 
 // Configure multer for file uploads with strict validation
 const ALLOWED_FILE_TYPES = [
@@ -329,6 +330,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup WebAuthn biometric authentication
   setupWebAuthn(app);
+
+  // Apply CORS middleware to all API routes only (not static assets)
+  // This allows custom domains like fieldsnaps.com to work without CORS errors
+  app.use('/api/*', corsConfig);
 
   // ========================================
   // Company Routes
