@@ -5,30 +5,39 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes
 
-### Landing Page Redesign (November 2025)
-Complete landing page overhaul with pain-driven messaging based on construction industry research:
+### Apple-Inspired Pre-Launch Landing Page (November 2025)
+Complete landing page redesign transformed from pain-driven detailed marketing to clean, minimalist Apple-inspired waitlist page. Focused entirely on conversion for January 2026 launch.
 
-**Research-Backed Pain Points Addressed**:
-- Contractors waste 9.1 hours/week searching for photos scattered across devices
-- Sending 20+ photos individually via MMS wastes cellular data (3MB+ per photo)
-- Work not documented = work not billed (revenue protection)
-- Photos mixed with personal camera roll (1,000+ photos)
+**Design Philosophy**:
+- Minimalist, Apple-inspired aesthetic with generous whitespace
+- Clean typography hierarchy (5xl-7xl headings, proper text-muted-foreground usage)
+- Conversion-optimized dual email capture (hero + footer dark CTA)
+- Pre-launch messaging: "Coming Soon" badge, "Launching January 2026"
 
-**New Landing Page Structure**:
-1. **Pain-Driven Hero**: "Stop Wasting 9 Hours a Week Searching for Photos" with specific benefit messaging
-2. **Before/After Comparison**: Visual side-by-side showing old chaos vs FieldSnaps organization
-3. **Three Core Benefits**: Never lose photos, Find in 3 seconds, Share 20+ with one link
-4. **Link-Sharing Spotlight**: Dedicated section highlighting game-changing share feature (60MB saved)
-5. **Social Proof**: Contractor testimonials reinforcing key benefits
-6. **Data-Saving Section**: WiFi-only uploads, smart compression (cellular data protection)
-7. **Revenue Protection**: Timestamp + GPS proof defends against payment disputes
-8. **Tightened Features Grid**: All features maintained but more scannable layout
+**New Page Structure**:
+1. **Hero Section**: Clean headline "Organize job photos. Separate work from home.", inline email capture form, trust indicators (90 days free, iOS & Android, no credit card), split-screen comparison placeholder
+2. **Old Way vs New Way**: Simple two-column comparison cards (before/after scenarios)
+3. **How It Works**: 3-step numbered process (Take photos → Auto-organize → Share with link)
+4. **Features Grid**: 6 clean feature cards (Smart Organization, Instant Search, One-Link Sharing, Cloud Backup, Works Offline, Team Access)
+5. **FAQ Section**: 8 contractor-specific questions with expandable answers
+6. **Final CTA**: Dark background (#1d1d1f) section with second email capture and "Join 500+ contractors" social proof
+7. **Footer**: Minimal footer with Privacy/Terms/Email links
 
-**Messaging Philosophy**:
-- Pain-first approach vs feature-first
-- Specific numbers (9 hours/week, 60MB data, 3 seconds) vs vague claims
-- Contractor language ("job photos" not "construction images")
-- Conversion-focused CTAs throughout page flow
+**Technical Implementation**:
+- Waitlist form uses fetch() directly (not apiRequest) to avoid auth issues on public endpoint
+- Database schema fixed: waitlist table now uses database-level UUID default (gen_random_uuid())
+- Shared email/name state between hero and footer forms (intentional - keeps forms synchronized)
+- All interactive elements have data-testid attributes per project guidelines
+- Buttons use shadcn defaults with hover-elevate utility (no custom sizing/hover overrides)
+
+**Removed Sections**:
+- Detailed problem breakdown
+- Game-changing feature spotlight
+- Data-saving section
+- Revenue protection section
+- Testimonials
+- Mission statement
+- All cluttered/detailed marketing copy in favor of simple, scannable content
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
