@@ -13,7 +13,6 @@ import {
   CheckCircle2, 
   X, 
   LogIn,
-  ChevronDown,
   Users
 } from 'lucide-react';
 import { useLocation } from 'wouter';
@@ -30,7 +29,6 @@ export default function Landing() {
   
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   
   const waitlistMutation = useMutation({
     mutationFn: async (data: { email: string; name?: string }) => {
@@ -91,7 +89,7 @@ export default function Landing() {
     },
     {
       q: "Can I use this with my team?",
-      a: "Yes. Add unlimited users for $19.99 each per month. No minimums, no team caps."
+      a: "Yes. It's $19.99 per user per month with no minimum. Add as many team members as you need."
     },
     {
       q: "How is this different from Google Photos?",
@@ -130,7 +128,7 @@ export default function Landing() {
               {isDevelopment && (
                 <Button 
                   variant="default"
-                  className="bg-orange-600"
+                  className="bg-sky-500"
                   onClick={() => window.location.href = '/api/dev-login'}
                   data-testid="button-dev-login-header"
                 >
@@ -155,7 +153,7 @@ export default function Landing() {
         <div className="max-w-5xl mx-auto">
           {/* Coming Soon Badge */}
           <div className="text-center mb-6">
-            <span className="inline-block px-4 py-1.5 bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400 rounded-full text-sm font-medium tracking-wide uppercase">
+            <span className="inline-block px-4 py-1.5 bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-full text-sm font-medium tracking-wide uppercase">
               Coming Soon
             </span>
           </div>
@@ -189,7 +187,7 @@ export default function Landing() {
               <Button 
                 type="submit"
                 size="lg"
-                className="bg-orange-600 hover-elevate whitespace-nowrap"
+                className="bg-sky-500 hover-elevate whitespace-nowrap"
                 disabled={waitlistMutation.isPending}
                 data-testid="button-join-waitlist-hero"
               >
@@ -288,7 +286,7 @@ export default function Landing() {
                   <span className="text-lg leading-relaxed">• Share 20+ photos with one link</span>
                 </li>
                 <li className="flex items-start gap-3 text-muted-foreground">
-                  <span className="text-lg leading-relaxed">• Find any photo in 3 seconds with search</span>
+                  <span className="text-lg leading-relaxed">• Find photos in seconds</span>
                 </li>
                 <li className="flex items-start gap-3 text-muted-foreground">
                   <span className="text-lg leading-relaxed">• Automatic cloud backup</span>
@@ -317,7 +315,7 @@ export default function Landing() {
           <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
             {/* Step 1 */}
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400 text-4xl font-bold mb-4">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 text-4xl font-bold mb-4">
                 1
               </div>
               <Camera className="w-12 h-12 mx-auto text-muted-foreground" />
@@ -331,7 +329,7 @@ export default function Landing() {
 
             {/* Step 2 */}
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400 text-4xl font-bold mb-4">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 text-4xl font-bold mb-4">
                 2
               </div>
               <Folder className="w-12 h-12 mx-auto text-muted-foreground" />
@@ -345,7 +343,7 @@ export default function Landing() {
 
             {/* Step 3 */}
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400 text-4xl font-bold mb-4">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 text-4xl font-bold mb-4">
                 3
               </div>
               <LinkIcon className="w-12 h-12 mx-auto text-muted-foreground" />
@@ -450,24 +448,9 @@ export default function Landing() {
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <Card key={index} className="overflow-hidden">
-                <button
-                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover-elevate"
-                  data-testid={`button-faq-${index}`}
-                >
-                  <span className="font-semibold text-lg pr-4">{faq.q}</span>
-                  <ChevronDown 
-                    className={`w-5 h-5 shrink-0 transition-transform ${
-                      expandedFaq === index ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {expandedFaq === index && (
-                  <div className="px-6 pb-5 text-muted-foreground leading-relaxed">
-                    {faq.a}
-                  </div>
-                )}
+              <Card key={index} className="p-6" data-testid={`card-faq-${index}`}>
+                <h3 className="font-semibold text-lg mb-3">{faq.q}</h3>
+                <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
               </Card>
             ))}
           </div>
@@ -502,7 +485,7 @@ export default function Landing() {
               <Button 
                 type="submit"
                 size="lg"
-                className="bg-orange-600 hover-elevate whitespace-nowrap"
+                className="bg-sky-500 hover-elevate whitespace-nowrap"
                 disabled={waitlistMutation.isPending}
                 data-testid="button-join-waitlist-footer"
               >
