@@ -1,0 +1,469 @@
+TASK: Redesign the FieldSnaps homepage to be clean, simple, and Apple-inspired. Remove clutter, simplify messaging, fix inconsistencies.
+
+=== GLOBAL CHANGES ===
+
+1. REMOVE these entire sections:
+   - "The Problem Every Contractor Faces" section
+   - "Game-Changing Feature" detailed breakdown
+   - "Save Your Cellular Data" section
+   - "Protect Your Revenue" section
+   - "Contractors Love FieldSnaps" testimonials section
+   - "Business as a Force for Good" mission statement
+
+2. CHANGE all CTAs to consistent messaging:
+   - Replace ALL buttons with: "Start Free Trial"
+   - Remove any "Join the Waitlist" or "View Demo" buttons
+   - Remove conflicting language about app availability
+
+3. TYPOGRAPHY HIERARCHY:
+   - H1 (hero only): 56px bold, line-height 1.1
+   - H2 (section titles): 40px semibold, line-height 1.2
+   - Body text: 18px regular, line-height 1.6
+   - Small text: 14px light
+   - Font: San Francisco, -apple-system, Inter, Helvetica, sans-serif
+
+4. SPACING:
+   - Section padding: 100px top/bottom, 40px left/right
+   - Between elements: 40px minimum
+   - Max content width: 1200px centered
+
+=== SECTION-BY-SECTION CHANGES ===
+
+---
+
+SECTION 1: HERO
+Background: White
+Padding: 120px vertical
+
+Replace current hero with:
+
+**Headline (56px bold, centered)**:
+"Organize job photos. Separate work from home."
+
+**Subheadline (24px regular, gray #6e6e73, centered)**:
+"Keep construction documentation out of your camera roll—where it belongs."
+
+**Hero Image**:
+[Use the split-screen comparison image showing chaotic camera roll vs organized FieldSnaps interface]
+- Width: 100% (max 1100px)
+- Margin: 40px auto
+- Border-radius: 12px
+- Box-shadow: 0 8px 24px rgba(0,0,0,0.12)
+
+**CTA Buttons (centered, horizontal)**:
+- Primary: "Start Free Trial" (solid orange #FF6B35, white text, 16px padding)
+- Secondary: "Watch Demo" (outline gray, dark text, 16px padding)
+- Gap between: 16px
+
+---
+
+SECTION 2: PROBLEM → SOLUTION (Simplified)
+Background: Light gray (#f5f5f7)
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"The old way vs. the FieldSnaps way"
+
+**Two-Column Comparison**:
+
+LEFT COLUMN - "Before FieldSnaps":
+Icon: ❌ or 📱 with chaos symbol
+
+• Job photos buried in 1,000+ personal pics
+• Texting photos one by one wastes data
+• Can't find that photo from two weeks ago
+• No backup if you lose your phone
+• No proof you sent photos to clients
+
+RIGHT COLUMN - "With FieldSnaps":
+Icon: ✅ or 📱 with checkmark
+
+• All job photos auto-organized by project
+• Share 20+ photos with one link
+• Find any photo in 3 seconds with search
+• Automatic cloud backup
+• Shareable links with timestamp proof
+
+---
+
+SECTION 3: KEY FEATURES
+Background: White
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Everything you need. Nothing you don't."
+
+**Subheadline (18px regular, gray, centered)**:
+"Built for contractors who work in the field, not behind a desk."
+
+**Three Feature Cards (horizontal, equal width, white cards with subtle shadow)**:
+
+CARD 1:
+Icon: 📁 (large, 48px)
+**Title**: "Smart Organization"
+**Description**: "Auto-organize by project, date, or location. Never dig through camera roll chaos again."
+
+CARD 2:
+Icon: 🔍 (large, 48px)
+**Title**: "Instant Search"
+**Description**: "Find any photo in seconds. Search by project name, date, or what's in the photo."
+
+CARD 3:
+Icon: 🔗 (large, 48px)
+**Title**: "One-Link Sharing"
+**Description**: "Stop texting photos individually. Share 20+ photos with one link—no app required."
+
+---
+
+SECTION 4: APP SHOWCASE (NEW SECTION)
+Background: Light gray (#f5f5f7)
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Designed for the way you work"
+
+**Large iPhone Mockup** (centered):
+Show the FieldSnaps mobile
+Copy
+Deep Research
+Request aborted
+
+right now it is not live thats why we had the join waitlist 
+Ah! That's a critical detail. Let me completely rewrite the script for a waitlist/pre-launch page instead:
+
+🎯 REPLIT WAITLIST PAGE REDESIGN SCRIPT
+TASK: Redesign FieldSnaps as a clean, Apple-inspired WAITLIST page for pre-launch. Build anticipation, collect emails, show what's coming.
+
+=== GLOBAL CHANGES ===
+
+1. REMOVE these entire sections:
+   - "The Problem Every Contractor Faces" section
+   - "Game-Changing Feature" detailed breakdown
+   - "Save Your Cellular Data" section
+   - "Protect Your Revenue" section
+   - "Contractors Love FieldSnaps" testimonials section
+   - "Business as a Force for Good" mission statement
+   - Any "Start Free Trial" buttons
+
+2. CHANGE all CTAs to:
+   - Primary CTA: "Join the Waitlist"
+   - Secondary CTA: "Get Early Access"
+   - Remove ANY language that implies the app is live now
+
+3. ADD launch anticipation elements:
+   - "Launching Spring 2025" (or your actual timeline)
+   - Email capture form in hero
+   - "Join 500+ contractors waiting" (update number as it grows)
+
+4. TYPOGRAPHY & SPACING (same as before):
+   - H1: 56px bold, line-height 1.1
+   - H2: 40px semibold
+   - Body: 18px regular
+   - Font: San Francisco, -apple-system, Inter, sans-serif
+   - Section padding: 100px vertical
+   - Max width: 1200px centered
+
+=== SECTION-BY-SECTION CHANGES ===
+
+---
+
+SECTION 1: HERO
+Background: White
+Padding: 120px vertical
+
+**Small Label Above Headline (14px, uppercase, orange #FF6B35, letter-spacing 2px)**:
+"COMING SOON"
+
+**Headline (56px bold, centered)**:
+"Organize job photos. Separate work from home."
+
+**Subheadline (24px regular, gray #6e6e73, centered)**:
+"Keep construction documentation out of your camera roll—where it belongs."
+
+**Launch Timeline (18px, gray, centered)**:
+"Launching Spring 2025"
+
+**Email Capture Form (centered, max-width 600px)**:
+- Input field: "Enter your email" (large, 56px height, rounded)
+- Submit button: "Join the Waitlist" (orange #FF6B35, white text, same height as input)
+- Inline horizontal layout (input 70% width, button 30% width)
+- Small text below: "Join 500+ contractors already waiting" (14px, gray)
+
+**Hero Image** (below email form):
+[Split-screen comparison image]
+- Margin-top: 60px
+- Width: 100% (max 1100px)
+- Border-radius: 12px
+- Box-shadow: 0 8px 24px rgba(0,0,0,0.12)
+
+**Trust Line (14px, centered, gray, below image)**:
+"✓ Free for the first 90 days  |  ✓ iOS & Android  |  ✓ No credit card required"
+
+---
+
+SECTION 2: THE PROBLEM (Simplified & Visual)
+Background: Light gray (#f5f5f7)
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Your camera roll wasn't built for contractors"
+
+**Two-Column Visual Comparison**:
+
+LEFT SIDE (50% width):
+**Label**: "Your phone right now" (18px bold)
+
+Visual representation or icon showing chaos:
+• 847 photos in camera roll
+• Job photos mixed with family pics
+• 10 minutes scrolling to find one photo
+• Lost phone = lost documentation
+• Texting photos one by one
+
+RIGHT SIDE (50% width):
+**Label**: "With FieldSnaps" (18px bold)
+
+Visual representation showing organization:
+• Job photos auto-organized by project
+• Find any photo in 3 seconds
+• Share 20+ photos with one link
+• Automatic cloud backup
+• Separate from personal photos
+
+**Center Divider**: Large arrow → or "vs." symbol
+
+---
+
+SECTION 3: HOW IT WORKS (NEW SECTION)
+Background: White
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Three steps. Zero hassle."
+
+**Subheadline (18px regular, gray, centered)**:
+"FieldSnaps works the way you already work—just better."
+
+**Three Steps (horizontal cards with numbers)**:
+
+STEP 1:
+**Large Number**: "1" (60px, orange)
+**Title**: "Take photos on site"
+**Description**: "Use your phone's camera like normal. FieldSnaps runs in the background."
+**Icon/Visual**: 📸 Camera icon or phone taking photo
+
+STEP 2:
+**Large Number**: "2" (60px, orange)
+**Title**: "Auto-organizes by project"
+**Description**: "Photos automatically sort into project folders. No manual filing required."
+**Icon/Visual**: 📁 Folders organizing themselves
+
+STEP 3:
+**Large Number**: "3" (60px, orange)
+**Title**: "Share with one link"
+**Description**: "Send clients or team members a link. They view photos instantly—no app needed."
+**Icon/Visual**: 🔗 Link being shared
+
+---
+
+SECTION 4: KEY FEATURES
+Background: Light gray (#f5f5f7)
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Built for contractors, by contractors"
+
+**Six Feature Grid (2 rows × 3 columns, simple icons + text)**:
+
+ROW 1:
+1. **Smart Organization** - Auto-organize by project, date, location
+2. **Instant Search** - Find photos in seconds, not minutes
+3. **One-Link Sharing** - Share 20+ photos without texting each one
+
+ROW 2:
+4. **Cloud Backup** - Never lose photos if you lose your phone
+5. **Works Offline** - Take photos on site, upload later on WiFi
+6. **Team Access** - Share projects with crew or subcontractors
+
+Each feature: Icon (32px) + Title (18px bold) + Short description (16px gray)
+
+---
+
+SECTION 5: PRICING (Simplified Pre-Launch)
+Background: White
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Simple pricing. No surprises."
+
+**Single Pricing Card (centered, max-width 500px, white with border)**:
+
+**Launch Offer Badge** (small orange label at top):
+"LAUNCH SPECIAL"
+
+**Price**: 
+"$19.99/user/month" (48px bold)
+"First 90 days free" (24px, orange)
+
+**Features List** (18px, left-aligned):
+✓ Unlimited photos
+✓ Unlimited projects  
+✓ Cloud backup & sync
+✓ Advanced search
+✓ Team sharing
+✓ Priority support
+
+**Small Text Below** (14px, gray, centered):
+"*$24.99/month when purchased through Apple App Store"
+
+**CTA Button** (centered):
+"Get Early Access" (orange, large)
+
+**Note Below Button** (14px, italic, gray):
+"Lock in launch pricing—price increases after public release"
+
+---
+
+SECTION 6: FAQ (NEW SECTION - Critical for Waitlist)
+Background: Light gray (#f5f5f7)
+Padding: 100px vertical
+
+**Title (40px semibold, centered)**:
+"Questions? We've got answers."
+
+**FAQ Accordion or Simple List** (max-width 800px, centered):
+
+**Q: When does FieldSnaps launch?**
+A: We're launching Spring 2025. Waitlist members get first access and 90 days free.
+
+**Q: Which devices will it work on?**
+A: iOS (iPhone), Android, and web. Take photos on your phone, organize from anywhere.
+
+**Q: What happens to my photos if I cancel?**
+A: You can export all photos anytime. Your photos, your data—we never lock you in.
+
+**Q: Do my clients need to download an app?**
+A: Nope. They click your link and view photos in their browser. Works on any device.
+
+**Q: How much storage do I get?**
+A: Unlimited. Upload as many photos and videos as you need.
+
+**Q: Can I use this with my team?**
+A: Yes. Add unlimited users for $19.99 each per month. No minimums, no team caps.
+
+---
+
+SECTION 7: FINAL CTA
+Background: Solid dark (#1d1d1f)
+Text: White
+Padding: 100px vertical
+
+**Headline (48px bold, centered, white)**:
+"Stop losing photos. Start documenting like a pro."
+
+**Subheadline (20px, light gray, centered)**:
+"Join the waitlist and get 90 days free when we launch."
+
+**Email Capture Form** (same as hero section):
+- Large input + button
+- White background on dark section (high contrast)
+- "Join the Waitlist" button
+
+**Small Text Below** (14px, light gray):
+"No spam. Just one email when we launch. Unsubscribe anytime."
+
+**Social Proof** (centered):
+"Join 500+ contractors already on the waitlist"
+
+---
+
+SECTION 8: FOOTER
+Background: Very dark (#0d0d0d)
+Text: Light gray
+Padding: 60px vertical
+
+**Simple Centered Layout**:
+FieldSnaps Logo (if you have one) or just "FieldSnaps" text
+
+"Built for contractors who need their photos organized—not buried."
+
+Links (horizontal, gray, underline on hover):
+Privacy  |  Terms  |  Contact: hello@fieldsnaps.com
+
+**Small Text**:
+© 2025 FieldSnaps. All rights reserved.
+
+---
+
+=== ADDITIONAL FUNCTIONALITY REQUIREMENTS ===
+
+1. EMAIL CAPTURE INTEGRATION:
+   - Form should submit to your email list service (Mailchimp, ConvertKit, or simple database)
+   - Show success message: "You're on the list! Check your email for confirmation."
+   - Validate email format before submission
+   - Add hidden honeypot field to prevent spam bots
+
+2. TRACKING:
+   - Track email signups as conversion event
+   - Track scroll depth (see how far people read)
+   - Track button clicks on "Join Waitlist"
+
+3. MOBILE OPTIMIZATION:
+   - Email form: Stack input and button vertically on mobile
+   - Two-column sections: Stack vertically on <768px
+   - Font sizes: Reduce H1 to 36px, H2 to 28px on mobile
+   - Padding: Reduce section padding to 60px on mobile
+
+4. PERFORMANCE:
+   - Lazy load images below fold
+   - Compress hero image to <500KB
+   - Use WebP format with JPG fallback
+   - Minify CSS and JavaScript
+
+5. SEO:
+   - Page title: "FieldSnaps - Construction Photo Organization App"
+   - Meta description: "Organize job photos. Separate work from home. Keep construction documentation out of your camera roll. Launching Spring 2025."
+   - OG image: Use the hero split-screen comparison image
+
+---
+
+=== TONE & VOICE GUIDELINES ===
+
+- **Calm and confident** - No hype, no exclamation marks
+- **Contractor-friendly** - Use their language ("job site" not "worksite")
+- **Honest about timing** - Don't pretend it's launching tomorrow
+- **Value-focused** - Show benefits, not just features
+- **Respectful** - No condescending "you're doing it wrong" messaging
+
+---
+
+=== WHAT TO KEEP FROM CURRENT SITE ===
+
+Keep these elements (but simplify):
+✓ The core value proposition (organize, search, share)
+✓ The before/after comparison (but make it visual, less text)
+✓ Basic feature descriptions (but cut from 10 to 6)
+✓ Simple pricing structure
+✓ Contact email: hello@fieldsnaps.com
+
+---
+
+=== COLOR PALETTE ===
+
+- Background: Pure white #FFFFFF
+- Section alt: Light gray #F5F5F7
+- Text primary: Near black #1D1D1F
+- Text secondary: Medium gray #6E6E73
+- Accent/CTA: Construction orange #FF6B35
+- Dark section: #1D1D1F
+- Success/check: Green #34C759
+
+---
+
+=== COPY STYLE RULES ===
+
+- Short sentences. Clear benefits.
+- No jargon or marketing speak
+- Use "you" and "your" (talk to the contractor)
+- Show don't tell (visual comparisons > paragraphs)
+- Every section answers: "What's in it for me?"
