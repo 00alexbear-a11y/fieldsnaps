@@ -34,7 +34,16 @@ export default function Landing() {
   
   const waitlistMutation = useMutation({
     mutationFn: async (data: { email: string; name?: string }) => {
-      return apiRequest('/api/waitlist', 'POST', data);
+      // Use fetch directly since this is a public endpoint (no auth needed)
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to join waitlist');
+      }
+      return response.json();
     },
     onSuccess: () => {
       toast({

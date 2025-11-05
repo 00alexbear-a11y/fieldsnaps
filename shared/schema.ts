@@ -344,7 +344,7 @@ export const subscriptionEvents = pgTable("subscription_events", {
 
 // Waitlist table - for pre-launch email collection
 export const waitlist = pgTable("waitlist", {
-  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
