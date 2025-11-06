@@ -51,6 +51,8 @@ export interface IStorage {
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: string): Promise<boolean>; // Soft delete
   toggleProjectCompletion(id: string): Promise<Project | undefined>;
+  trackProjectVisit(projectId: string): Promise<Project | undefined>; // Increment visitCount and update lastActivityAt
+  toggleProjectFavorite(projectId: string, isFavorite: boolean): Promise<Project | undefined>; // Toggle favorite status
   
   // Photos
   getProjectPhotos(projectId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string }>;
@@ -353,6 +355,10 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
+        isFavorite: projects.isFavorite,
+        visitCount: projects.visitCount,
+        unitCount: projects.unitCount,
+        unitLabels: projects.unitLabels,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
       })
       .from(projects)
@@ -384,6 +390,8 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
+        isFavorite: projects.isFavorite,
+        visitCount: projects.visitCount,
         unitCount: projects.unitCount,
         unitLabels: projects.unitLabels,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
@@ -403,7 +411,7 @@ export class DbStorage implements IStorage {
       .leftJoin(photos, eq(photos.projectId, projects.id))
       .leftJoin(coverPhoto, eq(coverPhoto.id, projects.coverPhotoId))
       .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
-      .groupBy(projects.id, projects.unitCount, projects.unitLabels, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
+      .groupBy(projects.id, projects.isFavorite, projects.visitCount, projects.unitCount, projects.unitLabels, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
       .orderBy(projects.createdAt);
     
     // Map to clean up undefined cover photos
@@ -450,6 +458,30 @@ export class DbStorage implements IStorage {
     const result = await db.update(projects)
       .set({ completed: !project.completed })
       .where(eq(projects.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async trackProjectVisit(projectId: string): Promise<Project | undefined> {
+    // Get current project
+    const project = await this.getProject(projectId);
+    if (!project) return undefined;
+    
+    // Increment visitCount and update lastActivityAt
+    const result = await db.update(projects)
+      .set({ 
+        visitCount: (project.visitCount || 0) + 1,
+        lastActivityAt: new Date()
+      })
+      .where(eq(projects.id, projectId))
+      .returning();
+    return result[0];
+  }
+
+  async toggleProjectFavorite(projectId: string, isFavorite: boolean): Promise<Project | undefined> {
+    const result = await db.update(projects)
+      .set({ isFavorite })
+      .where(eq(projects.id, projectId))
       .returning();
     return result[0];
   }
