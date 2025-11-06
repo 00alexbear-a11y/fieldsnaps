@@ -2631,6 +2631,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/todos/:id/flag", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;
+      
+      const todo = await storage.toggleTodoFlag(req.params.id);
+      if (!todo) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
+      res.json(todo);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
   app.delete("/api/todos/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       if (!await verifyTodoCompanyAccess(req, res, req.params.id)) return;

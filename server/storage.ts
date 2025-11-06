@@ -119,10 +119,11 @@ export interface IStorage {
   
   // ToDos
   getTodo(id: string): Promise<ToDo | undefined>;
-  getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]>;
+  getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; flag?: boolean; dueToday?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' | 'flagged' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]>;
   createTodo(data: InsertToDo): Promise<ToDo>;
   updateTodo(id: string, data: Partial<InsertToDo>): Promise<ToDo | undefined>;
   completeTodo(id: string, userId: string): Promise<ToDo | undefined>;
+  toggleTodoFlag(id: string): Promise<ToDo | undefined>;
   deleteTodo(id: string): Promise<boolean>;
   
   // Billing & Subscriptions
@@ -948,7 +949,7 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]> {
+  async getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; flag?: boolean; dueToday?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' | 'flagged' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]> {
     let query = db
       .select({
         id: todos.id,
@@ -962,6 +963,7 @@ export class DbStorage implements IStorage {
         completedAt: todos.completedAt,
         completedBy: todos.completedBy,
         dueDate: todos.dueDate,
+        flag: todos.flag,
         createdAt: todos.createdAt,
         project: {
           id: projects.id,
@@ -994,6 +996,8 @@ export class DbStorage implements IStorage {
       query = query.where(eq(todos.assignedTo, userId));
     } else if (filters?.view === 'i-created') {
       query = query.where(eq(todos.createdBy, userId));
+    } else if (filters?.view === 'flagged') {
+      query = query.where(eq(todos.flag, true));
     }
     // team-tasks shows all (no additional filter needed, company filter happens via user check)
 
@@ -1005,6 +1009,26 @@ export class DbStorage implements IStorage {
     // Filter by completion status if provided
     if (filters?.completed !== undefined) {
       query = query.where(eq(todos.completed, filters.completed));
+    }
+
+    // Filter by flag if provided
+    if (filters?.flag !== undefined) {
+      query = query.where(eq(todos.flag, filters.flag));
+    }
+
+    // Filter by dueToday if provided
+    if (filters?.dueToday) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      query = query.where(
+        and(
+          sql`${todos.dueDate} >= ${today.toISOString()}`,
+          sql`${todos.dueDate} < ${tomorrow.toISOString()}`
+        )
+      );
     }
 
     const result = await query.orderBy(todos.createdAt);
@@ -1031,6 +1055,17 @@ export class DbStorage implements IStorage {
         completedAt: new Date(),
         completedBy: userId 
       })
+      .where(eq(todos.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async toggleTodoFlag(id: string): Promise<ToDo | undefined> {
+    const todo = await this.getTodo(id);
+    if (!todo) return undefined;
+    
+    const result = await db.update(todos)
+      .set({ flag: !todo.flag })
       .where(eq(todos.id, id))
       .returning();
     return result[0];
