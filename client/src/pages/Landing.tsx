@@ -21,7 +21,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import mixedPhotosPath from '@assets/camera-roll-mixed-photos.png';
-import organizedPhotosPath from '@assets/CleanShot 2025-11-05 at 20.38.27@2x_1762403935456.png';
+import organizedPhotosPath from '@assets/IMG_3762_1762447489193.png';
 import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Landing() {
