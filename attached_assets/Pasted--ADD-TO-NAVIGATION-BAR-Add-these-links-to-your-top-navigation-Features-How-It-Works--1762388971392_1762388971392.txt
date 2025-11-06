@@ -1,0 +1,125 @@
+=== ADD TO NAVIGATION BAR ===
+
+Add these links to your top navigation:
+- Features
+- How It Works  
+- Pricing
+- Why $19.99?  ← NEW LINK (scrolls to founder story section)
+- Join Waitlist (button style)
+
+---
+
+=== NEW SECTION: "WHY FIELDSNAPS EXISTS" ===
+(Insert this RIGHT BEFORE your current pricing section)
+
+Background: White
+Padding: 100px vertical
+Max-width: 800px centered
+
+**Title (40px semibold, centered)**:
+"Why I built FieldSnaps"
+
+**Body Copy (20px, comfortable line-height 1.8, left-aligned or centered)**:
+
+I'm a general contractor. A few years ago, my camera roll was a disaster—
+hundreds of job photos mixed with family pictures, impossible to find 
+anything when clients asked for updates.
+
+I looked at photo management apps. Every one wanted $1,200+ per year, 
+forced me to buy licenses for 3+ users, and came loaded with features 
+I'd never touch.
+
+I just wanted to organize my job photos and share them with clients. 
+That's it.
+
+So I built FieldSnaps. $19.99 per user. No minimums. No BS.
+
+If you only need one license, you pay for one. If you need 10, you pay 
+for 10. No forced bundles. No enterprise sales calls.
+
+Just a tool that does exactly what contractors need—at a price that 
+actually makes sense.
+
+**Signature**:
+— [Your Name]
+Founder, FieldSnaps
+
+(Optional: Add your photo here - headshot or you on a job site, 120px circle)
+
+---
+
+=== UPDATE PRICING SECTION ===
+
+Replace your current pricing section with this:
+
+**Small Label Above Title (14px, uppercase, centered)**:
+"NO MINIMUMS. NO BS."
+
+**Title (40px semibold, centered)**:
+"Pricing that makes sense"
+
+**Subheadline (20px, centered)**:
+"Others charge $1,200/year with 3-user minimums. We don't."
+
+**Comparison Table** (simple, clean, centered, max-width 900px):
+
+┌──────────────────────────────────────────────────────────┐
+│                  Other Apps vs. FieldSnaps               │
+├────────────────────────────┬─────────────────────────────┤
+│   Typical Photo Apps       │      FieldSnaps             │
+├────────────────────────────┼─────────────────────────────┤
+│ $30-50 per user/month      │   $19.99 per user/month    │
+│ 3-user minimum required    │   No user minimum          │
+│ = $1,200+/year minimum     │   = $240/year for 1 user   │
+│ Bloated features you       │   Just what contractors    │
+│ never use                  │   actually need            │
+└────────────────────────────┴─────────────────────────────┘
+
+**Single Pricing Card** (centered below, max-width 500px, clean border):
+
+**Price**:
+"$19.99" (64px bold)
+"/user/month" (24px)
+
+**Key Points** (18px each):
+✓ No user minimum
+✓ Add or remove users anytime  
+✓ First 90 days free
+✓ Cancel anytime—keep your photos
+
+**What's Included**:
+• Unlimited photos & projects
+• Cloud backup & sync
+• Advanced search
+• Team sharing
+• Priority support
+
+**CTA Button (large, centered)**:
+"Join the Waitlist"
+
+**Small Text Below** (14px):
+*$24.99/month when purchased through Apple App Store
+
+**Launch Offer Badge** (centered):
+"Lock in $19.99 pricing forever—early access only"
+
+🎯 SUMMARY OF CHANGES:
+What to ADD:
+
+✅ "Why $19.99?" link in navigation
+✅ "Why I built FieldSnaps" founder story section (before pricing)
+✅ Comparison table showing $1,200/year vs $240/year
+✅ "No user minimum" emphasized throughout
+✅ "Lock in launch pricing" urgency
+What to KEEP from current site:
+
+Your hero section (we'll update headline separately)
+Features section
+How it works
+FAQ
+Footer
+What to REMOVE:
+
+Testimonials (until you have real ones)
+Mission statement (feels disconnected)
+Overly detailed sections that dilute your message
