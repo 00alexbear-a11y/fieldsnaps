@@ -35,6 +35,7 @@ import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
+import Onboarding from "./components/Onboarding";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { useIsNativeApp } from "./hooks/usePlatform";
@@ -161,6 +162,27 @@ function AppContent() {
     );
   }
 
+  // Check if authenticated user has seen onboarding (scoped to user ID)
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  useEffect(() => {
+    if (isAuthenticated && isWhitelisted && user?.id) {
+      const onboardingKey = `onboarding_complete_${user.id}`;
+      const hasCompletedOnboarding = localStorage.getItem(onboardingKey);
+      if (!hasCompletedOnboarding) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [isAuthenticated, isWhitelisted, user]);
+
+  const handleOnboardingComplete = () => {
+    if (user?.id) {
+      const onboardingKey = `onboarding_complete_${user.id}`;
+      localStorage.setItem(onboardingKey, 'true');
+      setShowOnboarding(false);
+    }
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
       {/* Universal swipe-back gesture (disabled on main pages) */}
@@ -171,6 +193,9 @@ function AppContent() {
       
       {/* Show payment notification for past_due users */}
       <PaymentNotification />
+      
+      {/* Onboarding for authenticated, whitelisted users only */}
+      {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
       
       <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
         <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
@@ -199,17 +224,6 @@ function AppContent() {
 }
 
 export default function App() {
-  // Onboarding disabled - no feature popups on first visit
-  // const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // Check onboarding status
-  // useEffect(() => {
-  //   const onboardingComplete = localStorage.getItem('onboarding_complete');
-  //   if (!onboardingComplete) {
-  //     setShowOnboarding(true);
-  //   }
-  // }, []);
-
   // Initialize status bar for native apps (transparent with dark content)
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
@@ -225,16 +239,9 @@ export default function App() {
   // the authorization code directly to the app without using deep links.
   // The NativeAppLogin component handles the complete OAuth flow including token storage.
 
-  // const handleOnboardingComplete = () => {
-  //   localStorage.setItem('onboarding_complete', 'true');
-  //   setShowOnboarding(false);
-  // };
-
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        {/* Onboarding disabled - no feature popups */}
-        {/* {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />} */}
         <AppContent />
         <SyncStatusNotifier />
         <ServiceWorkerUpdate />
