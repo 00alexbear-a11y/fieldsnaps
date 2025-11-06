@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import type { User, Subscription, InsertSubscription, InsertSubscriptionEvent } from "../shared/schema";
 
 export class BillingService {
-  private readonly TRIAL_DAYS = 7;
+  private readonly TRIAL_DAYS = 30;
   private readonly MONTHLY_PRICE = 1999; // $19.99 in cents
   private _stripe: Stripe | null = null;
 
