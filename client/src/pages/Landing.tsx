@@ -220,7 +220,7 @@ export default function Landing() {
                 <img 
                   src={mixedPhotosPath} 
                   alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
-                  className="w-full h-[600px] object-cover object-top"
+                  className="w-full h-auto"
                 />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
@@ -239,7 +239,7 @@ export default function Landing() {
                 <img 
                   src={organizedPhotosPath} 
                   alt="With FieldSnaps - all job photos organized by project" 
-                  className="w-full h-[600px] object-cover object-top"
+                  className="w-full h-auto"
                 />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
