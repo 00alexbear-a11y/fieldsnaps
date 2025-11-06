@@ -504,15 +504,147 @@ export default function ToDos() {
     return 'Unknown';
   };
 
-  // Render task card - simplified, minimal design
+  // Swipe gesture state - iOS-style with refs for synchronous updates
+  const [swipedTodo, setSwipedTodo] = useState<string | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
+  const restingOffsetRef = useRef<number>(0); // Synchronous resting position
+  const currentOffsetRef = useRef<number>(0); // Synchronous current position
+  const touchStartX = useRef<number>(0);
+  const isSwiping = useRef<boolean>(false);
+
+  const handleTouchStart = (e: React.TouchEvent, todoId: string) => {
+    touchStartX.current = e.touches[0].clientX;
+    isSwiping.current = false;
+    
+    // Close other cards when starting a new swipe (immediate via refs)
+    if (swipedTodo && swipedTodo !== todoId) {
+      setSwipedTodo(null);
+      setSwipeOffset(0);
+      currentOffsetRef.current = 0;
+      restingOffsetRef.current = 0;
+    }
+    
+    // Remember current resting position synchronously
+    if (swipedTodo === todoId) {
+      restingOffsetRef.current = currentOffsetRef.current;
+    } else {
+      restingOffsetRef.current = 0;
+      currentOffsetRef.current = 0;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent, todoId: string) => {
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - touchStartX.current;
+    
+    // Only activate swipe if moving more than 5px
+    if (Math.abs(diff) > 5) {
+      isSwiping.current = true;
+      setSwipedTodo(todoId);
+      
+      // Calculate offset from resting position (synchronous)
+      const newOffset = restingOffsetRef.current + diff;
+      
+      // Clamp: max 150px left, 80px right
+      const maxLeft = -150;
+      const maxRight = 80;
+      const clampedOffset = Math.max(maxLeft, Math.min(maxRight, newOffset));
+      
+      currentOffsetRef.current = clampedOffset;
+      setSwipeOffset(clampedOffset);
+    }
+  };
+
+  const handleTouchEnd = (todo: TodoWithDetails) => {
+    const threshold = 50;
+    
+    // Snap to revealed position or reset based on current offset
+    if (currentOffsetRef.current < -threshold) {
+      // Swipe left - reveal actions (flag + delete)
+      currentOffsetRef.current = -150;
+      restingOffsetRef.current = -150;
+      setSwipeOffset(-150);
+    } else if (currentOffsetRef.current > threshold && !todo.completed) {
+      // Swipe right - complete immediately with haptic
+      completeMutation.mutate(todo.id);
+      setSwipedTodo(null);
+      setSwipeOffset(0);
+      currentOffsetRef.current = 0;
+      restingOffsetRef.current = 0;
+    } else {
+      // Not enough swipe - reset to closed
+      setSwipedTodo(null);
+      setSwipeOffset(0);
+      currentOffsetRef.current = 0;
+      restingOffsetRef.current = 0;
+    }
+    
+    isSwiping.current = false;
+  };
+
+  const handleSwipeAction = (action: () => void) => {
+    action();
+    // Reset swipe state after action
+    setSwipedTodo(null);
+    setSwipeOffset(0);
+    currentOffsetRef.current = 0;
+    restingOffsetRef.current = 0;
+  };
+
+  // Render task card - simplified, minimal design with iOS-style swipe gestures
   const renderTaskCard = (todo: TodoWithDetails) => {
+    const isThisTodoSwiped = swipedTodo === todo.id;
+    const currentOffset = isThisTodoSwiped ? swipeOffset : 0;
+
     return (
-      <Card
-        key={todo.id}
-        className={`hover-elevate cursor-pointer transition-opacity ${todo.completed ? 'opacity-50' : ''} p-3`}
-        onClick={() => { setSelectedTodoForDetails(todo); setShowDetailsDrawer(true); }}
-        data-testid={`card-todo-${todo.id}`}
-      >
+      <div className="relative overflow-hidden" key={todo.id}>
+        {/* Swipe action background - right (complete) */}
+        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4">
+          <Check className="w-6 h-6 text-white" />
+        </div>
+        
+        {/* Swipe action buttons - left (flag + delete) */}
+        <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-12 w-12 bg-orange-500 hover:bg-orange-600 text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSwipeAction(() => toggleFlagMutation.mutate(todo.id));
+            }}
+            data-testid={`swipe-flag-${todo.id}`}
+          >
+            <Flag className="w-5 h-5" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-12 w-12 bg-red-500 hover:bg-red-600 text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSwipeAction(() => deleteMutation.mutate(todo.id));
+            }}
+            data-testid={`swipe-delete-${todo.id}`}
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+
+        <Card
+          className={`relative cursor-pointer ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''}`}
+          style={{ transform: `translateX(${currentOffset}px)` }}
+          onClick={() => { 
+            if (!isSwiping.current) {
+              setSelectedTodoForDetails(todo); 
+              setShowDetailsDrawer(true); 
+            }
+          }}
+          onTouchStart={(e) => handleTouchStart(e, todo.id)}
+          onTouchMove={(e) => handleTouchMove(e, todo.id)}
+          onTouchEnd={() => handleTouchEnd(todo)}
+          data-testid={`card-todo-${todo.id}`}
+        >
         <div className="flex items-center gap-3">
           {/* Checkbox */}
           <Checkbox
@@ -626,6 +758,7 @@ export default function ToDos() {
           </div>
         </div>
       </Card>
+      </div>
     );
   };
 
