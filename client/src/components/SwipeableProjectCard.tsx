@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, TouchEvent } from "react";
-import { Trash2, Home, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle, Edit } from "lucide-react";
+import { Trash2, Home, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle, Edit, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,11 +15,13 @@ interface SwipeableProjectCardProps {
   coverPhoto?: Photo;
   photoCount: number;
   pendingSyncCount: number;
+  isFavorite?: boolean;
   onClick: () => void;
   onDelete: () => void;
   onCameraClick: () => void;
   onShare: () => void;
   onToggleComplete: () => void;
+  onToggleFavorite?: () => void;
   onEdit: () => void;
 }
 
@@ -31,11 +33,13 @@ export default function SwipeableProjectCard({
   coverPhoto,
   photoCount,
   pendingSyncCount,
+  isFavorite = false,
   onClick,
   onDelete,
   onCameraClick,
   onShare,
   onToggleComplete,
+  onToggleFavorite,
   onEdit,
 }: SwipeableProjectCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -309,6 +313,23 @@ export default function SwipeableProjectCard({
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span className="text-xs font-medium">Done</span>
               </div>
+            )}
+            
+            {/* Favorite Button - Phase 3.4 */}
+            {onToggleFavorite && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-11 h-11"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite();
+                }}
+                data-testid={`button-favorite-${project.id}`}
+                aria-label={isFavorite ? `Remove ${project.name} from favorites` : `Add ${project.name} to favorites`}
+              >
+                <Star className={`w-5 h-5 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              </Button>
             )}
             
             {/* Camera Button - Always visible */}
