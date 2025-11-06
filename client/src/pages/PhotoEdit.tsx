@@ -6,6 +6,7 @@ import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 import { indexedDB as idb } from '@/lib/indexeddb';
+import { syncManager } from '@/lib/syncManager';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useForm } from 'react-hook-form';
@@ -296,6 +297,7 @@ export default function PhotoEdit() {
         // Continue anyway - photo is saved locally
       }
 
+      // Always show success toast
       toast({
         title: '✓ Saved Successfully',
         description: annotations.length > 0 
@@ -304,17 +306,117 @@ export default function PhotoEdit() {
         duration: 2000,
       });
 
-      if (photoUrlRef.current) {
-        URL.revokeObjectURL(photoUrlRef.current);
-        photoUrlRef.current = null;
-      }
-
-      // If we should create a todo, show the dialog
+      // If we should create a todo, we need to ensure the photo is synced first
+      // Otherwise the TO-DO will fail with a foreign key constraint error
       if (shouldCreateTodo) {
-        setTodoDialogOpen(true);
+        if (!navigator.onLine) {
+          // Offline - can't create TO-DO without syncing
+          toast({
+            title: 'Offline',
+            description: 'You need to be online to create a TO-DO. Photo saved locally.',
+            variant: 'destructive',
+            duration: 4000,
+          });
+          
+          // Clean up and return to camera
+          if (photoUrlRef.current) {
+            URL.revokeObjectURL(photoUrlRef.current);
+            photoUrlRef.current = null;
+          }
+          const params = new URLSearchParams({ preserveSession: 'true' });
+          if (projectId && projectId !== 'null' && projectId !== 'undefined') {
+            params.set('projectId', projectId);
+          }
+          setLocation(`/camera?${params.toString()}`);
+          return;
+        }
+
+        // Photo must be synced to server before creating TO-DO
+        // Check if photo already has a server ID
+        const currentPhoto = await idb.getPhoto(photoId);
+        if (currentPhoto?.serverId) {
+          // Photo already on server, safe to create TO-DO
+          console.log('[PhotoEdit] Photo already on server, opening TO-DO dialog');
+          // Don't clean up photoUrl yet - dialog still needs to display the annotated photo
+          setTodoDialogOpen(true);
+          return;
+        }
+
+        // Photo not on server yet, need to sync it
+        console.log('[PhotoEdit] Photo not on server, forcing sync...');
+        setIsSaving(true); // Keep loading state during sync
+        
+        toast({
+          title: 'Syncing photo...',
+          description: 'Please wait while we upload your photo',
+          duration: 3000,
+        });
+
+        try {
+          // Force immediate sync
+          const syncResult = await syncManager.syncNow();
+          console.log('[PhotoEdit] Sync result:', syncResult);
+
+          // Verify photo now has a server ID (not just sync status)
+          const syncedPhoto = await idb.getPhoto(photoId);
+          if (syncedPhoto?.serverId) {
+            console.log('[PhotoEdit] Photo synced successfully with server ID:', syncedPhoto.serverId);
+            toast({
+              title: '✓ Photo Synced',
+              description: 'You can now create a TO-DO',
+              duration: 2000,
+            });
+            setIsSaving(false);
+            // Don't clean up photoUrl yet - dialog still needs to display the annotated photo
+            setTodoDialogOpen(true);
+          } else {
+            console.warn('[PhotoEdit] Sync completed but photo has no server ID');
+            setIsSaving(false);
+            toast({
+              title: 'Sync Incomplete',
+              description: 'Photo upload is in progress. Please create the TO-DO from the project view in a moment.',
+              variant: 'destructive',
+              duration: 5000,
+            });
+            
+            // Clean up and return to camera
+            if (photoUrlRef.current) {
+              URL.revokeObjectURL(photoUrlRef.current);
+              photoUrlRef.current = null;
+            }
+            const params = new URLSearchParams({ preserveSession: 'true' });
+            if (projectId && projectId !== 'null' && projectId !== 'undefined') {
+              params.set('projectId', projectId);
+            }
+            setLocation(`/camera?${params.toString()}`);
+          }
+        } catch (syncError) {
+          console.error('[PhotoEdit] Sync error:', syncError);
+          setIsSaving(false);
+          toast({
+            title: 'Sync Failed',
+            description: 'Could not sync photo. Please create the TO-DO from the project view.',
+            variant: 'destructive',
+            duration: 5000,
+          });
+          
+          // Clean up and return to camera
+          if (photoUrlRef.current) {
+            URL.revokeObjectURL(photoUrlRef.current);
+            photoUrlRef.current = null;
+          }
+          const params = new URLSearchParams({ preserveSession: 'true' });
+          if (projectId && projectId !== 'null' && projectId !== 'undefined') {
+            params.set('projectId', projectId);
+          }
+          setLocation(`/camera?${params.toString()}`);
+        }
       } else {
-        // Return to camera with project context and preserve session
-        // Only include projectId if it's a valid UUID (not null/undefined/string "null")
+        // No TO-DO needed, clean up and return to camera
+        if (photoUrlRef.current) {
+          URL.revokeObjectURL(photoUrlRef.current);
+          photoUrlRef.current = null;
+        }
         const params = new URLSearchParams({ preserveSession: 'true' });
         if (projectId && projectId !== 'null' && projectId !== 'undefined') {
           params.set('projectId', projectId);
