@@ -58,6 +58,48 @@ class SyncManager {
   }
 
   /**
+   * Safe JSON parser that checks for auth errors and HTML responses
+   * Prevents "Unexpected token '<'" errors when server returns login page
+   */
+  private async safeJsonParse(response: Response): Promise<any> {
+    // Check if response is a redirect (session expired)
+    if (response.redirected) {
+      console.error('[Sync] Response was redirected - likely auth failure');
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    // Check if it's an auth error
+    if (response.status === 401) {
+      console.error('[Sync] 401 Unauthorized - session expired');
+      throw new Error('Authentication required. Please log in again.');
+    }
+
+    // Check for non-OK status
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        console.error('[Sync] Server returned HTML error page');
+        throw new Error('Server error. Please try again or log in.');
+      }
+      const errorText = await response.text();
+      throw new Error(`Server error: ${response.status} - ${errorText}`);
+    }
+
+    // Check Content-Type before parsing JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('[Sync] Unexpected response type:', contentType);
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+      throw new Error('Server returned unexpected response. Please try again.');
+    }
+
+    // Safe to parse JSON now
+    return await response.json();
+  }
+
+  /**
    * Check if upload should proceed based on network type and user settings
    */
   private async shouldUploadNow(): Promise<{ canUpload: boolean; reason?: string }> {
@@ -591,12 +633,7 @@ class SyncManager {
               }),
             });
             
-            if (!completeResponse.ok) {
-              const errorText = await completeResponse.text();
-              throw new Error(`Failed to complete chunked upload: ${completeResponse.status} - ${errorText}`);
-            }
-            
-            data = await completeResponse.json();
+            data = await this.safeJsonParse(completeResponse);
             console.log('[Sync] Chunked upload complete:', data);
           } catch (chunkError) {
             console.error('[Sync] Chunked upload failed:', chunkError);
@@ -626,12 +663,7 @@ class SyncManager {
               }),
             });
             
-            if (!initResponse.ok) {
-              const errorText = await initResponse.text();
-              throw new Error(`Failed to get presigned URL: ${initResponse.status} - ${errorText}`);
-            }
-            
-            const { uploadURL, sessionId } = await initResponse.json();
+            const { uploadURL, sessionId } = await this.safeJsonParse(initResponse);
             console.log('[Sync] Got presigned URL, uploading directly to cloud...');
             
             // Step 2: Upload directly to object storage (bypasses backend!)
@@ -662,12 +694,7 @@ class SyncManager {
               }),
             });
             
-            if (!completeResponse.ok) {
-              const errorText = await completeResponse.text();
-              throw new Error(`Failed to complete presigned upload: ${completeResponse.status} - ${errorText}`);
-            }
-            
-            data = await completeResponse.json();
+            data = await this.safeJsonParse(completeResponse);
             console.log('[Sync] Presigned upload complete:', data);
           } catch (presignedError) {
             console.error('[Sync] Presigned upload failed, falling back to multipart:', presignedError);
@@ -737,13 +764,7 @@ class SyncManager {
 
           console.log('[Sync] Upload response status:', response.status);
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('[Sync] Upload failed:', response.status, errorText);
-            throw new Error(`Server error: ${response.status} - ${errorText}`);
-          }
-
-          data = await response.json();
+          data = await this.safeJsonParse(response);
           console.log('[Sync] Upload successful, server response:', data);
         }
         
