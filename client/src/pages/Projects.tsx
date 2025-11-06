@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
-import { Plus, Home, Camera, MapPin, Clock, Search, Settings, Moon, Sun, ArrowUpDown, RefreshCw } from "lucide-react";
+import { Plus, Home, Camera, Search, Settings, ArrowUpDown, RefreshCw, Copy, Check } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,6 @@ import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeDialogs } from "@/lib/nativeDialogs";
 import { Capacitor } from "@capacitor/core";
-import { Copy, Check } from "lucide-react";
 
 type SortOption = 'lastActivity' | 'name' | 'created';
 
