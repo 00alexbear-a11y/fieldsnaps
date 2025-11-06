@@ -367,6 +367,8 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
+        unitCount: projects.unitCount,
+        unitLabels: projects.unitLabels,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
         coverPhoto: {
           id: coverPhoto.id,
@@ -384,7 +386,7 @@ export class DbStorage implements IStorage {
       .leftJoin(photos, eq(photos.projectId, projects.id))
       .leftJoin(coverPhoto, eq(coverPhoto.id, projects.coverPhotoId))
       .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
-      .groupBy(projects.id, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
+      .groupBy(projects.id, projects.unitCount, projects.unitLabels, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
       .orderBy(projects.createdAt);
     
     // Map to clean up undefined cover photos

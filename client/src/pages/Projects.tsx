@@ -59,6 +59,8 @@ export default function Projects() {
   const { isDark, toggleTheme } = useTheme();
   const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   
   // Enable keyboard management for form inputs
   useKeyboardManager();
@@ -90,6 +92,10 @@ export default function Projects() {
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [unitCount, setUnitCount] = useState(1);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editUnitCount, setEditUnitCount] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -204,6 +210,33 @@ export default function Projects() {
     },
   });
 
+  const editMutation = useMutation({
+    mutationFn: async (data: { id: string; name?: string; description?: string; address?: string; unitCount?: number }) => {
+      const { id, ...updateData } = data;
+      const res = await apiRequest("PATCH", `/api/projects/${id}`, updateData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
+      setEditDialogOpen(false);
+      setProjectToEdit(null);
+      setEditName("");
+      setEditDescription("");
+      setEditAddress("");
+      setEditUnitCount(1);
+      toast({ title: "Project updated successfully" });
+    },
+    onError: (error: any) => {
+      console.error('Project update error:', error);
+      toast({ 
+        title: "Error updating project", 
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (projectId: string) => {
       await apiRequest("DELETE", `/api/projects/${projectId}`);
@@ -299,6 +332,27 @@ export default function Projects() {
 
   const handleToggleComplete = (projectId: string) => {
     toggleCompleteMutation.mutate(projectId);
+  };
+
+  const handleEditProject = (project: Project) => {
+    setProjectToEdit(project);
+    setEditName(project.name);
+    setEditDescription(project.description || "");
+    setEditAddress(project.address || "");
+    setEditUnitCount(project.unitCount || 1);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectToEdit || !editName.trim()) return;
+    editMutation.mutate({
+      id: projectToEdit.id,
+      name: editName,
+      description: editDescription,
+      address: editAddress,
+      unitCount: editUnitCount,
+    });
   };
 
   const handleCopyShareLink = async () => {
@@ -561,6 +615,7 @@ export default function Projects() {
                   onCameraClick={() => setLocation(`/camera?projectId=${project.id}`)}
                   onShare={() => handleShareProject(project.id)}
                   onToggleComplete={() => handleToggleComplete(project.id)}
+                  onEdit={() => handleEditProject(project)}
                 />
               );
             })}
@@ -620,6 +675,85 @@ export default function Projects() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Project Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent data-testid="dialog-edit-project">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+            <DialogDescription>
+              Update your project details
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Project Name</Label>
+              <Input
+                id="edit-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Enter project name"
+                data-testid="input-edit-project-name"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-address">Address</Label>
+              <Input
+                id="edit-address"
+                value={editAddress}
+                onChange={(e) => setEditAddress(e.target.value)}
+                placeholder="Job site address"
+                data-testid="input-edit-project-address"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-unitCount">Number of Units</Label>
+              <Input
+                id="edit-unitCount"
+                type="number"
+                min="1"
+                max="999"
+                value={editUnitCount}
+                onChange={(e) => setEditUnitCount(parseInt(e.target.value) || 1)}
+                placeholder="1 for single-site projects"
+                data-testid="input-edit-project-unit-count"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Set to 1 for single-site projects. For multi-unit buildings, specify the number of units to enable unit labels in camera.
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="edit-description">Description (optional)</Label>
+              <Textarea
+                id="edit-description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Enter project description"
+                rows={3}
+                data-testid="input-edit-project-description"
+              />
+            </div>
+            <DialogFooter className="gap-2">
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+                data-testid="button-cancel-edit"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={editMutation.isPending}
+                data-testid="button-submit-edit"
+              >
+                {editMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Share Project Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>

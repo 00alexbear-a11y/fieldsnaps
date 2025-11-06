@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, TouchEvent } from "react";
-import { Trash2, Home, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle } from "lucide-react";
+import { Trash2, Home, Camera, MapPin, Clock, ExternalLink, Share2, MoreVertical, CheckCircle2, Circle, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ interface SwipeableProjectCardProps {
   onCameraClick: () => void;
   onShare: () => void;
   onToggleComplete: () => void;
+  onEdit: () => void;
 }
 
 const SWIPE_THRESHOLD = 100;
@@ -35,6 +36,7 @@ export default function SwipeableProjectCard({
   onCameraClick,
   onShare,
   onToggleComplete,
+  onEdit,
 }: SwipeableProjectCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
@@ -164,6 +166,11 @@ export default function SwipeableProjectCard({
     // On iOS, show native action sheet
     if (actionSheet.isSupported()) {
       const buttons = [];
+      
+      buttons.push({
+        title: 'Edit Project',
+        handler: onEdit,
+      });
       
       if (project.address) {
         buttons.push({
@@ -346,6 +353,16 @@ export default function SwipeableProjectCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit();
+                    }}
+                    data-testid={`menu-edit-${project.id}`}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Project
+                  </DropdownMenuItem>
                   {project.address && (
                     <DropdownMenuItem
                       onClick={(e) => {
