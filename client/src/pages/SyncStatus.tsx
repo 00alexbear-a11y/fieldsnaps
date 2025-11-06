@@ -34,6 +34,7 @@ export default function SyncStatus() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [swipedItemId, setSwipedItemId] = useState<string | null>(null);
   const touchStartX = useRef<number>(0);
   const touchCurrentX = useRef<number>(0);
@@ -154,6 +155,23 @@ export default function SyncStatus() {
     if (!swipedItemId) return;
     
     try {
+      // Find the sync item to get its details
+      const item = syncItems.find(i => i.id === swipedItemId);
+      
+      // If it's a photo item, check if we should delete the blob
+      if (item && item.type === 'photo' && item.localId) {
+        const photo = await indexedDBService.getPhoto(item.localId);
+        // Only delete blob if photo was NEVER uploaded (no serverId)
+        // If serverId exists, the photo is safely in the cloud
+        if (photo && !photo.serverId) {
+          await indexedDBService.deletePhoto(item.localId);
+          console.log('[SyncStatus] Deleted unuploaded photo blob:', item.localId);
+        } else if (photo && photo.serverId) {
+          console.log('[SyncStatus] Keeping photo blob - already uploaded to cloud:', photo.serverId);
+        }
+      }
+      
+      // Remove from sync queue
       await indexedDBService.removeFromSyncQueue(swipedItemId);
       await loadSyncItems();
       setSwipedItemId(null);
@@ -181,15 +199,62 @@ export default function SyncStatus() {
   const handleBatchDelete = async () => {
     try {
       const itemsArray = Array.from(selectedItems);
+      
       for (const itemId of itemsArray) {
+        // Find the sync item to get its details
+        const item = syncItems.find(i => i.id === itemId);
+        
+        // If it's a photo item, check if we should delete the blob
+        if (item && item.type === 'photo' && item.localId) {
+          const photo = await indexedDBService.getPhoto(item.localId);
+          // Only delete blob if photo was NEVER uploaded (no serverId)
+          // If serverId exists, the photo is safely in the cloud
+          if (photo && !photo.serverId) {
+            await indexedDBService.deletePhoto(item.localId);
+            console.log('[SyncStatus] Deleted unuploaded photo blob:', item.localId);
+          } else if (photo && photo.serverId) {
+            console.log('[SyncStatus] Keeping photo blob - already uploaded to cloud:', photo.serverId);
+          }
+        }
+        
+        // Remove from sync queue
         await indexedDBService.removeFromSyncQueue(itemId);
       }
+      
       await loadSyncItems();
       setSelectedItems(new Set());
       setIsSelectMode(false);
       setShowDeleteDialog(false);
     } catch (error) {
       console.error('Failed to delete items:', error);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      // Delete all unuploaded photos and clear the entire sync queue
+      for (const item of syncItems) {
+        // If it's a photo item, check if we should delete the blob
+        if (item.type === 'photo' && item.localId) {
+          const photo = await indexedDBService.getPhoto(item.localId);
+          // Only delete blob if photo was NEVER uploaded (no serverId)
+          // If serverId exists, the photo is safely in the cloud
+          if (photo && !photo.serverId) {
+            await indexedDBService.deletePhoto(item.localId);
+            console.log('[SyncStatus] Deleted unuploaded photo blob:', item.localId);
+          } else if (photo && photo.serverId) {
+            console.log('[SyncStatus] Keeping photo blob - already uploaded to cloud:', photo.serverId);
+          }
+        }
+        
+        // Remove from sync queue
+        await indexedDBService.removeFromSyncQueue(item.id);
+      }
+      
+      await loadSyncItems();
+      setShowDeleteAllDialog(false);
+    } catch (error) {
+      console.error('Failed to delete all items:', error);
     }
   };
 
@@ -264,15 +329,29 @@ export default function SyncStatus() {
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Pending Items</h2>
-            <Button
-              size="sm"
-              onClick={handleSync}
-              disabled={!isOnline || syncing || syncItems.length === 0}
-              data-testid="button-sync-now"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-              {syncing ? 'Syncing...' : 'Sync Now'}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleSync}
+                disabled={!isOnline || syncing || syncItems.length === 0}
+                data-testid="button-sync-now"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'Syncing...' : 'Sync Now'}
+              </Button>
+              {syncItems.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowDeleteAllDialog(true)}
+                  disabled={syncing}
+                  data-testid="button-delete-all"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete All
+                </Button>
+              )}
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4 text-center">
@@ -488,10 +567,12 @@ export default function SyncStatus() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent data-testid="dialog-confirm-delete">
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove from Sync Queue?</AlertDialogTitle>
+            <AlertDialogTitle>Delete from Queue?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'items'} from the sync queue. 
-              These items will not be uploaded to the server.
+              This will remove {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'items'} from the sync queue.
+              <br />
+              <br />
+              <strong className="text-destructive">Warning:</strong> Photos that have NEVER been uploaded (no cloud copy) will be permanently deleted from your device. Photos that were already uploaded will remain safe in the cloud - only the queue entry is removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -501,7 +582,35 @@ export default function SyncStatus() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
-              Remove
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete All Confirmation Dialog */}
+      <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
+        <AlertDialogContent data-testid="dialog-confirm-delete-all">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete All Pending Uploads?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will clear the entire sync queue ({syncItems.length} {syncItems.length === 1 ? 'item' : 'items'}).
+              <br />
+              <br />
+              <strong className="text-destructive">Warning:</strong> Only photos that have NEVER been uploaded (no cloud copy) will be permanently deleted from your device. Photos that were already uploaded to the cloud will be kept safe - only their queue entries are removed.
+              <br />
+              <br />
+              This action is intended for recovery when the sync queue gets stuck. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-all">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteAll}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-all"
+            >
+              Delete All
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
