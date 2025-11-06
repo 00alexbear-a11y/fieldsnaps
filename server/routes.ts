@@ -84,6 +84,25 @@ const uploadRateLimiter = rateLimit({
   },
 });
 
+// Rate limiting for auth endpoints - prevents brute force attacks
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Max 10 auth attempts per window per IP
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: any) => {
+    // For auth endpoints, use IP + email (if provided) to prevent distributed attacks
+    const email = req.body?.email || '';
+    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    return `${ip}-${email}`;
+  },
+  skip: (req: any) => {
+    // Skip rate limiting in development mode
+    return process.env.NODE_ENV === 'development';
+  },
+});
+
 // UUID validation middleware for route parameters
 
 const validateUuidParam = (paramName: string) => {
@@ -325,8 +344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Setup authentication
-  await setupAuth(app);
+  // Setup authentication with rate limiting
+  await setupAuth(app, authRateLimiter);
   
   // Setup WebAuthn biometric authentication
   setupWebAuthn(app);

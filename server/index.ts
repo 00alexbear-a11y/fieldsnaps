@@ -70,6 +70,45 @@ export const corsConfig = cors({
 // Enable gzip compression for all responses - reduces payload size by up to 70%
 app.use(compression());
 
+// Security headers middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Prevent clickjacking attacks
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Enable XSS protection (legacy browsers)
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  
+  // Control referrer information
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Enforce HTTPS in production
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  
+  // Content Security Policy
+  const cspDirectives = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Vite requires unsafe-inline/eval in dev
+    "style-src 'self' 'unsafe-inline'", // Tailwind requires unsafe-inline
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com",
+    "media-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+  
+  res.setHeader('Content-Security-Policy', cspDirectives);
+  
+  next();
+});
+
 // Stripe webhook endpoint - MUST be before express.json() to preserve raw body
 app.post('/api/webhooks/stripe', 
   express.raw({ type: 'application/json' }),
