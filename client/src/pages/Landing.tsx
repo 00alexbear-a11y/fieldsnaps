@@ -211,38 +211,38 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
             {/* Before - Camera Roll Chaos */}
             <div className="space-y-4 min-w-0">
-              <div className="text-center md:text-left">
+              <div className="text-center">
                 <span className="inline-block px-3 py-1 bg-destructive/10 text-destructive text-sm font-medium rounded-full mb-3">
                   Before FieldSnaps
                 </span>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full h-[550px] flex items-center justify-center bg-muted/20">
+              <div className="rounded-2xl overflow-hidden shadow-xl w-full h-[550px] flex items-center justify-center bg-muted/20">
                 <img 
                   src={mixedPhotosPath} 
                   alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
                   className="w-full h-full object-contain"
                 />
               </div>
-              <p className="text-sm text-muted-foreground text-center md:text-left">
+              <p className="text-sm text-muted-foreground text-center">
                 Job photos buried with 1,000+ personal pics
               </p>
             </div>
 
             {/* After - FieldSnaps Organized */}
             <div className="space-y-4 min-w-0">
-              <div className="text-center md:text-left">
+              <div className="text-center">
                 <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full mb-3">
                   With FieldSnaps
                 </span>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full h-[550px] flex items-center justify-center bg-muted/20">
+              <div className="rounded-2xl overflow-hidden shadow-xl w-full h-[550px] flex items-center justify-center bg-muted/20">
                 <img 
                   src={organizedPhotosPath} 
                   alt="With FieldSnaps - all job photos organized by project" 
                   className="w-full h-full object-contain"
                 />
               </div>
-              <p className="text-sm text-muted-foreground text-center md:text-left">
+              <p className="text-sm text-muted-foreground text-center">
                 Every project organized, instantly accessible
               </p>
             </div>
