@@ -141,6 +141,9 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
+  // Location/navigation tracking for Phase 3
+  isFavorite: boolean("is_favorite").default(false).notNull(), // User can favorite frequently-visited projects
+  visitCount: integer("visit_count").default(0).notNull(), // Track how many times project has been opened
   // Multi-unit support for construction sites
   unitCount: integer("unit_count").default(1).notNull(), // Number of units/apartments in project
   unitLabels: text("unit_labels").array().$type<string[]>(), // Custom unit labels (e.g., ["Unit 1", "Unit 2", "Penthouse"])
