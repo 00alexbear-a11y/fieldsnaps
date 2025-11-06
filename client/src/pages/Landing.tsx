@@ -421,7 +421,7 @@ export default function Landing() {
               </div>
               <h3 className="text-xl font-bold">Instant Search</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Find photos in seconds, not minutes. Search by project name, date, or what's in the photo.
+                Find photos in seconds, not minutes. Every photo organized by project and date.
               </p>
             </div>
 
