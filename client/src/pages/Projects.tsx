@@ -45,7 +45,7 @@ import { nativeDialogs } from "@/lib/nativeDialogs";
 import { NotificationPanel } from "@/components/NotificationPanel";
 import { Capacitor } from "@capacitor/core";
 
-type SortOption = 'lastActivity' | 'name' | 'created';
+type SortOption = 'recent' | 'favorites' | 'lastActivity' | 'name' | 'created';
 
 export default function Projects() {
   const [, setLocation] = useLocation();
@@ -106,6 +106,18 @@ export default function Projects() {
   // Offline-first: load from IndexedDB immediately, fetch from server in background
   const { projects: projectsWithCounts, isLoading: projectsLoading, isOnline, hasLocalData } = useOfflineFirstProjects();
 
+  // Fetch user's favorite project IDs (Phase 3.4)
+  const { data: favoriteProjectIds = [] } = useQuery<string[]>({
+    queryKey: ['/api/user/favorite-projects'],
+    enabled: isOnline,
+  });
+
+  // Fetch user's recent project IDs (Phase 3.4)
+  const { data: recentProjectIds = [] } = useQuery<string[]>({
+    queryKey: ['/api/user/recent-projects'],
+    enabled: isOnline,
+  });
+
   // Load sync status on mount and when online status changes
   useEffect(() => {
     const loadSyncStatus = async () => {
@@ -162,6 +174,27 @@ export default function Projects() {
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
+        case 'recent':
+          // Sort by recent visits (user-specific)
+          const aRecentIndex = recentProjectIds.indexOf(a.id);
+          const bRecentIndex = recentProjectIds.indexOf(b.id);
+          // If both are in recent list, sort by index (earlier = more recent)
+          if (aRecentIndex !== -1 && bRecentIndex !== -1) {
+            return aRecentIndex - bRecentIndex;
+          }
+          // Prioritize items in recent list
+          if (aRecentIndex !== -1) return -1;
+          if (bRecentIndex !== -1) return 1;
+          // For non-recent items, sort by last activity
+          return new Date(b.lastActivityAt || b.createdAt).getTime() - new Date(a.lastActivityAt || a.createdAt).getTime();
+        case 'favorites':
+          // Show favorites first, then sort by name
+          const aIsFavorite = favoriteProjectIds.includes(a.id);
+          const bIsFavorite = favoriteProjectIds.includes(b.id);
+          if (aIsFavorite && !bIsFavorite) return -1;
+          if (!aIsFavorite && bIsFavorite) return 1;
+          // If both are favorites or both are not, sort alphabetically
+          return a.name.localeCompare(b.name);
         case 'lastActivity':
           // Most recent activity first (top to bottom)
           return new Date(b.lastActivityAt || b.createdAt).getTime() - new Date(a.lastActivityAt || a.createdAt).getTime();
@@ -176,7 +209,7 @@ export default function Projects() {
     });
     
     return sorted;
-  }, [projects, debouncedSearchQuery, sortBy, showCompleted]);
+  }, [projects, debouncedSearchQuery, sortBy, showCompleted, favoriteProjectIds, recentProjectIds]);
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string; unitCount?: number }) => {
@@ -286,6 +319,50 @@ export default function Projects() {
     },
   });
 
+  // Toggle favorite with optimistic updates - Phase 3.4
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ projectId, isFavorite }: { projectId: string; isFavorite: boolean }) => {
+      const res = await apiRequest("POST", `/api/projects/${projectId}/favorite`, { isFavorite });
+      return await res.json();
+    },
+    onMutate: async ({ projectId, isFavorite }) => {
+      // Cancel outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ['/api/user/favorite-projects'] });
+      
+      // Snapshot previous value for rollback
+      const previousFavorites = queryClient.getQueryData<string[]>(['/api/user/favorite-projects']);
+      
+      // Optimistically update the favorites list
+      queryClient.setQueryData<string[]>(['/api/user/favorite-projects'], (old = []) => {
+        if (isFavorite) {
+          return [...old, projectId];
+        } else {
+          return old.filter(id => id !== projectId);
+        }
+      });
+      
+      // Haptic feedback for instant feel
+      haptics.light();
+      
+      return { previousFavorites };
+    },
+    onError: (error: any, variables, context) => {
+      // Rollback on error
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['/api/user/favorite-projects'], context.previousFavorites);
+      }
+      toast({
+        title: "Error updating favorite",
+        description: error.message || "Please try again",
+        variant: "destructive"
+      });
+    },
+    onSettled: () => {
+      // Refetch to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['/api/user/favorite-projects'] });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -325,6 +402,11 @@ export default function Projects() {
 
   const handleToggleComplete = (projectId: string) => {
     toggleCompleteMutation.mutate(projectId);
+  };
+
+  const handleToggleFavorite = (projectId: string) => {
+    const isFavorite = favoriteProjectIds.includes(projectId);
+    toggleFavoriteMutation.mutate({ projectId, isFavorite: !isFavorite });
   };
 
   const handleEditProject = (project: Project) => {
@@ -587,11 +669,13 @@ export default function Projects() {
                   coverPhoto={coverPhoto}
                   photoCount={photoCount}
                   pendingSyncCount={pendingSyncCount}
+                  isFavorite={favoriteProjectIds.includes(project.id)}
                   onClick={() => setLocation(`/projects/${project.id}`)}
                   onDelete={() => handleDeleteProject(project)}
                   onCameraClick={() => setLocation(`/camera?projectId=${project.id}`)}
                   onShare={() => handleShareProject(project.id)}
                   onToggleComplete={() => handleToggleComplete(project.id)}
+                  onToggleFavorite={() => handleToggleFavorite(project.id)}
                   onEdit={() => handleEditProject(project)}
                 />
               );
@@ -620,25 +704,40 @@ export default function Projects() {
                 <Button variant="outline" className="h-9 w-[140px]" data-testid="button-sort-filter">
                   <ArrowUpDown className="w-4 h-4 mr-2" />
                   <span className="text-sm">
-                    {sortBy === 'lastActivity' ? 'Recent...' : sortBy === 'name' ? 'Name' : 'Date...'}
+                    {sortBy === 'recent' ? 'Recent' : sortBy === 'favorites' ? 'Favorites' : sortBy === 'lastActivity' ? 'Activity' : sortBy === 'name' ? 'Name' : 'Date'}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[200px]">
                 <DropdownMenuLabel>Sort by</DropdownMenuLabel>
                 <DropdownMenuItem 
+                  onClick={() => setSortBy('recent')}
+                  data-testid="sort-recent"
+                >
+                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'recent' ? 'opacity-100' : 'opacity-0'}`} />
+                  Recent Visits
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSortBy('favorites')}
+                  data-testid="sort-favorites"
+                >
+                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'favorites' ? 'opacity-100' : 'opacity-0'}`} />
+                  Favorites
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
                   onClick={() => setSortBy('lastActivity')}
                   data-testid="sort-recent-activity"
                 >
                   <Check className={`mr-2 h-4 w-4 ${sortBy === 'lastActivity' ? 'opacity-100' : 'opacity-0'}`} />
-                  Recent Activity
+                  Last Activity
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setSortBy('name')}
                   data-testid="sort-name"
                 >
                   <Check className={`mr-2 h-4 w-4 ${sortBy === 'name' ? 'opacity-100' : 'opacity-0'}`} />
-                  Name
+                  Name (A-Z)
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setSortBy('created')}

@@ -1349,6 +1349,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's favorite project IDs - Phase 3.4
+  app.get("/api/user/favorite-projects", isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const favoriteIds = await storage.getUserFavoriteProjectIds(userId);
+      res.json(favoriteIds);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's recent project IDs - Phase 3.4
+  app.get("/api/user/recent-projects", isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const recentIds = await storage.getUserRecentProjectIds(userId, 10);
+      res.json(recentIds);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Toggle project favorite - Phase 3 (Locations feature)
   app.post("/api/projects/:id/favorite", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
