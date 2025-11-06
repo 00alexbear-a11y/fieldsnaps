@@ -435,8 +435,8 @@ export default function ToDos() {
     resolver: zodResolver(createTodoSchema),
     defaultValues: {
       title: "",
-      projectId: "",
-      assignedTo: "",
+      projectId: "none",
+      assignedTo: "unassigned",
       dueDate: "",
     },
   });
@@ -447,10 +447,10 @@ export default function ToDos() {
     };
     
     if (data.description) payload.description = data.description;
-    if (data.projectId) payload.projectId = data.projectId;
+    if (data.projectId && data.projectId !== 'none') payload.projectId = data.projectId;
     if (data.dueDate) payload.dueDate = data.dueDate;
     if (selectedPhotoId) payload.photoId = selectedPhotoId;
-    if (data.assignedTo) payload.assignedTo = data.assignedTo;
+    if (data.assignedTo && data.assignedTo !== 'unassigned') payload.assignedTo = data.assignedTo;
     
     if (editingTodo) {
       updateMutation.mutate({ id: editingTodo.id, data: payload });
@@ -486,8 +486,8 @@ export default function ToDos() {
     form.reset({
       title: todo.title,
       description: todo.description || "",
-      projectId: todo.projectId || "",
-      assignedTo: todo.assignedTo || "",
+      projectId: todo.projectId || "none",
+      assignedTo: todo.assignedTo || "unassigned",
       dueDate: todo.dueDate ? (typeof todo.dueDate === 'string' ? todo.dueDate : todo.dueDate.toISOString().split('T')[0]) : "",
     });
     if (todo.photo) {
@@ -822,7 +822,7 @@ export default function ToDos() {
                     <SelectValue placeholder="Select project (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No project</SelectItem>
+                    <SelectItem value="none">No project</SelectItem>
                     {projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
@@ -839,7 +839,7 @@ export default function ToDos() {
                     <SelectValue placeholder="Assign to someone (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     {members.map((member) => (
                       <SelectItem key={member.id} value={member.id}>
                         {getDisplayName(member)}
