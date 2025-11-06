@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -504,39 +504,17 @@ export default function ToDos() {
     return 'Unknown';
   };
 
-  const getDueDateColor = (dueDate: Date | string | null, completed: boolean) => {
-    if (!dueDate || completed) return 'text-muted-foreground';
-    
-    const date = new Date(dueDate);
-    const now = startOfDay(new Date());
-    const due = startOfDay(date);
-    
-    if (isPast(due) && !isSameDay(due, now)) return 'text-destructive font-medium';
-    if (isToday(due)) return 'text-orange-500 dark:text-orange-400 font-medium';
-    return 'text-muted-foreground';
-  };
-
-  const getDueDateText = (dueDate: Date | string) => {
-    const date = new Date(dueDate);
-    if (isToday(date)) return 'Due today';
-    if (isPast(date) && !isToday(date)) return `Overdue ${format(date, 'MMM d')}`;
-    return `Due ${format(date, 'MMM d')}`;
-  };
-
-  // Render task card
+  // Render task card - simplified, minimal design
   const renderTaskCard = (todo: TodoWithDetails) => {
-    const showProject = todo.project;
-    const showAssignee = todo.assignee && todo.assignee.id !== user?.id;
-    
     return (
       <Card
         key={todo.id}
-        className={`hover-elevate cursor-pointer transition-opacity ${todo.completed ? 'opacity-50' : ''} ${todo.photo ? 'p-3' : 'p-4'}`}
+        className={`hover-elevate cursor-pointer transition-opacity ${todo.completed ? 'opacity-50' : ''} p-3`}
         onClick={() => { setSelectedTodoForDetails(todo); setShowDetailsDrawer(true); }}
         data-testid={`card-todo-${todo.id}`}
       >
-        <div className="flex items-start gap-3">
-          {/* Checkbox - LEFT */}
+        <div className="flex items-center gap-3">
+          {/* Checkbox */}
           <Checkbox
             checked={todo.completed}
             onCheckedChange={(checked) => {
@@ -547,14 +525,14 @@ export default function ToDos() {
               }
             }}
             onClick={(e) => e.stopPropagation()}
-            className="mt-0.5 h-5 w-5"
+            className="h-5 w-5 flex-shrink-0"
             data-testid={`checkbox-todo-complete-${todo.id}`}
           />
 
-          {/* Photo thumbnail if available */}
+          {/* Photo thumbnail - small indicator */}
           {todo.photo && (
             <div
-              className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-muted cursor-pointer"
+              className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden bg-muted"
               onClick={(e) => {
                 e.stopPropagation();
                 setLocation(`/photo/${todo.photoId}/view`);
@@ -569,85 +547,83 @@ export default function ToDos() {
             </div>
           )}
 
-          {/* Content */}
+          {/* Title - main content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <h3
-                className={`font-semibold text-base leading-tight ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
-                data-testid={`text-todo-title-${todo.id}`}
-              >
-                {todo.title}
-              </h3>
-              {todo.flag && (
-                <Flag className="w-4 h-4 text-orange-500 fill-orange-500 flex-shrink-0" data-testid={`icon-flag-${todo.id}`} />
-              )}
-            </div>
-            
-            {/* Secondary info - one line */}
-            {(showProject || showAssignee || todo.dueDate) && (
-              <div className="flex items-center gap-1.5 mt-1.5 text-xs flex-wrap">
-                {showProject && (
-                  <span className="text-muted-foreground" data-testid={`text-project-${todo.id}`}>
-                    {showProject.name}
-                  </span>
-                )}
-                {showProject && (showAssignee || todo.dueDate) && (
-                  <span className="text-muted-foreground">•</span>
-                )}
-                {showAssignee && todo.assignee && (
-                  <span className="text-muted-foreground" data-testid={`text-assignee-${todo.id}`}>
-                    {getDisplayName(todo.assignee)}
-                  </span>
-                )}
-                {showAssignee && todo.dueDate && (
-                  <span className="text-muted-foreground">•</span>
-                )}
-                {todo.dueDate && (
-                  <span className={getDueDateColor(todo.dueDate, todo.completed)} data-testid={`text-due-date-${todo.id}`}>
-                    {getDueDateText(todo.dueDate)}
-                  </span>
-                )}
-              </div>
-            )}
+            <h3
+              className={`font-medium text-base leading-snug truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
+              data-testid={`text-todo-title-${todo.id}`}
+            >
+              {todo.title}
+            </h3>
           </div>
 
-          {/* Actions menu - RIGHT */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 flex-shrink-0"
-                data-testid={`button-todo-menu-${todo.id}`}
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); toggleFlagMutation.mutate(todo.id); }}
-                disabled={toggleFlagMutation.isPending}
-                data-testid={`menu-flag-todo-${todo.id}`}
-              >
-                <Flag className="w-4 h-4 mr-2" />
-                {todo.flag ? 'Unflag' : 'Flag'}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }}
-                data-testid={`menu-edit-todo-${todo.id}`}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(todo.id); }}
-                disabled={deleteMutation.isPending}
-                className="text-destructive"
-                data-testid={`menu-delete-todo-${todo.id}`}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Right indicators - flag and due date */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Due date indicator (icon with color coding for all tasks) */}
+            {todo.dueDate && (() => {
+              const date = new Date(todo.dueDate);
+              const now = startOfDay(new Date());
+              const due = startOfDay(date);
+              
+              // For completed tasks, always show muted clock (deadline awareness)
+              if (todo.completed) {
+                return <Clock className="w-4 h-4 text-muted-foreground" data-testid={`icon-due-completed-${todo.id}`} />;
+              }
+              
+              // For incomplete tasks, use color coding
+              if (isPast(due) && !isSameDay(due, now)) {
+                return <Clock className="w-4 h-4 text-destructive" data-testid={`icon-overdue-${todo.id}`} />;
+              } else if (isToday(due)) {
+                return <Clock className="w-4 h-4 text-orange-500" data-testid={`icon-due-today-${todo.id}`} />;
+              } else {
+                // Future tasks - show muted clock to indicate upcoming deadline
+                return <Clock className="w-4 h-4 text-muted-foreground" data-testid={`icon-due-future-${todo.id}`} />;
+              }
+            })()}
+
+            {/* Flag indicator */}
+            {todo.flag && (
+              <Flag className="w-4 h-4 text-orange-500 fill-orange-500" data-testid={`icon-flag-${todo.id}`} />
+            )}
+
+            {/* Actions menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  data-testid={`button-todo-menu-${todo.id}`}
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); toggleFlagMutation.mutate(todo.id); }}
+                  disabled={toggleFlagMutation.isPending}
+                  data-testid={`menu-flag-todo-${todo.id}`}
+                >
+                  <Flag className="w-4 h-4 mr-2" />
+                  {todo.flag ? 'Unflag' : 'Flag'}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }}
+                  data-testid={`menu-edit-todo-${todo.id}`}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(todo.id); }}
+                  disabled={deleteMutation.isPending}
+                  className="text-destructive"
+                  data-testid={`menu-delete-todo-${todo.id}`}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </Card>
     );
