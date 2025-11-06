@@ -114,14 +114,17 @@ export default function Landing() {
               className="h-8 w-auto object-contain"
             />
             <nav className="flex items-center gap-2 md:gap-6">
-              <a href="#how-it-works" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-how-it-works">
-                How it Works
-              </a>
               <a href="#features" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-features">
                 Features
               </a>
-              <a href="#faq" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-faq">
-                FAQ
+              <a href="#how-it-works" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-how-it-works">
+                How It Works
+              </a>
+              <a href="#pricing" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-pricing">
+                Pricing
+              </a>
+              <a href="#founder-story" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-why-price">
+                Why $19.99?
               </a>
               {isDevelopment && (
                 <Button 
@@ -468,6 +471,181 @@ export default function Landing() {
                 Share projects with crew or subcontractors. Everyone stays on the same page.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Founder Story Section */}
+      <section id="founder-story" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-semibold mb-6">
+              Why I built FieldSnaps
+            </h2>
+          </div>
+          
+          <div className="prose prose-lg mx-auto text-muted-foreground leading-relaxed space-y-6 text-center md:text-left">
+            <p className="text-lg sm:text-xl leading-relaxed">
+              I'm a general contractor. A few years ago, my camera roll was a disaster—
+              hundreds of job photos mixed with family pictures, impossible to find 
+              anything when clients asked for updates.
+            </p>
+            
+            <p className="text-lg sm:text-xl leading-relaxed">
+              I looked at photo management apps. Every one wanted $1,200+ per year, 
+              forced me to buy licenses for 3+ users, and came loaded with features 
+              I'd never touch.
+            </p>
+            
+            <p className="text-lg sm:text-xl leading-relaxed">
+              I just wanted to organize my job photos and share them with clients. 
+              That's it.
+            </p>
+            
+            <p className="text-lg sm:text-xl leading-relaxed">
+              So I built FieldSnaps. $19.99 per user. No minimums. No BS.
+            </p>
+            
+            <p className="text-lg sm:text-xl leading-relaxed">
+              If you only need one license, you pay for one. If you need 10, you pay 
+              for 10. No forced bundles. No enterprise sales calls.
+            </p>
+            
+            <p className="text-lg sm:text-xl leading-relaxed">
+              Just a tool that does exactly what contractors need—at a price that 
+              actually makes sense.
+            </p>
+            
+            <div className="mt-12 text-center">
+              <p className="text-xl font-semibold text-foreground">
+                — Founder, FieldSnaps
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-4">
+            <p className="text-sm font-medium uppercase tracking-wide text-primary mb-3">
+              NO MINIMUMS. NO BS.
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-semibold mb-4">
+              Pricing that makes sense
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Others charge $1,200/year with 3-user minimums. We don't.
+            </p>
+          </div>
+
+          {/* Comparison Table */}
+          <div className="max-w-4xl mx-auto my-16">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-border">
+                    <th className="text-left py-4 px-6 text-lg font-semibold">Typical Photo Apps</th>
+                    <th className="text-left py-4 px-6 text-lg font-semibold text-primary">FieldSnaps</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr>
+                    <td className="py-4 px-6 text-muted-foreground">$30-50 per user/month</td>
+                    <td className="py-4 px-6 font-semibold text-primary">$19.99 per user/month</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-muted-foreground">3-user minimum required</td>
+                    <td className="py-4 px-6 font-semibold text-primary">No user minimum</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-muted-foreground">= $1,200+/year minimum</td>
+                    <td className="py-4 px-6 font-semibold text-primary">= $240/year for 1 user</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-muted-foreground">Bloated features you never use</td>
+                    <td className="py-4 px-6 font-semibold text-primary">Just what contractors actually need</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pricing Card */}
+          <div className="max-w-lg mx-auto">
+            <Card className="p-8 border-2 border-primary">
+              <div className="text-center space-y-8">
+                {/* Price */}
+                <div>
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-6xl font-bold">$19.99</span>
+                    <span className="text-2xl text-muted-foreground">/user/month</span>
+                  </div>
+                </div>
+
+                {/* Key Points */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-lg">No user minimum</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-lg">Add or remove users anytime</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-lg">First 90 days free</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-lg">Cancel anytime—keep your photos</span>
+                  </div>
+                </div>
+
+                {/* What's Included */}
+                <div className="border-t border-border pt-6">
+                  <h3 className="font-semibold text-lg mb-4">What's Included</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li>• Unlimited photos & projects</li>
+                    <li>• Cloud backup & sync</li>
+                    <li>• Advanced search</li>
+                    <li>• Team sharing</li>
+                    <li>• Priority support</li>
+                  </ul>
+                </div>
+
+                {/* CTA Button */}
+                <Button 
+                  size="lg"
+                  className="w-full bg-sky-500 hover-elevate text-lg py-6"
+                  onClick={() => {
+                    const heroForm = document.querySelector('[data-testid="input-email-hero"]') as HTMLInputElement;
+                    if (heroForm) {
+                      heroForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setTimeout(() => heroForm.focus(), 500);
+                    }
+                  }}
+                  data-testid="button-join-waitlist-pricing"
+                >
+                  Join the Waitlist
+                </Button>
+
+                {/* App Store Note */}
+                <p className="text-sm text-muted-foreground">
+                  *$24.99/month when purchased through Apple App Store
+                </p>
+
+                {/* Launch Offer Badge */}
+                <div className="bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 px-4 py-3 rounded-lg">
+                  <p className="font-semibold">
+                    Lock in $19.99 pricing forever—early access only
+                  </p>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
