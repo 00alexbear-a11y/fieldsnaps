@@ -1,14 +1,14 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
-  Subscription, SubscriptionEvent, Waitlist,
+  Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
-  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist
+  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -146,6 +146,18 @@ export interface IStorage {
   // Waitlist operations
   addToWaitlist(data: InsertWaitlist): Promise<Waitlist>;
   getWaitlistEntries(): Promise<Waitlist[]>;
+  
+  // Activity logs (for accountability and audit trail)
+  createActivityLog(data: InsertActivityLog): Promise<ActivityLog>;
+  getActivityLogs(companyId: string, options?: { limit?: number; userId?: string; action?: string; entityType?: string }): Promise<(ActivityLog & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
+  
+  // Notifications
+  createNotification(data: InsertNotification): Promise<Notification>;
+  getNotifications(userId: string, options?: { unreadOnly?: boolean; limit?: number }): Promise<Notification[]>;
+  markNotificationAsRead(id: string): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: string): Promise<void>;
+  getUnreadNotificationCount(userId: string): Promise<number>;
+  deleteNotification(id: string): Promise<boolean>;
 }
 
 export class DbStorage implements IStorage {
@@ -1198,6 +1210,123 @@ export class DbStorage implements IStorage {
 
   async getWaitlistEntries(): Promise<Waitlist[]> {
     return await db.select().from(waitlist);
+  }
+
+  // Activity logs operations
+  async createActivityLog(data: InsertActivityLog): Promise<ActivityLog> {
+    const result = await db.insert(activityLogs)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getActivityLogs(
+    companyId: string,
+    options?: { limit?: number; userId?: string; action?: string; entityType?: string }
+  ): Promise<(ActivityLog & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]> {
+    const limit = options?.limit || 50;
+    
+    // Build where conditions
+    const conditions = [eq(activityLogs.companyId, companyId)];
+    if (options?.userId) {
+      conditions.push(eq(activityLogs.userId, options.userId));
+    }
+    if (options?.action) {
+      conditions.push(eq(activityLogs.action, options.action));
+    }
+    if (options?.entityType) {
+      conditions.push(eq(activityLogs.entityType, options.entityType));
+    }
+
+    const result = await db
+      .select({
+        id: activityLogs.id,
+        userId: activityLogs.userId,
+        companyId: activityLogs.companyId,
+        action: activityLogs.action,
+        entityType: activityLogs.entityType,
+        entityId: activityLogs.entityId,
+        metadata: activityLogs.metadata,
+        createdAt: activityLogs.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(activityLogs)
+      .innerJoin(users, eq(activityLogs.userId, users.id))
+      .where(and(...conditions))
+      .orderBy(sql`${activityLogs.createdAt} DESC`)
+      .limit(limit);
+
+    return result;
+  }
+
+  // Notifications operations
+  async createNotification(data: InsertNotification): Promise<Notification> {
+    const result = await db.insert(notifications)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getNotifications(
+    userId: string,
+    options?: { unreadOnly?: boolean; limit?: number }
+  ): Promise<Notification[]> {
+    const limit = options?.limit || 50;
+    const conditions = [eq(notifications.userId, userId)];
+    
+    if (options?.unreadOnly) {
+      conditions.push(eq(notifications.read, false));
+    }
+
+    return await db
+      .select()
+      .from(notifications)
+      .where(and(...conditions))
+      .orderBy(sql`${notifications.createdAt} DESC`)
+      .limit(limit);
+  }
+
+  async markNotificationAsRead(id: string): Promise<Notification | undefined> {
+    const result = await db
+      .update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async markAllNotificationsAsRead(userId: string): Promise<void> {
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(and(
+        eq(notifications.userId, userId),
+        eq(notifications.read, false)
+      ));
+  }
+
+  async getUnreadNotificationCount(userId: string): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(notifications)
+      .where(and(
+        eq(notifications.userId, userId),
+        eq(notifications.read, false)
+      ));
+    return result[0]?.count || 0;
+  }
+
+  async deleteNotification(id: string): Promise<boolean> {
+    const result = await db
+      .delete(notifications)
+      .where(eq(notifications.id, id))
+      .returning();
+    return result.length > 0;
   }
 }
 
