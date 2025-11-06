@@ -14,25 +14,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const steps = [
     {
       title: 'Take & annotate photos',
-      description: '',
+      description: 'Capture jobsite photos instantly. Add arrows, text, and measurements to document issues clearly.',
       icon: Camera,
       color: 'text-primary',
     },
     {
       title: 'Organize by project',
-      description: '',
+      description: 'Keep all your photos organized by project. Never waste time searching through camera rolls again.',
       icon: Home,
       color: 'text-primary',
     },
     {
       title: 'Share instantly',
-      description: '',
+      description: 'Generate shareable links for clients and teams. No more texting individual photos or managing email attachments.',
       icon: Share2,
       color: 'text-primary',
     },
     {
       title: 'Cloud backup',
-      description: '',
+      description: 'Your photos are automatically backed up to the cloud. Access them from any device, anytime.',
       icon: Cloud,
       color: 'text-primary',
     },
