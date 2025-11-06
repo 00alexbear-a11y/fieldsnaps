@@ -21,6 +21,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import mixedPhotosPath from '@assets/IMG_3721_1762386596117.png';
+import organizedPhotosPath from '@assets/CleanShot 2025-11-05 at 20.38.27@2x_1762403935456.png';
 import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Landing() {
@@ -219,7 +220,7 @@ export default function Landing() {
                 <img 
                   src={mixedPhotosPath} 
                   alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
-                  className="w-full h-auto"
+                  className="w-full h-[600px] object-cover object-top"
                 />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
@@ -234,16 +235,12 @@ export default function Landing() {
                   With FieldSnaps
                 </span>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-gradient-to-br from-muted/50 to-muted w-full min-h-[500px]">
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-3 p-8">
-                  <Folder className="w-16 h-16 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground max-w-md">
-                    FieldSnaps organized home screen
-                  </p>
-                  <p className="text-xs text-muted-foreground italic">
-                    [Screenshot placeholder - awaiting image]
-                  </p>
-                </div>
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full">
+                <img 
+                  src={organizedPhotosPath} 
+                  alt="With FieldSnaps - all job photos organized by project" 
+                  className="w-full h-[600px] object-cover object-top"
+                />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
                 Every project organized, instantly accessible
