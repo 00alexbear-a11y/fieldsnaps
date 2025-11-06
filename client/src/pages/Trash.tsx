@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format, differenceInDays } from 'date-fns';
 import type { Project, Photo } from '@shared/schema';
 import { getPhotoImageUrl } from '@/lib/photoUrls';
+import { haptics } from '@/lib/nativeHaptics';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +54,7 @@ export default function Trash() {
       await apiRequest('POST', `/api/trash/projects/${id}/restore`);
     },
     onSuccess: () => {
+      haptics.success();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/projects'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
       toast({
@@ -67,6 +69,7 @@ export default function Trash() {
       await apiRequest('POST', `/api/trash/photos/${id}/restore`);
     },
     onSuccess: () => {
+      haptics.success();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
       // Invalidate project-specific photo queries so restored photos appear
@@ -88,6 +91,7 @@ export default function Trash() {
       await apiRequest('DELETE', `/api/trash/projects/${id}`);
     },
     onSuccess: () => {
+      haptics.warning();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/projects'] });
       toast({
         title: 'Project deleted permanently',
@@ -103,6 +107,7 @@ export default function Trash() {
       await apiRequest('DELETE', `/api/trash/photos/${id}`);
     },
     onSuccess: () => {
+      haptics.warning();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       toast({
         title: 'Photo deleted permanently',
@@ -119,6 +124,7 @@ export default function Trash() {
       return await response.json();
     },
     onSuccess: (data: { projectsDeleted: number; photosDeleted: number }) => {
+      haptics.warning();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/projects'] });
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       toast({
@@ -159,6 +165,7 @@ export default function Trash() {
       
       await Promise.all(restorePromises);
       
+      haptics.success();
       queryClient.invalidateQueries({ queryKey: ['/api/trash/projects'] });
       queryClient.invalidateQueries({ queryKey: ['/api/trash/photos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
@@ -180,6 +187,7 @@ export default function Trash() {
       setSelectedPhotos(new Set());
       setSelectMode(false);
     } catch (error) {
+      haptics.error();
       toast({
         title: 'Error',
         description: 'Failed to restore some items.',

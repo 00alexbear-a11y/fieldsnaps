@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { haptics } from "@/lib/nativeHaptics";
 import type { ToDo, Project } from "@shared/schema";
 
 const createTodoSchema = z.object({
@@ -258,12 +259,14 @@ export default function ToDos() {
       return { previousQueries };
     },
     onSuccess: () => {
+      haptics.success();
       toast({ title: "Task completed!" });
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       }, 800);
     },
     onError: (error, variables, context) => {
+      haptics.error();
       if (context?.previousQueries) {
         context.previousQueries.forEach(({ queryKey, data }) => {
           queryClient.setQueryData(queryKey, data);
@@ -279,10 +282,12 @@ export default function ToDos() {
       return apiRequest('DELETE', `/api/todos/${todoId}`, {});
     },
     onSuccess: () => {
+      haptics.warning();
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "Task deleted" });
     },
     onError: () => {
+      haptics.error();
       toast({ title: "Failed to delete task", variant: "destructive" });
     },
   });
@@ -293,6 +298,7 @@ export default function ToDos() {
       return apiRequest('POST', '/api/todos', data);
     },
     onSuccess: () => {
+      haptics.success();
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "Task created!" });
       setShowAddDialog(false);
@@ -301,6 +307,7 @@ export default function ToDos() {
       setSelectedPhotoUrl(null);
     },
     onError: () => {
+      haptics.error();
       toast({ title: "Failed to create task", variant: "destructive" });
     },
   });
@@ -314,6 +321,7 @@ export default function ToDos() {
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       // Only show toast for explicit edits (not inline background saves)
       if (!variables.silent) {
+        haptics.light();
         toast({ title: "Task updated!" });
         setShowEditDialog(false);
         setEditingTodo(null);
@@ -323,6 +331,7 @@ export default function ToDos() {
       }
     },
     onError: () => {
+      haptics.error();
       toast({ title: "Failed to update task", variant: "destructive" });
     },
   });
