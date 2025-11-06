@@ -243,6 +243,7 @@ export const todos = pgTable("todos", {
   completedAt: timestamp("completed_at"),
   completedBy: varchar("completed_by").references(() => users.id, { onDelete: "set null" }), // Who marked complete
   dueDate: timestamp("due_date"),
+  flag: boolean("flag").default(false).notNull(), // Priority flag for important todos
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_todos_project_id").on(table.projectId),
@@ -250,6 +251,7 @@ export const todos = pgTable("todos", {
   index("idx_todos_assigned_to").on(table.assignedTo),
   index("idx_todos_created_by").on(table.createdBy),
   index("idx_todos_completed").on(table.completed),
+  index("idx_todos_flag").on(table.flag),
 ]);
 
 // Activity logs table - tracks all user actions for accountability and audit trail
