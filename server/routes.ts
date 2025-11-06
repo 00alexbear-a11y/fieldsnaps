@@ -91,12 +91,6 @@ const authRateLimiter = rateLimit({
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: any) => {
-    // For auth endpoints, use IP + email (if provided) to prevent distributed attacks
-    const email = req.body?.email || '';
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return `${ip}-${email}`;
-  },
   skip: (req: any) => {
     // Skip rate limiting in development mode
     return process.env.NODE_ENV === 'development';
