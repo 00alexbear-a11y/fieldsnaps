@@ -71,7 +71,7 @@ export default function Landing() {
   const faqs = [
     {
       q: "When does FieldSnaps launch?",
-      a: "We're launching January 2026. Waitlist members get first access and 90 days free."
+      a: "We're launching January 2026. Waitlist members get first access and 30 days free."
     },
     {
       q: "Which devices will it work on?",
@@ -254,7 +254,7 @@ export default function Landing() {
           <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span>Free for the first 90 days</span>
+              <span>Free for the first 30 days</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -594,7 +594,7 @@ export default function Landing() {
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-lg">First 90 days free</span>
+                    <span className="text-lg">First 30 days free</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
@@ -676,7 +676,7 @@ export default function Landing() {
               Start documenting like a pro.
             </h2>
             <p className="text-xl text-gray-400">
-              Join the waitlist and get 90 days free when we launch.
+              Join the waitlist and get 30 days free when we launch.
             </p>
           </div>
 
