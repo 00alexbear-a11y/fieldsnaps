@@ -1385,6 +1385,11 @@ export default function Settings() {
         </Card>
       )}
 
+      {/* Team Performance Stats (Owner Only) */}
+      {user?.companyId && company?.ownerId === user.id && (
+        <TeamPerformanceStats />
+      )}
+
       {/* Upload Queue */}
       <Card 
         className="p-4 space-y-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
@@ -1719,5 +1724,94 @@ export default function Settings() {
         </div>
       </div>
     </div>
+  );
+}
+
+function TeamPerformanceStats() {
+  type TeamStat = {
+    userId: string;
+    userName: string;
+    photoCount: number;
+  };
+
+  const { data: stats = [], isLoading } = useQuery<TeamStat[]>({
+    queryKey: ['/api/team-stats/photo-uploads'],
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <Camera className="w-5 h-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Team Performance</h2>
+        </div>
+        <div className="text-sm text-muted-foreground" data-testid="text-loading-stats">
+          Loading stats...
+        </div>
+      </Card>
+    );
+  }
+
+  if (stats.length === 0) {
+    return (
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <Camera className="w-5 h-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Team Performance</h2>
+        </div>
+        <div className="text-sm text-muted-foreground" data-testid="text-no-stats">
+          No photo uploads yet. Start documenting your projects!
+        </div>
+      </Card>
+    );
+  }
+
+  const totalPhotos = stats.reduce((sum, stat) => sum + stat.photoCount, 0);
+  const sortedStats = [...stats].sort((a, b) => b.photoCount - a.photoCount);
+
+  return (
+    <Card className="p-4 space-y-4" data-testid="card-team-performance">
+      <div className="flex items-center gap-3">
+        <Camera className="w-5 h-5 text-muted-foreground" />
+        <h2 className="text-lg font-semibold">Team Performance</h2>
+      </div>
+
+      <div className="p-3 rounded-lg bg-muted/50">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">Total Photos</span>
+          <span className="font-semibold text-lg" data-testid="text-total-photos">
+            {totalPhotos.toLocaleString()}
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Photo Uploads by Team Member</p>
+        {sortedStats.map((stat) => (
+          <div
+            key={stat.userId}
+            className="flex items-center justify-between p-3 rounded-lg border"
+            data-testid={`stat-item-${stat.userId}`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Avatar className="w-8 h-8">
+                <AvatarFallback>
+                  {stat.userName?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{stat.userName}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 ml-2">
+              <ImageIcon className="w-4 h-4 text-muted-foreground" />
+              <span className="font-semibold" data-testid={`photo-count-${stat.userId}`}>
+                {stat.photoCount.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 }
