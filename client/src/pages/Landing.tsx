@@ -20,6 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+import mixedPhotosPath from '@assets/IMG_3721_1762386596117.png';
 import { isDevModeEnabled } from '@/config/devMode';
 
 export default function Landing() {
@@ -115,29 +116,32 @@ export default function Landing() {
               />
               <span className="text-xl font-semibold">FieldSnaps</span>
             </div>
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-how-it-works">
+            <nav className="flex items-center gap-2 md:gap-6">
+              <a href="#how-it-works" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-how-it-works">
                 How it Works
               </a>
-              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-features">
+              <a href="#features" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-features">
                 Features
               </a>
-              <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-faq">
+              <a href="#faq" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-faq">
                 FAQ
               </a>
               {isDevelopment && (
                 <Button 
-                  variant="default"
-                  className="bg-sky-500"
+                  size="sm"
+                  className="bg-sky-500 text-xs md:text-sm"
                   onClick={() => window.location.href = '/api/dev-login'}
                   data-testid="button-dev-login-header"
                 >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Dev Login
+                  <LogIn className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">Dev Login</span>
+                  <span className="sm:hidden">Dev</span>
                 </Button>
               )}
               <Button 
+                size="sm"
                 variant={isDevelopment ? "outline" : "ghost"}
+                className="text-xs md:text-sm"
                 onClick={() => setLocation('/login')}
                 data-testid="button-signin-header"
               >
@@ -200,19 +204,13 @@ export default function Landing() {
             Join 500+ contractors already waiting
           </p>
 
-          {/* Hero Image Placeholder */}
+          {/* Hero Image - Mixed Photos */}
           <div className="rounded-2xl overflow-hidden shadow-2xl border border-border">
-            <div className="aspect-video bg-gradient-to-br from-muted/50 to-muted flex items-center justify-center">
-              <div className="text-center space-y-3 p-8">
-                <Camera className="w-16 h-16 mx-auto text-muted-foreground" />
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Split-screen comparison: chaotic camera roll vs organized FieldSnaps interface
-                </p>
-                <p className="text-xs text-muted-foreground italic">
-                  [Hero image placeholder - add your split-screen comparison here]
-                </p>
-              </div>
-            </div>
+            <img 
+              src={mixedPhotosPath} 
+              alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
+              className="w-full h-auto"
+            />
           </div>
 
           {/* Trust Indicators */}
@@ -362,14 +360,14 @@ export default function Landing() {
       <section id="features" className="py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl sm:text-5xl font-semibold">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center">
               Built for contractors, by contractors
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Feature 1 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Folder className="w-6 h-6 text-primary" />
               </div>
@@ -380,7 +378,7 @@ export default function Landing() {
             </div>
 
             {/* Feature 2 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Search className="w-6 h-6 text-primary" />
               </div>
@@ -391,7 +389,7 @@ export default function Landing() {
             </div>
 
             {/* Feature 3 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <LinkIcon className="w-6 h-6 text-primary" />
               </div>
@@ -402,7 +400,7 @@ export default function Landing() {
             </div>
 
             {/* Feature 4 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Cloud className="w-6 h-6 text-primary" />
               </div>
@@ -413,7 +411,7 @@ export default function Landing() {
             </div>
 
             {/* Feature 5 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <MapPin className="w-6 h-6 text-primary" />
               </div>
@@ -424,7 +422,7 @@ export default function Landing() {
             </div>
 
             {/* Feature 6 */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Users className="w-6 h-6 text-primary" />
               </div>
@@ -507,14 +505,6 @@ export default function Landing() {
       {/* Footer */}
       <footer className="bg-[#0d0d0d] text-gray-400 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center space-y-6">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <img 
-              src={logoPath} 
-              alt="FieldSnaps" 
-              className="h-8 w-auto object-contain opacity-80"
-            />
-            <span className="text-xl font-semibold text-white">FieldSnaps</span>
-          </div>
           <p className="text-sm max-w-md mx-auto">
             Built for contractors who need their photos organized—not buried.
           </p>
