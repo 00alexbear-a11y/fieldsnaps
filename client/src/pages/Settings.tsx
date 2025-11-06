@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -318,7 +318,8 @@ export default function Settings() {
 
   useEffect(() => {
     // Load sync status and storage usage
-    loadSyncStatus();
+    // Cleanup stale queue items on initial load
+    loadSyncStatus(true);
     calculateStorageUsage();
 
     // Check biometric support
@@ -363,7 +364,10 @@ export default function Settings() {
     }
   }, [company]);
 
-  const loadSyncStatus = async () => {
+  const loadSyncStatus = async (cleanup = false) => {
+    if (cleanup) {
+      await syncManager.cleanupSyncQueue();
+    }
     const status = await syncManager.getSyncStatus();
     setSyncStatus(status);
   };

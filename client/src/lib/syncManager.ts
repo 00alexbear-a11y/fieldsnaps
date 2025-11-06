@@ -239,6 +239,9 @@ class SyncManager {
       // This runs even if sync queue is empty
       await this.retryPendingTags();
       
+      // Clean up stale queue items before processing
+      await this.cleanupSyncQueue();
+      
       // Get pending sync items
       const queueItems = await idb.getPendingSyncItems();
       
@@ -1103,6 +1106,41 @@ class SyncManager {
 
     console.error('[Sync] Photo uploaded but no server ID found');
     return null;
+  }
+
+  /**
+   * Clean up stale items from sync queue
+   * Removes queue items for photos/projects that are already synced
+   */
+  async cleanupSyncQueue(): Promise<number> {
+    const items = await idb.getPendingSyncItems();
+    let removedCount = 0;
+
+    for (const item of items) {
+      try {
+        if (item.type === 'photo') {
+          const photo = await idb.getPhoto(item.localId);
+          if (!photo || photo.syncStatus === 'synced') {
+            await idb.removeFromSyncQueue(item.id);
+            removedCount++;
+          }
+        } else if (item.type === 'project') {
+          const project = await idb.getProject(item.localId);
+          if (!project || project.syncStatus === 'synced') {
+            await idb.removeFromSyncQueue(item.id);
+            removedCount++;
+          }
+        }
+      } catch (error) {
+        console.error('[Sync] Error checking queue item:', error);
+      }
+    }
+
+    if (removedCount > 0) {
+      console.log(`[Sync] Cleaned up ${removedCount} stale queue items`);
+    }
+
+    return removedCount;
   }
 
   /**
