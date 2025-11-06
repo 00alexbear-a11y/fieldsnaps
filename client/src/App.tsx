@@ -64,6 +64,26 @@ function AppContent() {
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
   
+  // Onboarding state for authenticated, whitelisted users (must be at top before any returns)
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  useEffect(() => {
+    if (isAuthenticated && isWhitelisted && user?.id) {
+      const onboardingKey = `onboarding_complete_${user.id}`;
+      const hasCompletedOnboarding = localStorage.getItem(onboardingKey);
+      if (!hasCompletedOnboarding) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [isAuthenticated, isWhitelisted, user]);
+
+  const handleOnboardingComplete = () => {
+    if (user?.id) {
+      const onboardingKey = `onboarding_complete_${user.id}`;
+      localStorage.setItem(onboardingKey, 'true');
+      setShowOnboarding(false);
+    }
+  };
   
   // Disable swipe back on main pages to prevent blank white screen
   const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
@@ -161,27 +181,6 @@ function AppContent() {
       </main>
     );
   }
-
-  // Check if authenticated user has seen onboarding (scoped to user ID)
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  
-  useEffect(() => {
-    if (isAuthenticated && isWhitelisted && user?.id) {
-      const onboardingKey = `onboarding_complete_${user.id}`;
-      const hasCompletedOnboarding = localStorage.getItem(onboardingKey);
-      if (!hasCompletedOnboarding) {
-        setShowOnboarding(true);
-      }
-    }
-  }, [isAuthenticated, isWhitelisted, user]);
-
-  const handleOnboardingComplete = () => {
-    if (user?.id) {
-      const onboardingKey = `onboarding_complete_${user.id}`;
-      localStorage.setItem(onboardingKey, 'true');
-      setShowOnboarding(false);
-    }
-  };
 
   return (
     <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
