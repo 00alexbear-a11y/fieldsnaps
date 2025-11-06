@@ -20,6 +20,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { nativeClipboard } from '@/lib/nativeClipboard';
 import { haptics } from '@/lib/nativeHaptics';
+import { NotificationPanel } from '@/components/NotificationPanel';
 import type { Tag, Company, User as UserType } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
@@ -599,6 +600,7 @@ export default function Settings() {
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
+              <NotificationPanel />
             </div>
           </div>
           {syncStatus && syncStatus.pending > 0 && (
