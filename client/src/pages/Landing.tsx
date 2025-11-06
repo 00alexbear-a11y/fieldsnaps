@@ -216,11 +216,11 @@ export default function Landing() {
                   Before FieldSnaps
                 </span>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full">
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full h-[550px] flex items-center justify-center bg-muted/20">
                 <img 
                   src={mixedPhotosPath} 
                   alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
-                  className="w-full h-auto"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
@@ -235,11 +235,11 @@ export default function Landing() {
                   With FieldSnaps
                 </span>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full">
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full h-[550px] flex items-center justify-center bg-muted/20">
                 <img 
                   src={organizedPhotosPath} 
                   alt="With FieldSnaps - all job photos organized by project" 
-                  className="w-full h-auto"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <p className="text-sm text-muted-foreground text-center md:text-left">
