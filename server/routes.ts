@@ -2635,6 +2635,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             projectId: todo.projectId || undefined,
           },
         });
+
+        // Create notification if assigned to someone other than creator (Integration Task 3)
+        if (assignedTo !== user.id) {
+          const creatorName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+          const projectInfo = todo.projectId ? await storage.getProject(todo.projectId) : null;
+          
+          await storage.createNotification({
+            userId: assignedTo,
+            type: 'todo_assigned',
+            title: 'New task assigned to you',
+            message: projectInfo 
+              ? `${creatorName} assigned you "${todo.title}" in ${projectInfo.name}`
+              : `${creatorName} assigned you "${todo.title}"`,
+            read: false,
+            entityType: 'todo',
+            entityId: todo.id,
+            metadata: {
+              creatorName,
+              todoTitle: todo.title,
+              projectName: projectInfo?.name,
+            },
+          });
+        }
       }
 
       res.status(201).json(todo);
@@ -2693,11 +2716,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validated.projectId) {
         if (!await verifyProjectCompanyAccess(req, res, validated.projectId)) return;
       }
+
+      // Get current todo to check if assignee is changing (Integration Task 3)
+      const oldTodo = await storage.getTodo(req.params.id);
+      if (!oldTodo) {
+        return res.status(404).json({ error: "To-do not found" });
+      }
       
       const todo = await storage.updateTodo(req.params.id, validated);
       if (!todo) {
         return res.status(404).json({ error: "To-do not found" });
       }
+
+      // Create notification if assignee changed to a different user
+      if (validated.assignedTo && validated.assignedTo !== oldTodo.assignedTo && validated.assignedTo !== user.id) {
+        const reassignerName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+        const projectInfo = todo.projectId ? await storage.getProject(todo.projectId) : null;
+        
+        await storage.createNotification({
+          userId: validated.assignedTo,
+          type: 'todo_assigned',
+          title: 'Task reassigned to you',
+          message: projectInfo 
+            ? `${reassignerName} assigned you "${todo.title}" in ${projectInfo.name}`
+            : `${reassignerName} assigned you "${todo.title}"`,
+          read: false,
+          entityType: 'todo',
+          entityId: todo.id,
+          metadata: {
+            reassignerName,
+            todoTitle: todo.title,
+            projectName: projectInfo?.name,
+          },
+        });
+      }
+
       res.json(todo);
     } catch (error: any) {
       handleError(res, error);
