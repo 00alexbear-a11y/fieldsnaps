@@ -4,11 +4,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useOfflineFirstPhotos } from "@/hooks/useOfflineFirstPhotos";
-import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle, Play } from "lucide-react";
+import { ArrowLeft, Camera, Settings as SettingsIcon, Check, Trash2, Share2, FolderInput, Tag as TagIcon, Images, X, CheckSquare, ChevronDown, ListTodo, FileText, MoreVertical, Grid3x3, Upload, Loader2, AlertCircle, Play, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -51,7 +53,7 @@ type TodoWithDetails = ToDo & {
   assignee: { id: string; firstName: string | null; lastName: string | null };
   creator: { id: string; firstName: string | null; lastName: string | null };
 };
-import { format } from "date-fns";
+import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 
 // Extend Photo to include tags
 type Photo = BasePhoto & { tags?: Tag[] };
@@ -89,6 +91,8 @@ export default function ProjectPhotos() {
     includeTags: true,
     includeProjectHeader: true,
     photosPerPage: 1 as 1 | 2 | 3 | 4,
+    dateFrom: null as Date | null,
+    dateTo: null as Date | null,
   });
   const { toast } = useToast();
   
@@ -637,6 +641,30 @@ export default function ProjectPhotos() {
     return selectedCount > 0 && selectedCount < datePhotos.length;
   };
 
+  // Calculate filtered photo count for export (by date range)
+  const exportFilteredPhotoCount = useMemo(() => {
+    const selectedPhotos = photos.filter(photo => selectedPhotoIds.has(photo.id));
+    
+    if (!exportOptions.dateFrom && !exportOptions.dateTo) {
+      return selectedPhotos.length;
+    }
+    
+    return selectedPhotos.filter(photo => {
+      const photoDate = new Date(photo.createdAt);
+      const from = exportOptions.dateFrom ? startOfDay(exportOptions.dateFrom) : null;
+      const to = exportOptions.dateTo ? endOfDay(exportOptions.dateTo) : null;
+      
+      if (from && to) {
+        return isWithinInterval(photoDate, { start: from, end: to });
+      } else if (from) {
+        return photoDate >= from;
+      } else if (to) {
+        return photoDate <= to;
+      }
+      return true;
+    }).length;
+  }, [photos, selectedPhotoIds, exportOptions.dateFrom, exportOptions.dateTo]);
+
   const handleShareSelected = () => {
     if (selectedPhotoIds.size === 0) {
       toast({
@@ -751,13 +779,31 @@ export default function ProjectPhotos() {
       // Dynamically import jsPDF
       const { jsPDF } = await import('jspdf');
       
-      // Get selected photos
-      const selectedPhotos = photos.filter(photo => selectedPhotoIds.has(photo.id));
+      // Get selected photos and filter by date range if specified
+      let selectedPhotos = photos.filter(photo => selectedPhotoIds.has(photo.id));
+      
+      // Apply date range filter
+      if (exportOptions.dateFrom || exportOptions.dateTo) {
+        selectedPhotos = selectedPhotos.filter(photo => {
+          const photoDate = new Date(photo.createdAt);
+          const from = exportOptions.dateFrom ? startOfDay(exportOptions.dateFrom) : null;
+          const to = exportOptions.dateTo ? endOfDay(exportOptions.dateTo) : null;
+          
+          if (from && to) {
+            return isWithinInterval(photoDate, { start: from, end: to });
+          } else if (from) {
+            return photoDate >= from;
+          } else if (to) {
+            return photoDate <= to;
+          }
+          return true;
+        });
+      }
       
       if (selectedPhotos.length === 0) {
         toast({
-          title: 'No photos selected',
-          description: 'Please select at least one photo to export',
+          title: 'No photos in selected date range',
+          description: 'Please adjust the date range or select different photos',
           variant: 'destructive',
         });
         return;
@@ -2247,10 +2293,93 @@ export default function ProjectPhotos() {
           <DialogHeader>
             <DialogTitle>Export to PDF</DialogTitle>
             <DialogDescription>
-              Export {selectedPhotoIds.size} photo{selectedPhotoIds.size === 1 ? '' : 's'} to PDF with customizable layout and details.
+              {exportFilteredPhotoCount > 0 ? (
+                <>
+                  Export {exportFilteredPhotoCount} photo{exportFilteredPhotoCount === 1 ? '' : 's'} to PDF with customizable layout and details.
+                  {(exportOptions.dateFrom || exportOptions.dateTo) && exportFilteredPhotoCount < selectedPhotoIds.size && (
+                    <span className="text-yellow-600 dark:text-yellow-500"> ({selectedPhotoIds.size - exportFilteredPhotoCount} filtered out by date range)</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-destructive">No photos match the selected date range</span>
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Date range filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Date range (optional)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal"
+                      data-testid="button-date-from"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {exportOptions.dateFrom ? format(exportOptions.dateFrom, 'MMM d, yyyy') : 'From date'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={exportOptions.dateFrom || undefined}
+                      onSelect={(date) => setExportOptions(prev => ({ ...prev, dateFrom: date || null }))}
+                      initialFocus
+                    />
+                    {exportOptions.dateFrom && (
+                      <div className="p-3 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setExportOptions(prev => ({ ...prev, dateFrom: null }))}
+                          className="w-full"
+                          data-testid="button-clear-date-from"
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start text-left font-normal"
+                      data-testid="button-date-to"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {exportOptions.dateTo ? format(exportOptions.dateTo, 'MMM d, yyyy') : 'To date'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={exportOptions.dateTo || undefined}
+                      onSelect={(date) => setExportOptions(prev => ({ ...prev, dateTo: date || null }))}
+                      initialFocus
+                    />
+                    {exportOptions.dateTo && (
+                      <div className="p-3 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setExportOptions(prev => ({ ...prev, dateTo: null }))}
+                          className="w-full"
+                          data-testid="button-clear-date-to"
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+            
             {/* Photos per page selector */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Photos per page</label>
