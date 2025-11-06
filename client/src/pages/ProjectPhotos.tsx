@@ -69,6 +69,8 @@ export default function ProjectPhotos() {
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [showShareConfigDialog, setShowShareConfigDialog] = useState(false);
+  const [shareExpirationDays, setShareExpirationDays] = useState<number | null>(null);
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [showBatchTagDialog, setShowBatchTagDialog] = useState(false);
   const [targetProjectId, setTargetProjectId] = useState<string>("");
@@ -635,7 +637,7 @@ export default function ProjectPhotos() {
     return selectedCount > 0 && selectedCount < datePhotos.length;
   };
 
-  const handleShareSelected = async () => {
+  const handleShareSelected = () => {
     if (selectedPhotoIds.size === 0) {
       toast({
         title: 'No photos selected',
@@ -645,12 +647,21 @@ export default function ProjectPhotos() {
       return;
     }
     
+    // Show share configuration dialog
+    setShowShareConfigDialog(true);
+  };
+
+  const confirmCreateShare = async () => {
     try {
-      // Create share via API (currently shares entire project, not just selected photos)
+      // Create share via API with selected photos and expiration
       const response = await fetch(`/api/projects/${projectId}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        body: JSON.stringify({
+          selectedPhotoIds: Array.from(selectedPhotoIds),
+          expirationDays: shareExpirationDays,
+        }),
       });
 
       if (!response.ok) {
@@ -660,12 +671,15 @@ export default function ProjectPhotos() {
       const share = await response.json();
       const shareUrl = `${window.location.origin}/share/${share.token}`;
 
+      // Close config dialog
+      setShowShareConfigDialog(false);
+
       // Try to copy to clipboard
       try {
         await nativeClipboard.write(shareUrl);
         toast({
           title: 'Share link created!',
-          description: 'Link copied to clipboard. All project photos are now shared.',
+          description: `Link copied to clipboard. Sharing ${selectedPhotoIds.size} photo${selectedPhotoIds.size === 1 ? '' : 's'}.`,
         });
       } catch (clipboardError) {
         console.log('Clipboard write failed, will show dialog instead');
@@ -681,8 +695,10 @@ export default function ProjectPhotos() {
       // Exit select mode
       setIsSelectMode(false);
       setSelectedPhotoIds(new Set());
+      setShareExpirationDays(null); // Reset expiration for next share
     } catch (error) {
       console.error('Share error:', error);
+      setShowShareConfigDialog(false);
       toast({
         title: 'Failed to create share link',
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -1990,6 +2006,59 @@ export default function ProjectPhotos() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Share Configuration Dialog */}
+      <Dialog open={showShareConfigDialog} onOpenChange={setShowShareConfigDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Configure Share Link</DialogTitle>
+            <DialogDescription>
+              Create a share link for {selectedPhotoIds.size} selected photo{selectedPhotoIds.size === 1 ? '' : 's'}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="expiration" className="text-sm font-medium">
+                Link Expiration
+              </label>
+              <Select
+                value={shareExpirationDays?.toString() || 'never'}
+                onValueChange={(value) => setShareExpirationDays(value === 'never' ? null : parseInt(value))}
+              >
+                <SelectTrigger id="expiration" data-testid="select-expiration">
+                  <SelectValue placeholder="Select expiration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">7 days</SelectItem>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="90">90 days</SelectItem>
+                  <SelectItem value="never">Never expires</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowShareConfigDialog(false);
+                setShareExpirationDays(null);
+              }}
+              data-testid="button-cancel-share-config"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmCreateShare}
+              data-testid="button-create-share-link"
+            >
+              Create Share Link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Share Link Dialog */}
       <Dialog open={!!shareLink} onOpenChange={() => setShareLink(null)}>

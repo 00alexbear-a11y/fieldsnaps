@@ -1326,10 +1326,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
 
-      // Check if share already exists
+      // Get company info for branding
+      const company = await storage.getCompany(user.companyId);
+      if (!company) {
+        return res.status(500).json({ error: "Company not found" });
+      }
+
+      // Parse request body
+      const { selectedPhotoIds, expirationDays } = req.body;
+
+      // Validate selectedPhotoIds belong to this project (security check)
+      if (selectedPhotoIds && Array.isArray(selectedPhotoIds) && selectedPhotoIds.length > 0) {
+        const projectPhotos = await storage.getProjectPhotos(req.params.id);
+        const projectPhotoIds = new Set(projectPhotos.map(p => p.id));
+        
+        const invalidPhotoIds = selectedPhotoIds.filter(id => !projectPhotoIds.has(id));
+        if (invalidPhotoIds.length > 0) {
+          return res.status(400).json({ 
+            error: "Some photo IDs do not belong to this project" 
+          });
+        }
+      }
+
+      // Calculate expiration date if provided
+      let expiresAt: Date | null = null;
+      if (expirationDays && typeof expirationDays === 'number' && expirationDays > 0) {
+        expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + expirationDays);
+      }
+
+      // Delete existing share if any (since we're updating photo selection)
       const existingShare = await storage.getShareByProjectId(req.params.id);
       if (existingShare) {
-        return res.json({ token: existingShare.token });
+        await storage.deleteShare(existingShare.id);
       }
 
       // Generate random 32-character token
@@ -1341,7 +1370,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const share = await storage.createShare({
         token,
         projectId: req.params.id,
-        expiresAt: null, // Never expires
+        photoIds: Array.isArray(selectedPhotoIds) && selectedPhotoIds.length > 0 ? selectedPhotoIds : null,
+        companyName: company.name,
+        expiresAt,
       });
 
       res.json({ token: share.token });
@@ -1486,7 +1517,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if expired
       if (share.expiresAt && new Date(share.expiresAt) < new Date()) {
-        return res.status(404).json({ error: "Share has expired" });
+        return res.status(410).json({ error: "Share has expired" });
       }
 
       // Get project and active photos (excluding trash)
@@ -1495,9 +1526,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Project not found" });
       }
 
-      const photos = await storage.getProjectPhotos(share.projectId);
+      let photos = await storage.getProjectPhotos(share.projectId);
+
+      // Filter photos if specific photoIds were selected
+      if (share.photoIds && Array.isArray(share.photoIds) && share.photoIds.length > 0) {
+        photos = photos.filter(photo => share.photoIds!.includes(photo.id));
+      }
 
       res.json({
+        companyName: share.companyName || null,
         project: {
           name: project.name,
           description: project.description,
@@ -1508,9 +1545,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
           url: photo.url,
           caption: photo.caption,
           createdAt: photo.createdAt,
-          photographerName: photo.photographerName,
+          // Note: photographerName removed for privacy
         })),
       });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Log view of shared link (for analytics)
+  app.post("/api/shared/:token/view-log", async (req, res) => {
+    try {
+      const share = await storage.getShareByToken(req.params.token);
+      if (!share) {
+        return res.status(404).json({ error: "Share not found" });
+      }
+
+      // Get client IP (handle proxy/forwarding)
+      const viewerIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] || 
+                       req.socket.remoteAddress || 
+                       null;
+
+      const userAgent = req.headers['user-agent'] || null;
+
+      await storage.createShareViewLog({
+        shareId: share.id,
+        viewerIp,
+        userAgent,
+      });
+
+      res.status(201).json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -1614,7 +1678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if expired
       if (share.expiresAt && new Date(share.expiresAt) < new Date()) {
-        return res.status(404).json({ error: "Share has expired" });
+        return res.status(410).json({ error: "Share has expired" });
       }
 
       // Get photo and verify it belongs to the shared project

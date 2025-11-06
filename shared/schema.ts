@@ -252,16 +252,30 @@ export const todos = pgTable("todos", {
   index("idx_todos_completed").on(table.completed),
 ]);
 
-// Shares table - for generating shareable project links (shows all active photos)
+// Shares table - for generating shareable project links
 export const shares = pgTable("shares", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   token: varchar("token", { length: 32 }).notNull().unique(), // Unique share link token
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  photoIds: text("photo_ids").array(), // Specific photo IDs to share (null = share all project photos)
+  companyName: varchar("company_name", { length: 255 }), // Company name for branding on share page
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at"), // Optional expiration (null = never expires)
 }, (table) => [
   index("idx_shares_project_id").on(table.projectId),
   index("idx_shares_token").on(table.token),
+]);
+
+// Share view logs - track who viewed shared links and when
+export const shareViewLogs = pgTable("share_view_logs", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  shareId: varchar("share_id").notNull().references(() => shares.id, { onDelete: "cascade" }),
+  viewerIp: varchar("viewer_ip", { length: 45 }), // IPv4 or IPv6 address
+  viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+  userAgent: text("user_agent"), // Browser/device info
+}, (table) => [
+  index("idx_share_view_logs_share_id").on(table.shareId),
+  index("idx_share_view_logs_viewed_at").on(table.viewedAt.desc()),
 ]);
 
 // Tags table - for photo categorization by trade/type
@@ -368,6 +382,7 @@ export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, creat
 });
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
+export const insertShareViewLogSchema = createInsertSchema(shareViewLogs).omit({ id: true, viewedAt: true });
 export const insertTagSchema = createInsertSchema(tags).omit({ id: true, createdAt: true });
 export const insertPhotoTagSchema = createInsertSchema(photoTags).omit({ id: true, createdAt: true });
 export const insertPdfSchema = createInsertSchema(pdfs).omit({ id: true, createdAt: true });
@@ -391,6 +406,7 @@ export type Comment = typeof comments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type ToDo = typeof todos.$inferSelect;
 export type Share = typeof shares.$inferSelect;
+export type ShareViewLog = typeof shareViewLogs.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
 export type PhotoTag = typeof photoTags.$inferSelect;
 export type Pdf = typeof pdfs.$inferSelect;
@@ -406,6 +422,7 @@ export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertToDo = z.infer<typeof insertTodoSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
+export type InsertShareViewLog = z.infer<typeof insertShareViewLogSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type InsertPhotoTag = z.infer<typeof insertPhotoTagSchema>;
 export type InsertPdf = z.infer<typeof insertPdfSchema>;
