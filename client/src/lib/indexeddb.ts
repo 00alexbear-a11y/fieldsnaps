@@ -810,6 +810,77 @@ class IndexedDBManager {
   }
 
   /**
+   * Clean up orphaned photos (photos with no queue item and never uploaded)
+   * These are photos that failed to sync or were manually deleted from queue
+   * Only deletes photos that have NO serverId (never successfully uploaded)
+   * Returns count of deleted orphaned photos
+   */
+  async cleanupOrphanedPhotos(): Promise<{ deleted: number; photos: Array<{ id: string; projectName?: string; syncStatus: string }> }> {
+    console.log('[IndexedDB] Starting orphaned photo cleanup');
+    
+    const db = await this.init();
+    
+    // Get all photos
+    const allPhotos = await this.getAllPhotos();
+    
+    // Get all sync queue items
+    const queueItems = await this.getPendingSyncItems();
+    
+    // Create a Set of photo IDs that are in the sync queue
+    const queuedPhotoIds = new Set(
+      queueItems
+        .filter(item => item.type === 'photo')
+        .map(item => item.localId)
+    );
+    
+    // Find orphaned photos: NOT in queue AND never uploaded (no serverId)
+    // This is safe because if serverId exists, the photo is in the cloud
+    const orphanedPhotos = allPhotos.filter(photo => 
+      !queuedPhotoIds.has(photo.id) && !photo.serverId
+    );
+    
+    console.log(`[IndexedDB] Found ${orphanedPhotos.length} orphaned photos`);
+    
+    // Collect info about orphaned photos before deleting
+    const orphanedInfo = await Promise.all(
+      orphanedPhotos.map(async (photo) => {
+        let projectName: string | undefined;
+        try {
+          const project = await this.getProject(photo.projectId);
+          projectName = project?.name;
+        } catch (error) {
+          // Project might not exist anymore
+        }
+        
+        return {
+          id: photo.id,
+          projectName,
+          syncStatus: photo.syncStatus,
+        };
+      })
+    );
+    
+    // Delete orphaned photos
+    let deletedCount = 0;
+    for (const photo of orphanedPhotos) {
+      try {
+        await this.deletePhoto(photo.id);
+        deletedCount++;
+        console.log(`[IndexedDB] Deleted orphaned photo ${photo.id} (status: ${photo.syncStatus})`);
+      } catch (error) {
+        console.error(`[IndexedDB] Failed to delete orphaned photo ${photo.id}:`, error);
+      }
+    }
+    
+    console.log(`[IndexedDB] Orphaned photo cleanup complete: deleted ${deletedCount} photos`);
+    
+    return {
+      deleted: deletedCount,
+      photos: orphanedInfo,
+    };
+  }
+
+  /**
    * Clear all data (for testing/reset)
    */
   async clearAll(): Promise<void> {

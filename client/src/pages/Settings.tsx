@@ -48,6 +48,12 @@ export default function Settings() {
     mb: number;
     photoCount: number;
   } | null>(null);
+  const [showCleanupDialog, setShowCleanupDialog] = useState(false);
+  const [cleanupResults, setCleanupResults] = useState<{
+    deleted: number;
+    photos: Array<{ id: string; projectName?: string; syncStatus: string }>;
+  } | null>(null);
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
   
   // Tag management state
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
@@ -406,6 +412,22 @@ export default function Settings() {
   const handleSync = async () => {
     await syncManager.syncNow();
     await loadSyncStatus();
+  };
+
+  const handleCleanupOrphans = async () => {
+    setIsCleaningUp(true);
+    try {
+      const results = await indexedDBService.cleanupOrphanedPhotos();
+      setCleanupResults(results);
+      setShowCleanupDialog(true);
+      
+      // Refresh storage usage after cleanup
+      await calculateStorageUsage();
+    } catch (error) {
+      console.error('Failed to cleanup orphaned photos:', error);
+    } finally {
+      setIsCleaningUp(false);
+    }
   };
 
   // Load tags
@@ -1483,19 +1505,45 @@ export default function Settings() {
         </div>
         
         {storageUsage ? (
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Used:</span>
-              <span className="font-medium text-lg" data-testid="text-storage-mb">
-                {storageUsage.mb} MB
-              </span>
+          <div className="space-y-3">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Used:</span>
+                <span className="font-medium text-lg" data-testid="text-storage-mb">
+                  {storageUsage.mb} MB
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Local Photos:</span>
+                <span className="font-medium" data-testid="text-storage-photo-count">
+                  {storageUsage.photoCount}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Local Photos:</span>
-              <span className="font-medium" data-testid="text-storage-photo-count">
-                {storageUsage.photoCount}
-              </span>
-            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCleanupOrphans}
+              disabled={isCleaningUp}
+              className="w-full"
+              data-testid="button-cleanup-orphans"
+            >
+              {isCleaningUp ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Cleaning Up...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clean Up Orphaned Photos
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Removes photos that failed to upload or were deleted from sync queue
+            </p>
           </div>
         ) : (
           <div className="flex items-center justify-center py-2">
@@ -1581,6 +1629,52 @@ export default function Settings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cleanup Results Dialog */}
+      <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
+        <AlertDialogContent data-testid="dialog-cleanup-results">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Orphaned Photo Cleanup Complete</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cleanupResults ? (
+                <>
+                  {cleanupResults.deleted === 0 ? (
+                    <p>No orphaned photos found. Your storage is clean!</p>
+                  ) : (
+                    <>
+                      <p className="mb-3">
+                        Successfully removed <strong>{cleanupResults.deleted}</strong> orphaned {cleanupResults.deleted === 1 ? 'photo' : 'photos'} that {cleanupResults.deleted === 1 ? 'was' : 'were'} not synced and had no queue item.
+                      </p>
+                      {cleanupResults.photos.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-sm font-medium mb-2">Deleted photos:</p>
+                          <ul className="text-xs space-y-1 max-h-40 overflow-y-auto">
+                            {cleanupResults.photos.map((photo) => (
+                              <li key={photo.id} className="text-muted-foreground">
+                                {photo.projectName || 'Unknown Project'} - Status: {photo.syncStatus}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <p>Cleanup completed.</p>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setShowCleanupDialog(false)}
+              data-testid="button-close-cleanup-results"
+            >
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Cancellation Warning Dialog */}
       <AlertDialog open={showCancellationWarning} onOpenChange={setShowCancellationWarning}>
