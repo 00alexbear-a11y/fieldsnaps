@@ -164,6 +164,13 @@ export function PhotoGestureViewer({
 
     if (e.touches.length === 1) {
       const touch = e.touches[0];
+      
+      // Block iOS edge-swipe gestures to prevent double navigation animations
+      // Only block if touch starts within 50px of screen edges
+      if (touch.clientX <= 50 || touch.clientX >= window.innerWidth - 50) {
+        e.preventDefault();
+      }
+      
       state.initialTouch = { x: touch.clientX, y: touch.clientY };
       state.initialTime = Date.now();
       state.moveDistance = 0;

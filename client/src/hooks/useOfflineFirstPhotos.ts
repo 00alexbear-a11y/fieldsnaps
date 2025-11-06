@@ -29,11 +29,11 @@ export function useOfflineFirstPhotos(projectId: string) {
 
   // Fetch from server in background
   const {
-    data: serverPhotos = [],
+    data: serverResponse,
     isLoading: isLoadingServer,
     error: serverError,
     dataUpdatedAt,
-  } = useQuery<Photo[]>({
+  } = useQuery<{ photos: Photo[]; nextCursor?: string }>({
     queryKey: ['/api/projects', projectId, 'photos'],
     staleTime: 0,
     retry: false, // Don't retry if offline
@@ -41,6 +41,8 @@ export function useOfflineFirstPhotos(projectId: string) {
       skipErrorToast: true, // Handle errors gracefully
     },
   });
+  
+  const serverPhotos = serverResponse?.photos || [];
 
   // Load from IndexedDB immediately and whenever photos are added
   useEffect(() => {
