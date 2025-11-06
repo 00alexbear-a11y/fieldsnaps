@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
 import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
+import { useAuth } from '@/hooks/useAuth';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { photoCompressionWorker } from '@/lib/photoCompressionWorker';
 import { type QualityPreset } from '@/lib/photoCompression';
@@ -80,6 +81,7 @@ type CameraFacing = 'environment' | 'user';
 
 export default function Camera() {
   const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
+  const { user } = useAuth();
   const [hasPermission, setHasPermission] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -1392,6 +1394,11 @@ export default function Camera() {
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
+      // Prepare photographer metadata for attribution
+      const photographerName = user?.firstName && user?.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user?.email || undefined;
+
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -1407,6 +1414,8 @@ export default function Camera() {
         unitLabel: selectedUnitLabel || undefined,
         sessionActive: true,
         sessionId: currentSessionId.current,
+        photographerId: user?.id,
+        photographerName,
       });
 
       URL.revokeObjectURL(compressionResult.url);
@@ -1515,6 +1524,11 @@ export default function Camera() {
       const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '-');
       const autoCaption = project ? `${project.name}_${dateStr}_${timeStr}` : '';
 
+      // Prepare photographer metadata for attribution
+      const photographerName = user?.firstName && user?.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user?.email || undefined;
+
       const savedPhoto = await idb.savePhoto({
         projectId: selectedProject,
         blob: compressionResult.blob,
@@ -1531,6 +1545,8 @@ export default function Camera() {
         isForTodo: mode === 'todo',
         sessionActive: true,
         sessionId: currentSessionId.current,
+        photographerId: user?.id,
+        photographerName,
       });
 
       console.log('[Camera] Photo saved for edit:', savedPhoto.id);
