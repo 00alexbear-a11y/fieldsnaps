@@ -127,7 +127,7 @@ function isValidRedirectUri(redirectUri: string, requestOrigin: string): boolean
   }
 }
 
-export async function setupAuth(app: Express) {
+export async function setupAuth(app: Express, authRateLimiter?: any) {
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
@@ -371,7 +371,7 @@ export async function setupAuth(app: Express) {
   });
 
   // Native App OAuth with PKCE - Step 1: Start Authorization
-  app.post("/api/native/oauth/start", async (req, res) => {
+  app.post("/api/native/oauth/start", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
     try {
       console.log('[Native OAuth Start] 🚀 Initiating PKCE flow for native app');
       
@@ -439,7 +439,7 @@ export async function setupAuth(app: Express) {
   });
 
   // Native App OAuth with PKCE - Step 2: Exchange Authorization Code
-  app.post("/api/native/oauth/exchange", async (req, res) => {
+  app.post("/api/native/oauth/exchange", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
     try {
       console.log('[Native OAuth Exchange] 🔄 Exchanging authorization code for tokens');
       
@@ -682,7 +682,7 @@ export async function setupAuth(app: Express) {
 
   // JWT token refresh endpoint for native apps
   // Exchanges a valid refresh token for a new access token
-  app.post("/api/auth/refresh", async (req, res) => {
+  app.post("/api/auth/refresh", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
     console.log('[JWT Refresh] Request received');
     const { refresh_token } = req.body;
     
@@ -732,7 +732,7 @@ export async function setupAuth(app: Express) {
 
   // JWT logout endpoint for native apps
   // Revokes the refresh token and clears authentication
-  app.post("/api/auth/logout", async (req, res) => {
+  app.post("/api/auth/logout", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
     console.log('[JWT Logout] Request received');
     const { refresh_token } = req.body;
     
