@@ -172,10 +172,7 @@ export default function ProjectPhotos() {
     if (!projectId || !isOnline) return;
     
     // Silently track visit in background - no UI feedback needed
-    apiRequest('/api/user/recent-projects', {
-      method: 'POST',
-      body: JSON.stringify({ projectId }),
-    }).catch(() => {
+    apiRequest('POST', '/api/user/recent-projects', { projectId }).catch(() => {
       // Ignore errors - visit tracking is non-critical
     });
   }, [projectId, isOnline]);
