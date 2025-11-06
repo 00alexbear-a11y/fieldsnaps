@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Download, ArrowLeft, X } from "lucide-react";
@@ -8,6 +8,7 @@ import type { Photo, Project, Share } from "../../../shared/schema";
 import { format } from "date-fns";
 
 interface ShareData {
+  companyName: string | null;
   project: {
     name: string;
     description?: string;
@@ -18,17 +19,28 @@ interface ShareData {
     url: string;
     caption?: string;
     createdAt: Date;
-    photographerName?: string;
   }>;
 }
 
 export default function ShareView() {
   const { token } = useParams();
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
+  const viewLoggedRef = useRef(false);
 
   const { data, isLoading, error } = useQuery<ShareData>({
     queryKey: [`/api/shared/${token}`],
   });
+
+  // Log view once when data is first loaded
+  useEffect(() => {
+    if (data && token && !viewLoggedRef.current) {
+      viewLoggedRef.current = true;
+      fetch(`/api/shared/${token}/view-log`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }).catch(err => console.error('Failed to log view:', err));
+    }
+  }, [data, token]);
 
   // Transform all photo URLs to use unauthenticated share proxy routes
   const transformedPhotos = useMemo(() => {
@@ -110,14 +122,75 @@ export default function ShareView() {
 
   const { project } = data;
 
+  const handleDownloadAll = async () => {
+    if (transformedPhotos.length === 0) return;
+
+    for (let i = 0; i < transformedPhotos.length; i++) {
+      const photo = transformedPhotos[i];
+      try {
+        const response = await fetch(photo.url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${project.name.replace(/[^a-z0-9]/gi, '_')}_photo_${i + 1}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        // Add small delay between downloads to avoid overwhelming browser
+        if (i < transformedPhotos.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (error) {
+        console.error('Download error for photo', i, error);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b p-4 bg-background">
-        <div>
-          <p className="text-sm text-muted-foreground mb-1">Shared with you</p>
-          <h1 className="text-xl font-bold">{project.name}</h1>
-          {project.description && (
-            <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
+      <header className="border-b bg-background">
+        <div className="p-4 space-y-4">
+          {/* Logo and Company Name */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">FS</span>
+              </div>
+              <span className="font-semibold text-foreground">FieldSnaps</span>
+            </div>
+            {data.companyName && (
+              <>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-sm font-medium text-foreground">{data.companyName}</span>
+              </>
+            )}
+          </div>
+
+          {/* Project Details */}
+          <div>
+            <h1 className="text-xl font-bold text-foreground">{project.name}</h1>
+            {project.description && (
+              <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
+            )}
+            {project.address && (
+              <p className="text-sm text-muted-foreground mt-1">{project.address}</p>
+            )}
+          </div>
+
+          {/* Download All Button */}
+          {transformedPhotos.length > 0 && (
+            <Button
+              onClick={handleDownloadAll}
+              variant="outline"
+              className="w-full sm:w-auto"
+              data-testid="button-download-all"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download All ({transformedPhotos.length})
+            </Button>
           )}
         </div>
       </header>
@@ -152,14 +225,6 @@ export default function ShareView() {
                           alt={photo.caption || "Photo"}
                           className="w-full h-full object-cover"
                         />
-                        {photo.photographerName && (
-                          <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-full bg-primary/80 flex items-center justify-center text-[10px] font-medium">
-                              {photo.photographerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                            </div>
-                            <span className="font-medium">{photo.photographerName.split(' ')[0]}</span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}

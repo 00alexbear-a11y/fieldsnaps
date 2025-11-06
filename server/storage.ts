@@ -1,13 +1,13 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share, Tag, PhotoTag, Pdf, Task, ToDo,
+  Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
   Subscription, SubscriptionEvent, Waitlist,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
   InsertSubscription, InsertSubscriptionEvent, InsertWaitlist
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
@@ -84,6 +84,10 @@ export interface IStorage {
   getShareByToken(token: string): Promise<Share | undefined>;
   getShareByProjectId(projectId: string): Promise<Share | undefined>;
   deleteShare(id: string): Promise<boolean>;
+  
+  // Share View Logs
+  createShareViewLog(data: InsertShareViewLog): Promise<ShareViewLog>;
+  getShareViewLogs(shareId: string): Promise<ShareViewLog[]>;
   
   // Tags
   getTags(projectId?: string): Promise<Tag[]>;
@@ -594,6 +598,18 @@ export class DbStorage implements IStorage {
   async deleteShare(id: string): Promise<boolean> {
     const result = await db.delete(shares).where(eq(shares.id, id)).returning();
     return result.length > 0;
+  }
+
+  // Share View Logs
+  async createShareViewLog(data: InsertShareViewLog): Promise<ShareViewLog> {
+    const result = await db.insert(shareViewLogs).values(data).returning();
+    return result[0];
+  }
+
+  async getShareViewLogs(shareId: string): Promise<ShareViewLog[]> {
+    return await db.select().from(shareViewLogs)
+      .where(eq(shareViewLogs.shareId, shareId))
+      .orderBy(shareViewLogs.viewedAt);
   }
 
   // Trash operations
