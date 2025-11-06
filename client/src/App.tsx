@@ -57,7 +57,7 @@ function AppContent() {
   const isNativeApp = useIsNativeApp();
   
   // Email whitelist - only these emails can access the app
-  const WHITELIST_EMAILS = ['team.abgroup@gmail.com'];
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local'];
   const isWhitelisted = user && user.email && WHITELIST_EMAILS.includes(user.email);
   
   // Initialize theme (handles localStorage and DOM automatically)

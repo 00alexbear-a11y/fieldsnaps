@@ -675,7 +675,8 @@ export async function setupAuth(app: Express) {
         console.log('[Dev Login] Redirecting native app with JWT tokens');
         return res.redirect(redirectUrl);
       }
-      return res.redirect("/");
+      // Redirect authenticated user to projects page
+      return res.redirect("/projects");
     });
   });
 
