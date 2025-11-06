@@ -53,7 +53,7 @@ export interface IStorage {
   toggleProjectCompletion(id: string): Promise<Project | undefined>;
   
   // Photos
-  getProjectPhotos(projectId: string): Promise<Photo[]>;
+  getProjectPhotos(projectId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string }>;
   getPhoto(id: string): Promise<Photo | undefined>;
   createPhoto(data: InsertPhoto): Promise<Photo>;
   updatePhoto(id: string, data: Partial<InsertPhoto>): Promise<Photo | undefined>;
@@ -442,16 +442,45 @@ export class DbStorage implements IStorage {
   }
 
   // Photos
-  async getProjectPhotos(projectId: string): Promise<Photo[]> {
-    // Get photos
-    const photoList = await db.select().from(photos)
-      .where(and(eq(photos.projectId, projectId), isNull(photos.deletedAt)))
+  async getProjectPhotos(projectId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string }> {
+    const shouldPaginate = options?.limit !== undefined;
+    const limit = options?.limit ?? 50; // Only used when pagination is requested
+    const cursor = options?.cursor;
+    
+    // Build query conditions
+    const conditions = [
+      eq(photos.projectId, projectId),
+      isNull(photos.deletedAt)
+    ];
+    
+    // Add cursor condition if provided (fetch photos created after cursor timestamp)
+    if (cursor) {
+      conditions.push(sql`${photos.createdAt} > ${cursor}`);
+    }
+    
+    // Build query
+    let query = db.select().from(photos)
+      .where(and(...conditions))
       .orderBy(photos.createdAt);
     
-    if (photoList.length === 0) return [];
+    // Only apply limit if pagination is explicitly requested
+    if (shouldPaginate) {
+      query = query.limit(limit + 1); // Fetch limit + 1 to check if there's a next page
+    }
+    
+    const photoList = await query;
+    
+    // Check if there are more photos (only relevant when paginating)
+    const hasMore = shouldPaginate && photoList.length > limit;
+    const photosToReturn = hasMore ? photoList.slice(0, limit) : photoList;
+    
+    // If there are no photos, return empty result
+    if (photosToReturn.length === 0) {
+      return { photos: [], nextCursor: undefined };
+    }
     
     // Get all tags for these photos in one query (ordered by name for stability)
-    const photoIds = photoList.map(p => p.id);
+    const photoIds = photosToReturn.map(p => p.id);
     const photoTagsWithTags = await db.select({
       photoId: photoTags.photoId,
       tag: tags,
@@ -471,10 +500,15 @@ export class DbStorage implements IStorage {
     }
     
     // Attach tags to photos
-    return photoList.map(photo => ({
+    const photosWithTags = photosToReturn.map(photo => ({
       ...photo,
       tags: tagsByPhotoId.get(photo.id) || [],
     })) as any;
+    
+    // Generate next cursor from last photo's createdAt timestamp
+    const nextCursor = hasMore ? photosToReturn[photosToReturn.length - 1].createdAt.toISOString() : undefined;
+    
+    return { photos: photosWithTags, nextCursor };
   }
 
   async getPhoto(id: string): Promise<Photo | undefined> {

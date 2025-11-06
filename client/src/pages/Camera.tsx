@@ -353,10 +353,14 @@ export default function Camera() {
         }
         // Mark session restoration as complete
         setIsRestoringSession(false);
+        // Reset preserve flag so future navigations work correctly
+        shouldPreserveSessionRef.current = false;
       }).catch((error: Error) => {
         console.error('[Camera] ERROR: Failed to load session photos:', error);
         // Even on error, allow camera to render
         setIsRestoringSession(false);
+        // Reset preserve flag
+        shouldPreserveSessionRef.current = false;
       });
     }
     
@@ -453,9 +457,17 @@ export default function Camera() {
       if (modeTransitionTimeoutRef.current) {
         clearTimeout(modeTransitionTimeoutRef.current);
       }
-      stopCamera();
-      // Ensure status bar is shown when component unmounts
-      nativeStatusBar.show();
+      
+      // Only stop camera if we're not preserving the session
+      // This prevents camera re-initialization when navigating to photo viewer and back
+      if (!shouldPreserveSessionRef.current) {
+        console.log('[Camera] Stopping camera - session not preserved');
+        stopCamera();
+        // Ensure status bar is shown when component unmounts
+        nativeStatusBar.show();
+      } else {
+        console.log('[Camera] Preserving camera stream - navigating to photo viewer');
+      }
     };
   }, []);
 
@@ -1119,7 +1131,15 @@ export default function Camera() {
 
   // Session preview swipe gesture handlers
   const handlePreviewTouchStart = (e: React.TouchEvent) => {
-    previewSwipeStartY.current = e.touches[0].clientY;
+    const touch = e.touches[0];
+    
+    // Block iOS edge-swipe gestures to prevent double navigation animations
+    // Only block if touch starts within 50px of screen edges
+    if (touch.clientX <= 50 || touch.clientX >= window.innerWidth - 50) {
+      e.preventDefault();
+    }
+    
+    previewSwipeStartY.current = touch.clientY;
     previewSwipeStartTime.current = Date.now();
   };
 

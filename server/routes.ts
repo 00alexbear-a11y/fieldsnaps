@@ -1337,7 +1337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Validate selectedPhotoIds belong to this project (security check)
       if (selectedPhotoIds && Array.isArray(selectedPhotoIds) && selectedPhotoIds.length > 0) {
-        const projectPhotos = await storage.getProjectPhotos(req.params.id);
+        const { photos: projectPhotos } = await storage.getProjectPhotos(req.params.id);
         const projectPhotoIds = new Set(projectPhotos.map(p => p.id));
         
         const invalidPhotoIds = selectedPhotoIds.filter(id => !projectPhotoIds.has(id));
@@ -1526,11 +1526,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Project not found" });
       }
 
-      let photos = await storage.getProjectPhotos(share.projectId);
+      const { photos: allPhotos } = await storage.getProjectPhotos(share.projectId);
 
       // Filter photos if specific photoIds were selected
+      let photos = allPhotos;
       if (share.photoIds && Array.isArray(share.photoIds) && share.photoIds.length > 0) {
-        photos = photos.filter(photo => share.photoIds!.includes(photo.id));
+        photos = allPhotos.filter(photo => share.photoIds!.includes(photo.id));
       }
 
       res.json({
@@ -1585,8 +1586,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;
       
-      const photos = await storage.getProjectPhotos(req.params.projectId);
-      res.json(photos);
+      // Parse pagination params
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+      const cursor = req.query.cursor as string | undefined;
+      
+      const result = await storage.getProjectPhotos(req.params.projectId, { limit, cursor });
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
