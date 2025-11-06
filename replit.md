@@ -1,43 +1,7 @@
 # FieldSnaps - Construction Photo PWA
 
 ## Overview
-FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its primary purpose is to provide robust offline photo and video documentation, aiming to enhance efficiency and minimize disputes. Key capabilities include instant media capture, smart compression, auto-timestamping, and efficient project organization. The project emphasizes full offline functionality and touch optimization, with ambitions to evolve into a commercial SaaS product.
-
-## Recent Changes
-
-### Apple-Inspired Pre-Launch Landing Page (November 2025)
-Complete landing page redesign transformed from pain-driven detailed marketing to clean, minimalist Apple-inspired waitlist page. Focused entirely on conversion for January 2026 launch.
-
-**Design Philosophy**:
-- Minimalist, Apple-inspired aesthetic with generous whitespace
-- Clean typography hierarchy (5xl-7xl headings, proper text-muted-foreground usage)
-- Conversion-optimized dual email capture (hero + footer dark CTA)
-- Pre-launch messaging: "Coming Soon" badge, "Launching January 2026"
-
-**New Page Structure**:
-1. **Hero Section**: Clean headline "Organize job photos. Separate work from home.", inline email capture form, trust indicators (90 days free, iOS & Android, no credit card), split-screen comparison placeholder
-2. **Old Way vs New Way**: Simple two-column comparison cards (before/after scenarios)
-3. **How It Works**: 3-step numbered process (Take photos → Auto-organize → Share with link)
-4. **Features Grid**: 6 clean feature cards (Smart Organization, Instant Search, One-Link Sharing, Cloud Backup, Works Offline, Team Access)
-5. **FAQ Section**: 8 contractor-specific questions with expandable answers
-6. **Final CTA**: Dark background (#1d1d1f) section with second email capture and "Join 500+ contractors" social proof
-7. **Footer**: Minimal footer with Privacy/Terms/Email links
-
-**Technical Implementation**:
-- Waitlist form uses fetch() directly (not apiRequest) to avoid auth issues on public endpoint
-- Database schema fixed: waitlist table now uses database-level UUID default (gen_random_uuid())
-- Shared email/name state between hero and footer forms (intentional - keeps forms synchronized)
-- All interactive elements have data-testid attributes per project guidelines
-- Buttons use shadcn defaults with hover-elevate utility (no custom sizing/hover overrides)
-
-**Removed Sections**:
-- Detailed problem breakdown
-- Game-changing feature spotlight
-- Data-saving section
-- Revenue protection section
-- Testimonials
-- Mission statement
-- All cluttered/detailed marketing copy in favor of simple, scannable content
+FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction professionals, providing robust offline photo and video documentation. Its core purpose is to enhance efficiency, minimize disputes, and streamline project organization through features like instant media capture, smart compression, and auto-timestamping. The project aims to become a commercial SaaS product with full offline functionality and touch optimization.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
@@ -54,102 +18,67 @@ Complete landing page redesign transformed from pain-driven detailed marketing t
 ## System Architecture
 
 ### UI/UX Decisions
-The design follows an "Apple-inspired" philosophy, emphasizing minimalism, content-first presentation, generous white space, and typography, built on an 8px grid with a specific color palette. Interaction design focuses on fluid 0.3s easing animations, haptic feedback, natural gesture navigation (swipe-to-dismiss, swipe-to-delete), and progressive disclosure. Components include rounded buttons, subtle card shadows, clean forms with floating labels, and a tab bar using SF Symbols-inspired icons. Key UI elements like the camera interface and zoom controls utilize frosted glass effects, precise sizing for one-handed operation, and careful safe-area handling for notch devices. A CSS-first responsive design system ensures adaptability across all screen sizes without device detection, using mobile-first CSS, dynamic viewport units, and safe-area awareness for optimal touch targets.
+The design adheres to an Apple-inspired philosophy, characterized by minimalism, generous white space, and clear typography, built on an 8px grid with a specific color palette. Interactions feature fluid 0.3s easing animations, haptic feedback, and natural gesture navigation (e.g., swipe-to-dismiss). Components include rounded buttons, subtle card shadows, clean forms, and a tab bar using SF Symbols-inspired icons. Key elements like the camera interface incorporate frosted glass effects and are optimized for one-handed operation and safe-area handling. A CSS-first, mobile-first responsive design system ensures adaptability across all screen sizes. Recent updates include a split-screen before/after comparison in the hero section and a complete landing page redesign focused on conversion with a minimalist, Apple-inspired aesthetic.
 
 ### Technical Implementations
-FieldSnaps is an offline-first PWA leveraging Service Workers for caching, IndexedDB for local storage, and the Background Sync API for background uploads. Performance is optimized with lazy loading and Web Workers for image compression. Photos and videos are stored in Replit Object Storage. The camera module supports auto-start, instant capture, and video recording with real-time annotation. PDF export supports flexible grid layouts.
-
-The application employs an Instagram/Google Photos-inspired session-based photo management system, keeping photos in IndexedDB throughout a camera session for instant access and smooth navigation. Intelligent quota management automatically cleans up old uploaded photos when storage limits are approached. WiFi-only upload controls allow users to restrict uploads to WiFi connections to save cellular data, with real-time UI indicators showing upload progress. An Upload Queue page provides manual management of sync statuses.
-
-Authentication uses Replit Auth with OpenID Connect and biometric login via SimpleWebAuthn. Capacitor integration provides a native-like iOS experience with native helpers for Haptic Feedback, Native Share, Status Bar Control, Network Detection, and more. A multi-platform subscription system supports Stripe, Apple In-App Purchase, and Google Play Billing.
+FieldSnaps is an offline-first PWA utilizing Service Workers for caching, IndexedDB for local storage, and the Background Sync API. Performance is optimized with lazy loading and Web Workers for image compression. Media is stored in Replit Object Storage. The camera module supports auto-start, instant capture, video recording, and real-time annotation. PDF export supports flexible grid layouts. The application employs an Instagram/Google Photos-inspired session-based photo management system, intelligent quota management, and WiFi-only upload controls. Authentication uses Replit Auth with OpenID Connect and biometric login via SimpleWebAuthn. Capacitor integration provides a native-like iOS experience with native helpers for various device functionalities. A multi-platform subscription system supports Stripe, Apple In-App Purchase, and Google Play Billing.
 
 ### Feature Specifications
-The application includes a bottom navigation bar, a comprehensive camera interface, and a To-Do system with photo attachments. The camera interface features session-based mode persistence and an in-camera session preview gallery with frosted glass overlay, 3-column grid, delete/edit/video playback features, and swipe-to-dismiss gesture (80px threshold, 0.4px/ms velocity). The camera interface uses an optimized layer structure: the main container has no background (for smooth transitions), the viewfinder section (flex-1) extends from the top bar all the way down to the bottom menu with bg-black providing the dark backdrop, top bar with pb-2 (8px bottom padding) and explicit bg-black, zoom controls positioned absolutely inside the viewfinder at the bottom (bottom-2, 8px from bottom edge) with py-1 (8px vertical padding) and transparent frosted glass background (bg-black/30 backdrop-blur-xl) floating over the camera preview, and bottom control bar with pt-4 pb-safe-4 (16px top padding + safe-area + 16px bottom padding to match edit mode), gap-2 between controls, and explicit bg-black. The zoom controls float transparently over the extended viewfinder's dark background.
-
-**Session Preview Gesture Isolation**: The session preview overlay and main camera container use independent swipe-to-dismiss handlers. When the session preview overlay is open, main container touch handlers (handleContainerTouchStart/Move/End) are disabled via `isSessionPreviewOpen` guard clauses to prevent gesture conflicts. This ensures swipe-down on the overlay only closes the overlay (not the entire camera page), while swipe-down on the bare camera still exits to projects.
-
-Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. The Photo Annotation Editor provides tools for text, arrows, lines, circles, pens, and a tape measure. Photos are auto-named with project, date, and time. Additional features include an interactive map view, a 30-day trash bin, and bulk photo move functionality. The fullscreen photo viewer includes optimized bottom controls, an edit menu, and GPU-accelerated carousel transitions.
+The application includes a bottom navigation bar, a comprehensive camera interface with session-based mode persistence, an in-camera session preview gallery, and a To-Do system with photo attachments. Project organization is card-based with photo counts and search. Photo management offers grid/timeline views, swipe actions, and batch selection. A Photo Annotation Editor provides tools for text, arrows, lines, and a tape measure. Photos are auto-named. Additional features include an interactive map view, a 30-day trash bin, bulk photo move functionality, and a fullscreen photo viewer with optimized controls and GPU-accelerated carousel transitions. The camera interface employs specific layer structures for smooth transitions, and gesture isolation ensures separate handling for the session preview and main camera container.
 
 ### System Design Choices
-The architecture emphasizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage leverages IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database query and sync queue optimization, database indexing, and code-splitting. The offline sync system is hardened with queue size limits, exponential backoff, and atomic deduplication. OAuth for native apps uses the Capacitor Browser plugin. Critical performance enhancements include `crossOrigin='use-credentials'`, O(n) photo rendering with Map-based caching, `viewport-fit=cover`, and comprehensive CSS utilities for iOS safe-area handling. Virtualization with `@tanstack/react-virtual` is implemented for large photo collections, and global error toast notifications are managed via TanStack Query.
+The architecture prioritizes simplicity and an invisible interface. The PWA infrastructure uses a Service Worker for hourly updates and offline caching. Storage leverages IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance optimizations include database indexing, query optimization, code-splitting, and virtualization with `@tanstack/react-virtual`. The offline sync system features queue size limits, exponential backoff, and atomic deduplication. OAuth for native apps uses the Capacitor Browser plugin. Critical performance enhancements include `crossOrigin='use-credentials'`, O(n) photo rendering with Map-based caching, `viewport-fit=cover`, and comprehensive CSS utilities for iOS safe-area handling. Global error toast notifications are managed via TanStack Query.
 
 ### Backend Performance Optimizations
-Backend optimizations target mobile networks and high-concurrency scenarios. Compression via Gzip/Brotli reduces API payload sizes (70% reduction). Field filtering via query parameters allows mobile clients to request only needed data. Upload resilience is managed with 10-minute timeouts and per-user rate limiting (100 uploads/15min). Database performance is enhanced with indexes on key tables (photos.projectId, photos.userId, photos.uploadedAt, projects.userId) and in-memory response caching with user-scoped keys and per-endpoint TTLs, with cache invalidation after all mutations.
-
-**CORS Architecture**: CORS middleware is scoped to `/api/*` routes only (not applied globally), allowing static assets to serve without CORS headers. This enables custom domains like fieldsnaps.com to load the application without 500 errors. API routes support Capacitor WebView origins (`capacitor://`, `ionic://`), localhost, *.replit.app domains, and *.repl.co domains for cross-origin API requests.
-
-**Upload Performance Monitoring**: Real-time metrics tracking system monitors all upload methods (multipart, presigned, chunked) with success/failure rates, average duration by file size, retry frequency, error types, and method distribution. Accessible via GET `/api/uploads/metrics` for debugging and performance analysis.
-
-### Intelligent Upload System
-The application uses a 3-tier upload strategy optimized for different file sizes:
-
-**Small Files (<5MB)**: Traditional multipart upload with thumbnail support
-- Simple and efficient for typical photos
-- Backend generates thumbnails inline
-- Full metadata support
-
-**Medium Files (5-20MB)**: Direct-to-cloud presigned URL uploads
-- Bypasses backend for file content (metadata only)
-- Faster uploads with reduced server load
-- Client uploads directly to object storage
-- Backend creates photo record after upload
-
-**Large Files (>20MB)**: Chunked upload with retry logic
-- Files split into 10MB chunks on client
-- Each chunk uploads with 3 retries and exponential backoff (1s to 30s)
-- Query parameter validation prevents disk space DoS attacks
-- Backend assembles chunks, uploads to object storage atomically
-- Automatic cleanup of expired sessions (24h) and orphaned chunks
-- Session-based progress tracking for resumability
-- Note: Thumbnail generation intentionally deferred (thumbnailUrl nullable)
+Backend optimizations include compression (Gzip/Brotli) for API payloads, field filtering via query parameters, and robust upload resilience with timeouts and per-user rate limiting. Database performance is enhanced with indexes and in-memory response caching with user-scoped keys and cache invalidation. CORS middleware is scoped to `/api/*` routes, supporting Capacitor WebView origins, localhost, and Replit domains. An intelligent 3-tier upload system is implemented: traditional multipart for small files (<5MB), direct-to-cloud presigned URLs for medium files (5-20MB), and chunked upload with retry logic for large files (>20MB). Real-time metrics track upload performance for all methods.
 
 ## External Dependencies
 
 ### Frontend
-- **React**: UI library.
-- **TypeScript**: Typed JavaScript.
-- **Vite**: Frontend tooling.
-- **Tailwind CSS**: Utility-first CSS framework.
-- **shadcn/ui**: React component library.
-- **Wouter**: Routing library.
-- **TanStack Query**: Asynchronous state management.
+- **React**: UI library
+- **TypeScript**: Typed JavaScript
+- **Vite**: Frontend tooling
+- **Tailwind CSS**: Utility-first CSS framework
+- **shadcn/ui**: React component library
+- **Wouter**: Routing library
+- **TanStack Query**: Asynchronous state management
 
 ### Backend
-- **Express.js**: Node.js web framework.
-- **PostgreSQL**: Relational database (Replit built-in).
-- **Drizzle ORM**: TypeScript ORM.
-- **Replit Object Storage**: Cloud object storage.
+- **Express.js**: Node.js web framework
+- **PostgreSQL**: Relational database (Replit built-in)
+- **Drizzle ORM**: TypeScript ORM
+- **Replit Object Storage**: Cloud object storage
 
 ### PWA Technologies
-- **Service Worker API**: Offline caching and background processes.
-- **Web Manifest**: PWA installation and metadata.
-- **IndexedDB**: Client-side structured data storage.
-- **Background Sync API**: Deferring network operations.
+- **Service Worker API**: Offline caching and background processes
+- **Web Manifest**: PWA installation and metadata
+- **IndexedDB**: Client-side structured data storage
+- **Background Sync API**: Deferring network operations
 
 ### Authentication
-- **Replit Auth**: User authentication.
-- **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication.
+- **Replit Auth**: User authentication
+- **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication
 
 ### Native Platform & OTA Updates
-- **Capacitor 6**: Native wrapper for iOS/Android.
-- **Capgo**: Encrypted over-the-air (OTA) updates.
+- **Capacitor 6**: Native wrapper for iOS/Android
+- **Capgo**: Encrypted over-the-air (OTA) updates
 
 ### Capacitor Plugins
-- **@capacitor/core**: Core functionality and platform detection.
-- **@capacitor/app**: App lifecycle management.
-- **@capacitor/browser**: Opens OAuth URLs.
-- **@capacitor/device**: Device information.
-- **@capacitor/preferences**: Native storage.
-- **@capacitor/filesystem**: Native file system access.
-- **@capacitor/camera**: Native camera integration.
-- **@capacitor/haptics**: Native haptic feedback.
-- **@capacitor/share**: Native iOS share sheet.
-- **@capacitor/status-bar**: Native status bar control.
-- **@capacitor/network**: Native network detection.
-- **@capacitor/clipboard**: Native clipboard operations.
-- **@capacitor/keyboard**: Native keyboard management.
-- **@capacitor/splash-screen**: Native splash screen control.
+- **@capacitor/core**: Core functionality and platform detection
+- **@capacitor/app**: App lifecycle management
+- **@capacitor/browser**: Opens OAuth URLs
+- **@capacitor/device**: Device information
+- **@capacitor/preferences**: Native storage
+- **@capacitor/filesystem**: Native file system access
+- **@capacitor/camera**: Native camera integration
+- **@capacitor/haptics**: Native haptic feedback
+- **@capacitor/share**: Native iOS share sheet
+- **@capacitor/status-bar**: Native status bar control
+- **@capacitor/network**: Native network detection
+- **@capacitor/clipboard**: Native clipboard operations
+- **@capacitor/keyboard**: Native keyboard management
+- **@capacitor/splash-screen**: Native splash screen control
 
 ### Third-Party APIs & Payment Processing
-- **Google Geocoding API**: Address to coordinates conversion.
-- **Stripe**: Web subscription management and payment processing.
+- **Google Geocoding API**: Address to coordinates conversion
+- **Stripe**: Web subscription management and payment processing
