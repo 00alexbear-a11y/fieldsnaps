@@ -167,6 +167,19 @@ export default function ProjectPhotos() {
     }
   }, [company]);
 
+  // Auto-track project visit for "Recent Visits" feature (Integration Task 1)
+  useEffect(() => {
+    if (!projectId || !isOnline) return;
+    
+    // Silently track visit in background - no UI feedback needed
+    apiRequest('/api/user/recent-projects', {
+      method: 'POST',
+      body: JSON.stringify({ projectId }),
+    }).catch(() => {
+      // Ignore errors - visit tracking is non-critical
+    });
+  }, [projectId, isOnline]);
+
   // Filter photos by selected tags (for use in viewer and display)
   const filteredPhotos = useMemo(() => {
     if (selectedTagIds.size === 0) return photos;
