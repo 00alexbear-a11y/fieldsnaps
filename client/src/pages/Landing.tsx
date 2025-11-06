@@ -20,7 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
-import mixedPhotosPath from '@assets/IMG_3721_1762386596117.png';
+import mixedPhotosPath from '@assets/camera-roll-mixed-photos.png';
 import organizedPhotosPath from '@assets/CleanShot 2025-11-05 at 20.38.27@2x_1762403935456.png';
 import { isDevModeEnabled } from '@/config/devMode';
 
