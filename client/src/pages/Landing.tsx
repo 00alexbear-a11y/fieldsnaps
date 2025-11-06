@@ -108,14 +108,11 @@ export default function Landing() {
       <header className="border-b border-border sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <img 
-                src={logoPath} 
-                alt="FieldSnaps" 
-                className="h-8 w-auto object-contain"
-              />
-              <span className="text-xl font-semibold">FieldSnaps</span>
-            </div>
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-8 w-auto object-contain"
+            />
             <nav className="flex items-center gap-2 md:gap-6">
               <a href="#how-it-works" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-how-it-works">
                 How it Works
@@ -203,17 +200,57 @@ export default function Landing() {
           <p className="text-center text-sm text-muted-foreground mb-16">
             Join 500+ contractors already waiting
           </p>
+        </div>
 
-          {/* Hero Image - Mixed Photos */}
-          <div className="rounded-2xl overflow-hidden shadow-2xl border border-border">
-            <img 
-              src={mixedPhotosPath} 
-              alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
-              className="w-full h-auto"
-            />
+        {/* Before/After Split Screen Comparison - Full Width on Mobile */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
+            {/* Before - Camera Roll Chaos */}
+            <div className="space-y-4 min-w-0">
+              <div className="text-center md:text-left">
+                <span className="inline-block px-3 py-1 bg-destructive/10 text-destructive text-sm font-medium rounded-full mb-3">
+                  Before FieldSnaps
+                </span>
+              </div>
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border w-full">
+                <img 
+                  src={mixedPhotosPath} 
+                  alt="Before FieldSnaps - job photos mixed with personal photos in camera roll" 
+                  className="w-full h-auto"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground text-center md:text-left">
+                Job photos buried with 1,000+ personal pics
+              </p>
+            </div>
+
+            {/* After - FieldSnaps Organized */}
+            <div className="space-y-4 min-w-0">
+              <div className="text-center md:text-left">
+                <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full mb-3">
+                  With FieldSnaps
+                </span>
+              </div>
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-gradient-to-br from-muted/50 to-muted w-full min-h-[500px]">
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-3 p-8">
+                  <Folder className="w-16 h-16 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    FieldSnaps organized home screen
+                  </p>
+                  <p className="text-xs text-muted-foreground italic">
+                    [Screenshot placeholder - awaiting image]
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground text-center md:text-left">
+                Every project organized, instantly accessible
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Trust Indicators */}
+        {/* Trust Indicators */}
+        <div className="max-w-5xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
