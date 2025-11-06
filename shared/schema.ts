@@ -1,4 +1,4 @@
-import { pgTable, varchar, text, timestamp, jsonb, integer, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, jsonb, integer, boolean, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -141,9 +141,6 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   lastActivityAt: timestamp("last_activity_at").defaultNow().notNull(), // Track last upload or view
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
-  // Location/navigation tracking for Phase 3
-  isFavorite: boolean("is_favorite").default(false).notNull(), // User can favorite frequently-visited projects
-  visitCount: integer("visit_count").default(0).notNull(), // Track how many times project has been opened
   // Multi-unit support for construction sites
   unitCount: integer("unit_count").default(1).notNull(), // Number of units/apartments in project
   unitLabels: text("unit_labels").array().$type<string[]>(), // Custom unit labels (e.g., ["Unit 1", "Unit 2", "Penthouse"])
@@ -398,6 +395,31 @@ export const subscriptionEvents = pgTable("subscription_events", {
   index("idx_subscription_events_created_at").on(table.createdAt.desc()),
 ]);
 
+// Project Favorites table - user-specific favorites (Phase 3)
+export const projectFavorites = pgTable("project_favorites", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_project_favorites_user_id").on(table.userId),
+  index("idx_project_favorites_project_id").on(table.projectId),
+  // Composite unique constraint - user can only favorite a project once
+  uniqueIndex("idx_project_favorites_user_project").on(table.userId, table.projectId),
+]);
+
+// Project Visits table - user-specific visit tracking (Phase 3)
+export const projectVisits = pgTable("project_visits", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  visitedAt: timestamp("visited_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_project_visits_user_id").on(table.userId),
+  index("idx_project_visits_project_id").on(table.projectId),
+  index("idx_project_visits_visited_at").on(table.visitedAt.desc()),
+]);
+
 // Waitlist table - for pre-launch email collection
 export const waitlist = pgTable("waitlist", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -435,6 +457,8 @@ export const updateUserSettingsSchema = createInsertSchema(userSettings).omit({ 
 export const insertWaitlistSchema = createInsertSchema(waitlist).omit({ id: true, createdAt: true });
 export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ id: true, createdAt: true });
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
+export const insertProjectFavoriteSchema = createInsertSchema(projectFavorites).omit({ id: true, createdAt: true });
+export const insertProjectVisitSchema = createInsertSchema(projectVisits).omit({ id: true, visitedAt: true });
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
@@ -479,6 +503,10 @@ export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;
 export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type ProjectFavorite = typeof projectFavorites.$inferSelect;
+export type InsertProjectFavorite = z.infer<typeof insertProjectFavoriteSchema>;
+export type ProjectVisit = typeof projectVisits.$inferSelect;
+export type InsertProjectVisit = z.infer<typeof insertProjectVisitSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
