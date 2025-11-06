@@ -10,7 +10,6 @@ import { Card } from "@/components/ui/card";
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import {
   AlertDialog,
@@ -35,14 +34,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
@@ -531,23 +524,6 @@ export default function Projects() {
             </p>
           )}
         </div>
-        
-        {/* Show Completed Toggle - Moved to top for better accessibility */}
-        <div className="flex items-center justify-between px-4 pb-3">
-          <label 
-            htmlFor="show-completed" 
-            className="text-sm text-muted-foreground cursor-pointer select-none"
-          >
-            Show completed
-          </label>
-          <Switch 
-            id="show-completed" 
-            checked={showCompleted}
-            onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
-            className="scale-75"
-            data-testid="switch-show-completed"
-          />
-        </div>
       </div>
 
       {/* Projects List */}
@@ -638,17 +614,48 @@ export default function Projects() {
                 data-testid="input-search-projects"
               />
             </div>
-            <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-              <SelectTrigger className="w-[140px] h-9" data-testid="select-sort">
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lastActivity">Recent Activity</SelectItem>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="created">Date Created</SelectItem>
-              </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-9 w-[140px]" data-testid="button-sort-filter">
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  <span className="text-sm">
+                    {sortBy === 'lastActivity' ? 'Recent...' : sortBy === 'name' ? 'Name' : 'Date...'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuItem 
+                  onClick={() => setSortBy('lastActivity')}
+                  data-testid="sort-recent-activity"
+                >
+                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'lastActivity' ? 'opacity-100' : 'opacity-0'}`} />
+                  Recent Activity
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSortBy('name')}
+                  data-testid="sort-name"
+                >
+                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'name' ? 'opacity-100' : 'opacity-0'}`} />
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSortBy('created')}
+                  data-testid="sort-date-created"
+                >
+                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'created' ? 'opacity-100' : 'opacity-0'}`} />
+                  Date Created
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuCheckboxItem
+                  checked={showCompleted}
+                  onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+                  data-testid="switch-show-completed"
+                >
+                  Show completed
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
