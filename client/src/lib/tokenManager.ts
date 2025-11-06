@@ -173,6 +173,14 @@ class TokenManager {
         return null;
       }
 
+      // Check Content-Type to avoid parsing HTML as JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('[TokenManager] Unexpected response type:', contentType);
+        console.error('[TokenManager] Response is not JSON - likely redirected to login page');
+        return null;
+      }
+
       const data = await response.json();
       const newAccessToken = data.access_token;
 
