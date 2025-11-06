@@ -53,7 +53,7 @@ type TodoWithDetails = ToDo & {
   assignee: { id: string; firstName: string | null; lastName: string | null };
   creator: { id: string; firstName: string | null; lastName: string | null };
 };
-import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
+import { format, startOfDay, endOfDay, isWithinInterval, formatDistanceToNow } from "date-fns";
 
 // Extend Photo to include tags
 type Photo = BasePhoto & { tags?: Tag[] };
@@ -1857,6 +1857,20 @@ export default function ProjectPhotos() {
                                 alt={photo.caption || "Photo"}
                                 className="w-full h-full object-cover"
                               />
+                            )}
+
+                            {/* Photo Attribution */}
+                            {(photo.photographerName || photo.createdAt) && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5">
+                                <p className="text-xs text-white/95 font-medium truncate" data-testid={`photographer-${photo.id}`}>
+                                  {photo.photographerName || 'Unknown photographer'}
+                                </p>
+                                {photo.createdAt && (
+                                  <p className="text-[10px] text-white/70 truncate" data-testid={`timestamp-${photo.id}`}>
+                                    {formatDistanceToNow(new Date(photo.createdAt), { addSuffix: true })}
+                                  </p>
+                                )}
+                              </div>
                             )}
                           </div>
                         );

@@ -33,6 +33,9 @@ export interface LocalPhoto {
   sessionActive?: boolean; // True if photo is part of active camera session
   sessionId?: string; // ID of the camera session this photo belongs to
   uploadedAt?: number; // Timestamp when photo was successfully uploaded
+  // Attribution metadata for offline display
+  photographerId?: string; // ID of user who took the photo
+  photographerName?: string; // Cached name for offline display
   createdAt: number;
   updatedAt: number;
 }
