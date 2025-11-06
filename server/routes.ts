@@ -1318,6 +1318,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Track project visit - Phase 3 (Locations feature)
+  app.post("/api/projects/:id/visit", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const visit = await storage.trackProjectVisit(userId, req.params.id);
+      
+      // Invalidate projects cache after visit tracking
+      invalidateCachePattern(userId, '/api/projects');
+      
+      res.json(visit);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Toggle project favorite - Phase 3 (Locations feature)
+  app.post("/api/projects/:id/favorite", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Verify project belongs to user's company
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Toggle favorite status (user-scoped)
+      const { isFavorite } = req.body;
+      if (typeof isFavorite !== 'boolean') {
+        return res.status(400).json({ error: "isFavorite must be a boolean" });
+      }
+
+      const result = await storage.toggleProjectFavorite(userId, req.params.id, isFavorite);
+      
+      // Invalidate projects cache after favorite toggle
+      invalidateCachePattern(userId, '/api/projects');
+      
+      res.json({ success: true, isFavorite, favorite: result !== false ? result : null });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/projects/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;

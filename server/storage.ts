@@ -1,16 +1,16 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
-  Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification,
+  Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
-  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification
+  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit
 } from "../shared/schema";
-import { eq, inArray, isNull, isNotNull, and, lt, count, sql } from "drizzle-orm";
+import { eq, inArray, isNull, isNotNull, and, lt, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { ObjectStorageService } from "./objectStorage";
 
@@ -51,8 +51,10 @@ export interface IStorage {
   updateProject(id: string, data: Partial<InsertProject>): Promise<Project | undefined>;
   deleteProject(id: string): Promise<boolean>; // Soft delete
   toggleProjectCompletion(id: string): Promise<Project | undefined>;
-  trackProjectVisit(projectId: string): Promise<Project | undefined>; // Increment visitCount and update lastActivityAt
-  toggleProjectFavorite(projectId: string, isFavorite: boolean): Promise<Project | undefined>; // Toggle favorite status
+  trackProjectVisit(userId: string, projectId: string): Promise<ProjectVisit>; // Record user visit
+  toggleProjectFavorite(userId: string, projectId: string, isFavorite: boolean): Promise<ProjectFavorite | boolean>; // Toggle user favorite (returns favorite record if added, false if removed)
+  getUserFavoriteProjectIds(userId: string): Promise<string[]>; // Get project IDs user has favorited
+  getUserRecentProjectIds(userId: string, limit?: number): Promise<string[]>; // Get recently visited project IDs for user
   
   // Photos
   getProjectPhotos(projectId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string }>;
@@ -355,8 +357,6 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
-        isFavorite: projects.isFavorite,
-        visitCount: projects.visitCount,
         unitCount: projects.unitCount,
         unitLabels: projects.unitLabels,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
@@ -390,8 +390,6 @@ export class DbStorage implements IStorage {
         lastActivityAt: projects.lastActivityAt,
         deletedAt: projects.deletedAt,
         completed: projects.completed,
-        isFavorite: projects.isFavorite,
-        visitCount: projects.visitCount,
         unitCount: projects.unitCount,
         unitLabels: projects.unitLabels,
         photoCount: sql<number>`CAST(COUNT(CASE WHEN ${photos.deletedAt} IS NULL THEN ${photos.id} END) AS INTEGER)`,
@@ -411,7 +409,7 @@ export class DbStorage implements IStorage {
       .leftJoin(photos, eq(photos.projectId, projects.id))
       .leftJoin(coverPhoto, eq(coverPhoto.id, projects.coverPhotoId))
       .where(and(eq(projects.companyId, companyId), isNull(projects.deletedAt)))
-      .groupBy(projects.id, projects.isFavorite, projects.visitCount, projects.unitCount, projects.unitLabels, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
+      .groupBy(projects.id, projects.unitCount, projects.unitLabels, coverPhoto.id, coverPhoto.url, coverPhoto.caption, coverPhoto.mediaType, coverPhoto.projectId, coverPhoto.photographerId, coverPhoto.photographerName, coverPhoto.createdAt, coverPhoto.deletedAt)
       .orderBy(projects.createdAt);
     
     // Map to clean up undefined cover photos
@@ -462,28 +460,47 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async trackProjectVisit(projectId: string): Promise<Project | undefined> {
-    // Get current project
-    const project = await this.getProject(projectId);
-    if (!project) return undefined;
-    
-    // Increment visitCount and update lastActivityAt
-    const result = await db.update(projects)
-      .set({ 
-        visitCount: (project.visitCount || 0) + 1,
-        lastActivityAt: new Date()
-      })
-      .where(eq(projects.id, projectId))
+  async trackProjectVisit(userId: string, projectId: string): Promise<ProjectVisit> {
+    const result = await db.insert(projectVisits)
+      .values({ userId, projectId })
       .returning();
     return result[0];
   }
 
-  async toggleProjectFavorite(projectId: string, isFavorite: boolean): Promise<Project | undefined> {
-    const result = await db.update(projects)
-      .set({ isFavorite })
-      .where(eq(projects.id, projectId))
-      .returning();
-    return result[0];
+  async toggleProjectFavorite(userId: string, projectId: string, isFavorite: boolean): Promise<ProjectFavorite | boolean> {
+    if (isFavorite) {
+      // Add favorite - use onConflictDoNothing to handle duplicate favorites
+      const result = await db.insert(projectFavorites)
+        .values({ userId, projectId })
+        .onConflictDoNothing()
+        .returning();
+      return result[0] || false; // Return false if already existed
+    } else {
+      // Remove favorite
+      await db.delete(projectFavorites)
+        .where(and(
+          eq(projectFavorites.userId, userId),
+          eq(projectFavorites.projectId, projectId)
+        ));
+      return false;
+    }
+  }
+
+  async getUserFavoriteProjectIds(userId: string): Promise<string[]> {
+    const favorites = await db.select({ projectId: projectFavorites.projectId })
+      .from(projectFavorites)
+      .where(eq(projectFavorites.userId, userId));
+    return favorites.map(f => f.projectId);
+  }
+
+  async getUserRecentProjectIds(userId: string, limit: number = 10): Promise<string[]> {
+    const visits = await db
+      .selectDistinctOn([projectVisits.projectId], { projectId: projectVisits.projectId })
+      .from(projectVisits)
+      .where(eq(projectVisits.userId, userId))
+      .orderBy(projectVisits.projectId, desc(projectVisits.visitedAt))
+      .limit(limit);
+    return visits.map(v => v.projectId);
   }
 
   // Photos
