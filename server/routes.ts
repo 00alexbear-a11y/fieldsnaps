@@ -953,6 +953,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update project activity
       await storage.updateProject(session.projectId, { lastActivityAt: new Date() });
 
+      // Log activity for accountability
+      if (user.companyId) {
+        await storage.createActivityLog({
+          userId,
+          companyId: user.companyId,
+          action: 'photo_uploaded',
+          entityType: 'photo',
+          entityId: photo.id,
+          metadata: {
+            projectId: session.projectId,
+            projectName: project?.name || 'Unknown Project',
+            photoCaption: photo.caption,
+            mediaType: photo.mediaType,
+          },
+        });
+      }
+
       // Invalidate cache
       invalidateCachePattern(userId, '/api/projects');
 
@@ -1184,6 +1201,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const project = await storage.createProject(projectData);
+
+      // Log activity for accountability
+      if (user.companyId) {
+        await storage.createActivityLog({
+          userId,
+          companyId: user.companyId,
+          action: 'project_created',
+          entityType: 'project',
+          entityId: project.id,
+          metadata: {
+            projectName: project.name,
+            address: project.address || undefined,
+          },
+        });
+      }
       
       // Invalidate projects cache after creation
       invalidateCachePattern(userId, '/api/projects');
@@ -1387,6 +1419,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyName: company.name,
         expiresAt,
       });
+
+      // Log activity for accountability
+      if (user.companyId) {
+        await storage.createActivityLog({
+          userId,
+          companyId: user.companyId,
+          action: 'share_created',
+          entityType: 'share',
+          entityId: share.id,
+          metadata: {
+            projectId: req.params.id,
+            projectName: project.name,
+            photoCount: selectedPhotoIds?.length || 0,
+            expiresAt: expiresAt?.toISOString() || undefined,
+          },
+        });
+      }
 
       res.json({ token: share.token });
     } catch (error: any) {
@@ -1845,6 +1894,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update project's last activity timestamp
       await storage.updateProject(req.params.projectId, { lastActivityAt: new Date() });
+
+      // Log activity for accountability
+      if (req.user) {
+        const user = await storage.getUser(userId);
+        if (user?.companyId) {
+          await storage.createActivityLog({
+            userId,
+            companyId: user.companyId,
+            action: 'photo_uploaded',
+            entityType: 'photo',
+            entityId: photo.id,
+            metadata: {
+              projectId: req.params.projectId,
+              projectName: project?.name || 'Unknown Project',
+              photoCaption: photo.caption,
+              mediaType: photo.mediaType,
+            },
+          });
+        }
+      }
       
       // Invalidate projects cache after photo upload (photo counts changed)
       invalidateCachePattern(userId, '/api/projects');
@@ -1978,6 +2047,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update project activity
       await storage.updateProject(projectId, { lastActivityAt: new Date() });
+
+      // Log activity for accountability
+      if (user.companyId) {
+        await storage.createActivityLog({
+          userId,
+          companyId: user.companyId,
+          action: 'photo_uploaded',
+          entityType: 'photo',
+          entityId: photo.id,
+          metadata: {
+            projectId,
+            projectName: project?.name || 'Unknown Project',
+            photoCaption: photo.caption,
+            mediaType: photo.mediaType,
+          },
+        });
+      }
       
       // Invalidate cache
       invalidateCachePattern(userId, '/api/projects');
@@ -2440,6 +2526,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const todo = await storage.createTodo(validated);
+
+      // Log activity for accountability
+      if (user.companyId) {
+        const assignee = await storage.getUser(assignedTo);
+        const assigneeName = assignee ? `${assignee.firstName || ''} ${assignee.lastName || ''}`.trim() || assignee.email : 'Unknown';
+        
+        await storage.createActivityLog({
+          userId: user.id,
+          companyId: user.companyId,
+          action: 'todo_created',
+          entityType: 'todo',
+          entityId: todo.id,
+          metadata: {
+            todoTitle: todo.title,
+            assignedTo: assignedTo,
+            assigneeName,
+            projectId: todo.projectId || undefined,
+          },
+        });
+      }
+
       res.status(201).json(todo);
     } catch (error: any) {
       handleError(res, error);
@@ -2538,7 +2645,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // Activity Log Routes - accountability and audit trail
+  // ========================================
+
+  app.get("/api/activity-logs", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const options = {
+        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 50,
+        userId: req.query.userId as string | undefined,
+        action: req.query.action as string | undefined,
+        entityType: req.query.entityType as string | undefined,
+      };
+
+      const logs = await storage.getActivityLogs(user.companyId, options);
+      res.json(logs);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Notification Routes
+  // ========================================
+
+  app.get("/api/notifications", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const options = {
+        unreadOnly: req.query.unreadOnly === 'true',
+        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 50,
+      };
+
+      const notifications = await storage.getNotifications(userId, options);
+      res.json(notifications);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.get("/api/notifications/unread-count", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const count = await storage.getUnreadNotificationCount(userId);
+      res.json({ count });
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.post("/api/notifications/:id/read", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Verify notification belongs to user
+      const notification = await storage.getNotifications(userId, { limit: 1000 });
+      const notificationToMark = notification.find(n => n.id === req.params.id);
+      
+      if (!notificationToMark) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+
+      const updated = await storage.markNotificationAsRead(req.params.id);
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.post("/api/notifications/mark-all-read", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await storage.markAllNotificationsAsRead(userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.delete("/api/notifications/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Verify notification belongs to user
+      const notifications = await storage.getNotifications(userId, { limit: 1000 });
+      const notificationToDelete = notifications.find(n => n.id === req.params.id);
+      
+      if (!notificationToDelete) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+
+      const deleted = await storage.deleteNotification(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Team Stats Routes - for company owners
+  // ========================================
+
+  app.get("/api/team-stats/photo-uploads", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Only owner can view team stats
+      if (user.role !== 'owner') {
+        return res.status(403).json({ error: "Only company owners can view team stats" });
+      }
+
+      // Get activity logs for photo uploads
+      const logs = await storage.getActivityLogs(user.companyId, {
+        action: 'photo_uploaded',
+        limit: 1000, // Get more for accurate stats
+      });
+
+      // Group by user and count
+      const userStats = logs.reduce((acc, log) => {
+        const userId = log.userId;
+        const userName = `${log.user.firstName || ''} ${log.user.lastName || ''}`.trim() || log.user.email || 'Unknown';
+        
+        if (!acc[userId]) {
+          acc[userId] = {
+            userId,
+            userName,
+            photoCount: 0,
+          };
+        }
+        acc[userId].photoCount += 1;
+        return acc;
+      }, {} as Record<string, { userId: string; userName: string; photoCount: number }>);
+
+      // Convert to array and sort by photo count descending
+      const stats = Object.values(userStats).sort((a, b) => b.photoCount - a.photoCount);
+
+      res.json(stats);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
   // Trash operations - 30-day soft delete
+  // ========================================
   app.get("/api/trash/projects", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const projects = await storage.getDeletedProjects();

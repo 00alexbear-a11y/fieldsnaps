@@ -252,6 +252,43 @@ export const todos = pgTable("todos", {
   index("idx_todos_completed").on(table.completed),
 ]);
 
+// Activity logs table - tracks all user actions for accountability and audit trail
+export const activityLogs = pgTable("activity_logs", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Who performed the action
+  companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }), // Team visibility
+  action: varchar("action", { length: 100 }).notNull(), // photo_uploaded, project_created, todo_assigned, share_created, etc.
+  entityType: varchar("entity_type", { length: 50 }).notNull(), // photo, project, todo, share, etc.
+  entityId: varchar("entity_id").notNull(), // ID of the entity that was acted upon
+  metadata: jsonb("metadata"), // Additional context (e.g., photo count, project name, assignee name)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_activity_logs_user_id").on(table.userId),
+  index("idx_activity_logs_company_id").on(table.companyId),
+  index("idx_activity_logs_action").on(table.action),
+  index("idx_activity_logs_entity_type").on(table.entityType),
+  index("idx_activity_logs_created_at").on(table.createdAt.desc()), // Most recent first
+]);
+
+// Notifications table - for notifying users about assignments, mentions, and important events
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Who receives this notification
+  type: varchar("type", { length: 50 }).notNull(), // todo_assigned, photo_shared, project_completed, etc.
+  title: text("title").notNull(), // "New task assigned to you"
+  message: text("message").notNull(), // "Jake assigned you 'Install Cabinet Pulls' in Ridgefield"
+  read: boolean("read").default(false).notNull(), // Whether user has seen this
+  entityType: varchar("entity_type", { length: 50 }), // Optional - photo, project, todo
+  entityId: varchar("entity_id"), // Optional - ID to link to (for tap-to-open functionality)
+  metadata: jsonb("metadata"), // Additional data (e.g., assignee name, project name)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_notifications_user_id").on(table.userId),
+  index("idx_notifications_read").on(table.read),
+  index("idx_notifications_type").on(table.type),
+  index("idx_notifications_created_at").on(table.createdAt.desc()), // Most recent first
+]);
+
 // Shares table - for generating shareable project links
 export const shares = pgTable("shares", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -391,6 +428,8 @@ export const insertSubscriptionEventSchema = createInsertSchema(subscriptionEven
 export const insertUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, createdAt: true, updatedAt: true });
 export const updateUserSettingsSchema = createInsertSchema(userSettings).omit({ id: true, userId: true, createdAt: true, updatedAt: true }).partial();
 export const insertWaitlistSchema = createInsertSchema(waitlist).omit({ id: true, createdAt: true });
+export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ id: true, createdAt: true });
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
@@ -413,6 +452,8 @@ export type Pdf = typeof pdfs.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type SubscriptionEvent = typeof subscriptionEvents.$inferSelect;
 export type Waitlist = typeof waitlist.$inferSelect;
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
@@ -431,6 +472,8 @@ export type InsertSubscriptionEvent = z.infer<typeof insertSubscriptionEventSche
 export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
 export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;
 export type InsertWaitlist = z.infer<typeof insertWaitlistSchema>;
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
