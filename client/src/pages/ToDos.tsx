@@ -1,10 +1,9 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
@@ -14,10 +13,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay, startOfWeek, endOfWeek, addDays, addWeeks, subWeeks } from "date-fns";
+import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useKeyboardManager } from "@/hooks/useKeyboardManager";
@@ -44,6 +55,8 @@ type TodoWithDetails = ToDo & {
   creator: { id: string; firstName: string | null; lastName: string | null };
 };
 
+type SmartList = 'today' | 'flagged' | 'assigned-to-me' | 'all' | 'completed';
+
 export default function ToDos() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
@@ -51,12 +64,7 @@ export default function ToDos() {
   
   useKeyboardManager();
   
-  const [view, setView] = useState<'my-tasks' | 'team-tasks' | 'calendar'>('my-tasks');
-  const [filterProject, setFilterProject] = useState<string>('all');
-  const [filterCompleted, setFilterCompleted] = useState<string>('active');
-  const [filterCreator, setFilterCreator] = useState<string>('all'); // 'all' or 'me'
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [calendarMode, setCalendarMode] = useState<'week' | 'month'>('month');
+  const [selectedList, setSelectedList] = useState<SmartList>('assigned-to-me');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
@@ -64,7 +72,6 @@ export default function ToDos() {
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
-  const [showDetailsSection, setShowDetailsSection] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -121,12 +128,11 @@ export default function ToDos() {
     }
   }, [location]);
 
-  // Fetch todos
+  // Fetch all todos (for accurate badge counts)
   const { data: allTodos = [], isLoading } = useQuery<TodoWithDetails[]>({
-    queryKey: ['/api/todos', view],
+    queryKey: ['/api/todos'],
     queryFn: async () => {
-      const params = new URLSearchParams({ view });
-      const response = await fetch(`/api/todos?${params.toString()}`);
+      const response = await fetch('/api/todos');
       if (!response.ok) {
         throw new Error(`Failed to fetch todos: ${response.statusText}`);
       }
@@ -135,25 +141,64 @@ export default function ToDos() {
     },
   });
 
-  // Apply filters to todos
+  // Filter todos based on selected smart list
   const filteredTodos = useMemo(() => {
-    return allTodos.filter((todo) => {
-      // Project filter
-      if (filterProject !== 'all' && todo.projectId !== filterProject) return false;
-      
-      // Completed filter
-      if (filterCompleted === 'active' && todo.completed) return false;
-      if (filterCompleted === 'completed' && !todo.completed) return false;
-      
-      // Creator filter (I Created)
-      if (filterCreator === 'me' && todo.creator?.id !== user?.id) return false;
-      
-      return true;
-    });
-  }, [allTodos, filterProject, filterCompleted, filterCreator, user?.id]);
+    const now = startOfDay(new Date());
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // Group todos by urgency for list views
+    switch (selectedList) {
+      case 'today':
+        return allTodos.filter(todo => {
+          if (todo.completed || !todo.dueDate) return false;
+          const dueDate = new Date(todo.dueDate);
+          return dueDate >= now && dueDate < tomorrow;
+        });
+      case 'flagged':
+        return allTodos.filter(todo => todo.flag);
+      case 'assigned-to-me':
+        return allTodos.filter(todo => todo.assignedTo === user?.id && !todo.completed);
+      case 'all':
+        return allTodos.filter(todo => !todo.completed);
+      case 'completed':
+        return allTodos.filter(todo => todo.completed);
+      default:
+        return allTodos;
+    }
+  }, [allTodos, selectedList, user?.id]);
+
+  // Calculate badge counts for all smart lists (from full dataset)
+  const smartListCounts = useMemo(() => {
+    const now = startOfDay(new Date());
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return {
+      today: allTodos.filter(todo => {
+        if (todo.completed || !todo.dueDate) return false;
+        const dueDate = new Date(todo.dueDate);
+        return dueDate >= now && dueDate < tomorrow;
+      }).length,
+      flagged: allTodos.filter(todo => todo.flag).length,
+      assignedToMe: allTodos.filter(todo => todo.assignedTo === user?.id && !todo.completed).length,
+      all: allTodos.filter(todo => !todo.completed).length,
+      completed: allTodos.filter(todo => todo.completed).length,
+    };
+  }, [allTodos, user?.id]);
+
+  // Group todos by urgency (for non-completed views)
   const groupedTodos = useMemo(() => {
+    if (selectedList === 'completed') {
+      return {
+        completed: filteredTodos,
+        overdue: [],
+        today: [],
+        thisWeek: [],
+        later: [],
+        noDueDate: [],
+      };
+    }
+
     const now = startOfDay(new Date());
     const groups = {
       overdue: [] as TodoWithDetails[],
@@ -161,6 +206,7 @@ export default function ToDos() {
       thisWeek: [] as TodoWithDetails[],
       later: [] as TodoWithDetails[],
       noDueDate: [] as TodoWithDetails[],
+      completed: [] as TodoWithDetails[],
     };
 
     filteredTodos.forEach((todo) => {
@@ -182,43 +228,9 @@ export default function ToDos() {
     });
 
     return groups;
-  }, [filteredTodos]);
+  }, [filteredTodos, selectedList]);
 
-  // Calculate task counts by date for calendar
-  const taskCountsByDate = useMemo(() => {
-    const counts = new Map<string, number>();
-    
-    filteredTodos.forEach((todo) => {
-      if (todo.dueDate) {
-        const date = new Date(todo.dueDate);
-        const dateString = format(date, 'yyyy-MM-dd');
-        counts.set(dateString, (counts.get(dateString) || 0) + 1);
-      }
-    });
-    
-    return counts;
-  }, [filteredTodos]);
-
-  // Filter todos by selected date for calendar view
-  const calendarTodos = view === 'calendar' 
-    ? filteredTodos.filter((todo) => {
-        if (!todo.dueDate) return false;
-        const todoDate = new Date(todo.dueDate);
-        const selected = new Date(selectedDate);
-        return (
-          todoDate.getFullYear() === selected.getFullYear() &&
-          todoDate.getMonth() === selected.getMonth() &&
-          todoDate.getDate() === selected.getDate()
-        );
-      })
-    : [];
-
-  const selectedDateTaskCount = useMemo(() => {
-    const dateString = format(selectedDate, 'yyyy-MM-dd');
-    return taskCountsByDate.get(dateString) || 0;
-  }, [selectedDate, taskCountsByDate]);
-
-  // Fetch projects for filter
+  // Fetch projects for assignment
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
@@ -276,6 +288,51 @@ export default function ToDos() {
     },
   });
 
+  // Toggle flag mutation
+  const toggleFlagMutation = useMutation({
+    mutationFn: async (todoId: string) => {
+      return apiRequest('POST', `/api/todos/${todoId}/flag`, {});
+    },
+    onMutate: async (todoId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/todos'] });
+      
+      const previousQueries: Array<{ queryKey: any; data: TodoWithDetails[] }> = [];
+      queryClient.getQueryCache().findAll({ queryKey: ['/api/todos'] }).forEach((query) => {
+        const data = query.state.data as TodoWithDetails[] | undefined;
+        if (data) {
+          previousQueries.push({ queryKey: query.queryKey, data });
+        }
+      });
+      
+      queryClient.setQueriesData<TodoWithDetails[]>(
+        { queryKey: ['/api/todos'] },
+        (old) => {
+          if (!old) return old;
+          return old.map(todo => 
+            todo.id === todoId 
+              ? { ...todo, flag: !todo.flag }
+              : todo
+          );
+        }
+      );
+      
+      return { previousQueries };
+    },
+    onSuccess: () => {
+      haptics.light();
+      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+    },
+    onError: (error, variables, context) => {
+      haptics.error();
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      toast({ title: "Failed to toggle flag", variant: "destructive" });
+    },
+  });
+
   // Delete todo mutation
   const deleteMutation = useMutation({
     mutationFn: async (todoId: string) => {
@@ -285,6 +342,7 @@ export default function ToDos() {
       haptics.warning();
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "Task deleted" });
+      setShowDetailsDrawer(false);
     },
     onError: () => {
       haptics.error();
@@ -319,7 +377,6 @@ export default function ToDos() {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
-      // Only show toast for explicit edits (not inline background saves)
       if (!variables.silent) {
         haptics.light();
         toast({ title: "Task updated!" });
@@ -389,6 +446,7 @@ export default function ToDos() {
       title: data.title,
     };
     
+    if (data.description) payload.description = data.description;
     if (data.projectId) payload.projectId = data.projectId;
     if (data.dueDate) payload.dueDate = data.dueDate;
     if (selectedPhotoId) payload.photoId = selectedPhotoId;
@@ -412,6 +470,7 @@ export default function ToDos() {
   const handleCameraClick = () => {
     const formData = {
       title: form.watch('title'),
+      description: form.watch('description'),
       projectId: form.watch('projectId'),
       assignedTo: form.watch('assignedTo'),
       dueDate: form.watch('dueDate'),
@@ -466,8 +525,8 @@ export default function ToDos() {
 
   // Render task card
   const renderTaskCard = (todo: TodoWithDetails) => {
-    const showProject = filterProject === 'all' && todo.project;
-    const showAssignee = view === 'my-tasks' ? (todo.assignee && todo.assignee.id !== user?.id) : todo.assignee;
+    const showProject = todo.project;
+    const showAssignee = todo.assignee && todo.assignee.id !== user?.id;
     
     return (
       <Card
@@ -512,34 +571,39 @@ export default function ToDos() {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <h3
-              className={`font-semibold text-base leading-tight ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
-              data-testid={`text-todo-title-${todo.id}`}
-            >
-              {todo.title}
-            </h3>
+            <div className="flex items-start justify-between gap-2">
+              <h3
+                className={`font-semibold text-base leading-tight ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
+                data-testid={`text-todo-title-${todo.id}`}
+              >
+                {todo.title}
+              </h3>
+              {todo.flag && (
+                <Flag className="w-4 h-4 text-orange-500 fill-orange-500 flex-shrink-0" data-testid={`icon-flag-${todo.id}`} />
+              )}
+            </div>
             
             {/* Secondary info - one line */}
             {(showProject || showAssignee || todo.dueDate) && (
               <div className="flex items-center gap-1.5 mt-1.5 text-xs flex-wrap">
                 {showProject && (
-                  <span className="text-muted-foreground" data-testid={`text-todo-project-${todo.id}`}>
-                    {todo.project!.name}
+                  <span className="text-muted-foreground" data-testid={`text-project-${todo.id}`}>
+                    {showProject.name}
                   </span>
                 )}
                 {showProject && (showAssignee || todo.dueDate) && (
                   <span className="text-muted-foreground">•</span>
                 )}
-                {showAssignee && (
-                  <span className="text-muted-foreground">
-                    {getDisplayName(todo.assignee!)}
+                {showAssignee && todo.assignee && (
+                  <span className="text-muted-foreground" data-testid={`text-assignee-${todo.id}`}>
+                    {getDisplayName(todo.assignee)}
                   </span>
                 )}
                 {showAssignee && todo.dueDate && (
                   <span className="text-muted-foreground">•</span>
                 )}
                 {todo.dueDate && (
-                  <span className={getDueDateColor(todo.dueDate, todo.completed)}>
+                  <span className={getDueDateColor(todo.dueDate, todo.completed)} data-testid={`text-due-date-${todo.id}`}>
                     {getDueDateText(todo.dueDate)}
                   </span>
                 )}
@@ -547,32 +611,33 @@ export default function ToDos() {
             )}
           </div>
 
-          {/* Three-dot menu */}
+          {/* Actions menu - RIGHT */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
               <Button
-                size="icon"
                 variant="ghost"
+                size="icon"
                 className="h-8 w-8 flex-shrink-0"
-                onClick={(e) => e.stopPropagation()}
-                data-testid={`button-menu-todo-${todo.id}`}
+                data-testid={`button-todo-menu-${todo.id}`}
               >
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }} data-testid={`menu-edit-todo-${todo.id}`}>
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); toggleFlagMutation.mutate(todo.id); }}
+                disabled={toggleFlagMutation.isPending}
+                data-testid={`menu-flag-todo-${todo.id}`}
+              >
+                <Flag className="w-4 h-4 mr-2" />
+                {todo.flag ? 'Unflag' : 'Flag'}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); handleEditTodo(todo); }}
+                data-testid={`menu-edit-todo-${todo.id}`}
+              >
                 Edit
               </DropdownMenuItem>
-              {!todo.completed && (
-                <DropdownMenuItem
-                  onClick={(e) => { e.stopPropagation(); completeMutation.mutate(todo.id); }}
-                  disabled={completeMutation.isPending}
-                  data-testid={`menu-complete-todo-${todo.id}`}
-                >
-                  Mark Complete
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem
                 onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(todo.id); }}
                 disabled={deleteMutation.isPending}
@@ -604,795 +669,393 @@ export default function ToDos() {
     );
   };
 
+  // Smart list items
+  const smartLists = [
+    { id: 'today' as SmartList, label: 'Today', icon: CalendarIcon, count: smartListCounts.today },
+    { id: 'flagged' as SmartList, label: 'Flagged', icon: Flag, count: smartListCounts.flagged },
+    { id: 'assigned-to-me' as SmartList, label: 'Assigned to Me', icon: User, count: smartListCounts.assignedToMe },
+    { id: 'all' as SmartList, label: 'All', icon: ListTodo, count: smartListCounts.all },
+    { id: 'completed' as SmartList, label: 'Completed', icon: CheckCircle, count: smartListCounts.completed },
+  ];
+
+  const sidebarStyle = {
+    "--sidebar-width": "16rem",
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b pt-safe">
-        {/* Tabs */}
-        <Tabs value={view} onValueChange={(v) => setView(v as any)} className="w-full">
-          <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 h-11">
-            <TabsTrigger
-              value="my-tasks"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-              data-testid="tab-my-tasks"
-            >
-              My Tasks
-            </TabsTrigger>
-            <TabsTrigger
-              value="team-tasks"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-              data-testid="tab-team-tasks"
-            >
-              Team
-            </TabsTrigger>
-            <TabsTrigger
-              value="calendar"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-              data-testid="tab-calendar"
-            >
-              Calendar
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
+      <div className="flex h-screen w-full">
+        {/* Sidebar */}
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Smart Lists</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {smartLists.map((list) => (
+                    <SidebarMenuItem key={list.id}>
+                      <SidebarMenuButton
+                        onClick={() => setSelectedList(list.id)}
+                        isActive={selectedList === list.id}
+                        data-testid={`sidebar-${list.id}`}
+                      >
+                        <list.icon className="w-4 h-4" />
+                        <span>{list.label}</span>
+                        {list.count > 0 && (
+                          <span className="ml-auto text-xs bg-muted px-2 py-0.5 rounded-full" data-testid={`count-${list.id}`}>
+                            {list.count}
+                          </span>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
 
-        {/* Filters */}
-        <div className="flex gap-2 px-4 py-3 border-b">
-          <Select value={filterProject} onValueChange={setFilterProject}>
-            <SelectTrigger className="h-9 flex-1" data-testid="select-filter-project">
-              <SelectValue placeholder="All Projects" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Projects</SelectItem>
-              {projects.map((project) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={filterCompleted} onValueChange={setFilterCompleted}>
-            <SelectTrigger className="h-9 w-28" data-testid="select-filter-status">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="completed">Done</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-filter-more">
-                <Filter className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem 
-                onClick={() => setFilterCreator(filterCreator === 'all' ? 'me' : 'all')}
-                data-testid="menu-filter-created-by-me"
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${filterCreator === 'me' ? 'bg-primary border-primary' : 'border-input'}`}>
-                    {filterCreator === 'me' && <Check className="w-3 h-3 text-primary-foreground" />}
-                  </div>
-                  <span>I Created</span>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Content */}
-      {view === 'calendar' ? (
-        <div className="p-4 space-y-6">
-          {/* Calendar Header with Week/Month Toggle */}
-          <div className="flex justify-end gap-1 mb-2">
+        {/* Main Content */}
+        <div className="flex flex-col flex-1">
+          {/* Header */}
+          <header className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger data-testid="button-sidebar-toggle" />
+              <h1 className="text-xl font-semibold" data-testid="text-list-title">
+                {smartLists.find(l => l.id === selectedList)?.label}
+              </h1>
+            </div>
             <Button
-              variant={calendarMode === 'week' ? 'default' : 'outline'}
+              onClick={() => setShowAddDialog(true)}
               size="sm"
-              onClick={() => setCalendarMode('week')}
-              className="h-8 px-3"
-              data-testid="button-calendar-week"
+              data-testid="button-add-todo"
             >
-              Week
+              <Plus className="w-4 h-4 mr-2" />
+              New Task
             </Button>
-            <Button
-              variant={calendarMode === 'month' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setCalendarMode('month')}
-              className="h-8 px-3"
-              data-testid="button-calendar-month"
-            >
-              Month
-            </Button>
-          </div>
+          </header>
 
-          {/* Calendar - Week or Month View */}
-          {calendarMode === 'week' ? (
-            // Week View - Compact 7-day grid
-            <div className="rounded-lg border overflow-hidden bg-card" data-testid="calendar-week-view">
-              {/* Week Navigation */}
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/50">
+          {/* Content */}
+          <main className="flex-1 overflow-y-auto p-4 pb-20">
+            {isLoading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Loading tasks...</p>
+              </div>
+            ) : allTodos.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckSquare className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                <p className="text-muted-foreground" data-testid="text-no-todos">
+                  No tasks in this list
+                </p>
                 <Button
+                  onClick={() => setShowAddDialog(true)}
                   variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedDate(subWeeks(selectedDate, 1))}
-                  className="h-8"
-                  data-testid="button-prev-week"
+                  className="mt-4"
+                  data-testid="button-add-first-todo"
                 >
-                  ← Prev
-                </Button>
-                <span className="text-sm font-medium">
-                  {format(startOfWeek(selectedDate, { weekStartsOn: 0 }), 'MMM d')} - {format(endOfWeek(selectedDate, { weekStartsOn: 0 }), 'MMM d, yyyy')}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedDate(addWeeks(selectedDate, 1))}
-                  className="h-8"
-                  data-testid="button-next-week"
-                >
-                  Next →
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Task
                 </Button>
               </div>
-
-              {/* Week Grid */}
-              <div className="grid grid-cols-7 gap-0">
-                {Array.from({ length: 7 }).map((_, index) => {
-                  const dayDate = addDays(startOfWeek(selectedDate, { weekStartsOn: 0 }), index);
-                  const dateString = format(dayDate, 'yyyy-MM-dd');
-                  const count = taskCountsByDate.get(dateString) || 0;
-                  const isSelected = isSameDay(dayDate, selectedDate);
-                  const isDayToday = isToday(dayDate);
-
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedDate(dayDate)}
-                      className={`
-                        relative h-28 border-r last:border-r-0 hover-elevate transition-colors
-                        ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-card'}
-                        ${isDayToday && !isSelected ? 'bg-accent' : ''}
-                      `}
-                      data-testid={`day-${dateString}`}
-                    >
-                      <div className="flex flex-col items-center justify-start pt-3">
-                        <span className="text-xs font-medium uppercase">
-                          {format(dayDate, 'EEE')}
-                        </span>
-                        <span className={`text-2xl font-semibold mt-1 ${isSelected ? '' : 'text-foreground'}`}>
-                          {format(dayDate, 'd')}
-                        </span>
-                      </div>
-                      {count > 0 && (
-                        <div 
-                          className={`absolute bottom-[8px] left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full min-w-[20px] h-[20px] px-1.5 text-xs font-semibold ${
-                            isSelected 
-                              ? 'bg-primary-foreground text-primary' 
-                              : 'bg-primary text-primary-foreground'
-                          }`}
-                          data-testid={`badge-count-${dateString}`}
-                        >
-                          {count}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
+            ) : (
+              <div className="space-y-6 max-w-3xl">
+                {selectedList === 'completed' ? (
+                  renderSection('Completed', groupedTodos.completed, 'section-completed')
+                ) : (
+                  <>
+                    {renderSection('Overdue', groupedTodos.overdue, 'section-overdue')}
+                    {renderSection('Today', groupedTodos.today, 'section-today')}
+                    {renderSection('This Week', groupedTodos.thisWeek, 'section-this-week')}
+                    {renderSection('Later', groupedTodos.later, 'section-later')}
+                    {renderSection('No Due Date', groupedTodos.noDueDate, 'section-no-due-date')}
+                  </>
+                )}
               </div>
-            </div>
-          ) : (
-            // Month View - Full Calendar
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-lg border w-full"
-              data-testid="calendar-view"
-              components={{
-                DayContent: ({ date, ...props }) => {
-                  const dateString = format(date, 'yyyy-MM-dd');
-                  const count = taskCountsByDate.get(dateString) || 0;
-                  
-                  return (
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      <span>{date.getDate()}</span>
-                      {count > 0 && (
-                        <div 
-                          className="absolute top-0 right-0 flex items-center justify-center bg-primary text-primary-foreground rounded-full min-w-[18px] h-[18px] px-1 text-[10px] font-semibold"
-                          data-testid={`badge-count-${dateString}`}
-                        >
-                          {count}
-                        </div>
-                      )}
-                    </div>
-                  );
-                },
-              }}
-            />
-          )}
-
-          {/* Selected Date Header */}
-          <div className="text-center">
-            <h2 className="text-lg font-semibold" data-testid="text-selected-date">
-              {format(selectedDate, "EEEE, MMMM d, yyyy")}
-            </h2>
-            {selectedDateTaskCount > 0 && (
-              <p className="text-sm text-muted-foreground mt-1" data-testid="text-task-count">
-                {selectedDateTaskCount} {selectedDateTaskCount === 1 ? 'task' : 'tasks'}
-              </p>
             )}
-          </div>
-
-          {/* Tasks for Selected Date */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : calendarTodos.length === 0 ? (
-            <div className="text-center py-12">
-              <CheckSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No tasks</h3>
-              <p className="text-muted-foreground">
-                No tasks scheduled for this date
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {calendarTodos.map(renderTaskCard)}
-            </div>
-          )}
+          </main>
         </div>
-      ) : (
-        <div className="max-w-2xl mx-auto p-4 space-y-6">
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : filteredTodos.length === 0 ? (
-            <div className="text-center py-12">
-              <CheckSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-semibold mb-2">No tasks</h2>
-              <p className="text-muted-foreground">
-                {view === 'my-tasks' ? 'You have no assigned tasks' : 'Your team has no tasks'}
-              </p>
-            </div>
-          ) : (
-            <>
-              {renderSection('Overdue', groupedTodos.overdue, 'section-overdue')}
-              {renderSection('Today', groupedTodos.today, 'section-today')}
-              {renderSection('This Week', groupedTodos.thisWeek, 'section-this-week')}
-              {renderSection('Later', groupedTodos.later, 'section-later')}
-              {renderSection('No Due Date', groupedTodos.noDueDate, 'section-no-due-date')}
-            </>
-          )}
-        </div>
-      )}
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileSelect}
-        data-testid="input-file-photo"
-      />
-
-      {/* Task Details Drawer */}
-      <Sheet 
-        open={showDetailsDrawer} 
-        onOpenChange={setShowDetailsDrawer}
-        data-testid="sheet-task-details"
-      >
-        <SheetContent side="bottom" className="h-[85vh] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Task Details</SheetTitle>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-y-auto space-y-4 py-4">
-            {selectedTodoForDetails?.photo && (
-              <img 
-                src={selectedTodoForDetails.photo.url} 
-                alt="Task photo"
-                className="w-full h-48 object-cover rounded-lg" 
-                data-testid="img-task-detail-photo"
-              />
-            )}
-            
-            <h2 className="text-xl font-bold" data-testid="text-task-detail-title">
-              {selectedTodoForDetails?.title}
-            </h2>
-            
-            <div className="space-y-3 pt-2">
-              {selectedTodoForDetails?.dueDate && (
-                <div className="flex items-center gap-3">
-                  <CalendarIconOutline className="w-5 h-5 text-muted-foreground" />
-                  <span>Due: {format(new Date(selectedTodoForDetails.dueDate), "PPP")}</span>
-                </div>
-              )}
-              
-              {selectedTodoForDetails?.assignee && (
-                <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-muted-foreground" />
-                  <span>Assigned: {getDisplayName(selectedTodoForDetails.assignee)}</span>
-                </div>
-              )}
-              
-              {selectedTodoForDetails?.project && (
-                <div className="flex items-center gap-3">
-                  <Home className="w-5 h-5 text-muted-foreground" />
-                  <span>Project: {selectedTodoForDetails.project.name}</span>
-                </div>
-              )}
-            </div>
-            
-            <div className="pt-4 border-t">
-              <h3 className="text-sm font-semibold mb-2">Notes</h3>
-              <Textarea
-                value={selectedTodoForDetails?.description || ''}
-                onChange={(e) => {
-                  if (selectedTodoForDetails) {
-                    setSelectedTodoForDetails({
-                      ...selectedTodoForDetails,
-                      description: e.target.value
-                    });
-                  }
-                }}
-                onBlur={() => {
-                  if (selectedTodoForDetails) {
-                    updateMutation.mutate({
-                      id: selectedTodoForDetails.id,
-                      data: { description: selectedTodoForDetails.description || '' },
-                      silent: true
-                    });
-                  }
-                }}
-                placeholder="Tap to add notes..."
-                className="min-h-[120px] resize-none"
-                data-testid="textarea-task-notes-inline"
-              />
-            </div>
-          </div>
-          
-          <SheetFooter className="flex-row gap-3 sm:gap-3">
-            <Button 
-              variant="outline" 
-              className="flex-1"
-              onClick={() => {
-                if (selectedTodoForDetails) {
-                  handleEditTodo(selectedTodoForDetails);
-                  setShowDetailsDrawer(false);
-                }
-              }}
-              data-testid="button-edit-task"
-            >
-              Edit
-            </Button>
-            {!selectedTodoForDetails?.completed && (
-              <Button 
-                className="flex-1" 
-                onClick={() => {
-                  if (selectedTodoForDetails) {
-                    completeMutation.mutate(selectedTodoForDetails.id);
-                    setShowDetailsDrawer(false);
-                  }
-                }}
-                data-testid="button-complete-task"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Complete
-              </Button>
-            )}
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-
-      {/* Floating Action Button */}
-      <Button
-        onClick={() => {
-          setEditingTodo(null);
-          setShowDetailsSection(false);
-          form.reset({
-            title: "",
-            description: "",
-            projectId: filterProject !== "all" ? filterProject : "",
-            assignedTo: "",
-            dueDate: "",
-          });
-          setSelectedPhotoId(null);
-          setSelectedPhotoUrl(null);
-          setShowAddDialog(true);
-        }}
-        size="icon"
-        className="!fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full shadow-lg"
-        style={{ position: 'fixed', bottom: '5rem', right: '1rem' }}
-        data-testid="button-add-todo-fab"
-      >
-        <Plus className="w-6 h-6" />
-      </Button>
-
-      {/* Quick Add Sheet (Bottom Sheet) */}
-      <Sheet open={showAddDialog} onOpenChange={(open) => {
-        if (!open) {
-          setShowAddDialog(false);
-          setShowDetailsSection(false);
-          setEditingTodo(null);
-          setSelectedPhotoId(null);
-          setSelectedPhotoUrl(null);
-          form.reset({
-            title: "",
-            description: "",
-            projectId: "",
-            assignedTo: "",
-            dueDate: "",
-          });
-        }
-      }}>
-        <SheetContent side="bottom" className="h-auto max-h-[90vh] flex flex-col p-0">
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col max-h-[90vh]">
-            {/* Main Title Input Section - Fixed at top */}
-            <div className="flex-shrink-0 p-6 pb-4">
-              <SheetHeader className="mb-4">
-                <SheetTitle>New Task</SheetTitle>
-              </SheetHeader>
-              
-              <div className="space-y-2">
+        {/* Add/Edit Dialog */}
+        <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
+          if (!open) {
+            setShowAddDialog(false);
+            setShowEditDialog(false);
+            setEditingTodo(null);
+            form.reset();
+            setSelectedPhotoId(null);
+            setSelectedPhotoUrl(null);
+          }
+        }}>
+          <DialogContent data-testid="dialog-todo-form">
+            <DialogHeader>
+              <DialogTitle>{editingTodo ? 'Edit Task' : 'New Task'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title *</Label>
                 <Input
+                  id="title"
                   {...form.register("title")}
                   placeholder="What needs to be done?"
-                  className="text-base h-12"
-                  autoFocus
                   data-testid="input-todo-title"
                 />
                 {form.formState.errors.title && (
-                  <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
+                  <p className="text-sm text-destructive mt-1">{form.formState.errors.title.message}</p>
                 )}
               </div>
 
-              {/* Add Details Toggle Button */}
-              {!showDetailsSection && (
-                <button
-                  type="button"
-                  onClick={() => setShowDetailsSection(true)}
-                  className="mt-3 text-sm text-primary hover:underline"
-                  data-testid="button-show-details"
-                >
-                  Add Details
-                </button>
-              )}
-            </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  {...form.register("description")}
+                  placeholder="Add details..."
+                  rows={3}
+                  data-testid="input-todo-description"
+                />
+              </div>
 
-            {/* Expandable Details Section - Scrollable middle */}
-            {showDetailsSection && (
-              <div className="flex-1 px-6 pb-4 space-y-4 border-t pt-4 overflow-y-auto min-h-0">
-                {/* Photo */}
-                <div>
-                  <Label className="text-sm text-muted-foreground">Photo</Label>
-                  <div className="flex gap-2 mt-2">
+              <div>
+                <Label htmlFor="projectId">Project</Label>
+                <Select value={form.watch('projectId') || ''} onValueChange={(value) => form.setValue('projectId', value)}>
+                  <SelectTrigger id="projectId" data-testid="select-todo-project">
+                    <SelectValue placeholder="Select project (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No project</SelectItem>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="assignedTo">Assign to</Label>
+                <Select value={form.watch('assignedTo') || ''} onValueChange={(value) => form.setValue('assignedTo', value)}>
+                  <SelectTrigger id="assignedTo" data-testid="select-todo-assignee">
+                    <SelectValue placeholder="Assign to someone (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Unassigned</SelectItem>
+                    {members.map((member) => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {getDisplayName(member)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="dueDate">Due Date</Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  {...form.register("dueDate")}
+                  data-testid="input-todo-due-date"
+                />
+              </div>
+
+              {selectedPhotoUrl && (
+                <div className="relative">
+                  <Label>Attached Photo</Label>
+                  <div className="mt-2 relative">
+                    <img src={selectedPhotoUrl} alt="Attached" className="w-full h-40 object-cover rounded-lg" />
                     <Button
                       type="button"
-                      variant="outline"
-                      onClick={handleCameraClick}
-                      className="flex-1 h-11"
-                      data-testid="button-camera"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setSelectedPhotoId(null);
+                        setSelectedPhotoUrl(null);
+                      }}
+                      data-testid="button-remove-photo"
                     >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Camera
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex-1 h-11"
-                      data-testid="button-album"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Album
+                      <X className="w-4 h-4" />
                     </Button>
                   </div>
-                  
-                  {uploadPhotoMutation.isPending && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                      <span>Uploading...</span>
-                    </div>
-                  )}
-
-                  {selectedPhotoUrl && !uploadPhotoMutation.isPending && (
-                    <div className="mt-3 relative rounded-lg overflow-hidden border">
-                      <img
-                        src={selectedPhotoUrl}
-                        alt="Selected photo"
-                        className="w-full h-32 object-cover"
-                        data-testid="img-preview-photo"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 h-7 w-7"
-                        onClick={() => {
-                          setSelectedPhotoId(null);
-                          setSelectedPhotoUrl(null);
-                        }}
-                        data-testid="button-remove-photo"
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Notes */}
-                <div>
-                  <Label htmlFor="description" className="text-sm text-muted-foreground">Notes</Label>
-                  <Textarea
-                    id="description"
-                    {...form.register("description")}
-                    placeholder="Add context, measurements, or follow-up details..."
-                    className="mt-2 min-h-[80px]"
-                    data-testid="textarea-todo-notes"
-                  />
-                </div>
-
-                {/* Assign To */}
-                <div>
-                  <Label htmlFor="assignedTo" className="text-sm text-muted-foreground">Assign to</Label>
-                  <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
-                    <SelectTrigger id="assignedTo" className="h-11 mt-2" data-testid="select-todo-assignee">
-                      <SelectValue placeholder="Select team member" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {members.map((member) => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Due Date */}
-                <div>
-                  <Label htmlFor="dueDate" className="text-sm text-muted-foreground">Due Date</Label>
-                  <Input
-                    id="dueDate"
-                    type="date"
-                    {...form.register("dueDate")}
-                    className="h-11 mt-2"
-                    data-testid="input-due-date"
-                  />
-                </div>
-
-                {/* Project */}
-                <div>
-                  <Label htmlFor="projectId" className="text-sm text-muted-foreground">Project</Label>
-                  <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
-                    <SelectTrigger id="projectId" className="h-11 mt-2" data-testid="select-todo-project">
-                      <SelectValue placeholder="None" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {projects.map((project) => (
-                        <SelectItem key={project.id} value={project.id}>
-                          {project.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-
-            {/* Footer Buttons - Sticky at bottom */}
-            <div className="flex-shrink-0 flex gap-3 p-6 pt-4 border-t bg-background">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => {
-                  setShowAddDialog(false);
-                  setShowDetailsSection(false);
-                }}
-                className="flex-1 h-12"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={createMutation.isPending}
-                className="flex-1 h-12"
-                data-testid="button-submit-todo"
-              >
-                {createMutation.isPending ? (
-                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
-                ) : null}
-                Create
-              </Button>
-            </div>
-          </form>
-        </SheetContent>
-      </Sheet>
-
-      {/* Edit Todo Dialog (Keep as Dialog for editing) */}
-      <Dialog open={showEditDialog} onOpenChange={(open) => {
-        if (!open) {
-          setShowEditDialog(false);
-          setEditingTodo(null);
-          setSelectedPhotoId(null);
-          setSelectedPhotoUrl(null);
-          form.reset({
-            title: "",
-            description: "",
-            projectId: "",
-            assignedTo: "",
-            dueDate: "",
-          });
-        }
-      }}>
-        <DialogContent className="max-w-md max-h-[85vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4 flex-1 overflow-hidden">
-            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-            
-            {/* Photo */}
-            <div>
-              <Label>Photo</Label>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCameraClick}
-                  className="flex-1"
-                  data-testid="button-camera"
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Camera
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex-1"
-                  data-testid="button-album"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Album
-                </Button>
-              </div>
-              
-              {uploadPhotoMutation.isPending && (
-                <div className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                  <span>Uploading...</span>
                 </div>
               )}
 
-              {selectedPhotoUrl && !uploadPhotoMutation.isPending && (
-                <div className="mt-3 relative rounded-lg overflow-hidden border">
-                  <img
-                    src={selectedPhotoUrl}
-                    alt="Selected photo"
-                    className="w-full h-40 object-cover"
-                    data-testid="img-preview-photo"
-                  />
+              {!selectedPhotoUrl && (
+                <div className="flex gap-2">
                   <Button
                     type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-8 w-8"
-                    onClick={() => {
-                      setSelectedPhotoId(null);
-                      setSelectedPhotoUrl(null);
-                    }}
-                    data-testid="button-remove-photo"
+                    variant="outline"
+                    onClick={handleCameraClick}
+                    className="flex-1"
+                    data-testid="button-attach-camera"
                   >
-                    <X className="w-4 h-4" />
+                    <Camera className="w-4 h-4 mr-2" />
+                    Camera
                   </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadPhotoMutation.isPending}
+                    className="flex-1"
+                    data-testid="button-attach-upload"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {uploadPhotoMutation.isPending ? 'Uploading...' : 'Upload'}
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                 </div>
               )}
-            </div>
 
-            {/* Title */}
-            <div>
-              <Label htmlFor="title-edit">Task *</Label>
-              <Input
-                id="title-edit"
-                {...form.register("title")}
-                placeholder="What needs to be done?"
-                className="mt-2"
-                data-testid="input-todo-title"
-              />
-              {form.formState.errors.title && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.title.message}</p>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddDialog(false);
+                    setShowEditDialog(false);
+                    setEditingTodo(null);
+                    form.reset();
+                    setSelectedPhotoId(null);
+                    setSelectedPhotoUrl(null);
+                  }}
+                  data-testid="button-cancel-todo"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  data-testid="button-save-todo"
+                >
+                  {editingTodo ? 'Update' : 'Create'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Drawer */}
+        <Sheet open={showDetailsDrawer} onOpenChange={setShowDetailsDrawer}>
+          <SheetContent side="bottom" className="h-[85vh] flex flex-col">
+            <SheetHeader>
+              <SheetTitle>Task Details</SheetTitle>
+            </SheetHeader>
+            
+            <div className="flex-1 overflow-y-auto space-y-4 py-4">
+              {selectedTodoForDetails?.photo && (
+                <img 
+                  src={selectedTodoForDetails.photo.url} 
+                  alt="Task photo"
+                  className="w-full h-48 object-cover rounded-lg" 
+                  data-testid="img-task-detail-photo"
+                />
               )}
+              
+              <div className="flex items-start justify-between gap-2">
+                <h2 className="text-xl font-bold" data-testid="text-task-detail-title">
+                  {selectedTodoForDetails?.title}
+                </h2>
+                {selectedTodoForDetails?.flag && (
+                  <Flag className="w-5 h-5 text-orange-500 fill-orange-500 flex-shrink-0" />
+                )}
+              </div>
+              
+              <div className="space-y-3 pt-2">
+                {selectedTodoForDetails?.dueDate && (
+                  <div className="flex items-center gap-3">
+                    <CalendarIconOutline className="w-5 h-5 text-muted-foreground" />
+                    <span>Due: {format(new Date(selectedTodoForDetails.dueDate), "PPP")}</span>
+                  </div>
+                )}
+                
+                {selectedTodoForDetails?.assignee && (
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <span>Assigned: {getDisplayName(selectedTodoForDetails.assignee)}</span>
+                  </div>
+                )}
+                
+                {selectedTodoForDetails?.project && (
+                  <div className="flex items-center gap-3">
+                    <Home className="w-5 h-5 text-muted-foreground" />
+                    <span>Project: {selectedTodoForDetails.project.name}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="pt-4 border-t">
+                <h3 className="text-sm font-semibold mb-2">Notes</h3>
+                <Textarea
+                  value={selectedTodoForDetails?.description || ''}
+                  onChange={(e) => {
+                    if (selectedTodoForDetails) {
+                      setSelectedTodoForDetails({
+                        ...selectedTodoForDetails,
+                        description: e.target.value
+                      });
+                    }
+                  }}
+                  onBlur={() => {
+                    if (selectedTodoForDetails) {
+                      updateMutation.mutate({
+                        id: selectedTodoForDetails.id,
+                        data: { description: selectedTodoForDetails.description || '' },
+                        silent: true
+                      });
+                    }
+                  }}
+                  placeholder="Add notes..."
+                  rows={6}
+                  className="resize-none"
+                  data-testid="textarea-task-notes"
+                />
+              </div>
             </div>
-
-            {/* Notes */}
-            <div>
-              <Label htmlFor="description-edit">Notes</Label>
-              <Textarea
-                id="description-edit"
-                {...form.register("description")}
-                placeholder="Add context, measurements, or follow-up details..."
-                className="mt-2 min-h-[80px]"
-                data-testid="textarea-todo-notes"
-              />
-            </div>
-
-            {/* Assign To */}
-            <div>
-              <Label htmlFor="assignedTo-edit">Assign to</Label>
-              <Select onValueChange={(value) => form.setValue("assignedTo", value)} value={form.watch("assignedTo") || undefined}>
-                <SelectTrigger id="assignedTo-edit" className="mt-2" data-testid="select-todo-assignee">
-                  <SelectValue placeholder="Select team member" />
-                </SelectTrigger>
-                <SelectContent>
-                  {members.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      {getDisplayName({ firstName: member.firstName, lastName: member.lastName })}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Due Date */}
-            <div>
-              <Label htmlFor="dueDate-edit">Due Date</Label>
-              <Input
-                id="dueDate-edit"
-                type="date"
-                {...form.register("dueDate")}
-                className="mt-2"
-                data-testid="input-due-date"
-              />
-            </div>
-
-            {/* Project */}
-            <div>
-              <Label htmlFor="projectId-edit">Project</Label>
-              <Select onValueChange={(value) => form.setValue("projectId", value)} value={form.watch("projectId") || undefined}>
-                <SelectTrigger id="projectId-edit" className="mt-2" data-testid="select-todo-project">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            </div>
-
-            <DialogFooter className="flex-shrink-0">
-              <Button type="button" variant="outline" onClick={() => {
-                setShowEditDialog(false);
-                setEditingTodo(null);
-              }}>
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={updateMutation.isPending}
-                data-testid="button-submit-todo"
+            
+            <SheetFooter className="flex-row gap-2 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => selectedTodoForDetails && toggleFlagMutation.mutate(selectedTodoForDetails.id)}
+                className="flex-1"
+                data-testid="button-detail-flag"
               >
-                {updateMutation.isPending ? (
-                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
-                ) : null}
-                Update
+                <Flag className="w-4 h-4 mr-2" />
+                {selectedTodoForDetails?.flag ? 'Unflag' : 'Flag'}
               </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (selectedTodoForDetails) {
+                    handleEditTodo(selectedTodoForDetails);
+                    setShowDetailsDrawer(false);
+                  }
+                }}
+                className="flex-1"
+                data-testid="button-detail-edit"
+              >
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => selectedTodoForDetails && deleteMutation.mutate(selectedTodoForDetails.id)}
+                disabled={deleteMutation.isPending}
+                className="flex-1"
+                data-testid="button-detail-delete"
+              >
+                Delete
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </SidebarProvider>
   );
 }
