@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
-import { Plus, Home, Camera, Search, Settings, ArrowUpDown, RefreshCw, Copy, Check } from "lucide-react";
+import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -589,16 +589,6 @@ export default function Projects() {
                 </form>
               </DialogContent>
             </Dialog>
-            
-              <Button 
-                size="icon" 
-                variant="outline" 
-                className="h-12 w-12" 
-                onClick={() => setLocation('/settings')}
-                data-testid="button-settings"
-              >
-                <Settings className="w-5 h-5" />
-              </Button>
             </div>
           </div>
           {syncStatus && syncStatus.pending > 0 && (
