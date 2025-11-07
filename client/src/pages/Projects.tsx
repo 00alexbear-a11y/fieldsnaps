@@ -42,7 +42,6 @@ import { syncManager } from "@/lib/syncManager";
 import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeDialogs } from "@/lib/nativeDialogs";
-import { NotificationPanel } from "@/components/NotificationPanel";
 import { Capacitor } from "@capacitor/core";
 
 type SortOption = 'recent' | 'favorites' | 'lastActivity' | 'name' | 'created';
@@ -506,7 +505,6 @@ export default function Projects() {
               data-testid="img-fieldsnaps-logo"
             />
             <div className="flex items-center gap-2">
-              <NotificationPanel />
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <Button 
                   className="h-12"

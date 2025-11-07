@@ -36,6 +36,7 @@ import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
 import { Button } from "./components/ui/button";
+import { NotificationPanel } from "./components/NotificationPanel";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
@@ -233,7 +234,7 @@ function AppContent() {
                   <span className="text-sm font-semibold">FieldSnaps</span>
                 </button>
               </SidebarTrigger>
-              <div className="w-9" /> {/* Spacer for symmetry */}
+              <NotificationPanel />
             </header>
           )}
           
