@@ -189,14 +189,19 @@ function AppContent() {
   }
 
   // Routes where sidebar should be hidden (camera, edit modes, full-screen views)
+  // Extract pathname without query params or hash
+  const pathname = location.split('?')[0].split('#')[0];
+  
   const hideSidebarRoutes = ['/camera', '/photo/:id/edit', '/photo/:id/view'];
   const shouldShowSidebar = !hideSidebarRoutes.some(route => {
-    // Simple route matching
+    // Route matching with pathname parsing
     if (route.includes(':')) {
+      // Convert route pattern to regex (e.g., /photo/:id/edit -> /photo/[^/]+/edit)
       const pattern = route.replace(/:[^/]+/g, '[^/]+');
-      return new RegExp(`^${pattern}$`).test(location);
+      return new RegExp(`^${pattern}/?$`).test(pathname); // Allow optional trailing slash
     }
-    return location === route;
+    // Exact match with optional trailing slash
+    return pathname === route || pathname === route + '/';
   });
 
   return (
