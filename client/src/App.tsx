@@ -225,11 +225,9 @@ function AppContent() {
         <div className="flex flex-col flex-1 min-w-0">
           {/* Header with sidebar trigger - only shown when sidebar is visible */}
           {shouldShowSidebar && (
-            <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <SidebarTrigger asChild>
-                <Button variant="ghost" size="icon" data-testid="sidebar-trigger">
-                  <Menu className="h-5 w-5" />
-                </Button>
+            <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
+              <SidebarTrigger className="-ml-1" data-testid="sidebar-trigger">
+                <Menu className="h-5 w-5" />
               </SidebarTrigger>
               <div className="flex-1 text-center">
                 <h1 className="text-sm font-semibold">FieldSnaps</h1>

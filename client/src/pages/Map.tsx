@@ -391,7 +391,7 @@ export default function Map() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-black">
+    <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Header */}
       <div className="space-y-3 px-4 pt-safe-3 pb-3 border-b border-border">
         <div className="flex items-center justify-between">
