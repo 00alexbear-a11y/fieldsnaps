@@ -226,13 +226,14 @@ function AppContent() {
           {/* Header with logo as sidebar trigger - only shown when sidebar is visible */}
           {shouldShowSidebar && (
             <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
-              <SidebarTrigger asChild data-testid="sidebar-trigger">
-                <button className="flex items-center gap-2 hover-elevate active-elevate-2 px-2 py-1 rounded-md transition-colors">
-                  <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-xs">F</span>
-                  </div>
-                  <span className="text-sm font-semibold">FieldSnaps</span>
-                </button>
+              <SidebarTrigger 
+                data-testid="button-sidebar-trigger"
+                className="flex items-center gap-2 hover-elevate active-elevate-2 px-2 py-1 rounded-md transition-colors"
+              >
+                <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xs">F</span>
+                </div>
+                <span className="text-sm font-semibold">FieldSnaps</span>
               </SidebarTrigger>
               <NotificationPanel />
             </header>
