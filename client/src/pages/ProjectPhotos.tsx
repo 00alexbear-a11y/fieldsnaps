@@ -118,6 +118,11 @@ export default function ProjectPhotos() {
     enabled: showMoveDialog,
   });
 
+  // Fetch all projects with photo counts for sidebar
+  const { data: allProjectsWithCounts = [] } = useQuery<any[]>({
+    queryKey: ["/api/projects/with-counts"],
+  });
+
   // Offline-first: load from IndexedDB immediately, fetch from server in background
   const { photos = [], isLoading, isOnline, hasLocalData } = useOfflineFirstPhotos(projectId || '');
 
@@ -274,6 +279,20 @@ export default function ProjectPhotos() {
     // Sort by latest date (most recent first)
     return Array.from(sessionMap.values()).sort((a, b) => b.latestDate.getTime() - a.latestDate.getTime());
   }, [photos]);
+
+  // Format projects for sidebar
+  const projectOptions = useMemo(() => {
+    return allProjectsWithCounts.map(p => ({
+      id: p.id,
+      name: p.name,
+      photoCount: p.photoCount || 0,
+    })).sort((a, b) => b.photoCount - a.photoCount);
+  }, [allProjectsWithCounts]);
+
+  // Handler for project navigation
+  const handleProjectChange = (newProjectId: string) => {
+    setLocation(`/projects/${newProjectId}/photos`);
+  };
 
   // Sort and group photos by date using filtered photos
   const photosByDate = useMemo(() => {
@@ -1373,6 +1392,9 @@ export default function ProjectPhotos() {
           sortOption={sortOption}
           onSortChange={setSortOption}
           photoCount={filteredPhotos.length}
+          projects={projectOptions}
+          currentProjectId={projectId || null}
+          onProjectChange={handleProjectChange}
           uploaders={uploaders}
           selectedUploaderId={selectedUploaderId}
           onUploaderChange={setSelectedUploaderId}

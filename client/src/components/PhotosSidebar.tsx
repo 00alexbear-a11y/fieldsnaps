@@ -1,4 +1,4 @@
-import { Calendar, Clock, Filter, SortAsc, User, Tag as TagIcon, Camera as CameraIcon } from "lucide-react";
+import { Calendar, Clock, Filter, SortAsc, User, Tag as TagIcon, Camera as CameraIcon, FolderOpen } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 
 export type DateFilter = 'all' | 'today' | 'this-week' | 'this-month';
 export type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
+
+interface ProjectOption {
+  id: string;
+  name: string;
+  photoCount: number;
+}
 
 interface UploaderOption {
   id: string;
@@ -33,6 +39,9 @@ interface PhotosSidebarProps {
   sortOption: SortOption;
   onSortChange: (sort: SortOption) => void;
   photoCount: number;
+  projects: ProjectOption[];
+  currentProjectId: string | null;
+  onProjectChange: (projectId: string) => void;
   uploaders: UploaderOption[];
   selectedUploaderId: string | null;
   onUploaderChange: (uploaderId: string | null) => void;
@@ -47,6 +56,9 @@ export function PhotosSidebar({
   sortOption,
   onSortChange,
   photoCount,
+  projects,
+  currentProjectId,
+  onProjectChange,
   uploaders,
   selectedUploaderId,
   onUploaderChange,
@@ -81,6 +93,32 @@ export function PhotosSidebar({
       </SidebarHeader>
 
       <SidebarContent>
+        {/* Projects */}
+        {projects.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {projects.map((project) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton
+                      onClick={() => onProjectChange(project.id)}
+                      isActive={currentProjectId === project.id}
+                      data-testid={`filter-project-${project.id}`}
+                    >
+                      <FolderOpen className="w-4 h-4" />
+                      <span>{project.name}</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {project.photoCount}
+                      </Badge>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
         {/* Smart Views */}
         <SidebarGroup>
           <SidebarGroupLabel>Smart Views</SidebarGroupLabel>
