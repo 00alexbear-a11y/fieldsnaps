@@ -450,7 +450,16 @@ export default function ToDos() {
     if (data.projectId && data.projectId !== 'none') payload.projectId = data.projectId;
     if (data.dueDate) payload.dueDate = data.dueDate;
     if (selectedPhotoId) payload.photoId = selectedPhotoId;
-    if (data.assignedTo && data.assignedTo !== 'unassigned') payload.assignedTo = data.assignedTo;
+    
+    // For edits, always include assignedTo so backend can detect changes (Integration Task 3)
+    // For creates, only include if not 'unassigned'
+    if (editingTodo) {
+      payload.assignedTo = data.assignedTo !== 'unassigned' ? data.assignedTo : null;
+    } else {
+      if (data.assignedTo && data.assignedTo !== 'unassigned') {
+        payload.assignedTo = data.assignedTo;
+      }
+    }
     
     if (editingTodo) {
       updateMutation.mutate({ id: editingTodo.id, data: payload });
