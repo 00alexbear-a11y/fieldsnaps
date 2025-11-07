@@ -2728,7 +2728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "To-do not found" });
       }
 
-      // Create notification if assignee changed to a different user
+      // Create notification if assignee changed to a different user (Integration Task 3)
       if (validated.assignedTo && validated.assignedTo !== oldTodo.assignedTo && validated.assignedTo !== user.id) {
         const reassignerName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
         const projectInfo = todo.projectId ? await storage.getProject(todo.projectId) : null;
