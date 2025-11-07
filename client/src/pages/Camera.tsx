@@ -24,6 +24,7 @@ import { useQuery } from '@tanstack/react-query';
 import { type Tag } from '@shared/schema';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Badge } from '@/components/ui/badge';
+import { CameraSettingsSidebar } from '@/components/CameraSettingsSidebar';
 import {
   Sheet,
   SheetContent,
@@ -129,6 +130,27 @@ export default function Camera() {
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [isAttachMode, setIsAttachMode] = useState(false);
   
+  // Camera Settings Sidebar state
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showGrid, setShowGrid] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('camera-grid') === 'true';
+    }
+    return false;
+  });
+  const [pdfMode, setPdfMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('camera-pdf-mode') === 'true';
+    }
+    return false;
+  });
+  const [autoSave, setAutoSave] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('camera-auto-save') === 'true';
+    }
+    return false;
+  });
+  
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagPickerExpanded, setTagPickerExpanded] = useState(false);
   const [selectedUnitLabel, setSelectedUnitLabel] = useState<string | null>(null);
@@ -226,6 +248,23 @@ export default function Camera() {
   const photoIdsWithTasks = useMemo(() => {
     return new Set(todos.filter(t => t.photoId).map(t => t.photoId!));
   }, [todos]);
+
+  // Persist camera settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('camera-grid', showGrid.toString());
+  }, [showGrid]);
+
+  useEffect(() => {
+    localStorage.setItem('camera-pdf-mode', pdfMode.toString());
+  }, [pdfMode]);
+
+  useEffect(() => {
+    localStorage.setItem('camera-auto-save', autoSave.toString());
+  }, [autoSave]);
+
+  useEffect(() => {
+    localStorage.setItem('camera-quality', selectedQuality);
+  }, [selectedQuality]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1844,15 +1883,26 @@ export default function Camera() {
                 );
               })()}
               
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={switchCamera}
-                className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
-                data-testid="button-switch-camera"
-              >
-                <SwitchCamera className="w-5 h-5" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSettingsOpen(true)}
+                  className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
+                  data-testid="button-camera-settings"
+                >
+                  <Settings2 className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={switchCamera}
+                  className="h-11 w-11 bg-black/30 text-white/80 hover:bg-black/40 backdrop-blur-sm border border-white/10 rounded-full"
+                  data-testid="button-switch-camera"
+                >
+                  <SwitchCamera className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -2412,6 +2462,20 @@ export default function Camera() {
         open={upgradeModalOpen} 
         onClose={() => setUpgradeModalOpen(false)}
         reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
+      />
+
+      {/* Camera Settings Sidebar */}
+      <CameraSettingsSidebar
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        selectedQuality={selectedQuality}
+        onQualityChange={setSelectedQuality}
+        showGrid={showGrid}
+        onShowGridChange={setShowGrid}
+        pdfMode={pdfMode}
+        onPdfModeChange={setPdfMode}
+        autoSave={autoSave}
+        onAutoSaveChange={setAutoSave}
       />
     </div>
   );
