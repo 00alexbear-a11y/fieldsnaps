@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { syncManager } from '@/lib/syncManager';
@@ -20,7 +21,6 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { nativeClipboard } from '@/lib/nativeClipboard';
 import { haptics } from '@/lib/nativeHaptics';
-import { NotificationPanel } from '@/components/NotificationPanel';
 import type { Tag, Company, User as UserType } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
@@ -56,13 +56,11 @@ export default function Settings() {
   } | null>(null);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   
-  // Tag management state
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [tagName, setTagName] = useState('');
   const [tagColor, setTagColor] = useState('blue');
   
-  // Camera quality settings
   const [cameraQuality, setCameraQuality] = useState<'quick' | 'standard' | 'detailed'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('camera-quality');
@@ -71,13 +69,11 @@ export default function Settings() {
     return 'standard';
   });
   
-  // User settings
   const { data: userSettings } = useQuery<{ uploadOnWifiOnly: boolean }>({
     queryKey: ['/api/settings'],
     enabled: !!user,
   });
   
-  // Update settings mutation
   const updateSettingsMutation = useMutation({
     mutationFn: async (data: { uploadOnWifiOnly: boolean }) => {
       const res = await apiRequest('PUT', '/api/settings', data);
@@ -99,11 +95,13 @@ export default function Settings() {
     },
   });
   
-  // Team management state
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const [showCancellationWarning, setShowCancellationWarning] = useState(false);
+  const [showPdfDialog, setShowPdfDialog] = useState(false);
+  const [showTagsDialog, setShowTagsDialog] = useState(false);
+  const [showTeamDialog, setShowTeamDialog] = useState(false);
+  const [showCameraDialog, setShowCameraDialog] = useState(false);
 
-  // PDF settings state
   const [pdfSettings, setPdfSettings] = useState({
     pdfCompanyName: '',
     pdfCompanyAddress: '',
@@ -124,19 +122,16 @@ export default function Settings() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  // Company data
   const { data: company } = useQuery<Company>({
     queryKey: ['/api/companies/me'],
     enabled: !!user?.companyId,
   });
 
-  // Team members data
   const { data: members = [] } = useQuery<UserType[]>({
     queryKey: ['/api/companies/members'],
     enabled: !!user?.companyId,
   });
 
-  // Generate invite link mutation
   const generateInviteMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('POST', '/api/companies/invite-link');
@@ -158,7 +153,6 @@ export default function Settings() {
     },
   });
 
-  // Revoke invite link mutation
   const revokeInviteMutation = useMutation({
     mutationFn: async () => {
       await apiRequest('DELETE', '/api/companies/invite-link');
@@ -179,7 +173,6 @@ export default function Settings() {
     },
   });
 
-  // Remove member mutation
   const removeMemberMutation = useMutation({
     mutationFn: async (userId: string) => {
       await apiRequest('DELETE', `/api/companies/members/${userId}`);
@@ -200,7 +193,6 @@ export default function Settings() {
     },
   });
 
-  // Promote member mutation
   const promoteMemberMutation = useMutation({
     mutationFn: async (userId: string) => {
       await apiRequest('PUT', `/api/companies/members/${userId}/promote`);
@@ -223,7 +215,6 @@ export default function Settings() {
     },
   });
 
-  // PDF settings mutations
   const savePdfSettingsMutation = useMutation({
     mutationFn: async (settings: typeof pdfSettings) => {
       const res = await apiRequest('PUT', '/api/companies/pdf-settings', settings);
@@ -324,15 +315,10 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    // Load sync status and storage usage
-    // Cleanup stale queue items on initial load
     loadSyncStatus(true);
     calculateStorageUsage();
-
-    // Check biometric support
     checkBiometricSupport().then(setBiometricSupported);
 
-    // Update online status
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -345,7 +331,6 @@ export default function Settings() {
     };
   }, []);
 
-  // Load PDF settings from company
   useEffect(() => {
     if (company) {
       setPdfSettings({
@@ -381,10 +366,8 @@ export default function Settings() {
 
   const calculateStorageUsage = async () => {
     try {
-      // Get all projects first
       const projects = await indexedDBService.getAllProjects();
       
-      // Get photos for all projects
       let totalBytes = 0;
       let totalPhotoCount = 0;
       
@@ -422,7 +405,6 @@ export default function Settings() {
       setCleanupResults(results);
       setShowCleanupDialog(true);
       
-      // Refresh storage usage after cleanup
       await calculateStorageUsage();
     } catch (error) {
       console.error('Failed to cleanup orphaned photos:', error);
@@ -431,12 +413,10 @@ export default function Settings() {
     }
   };
 
-  // Load tags
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags'],
   });
 
-  // Create tag mutation
   const createTagMutation = useMutation({
     mutationFn: async (data: { name: string; color: string }) => {
       const res = await apiRequest('POST', '/api/tags', data);
@@ -461,7 +441,6 @@ export default function Settings() {
     },
   });
 
-  // Update tag mutation
   const updateTagMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: { name?: string; color?: string } }) => {
       const res = await apiRequest('PUT', `/api/tags/${id}`, data);
@@ -487,7 +466,6 @@ export default function Settings() {
     },
   });
 
-  // Delete tag mutation
   const deleteTagMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiRequest('DELETE', `/api/tags/${id}`);
@@ -508,14 +486,12 @@ export default function Settings() {
     },
   });
 
-  // Checkout mutation
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('POST', '/api/billing/create-checkout-session');
       return await res.json();
     },
     onSuccess: (data: { url: string }) => {
-      // Redirect to Stripe Checkout
       window.location.href = data.url;
     },
     onError: (error: any) => {
@@ -576,999 +552,583 @@ export default function Settings() {
     });
   };
 
+  const getQualityLabel = () => {
+    const labels = {
+      quick: 'Quick (S)',
+      standard: 'Standard (M)',
+      detailed: 'Detailed (L)'
+    };
+    return labels[cameraQuality];
+  };
+
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-black">
-      {/* Sticky Header - matches Projects page */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-black">
-        <div className="px-4 pt-safe-3 pb-3 space-y-1">
+    <div className="flex flex-col h-full bg-background">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-background border-b">
+        <div className="px-4 pt-safe-3 pb-3">
           <div className="flex items-center justify-between">
-            <img 
-              src={logoPath} 
-              alt="FieldSnaps" 
-              className="h-9 w-auto object-contain"
-              data-testid="img-fieldsnaps-logo"
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">
-                {isDark ? 'Dark Mode' : 'Light Mode'}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                data-testid="button-theme-toggle"
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
-              <NotificationPanel />
-            </div>
+            <h1 className="text-2xl font-semibold">Settings</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              data-testid="button-theme-toggle"
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
           </div>
-          {syncStatus && syncStatus.pending > 0 && (
-            <p className="text-xs text-muted-foreground">
-              {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
-            </p>
-          )}
         </div>
       </div>
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="px-4 pb-24 pt-4 space-y-6 max-w-screen-sm mx-auto">
+        <div className="px-4 pb-24 pt-6 space-y-6 max-w-screen-sm mx-auto">
 
-      {/* Camera Quality */}
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <Camera className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Camera Quality</h2>
-        </div>
-        
-        <p className="text-sm text-muted-foreground">
-          Choose default quality for new photos
-        </p>
-
-        <div className="space-y-3">
-          <label
-            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
-              cameraQuality === 'quick' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
-            }`}
-            data-testid="option-quality-quick"
-          >
-            <div className="flex-1">
-              <div className="font-medium">Quick (S)</div>
-              <div className="text-sm text-muted-foreground">~200 KB • 1280x960 pixels</div>
-              <div className="text-xs text-muted-foreground mt-1">Fast upload, good for progress photos and daily documentation</div>
-            </div>
-            <input
-              type="radio"
-              name="camera-quality"
-              value="quick"
-              checked={cameraQuality === 'quick'}
-              onChange={() => handleQualityChange('quick')}
-              className="w-4 h-4 text-primary"
-            />
-          </label>
-
-          <label
-            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
-              cameraQuality === 'standard' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
-            }`}
-            data-testid="option-quality-standard"
-          >
-            <div className="flex-1">
-              <div className="font-medium">Standard (M)</div>
-              <div className="text-sm text-muted-foreground">~500 KB • 1920x1440 pixels</div>
-              <div className="text-xs text-muted-foreground mt-1">Balanced quality and file size for general use and client sharing</div>
-            </div>
-            <input
-              type="radio"
-              name="camera-quality"
-              value="standard"
-              checked={cameraQuality === 'standard'}
-              onChange={() => handleQualityChange('standard')}
-              className="w-4 h-4 text-primary"
-            />
-          </label>
-
-          <label
-            className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
-              cameraQuality === 'detailed' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
-            }`}
-            data-testid="option-quality-detailed"
-          >
-            <div className="flex-1">
-              <div className="font-medium">Detailed (L)</div>
-              <div className="text-sm text-muted-foreground">~1 MB • 2560x1920 pixels</div>
-              <div className="text-xs text-muted-foreground mt-1">Maximum quality for defect documentation and project closeout</div>
-            </div>
-            <input
-              type="radio"
-              name="camera-quality"
-              value="detailed"
-              checked={cameraQuality === 'detailed'}
-              onChange={() => handleQualityChange('detailed')}
-              className="w-4 h-4 text-primary"
-            />
-          </label>
-        </div>
-      </Card>
-
-      {/* Upload Settings */}
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <Upload className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Upload Settings</h2>
-        </div>
-        
-        <p className="text-sm text-muted-foreground">
-          Control when photos sync to the cloud
-        </p>
-
-        <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-          <div className="flex-1">
-            <Label htmlFor="wifi-only" className="font-medium">Upload only on WiFi</Label>
-            <p className="text-sm text-muted-foreground mt-1">
-              Save cellular data by uploading only when connected to WiFi
-            </p>
-          </div>
-          <Switch
-            id="wifi-only"
-            checked={userSettings?.uploadOnWifiOnly ?? true}
-            onCheckedChange={(checked) => updateSettingsMutation.mutate({ uploadOnWifiOnly: checked })}
-            data-testid="switch-upload-wifi-only"
-          />
-        </div>
-      </Card>
-
-      {/* Tags Management */}
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Photo Tags</h2>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => handleOpenTagDialog()}
-            data-testid="button-create-tag"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Tag
-          </Button>
-        </div>
-
-        {tags.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            No tags yet. Create one to categorize your photos.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {tags.map((tag) => (
-              <div
-                key={tag.id}
-                className="flex items-center justify-between p-3 rounded-lg border bg-card hover-elevate transition-colors"
-                data-testid={`tag-item-${tag.id}`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-4 h-4 rounded-full`}
-                    style={{ backgroundColor: tag.color }}
-                  />
-                  <span className="font-medium">{tag.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleOpenTagDialog(tag)}
-                    data-testid={`button-edit-tag-${tag.id}`}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteTagMutation.mutate(tag.id)}
-                    disabled={deleteTagMutation.isPending}
-                    data-testid={`button-delete-tag-${tag.id}`}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* Account */}
-      <Card className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Account</h2>
-        
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <Avatar className="w-12 h-12" data-testid="avatar-user">
-              <AvatarImage 
-                src={user?.profileImageUrl || undefined} 
-                alt={user?.email || 'User'} 
-                className="object-cover"
-              />
-              <AvatarFallback>
-                {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate" data-testid="text-user-name">
-                {user?.firstName && user?.lastName 
-                  ? `${user.firstName} ${user.lastName}` 
-                  : user?.email || 'User'}
-              </p>
-              {user?.email && (
-                <p className="text-sm text-muted-foreground truncate" data-testid="text-user-email">
-                  {user.email}
+          {/* Account */}
+          <Card className="p-0 overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3 bg-card">
+              <Avatar className="w-12 h-12" data-testid="avatar-user">
+                <AvatarImage 
+                  src={user?.profileImageUrl || undefined} 
+                  alt={user?.email || 'User'} 
+                  className="object-cover"
+                />
+                <AvatarFallback>
+                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold truncate" data-testid="text-user-name">
+                  {user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user?.email || 'User'}
                 </p>
-              )}
-            </div>
-          </div>
-          
-          {biometricSupported && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Fingerprint className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Biometric Login</span>
-                </div>
+                {user?.email && (
+                  <p className="text-sm text-muted-foreground truncate" data-testid="text-user-email">
+                    {user.email}
+                  </p>
+                )}
               </div>
-              <Button
-                variant="outline"
-                size="default"
-                className="w-full"
-                onClick={registerBiometric}
-                disabled={isWebAuthnLoading}
-                data-testid="button-register-biometric"
-              >
-                <Fingerprint className="w-4 h-4 mr-2" />
-                {isWebAuthnLoading ? 'Setting up...' : 'Enable Biometric Login'}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Use Touch ID, Face ID, or Windows Hello to sign in
-              </p>
             </div>
-          )}
-          
-          <Button
-            variant="outline"
-            size="default"
-            className="w-full"
-            onClick={async () => {
-              try {
-                // Import tokenManager dynamically to avoid circular dependencies
-                const { tokenManager } = await import('@/lib/tokenManager');
-                const { Capacitor } = await import('@capacitor/core');
-                
-                // For native apps, use JWT logout
-                if (Capacitor.isNativePlatform()) {
-                  await tokenManager.logout();
-                  window.location.href = '/login';
-                } else {
-                  // For web, use session-based logout
+            
+            {biometricSupported && (
+              <>
+                <Separator />
+                <button
+                  onClick={registerBiometric}
+                  disabled={isWebAuthnLoading}
+                  className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+                  data-testid="button-register-biometric"
+                >
+                  <div className="flex items-center gap-3">
+                    <Fingerprint className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-sm">Biometric Login</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </>
+            )}
+            
+            <Separator />
+            <button
+              onClick={async () => {
+                try {
+                  const { tokenManager } = await import('@/lib/tokenManager');
+                  const { Capacitor } = await import('@capacitor/core');
+                  
+                  if (Capacitor.isNativePlatform()) {
+                    await tokenManager.logout();
+                    window.location.href = '/login';
+                  } else {
+                    window.location.href = '/api/logout';
+                  }
+                } catch (error) {
+                  console.error('Logout failed:', error);
                   window.location.href = '/api/logout';
                 }
-              } catch (error) {
-                console.error('Logout failed:', error);
-                // Fallback to session logout
-                window.location.href = '/api/logout';
-              }
-            }}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </Card>
-
-      {/* Subscription Status */}
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary" />
-          </div>
-          <h2 className="text-lg font-semibold">Subscription</h2>
-        </div>
-        
-        <div className="space-y-3">
-          {/* Trial Status */}
-          {user?.subscriptionStatus === 'trial' && user?.trialStartDate && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="font-medium text-sm">Free Trial</span>
+              }}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="button-logout"
+            >
+              <div className="flex items-center gap-3">
+                <LogOut className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Sign Out</span>
               </div>
-              {user?.trialEndDate && (
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </Card>
+
+          {/* Appearance */}
+          <Card className="p-0 overflow-hidden">
+            <div className="flex items-center justify-between px-4 h-12">
+              <div className="flex items-center gap-3">
+                {isDark ? <Moon className="w-5 h-5 text-muted-foreground" /> : <Sun className="w-5 h-5 text-muted-foreground" />}
+                <span className="text-sm">Dark Mode</span>
+              </div>
+              <Switch
+                checked={isDark}
+                onCheckedChange={toggleTheme}
+                data-testid="switch-dark-mode"
+              />
+            </div>
+          </Card>
+
+          {/* Camera */}
+          <Card className="p-0 overflow-hidden">
+            <button
+              onClick={() => setShowCameraDialog(true)}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="button-camera-quality"
+            >
+              <div className="flex items-center gap-3">
+                <Camera className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Photo Quality</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{getQualityLabel()}</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </button>
+          </Card>
+
+          {/* Data & Storage */}
+          <Card className="p-0 overflow-hidden">
+            <div className="flex items-center justify-between px-4 h-12">
+              <div className="flex items-center gap-3">
+                <Wifi className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Upload Only on WiFi</span>
+              </div>
+              <Switch
+                checked={userSettings?.uploadOnWifiOnly ?? true}
+                onCheckedChange={(checked) => updateSettingsMutation.mutate({ uploadOnWifiOnly: checked })}
+                data-testid="switch-upload-wifi-only"
+              />
+            </div>
+            
+            <Separator />
+            <button
+              onClick={() => setLocation('/upload-queue')}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="card-upload-queue"
+            >
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Upload Queue</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {syncStatus && syncStatus.pending > 0 && (
+                  <span className="text-sm text-muted-foreground" data-testid="text-pending-count">
+                    {syncStatus.pending}
+                  </span>
+                )}
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </button>
+            
+            <Separator />
+            <button
+              onClick={() => setLocation('/sync-status')}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="card-sync-status"
+            >
+              <div className="flex items-center gap-3">
+                {isOnline ? (
+                  <Wifi className="w-5 h-5 text-green-500" />
+                ) : (
+                  <WifiOff className="w-5 h-5 text-destructive" />
+                )}
+                <span className="text-sm">Sync Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground" data-testid="text-online-status">
+                  {isOnline ? 'Online' : 'Offline'}
+                </span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </button>
+            
+            <Separator />
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <HardDrive className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm">Local Storage</span>
+                </div>
+                {storageUsage && (
+                  <span className="text-sm font-medium" data-testid="text-storage-mb">
+                    {storageUsage.mb} MB
+                  </span>
+                )}
+              </div>
+              {storageUsage && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCleanupOrphans}
+                  disabled={isCleaningUp}
+                  className="w-full mt-2"
+                  data-testid="button-cleanup-orphans"
+                >
+                  {isCleaningUp ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Cleaning...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Clean Up Storage
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+            
+            <Separator />
+            <button
+              onClick={() => setLocation('/trash')}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="card-trash"
+            >
+              <div className="flex items-center gap-3">
+                <Trash2 className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Trash</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </Card>
+
+          {/* Team Management */}
+          {user?.companyId && (
+            <Card className="p-0 overflow-hidden">
+              <button
+                onClick={() => setShowTagsDialog(true)}
+                className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+                data-testid="button-manage-tags"
+              >
+                <div className="flex items-center gap-3">
+                  <TagIcon className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm">Photo Tags</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{tags.length}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </button>
+              
+              <Separator />
+              <button
+                onClick={() => setShowTeamDialog(true)}
+                className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+                data-testid="button-manage-team"
+              >
+                <div className="flex items-center gap-3">
+                  <Users className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm">Team Members</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{members.length}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </button>
+              
+              {company?.ownerId === user.id && (
                 <>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Trial ends</span>
-                    <span className="font-medium text-sm">
-                      {new Date(user.trialEndDate).toLocaleDateString('en-US', { 
-                        month: 'long', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                      })}
-                      {' '}
-                      ({Math.max(0, Math.ceil((new Date(user.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining)
-                    </span>
+                  <Separator />
+                  <button
+                    onClick={() => setShowPdfDialog(true)}
+                    className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+                    data-testid="button-pdf-settings"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm">PDF Export Settings</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </>
+              )}
+            </Card>
+          )}
+
+          {/* Billing */}
+          <Card className="p-0 overflow-hidden">
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-3 mb-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">Subscription</span>
+              </div>
+              
+              {user?.subscriptionStatus === 'trial' && user?.trialStartDate && (
+                <div className="space-y-2 mt-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-medium">Free Trial</span>
+                  </div>
+                  {user?.trialEndDate && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Ends</span>
+                        <span className="font-medium">
+                          {Math.max(0, Math.ceil((new Date(user.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days
+                        </span>
+                      </div>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={handleUpgradeClick}
+                        disabled={checkoutMutation.isPending}
+                        data-testid="button-upgrade-trial"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        {checkoutMutation.isPending ? 'Loading...' : 'Upgrade to Pro'}
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {user?.subscriptionStatus === 'trial' && !user?.trialStartDate && (
+                <div className="mt-3">
+                  <p className="text-sm text-muted-foreground">
+                    Your 7-day free trial starts when you create your first project
+                  </p>
+                </div>
+              )}
+
+              {user?.subscriptionStatus === 'active' && (
+                <div className="space-y-2 mt-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-medium text-green-600 dark:text-green-500">Active</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Plan</span>
+                    <span className="font-medium">$19.99/month</span>
                   </div>
                   <Button
                     variant="outline"
-                    size="default"
-                    className="w-full"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      if (members.length > 1) {
+                        setShowCancellationWarning(true);
+                      } else {
+                        window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank');
+                      }
+                    }}
+                    data-testid="button-manage-subscription"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Manage Subscription
+                  </Button>
+                </div>
+              )}
+
+              {user?.subscriptionStatus === 'past_due' && (
+                <div className="space-y-2 mt-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-medium text-amber-600 dark:text-amber-500">Payment Issue</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Please update your payment method
+                  </p>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank')}
+                    data-testid="button-update-payment"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Update Payment
+                  </Button>
+                </div>
+              )}
+
+              {(!user?.subscriptionStatus || user?.subscriptionStatus === 'canceled' || 
+                (user?.subscriptionStatus === 'trial' && user?.trialEndDate && new Date(user.trialEndDate) < new Date())) && (
+                <div className="space-y-2 mt-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-medium">Trial Ended</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Upgrade to continue using all features
+                  </p>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="w-full mt-2"
                     onClick={handleUpgradeClick}
                     disabled={checkoutMutation.isPending}
-                    data-testid="button-upgrade-trial"
+                    data-testid="button-upgrade-expired"
                   >
                     <CreditCard className="w-4 h-4 mr-2" />
                     {checkoutMutation.isPending ? 'Loading...' : 'Upgrade to Pro'}
                   </Button>
-                </>
+                </div>
               )}
             </div>
-          )}
+          </Card>
 
-          {/* Trial Not Started */}
-          {user?.subscriptionStatus === 'trial' && !user?.trialStartDate && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="font-medium text-sm">Trial Ready</span>
+          {/* About */}
+          <Card className="p-0 overflow-hidden">
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-3 mb-2">
+                <Info className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm font-medium">About</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Your 7-day free trial starts when you create your first project
+              <p className="text-sm text-muted-foreground mt-2" data-testid="text-app-version">
+                FieldSnaps v1.0.0
               </p>
-            </div>
-          )}
-
-          {/* Active Subscription */}
-          {user?.subscriptionStatus === 'active' && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="font-medium text-sm text-green-600 dark:text-green-500">
-                  FieldSnaps Pro - Active
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Billing</span>
-                <span className="font-medium text-sm">$19.99/month</span>
-              </div>
-              <Button
-                variant="outline"
-                size="default"
-                className="w-full"
-                onClick={() => {
-                  if (members.length > 1) {
-                    setShowCancellationWarning(true);
-                  } else {
-                    window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank');
-                  }
-                }}
-                data-testid="button-manage-subscription"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Manage Subscription
-              </Button>
-            </div>
-          )}
-
-          {/* Past Due */}
-          {user?.subscriptionStatus === 'past_due' && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="font-medium text-sm text-amber-600 dark:text-amber-500">
-                  Payment Issue
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Please update your payment method to continue using FieldSnaps
+              <p className="text-xs text-muted-foreground mt-1">
+                Offline-first photo documentation
               </p>
-              <Button
-                variant="default"
-                size="default"
-                className="w-full"
-                onClick={() => window.open(process.env.VITE_STRIPE_CUSTOMER_PORTAL_URL || '#', '_blank')}
-                data-testid="button-update-payment"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Update Payment Method
-              </Button>
-            </div>
-          )}
-
-          {/* Trial Ended */}
-          {(!user?.subscriptionStatus || user?.subscriptionStatus === 'canceled' || 
-            (user?.subscriptionStatus === 'trial' && user?.trialEndDate && new Date(user.trialEndDate) < new Date())) && (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status</span>
-                <span className="font-medium text-sm">Trial Ended</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Upgrade to FieldSnaps Pro to continue using all features
-              </p>
-              <Button
-                variant="default"
-                size="default"
-                className="w-full"
-                onClick={handleUpgradeClick}
-                disabled={checkoutMutation.isPending}
-                data-testid="button-upgrade-expired"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                {checkoutMutation.isPending ? 'Loading...' : 'Upgrade to Pro'}
-              </Button>
-            </div>
-          )}
-        </div>
-      </Card>
-
-      {/* PDF Export Settings */}
-      {user?.companyId && company?.ownerId === user.id && (
-        <div data-testid="section-pdf-settings">
-          <div className="flex items-center gap-3 mb-4">
-            <FileText className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-semibold">PDF Export Settings</h2>
-          </div>
-          
-          <Card className="p-6 space-y-6" data-testid="card-pdf-settings">
-            {/* Logo Upload */}
-            <div className="space-y-3">
-              <Label className="text-base font-medium">Company Logo</Label>
-              <p className="text-sm text-muted-foreground">Upload a logo to appear on exported PDFs</p>
-              <div className="flex items-center gap-4">
-                {logoPreview && (
-                  <div className="w-32 h-32 border rounded-md overflow-hidden flex items-center justify-center bg-muted">
-                    <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
-                  </div>
-                )}
-                <div className="flex flex-col gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    className="hidden"
-                    id="logo-upload"
-                    data-testid="input-logo-file"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => document.getElementById('logo-upload')?.click()}
-                    data-testid="button-choose-logo"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose Image
-                  </Button>
-                  {logoFile && (
-                    <Button
-                      size="sm"
-                      onClick={handleLogoUpload}
-                      disabled={uploadLogoMutation.isPending}
-                      data-testid="button-upload-logo"
-                    >
-                      {uploadLogoMutation.isPending ? 'Uploading...' : 'Upload Logo'}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Company Information */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Company Information</Label>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="pdf-company-name">Company Name</Label>
-                  <input
-                    id="pdf-company-name"
-                    type="text"
-                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
-                    value={pdfSettings.pdfCompanyName}
-                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyName: e.target.value })}
-                    placeholder="Enter company name"
-                    data-testid="input-pdf-company-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pdf-company-address">Company Address</Label>
-                  <textarea
-                    id="pdf-company-address"
-                    className="mt-1.5 w-full px-3 py-2 border rounded-md resize-none"
-                    rows={2}
-                    value={pdfSettings.pdfCompanyAddress}
-                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyAddress: e.target.value })}
-                    placeholder="Enter company address"
-                    data-testid="input-pdf-company-address"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pdf-company-phone">Company Phone</Label>
-                  <input
-                    id="pdf-company-phone"
-                    type="tel"
-                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
-                    value={pdfSettings.pdfCompanyPhone}
-                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyPhone: e.target.value })}
-                    placeholder="Enter phone number"
-                    data-testid="input-pdf-company-phone"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Header/Footer Text */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Default Header & Footer</Label>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="pdf-header-text">Header Text</Label>
-                  <input
-                    id="pdf-header-text"
-                    type="text"
-                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
-                    value={pdfSettings.pdfHeaderText}
-                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfHeaderText: e.target.value })}
-                    placeholder="Optional header text"
-                    data-testid="input-pdf-header-text"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pdf-footer-text">Footer Text</Label>
-                  <input
-                    id="pdf-footer-text"
-                    type="text"
-                    className="mt-1.5 w-full px-3 py-2 border rounded-md"
-                    value={pdfSettings.pdfFooterText}
-                    onChange={(e) => setPdfSettings({ ...pdfSettings, pdfFooterText: e.target.value })}
-                    placeholder="Optional footer text"
-                    data-testid="input-pdf-footer-text"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Font Settings */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Font Settings</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="pdf-font-family">Font Family</Label>
-                  <Select
-                    value={pdfSettings.pdfFontFamily}
-                    onValueChange={(value: 'Arial' | 'Helvetica' | 'Times') => setPdfSettings({ ...pdfSettings, pdfFontFamily: value })}
-                  >
-                    <SelectTrigger id="pdf-font-family" className="mt-1.5" data-testid="select-pdf-font-family">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Arial">Arial</SelectItem>
-                      <SelectItem value="Helvetica">Helvetica</SelectItem>
-                      <SelectItem value="Times">Times</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="pdf-default-grid">Default Grid Layout</Label>
-                  <Select
-                    value={pdfSettings.pdfDefaultGridLayout.toString()}
-                    onValueChange={(value) => setPdfSettings({ ...pdfSettings, pdfDefaultGridLayout: parseInt(value) })}
-                  >
-                    <SelectTrigger id="pdf-default-grid" className="mt-1.5" data-testid="select-pdf-default-grid">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 photo per page</SelectItem>
-                      <SelectItem value="2">2 photos per page</SelectItem>
-                      <SelectItem value="3">3 photos per page</SelectItem>
-                      <SelectItem value="4">4 photos per page</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            {/* Photo Caption Options */}
-            <div className="space-y-3">
-              <Label className="text-base font-medium">Photo Captions</Label>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pdf-include-timestamp" className="font-normal">Include timestamp</Label>
-                  <Switch
-                    id="pdf-include-timestamp"
-                    checked={pdfSettings.pdfIncludeTimestamp}
-                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTimestamp: checked })}
-                    data-testid="switch-pdf-include-timestamp"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pdf-include-tags" className="font-normal">Include tags</Label>
-                  <Switch
-                    id="pdf-include-tags"
-                    checked={pdfSettings.pdfIncludeTags}
-                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTags: checked })}
-                    data-testid="switch-pdf-include-tags"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pdf-include-annotations" className="font-normal">Include annotations</Label>
-                  <Switch
-                    id="pdf-include-annotations"
-                    checked={pdfSettings.pdfIncludeAnnotations}
-                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeAnnotations: checked })}
-                    data-testid="switch-pdf-include-annotations"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="pdf-include-signature" className="font-normal">Include signature line</Label>
-                  <Switch
-                    id="pdf-include-signature"
-                    checked={pdfSettings.pdfIncludeSignatureLine}
-                    onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeSignatureLine: checked })}
-                    data-testid="switch-pdf-include-signature"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="pt-2">
-              <Button
-                onClick={handleSavePdfSettings}
-                disabled={savePdfSettingsMutation.isPending}
-                data-testid="button-save-pdf-settings"
-              >
-                {savePdfSettingsMutation.isPending ? 'Saving...' : 'Save PDF Settings'}
-              </Button>
             </div>
           </Card>
         </div>
-      )}
+      </div>
 
-      {/* Team Management */}
-      {user?.companyId && (
-        <Card className="p-4 space-y-4">
-          <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">Team</h2>
-          </div>
-
-          {/* Billing Info */}
-          {company?.ownerId === user.id && (
-            <div className="p-3 rounded-lg bg-muted/50 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Team Size</span>
-                <span className="font-medium">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+      {/* Camera Quality Dialog */}
+      <Dialog open={showCameraDialog} onOpenChange={setShowCameraDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Photo Quality</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-3 py-4">
+            <label
+              className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+                cameraQuality === 'quick' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+              }`}
+              data-testid="option-quality-quick"
+            >
+              <div className="flex-1">
+                <div className="font-medium">Quick (S)</div>
+                <div className="text-sm text-muted-foreground">~200 KB • 1280x960 pixels</div>
+                <div className="text-xs text-muted-foreground mt-1">Fast upload, good for progress photos</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Cost per user</span>
-                <span className="font-medium">$19.99/month</span>
+              <input
+                type="radio"
+                name="camera-quality"
+                value="quick"
+                checked={cameraQuality === 'quick'}
+                onChange={() => handleQualityChange('quick')}
+                className="w-4 h-4 text-primary"
+              />
+            </label>
+
+            <label
+              className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+                cameraQuality === 'standard' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+              }`}
+              data-testid="option-quality-standard"
+            >
+              <div className="flex-1">
+                <div className="font-medium">Standard (M)</div>
+                <div className="text-sm text-muted-foreground">~500 KB • 1920x1440 pixels</div>
+                <div className="text-xs text-muted-foreground mt-1">Balanced quality for general use</div>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-border">
-                <span className="text-sm font-medium">Total Monthly Cost</span>
-                <span className="font-semibold">${(members.length * 19.99).toFixed(2)}/month</span>
+              <input
+                type="radio"
+                name="camera-quality"
+                value="standard"
+                checked={cameraQuality === 'standard'}
+                onChange={() => handleQualityChange('standard')}
+                className="w-4 h-4 text-primary"
+              />
+            </label>
+
+            <label
+              className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+                cameraQuality === 'detailed' ? 'border-primary bg-primary/5' : 'border-border hover-elevate'
+              }`}
+              data-testid="option-quality-detailed"
+            >
+              <div className="flex-1">
+                <div className="font-medium">Detailed (L)</div>
+                <div className="text-sm text-muted-foreground">~1 MB • 2560x1920 pixels</div>
+                <div className="text-xs text-muted-foreground mt-1">Maximum quality for documentation</div>
               </div>
-            </div>
-          )}
-
-          {/* Invite Link Section (Owner Only) */}
-          {company?.ownerId === user.id && (
-            <div className="space-y-3">
-              {company?.inviteLinkToken ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Active Invite Link</p>
-                      <p className="text-xs text-muted-foreground">
-                        {company.inviteLinkUses} / {company.inviteLinkMaxUses} uses
-                        {company.inviteLinkExpiresAt && ` • Expires ${new Date(company.inviteLinkExpiresAt).toLocaleDateString()}`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="default"
-                      className="flex-1"
-                      onClick={copyInviteLink}
-                      data-testid="button-copy-invite"
-                    >
-                      {inviteLinkCopied ? (
-                        <>
-                          <Check className="w-4 h-4 mr-2" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Copy Link
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="default"
-                      onClick={() => revokeInviteMutation.mutate()}
-                      disabled={revokeInviteMutation.isPending}
-                      data-testid="button-revoke-invite"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Revoke
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="default"
-                  className="w-full"
-                  onClick={() => generateInviteMutation.mutate()}
-                  disabled={generateInviteMutation.isPending}
-                  data-testid="button-generate-invite"
-                >
-                  <LinkIcon className="w-4 h-4 mr-2" />
-                  {generateInviteMutation.isPending ? 'Generating...' : 'Generate Invite Link'}
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Team Members List */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Team Members</p>
-            {members.map((member: any) => (
-              <div
-                key={member.id}
-                className="flex items-center justify-between p-3 rounded-lg border"
-                data-testid={`member-item-${member.id}`}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={member.profileImageUrl || undefined} />
-                    <AvatarFallback>
-                      {member.firstName?.[0] || member.email?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">
-                      {member.firstName && member.lastName 
-                        ? `${member.firstName} ${member.lastName}` 
-                        : member.email}
-                      {member.id === user.id && (
-                        <span className="text-xs text-muted-foreground ml-2">(You)</span>
-                      )}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">{member.email}</p>
-                  </div>
-                  {company?.ownerId === member.id && (
-                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10">
-                      <Crown className="w-3 h-3 text-primary" />
-                      <span className="text-xs font-medium text-primary">Owner</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Owner Actions */}
-                {company?.ownerId === user.id && member.id !== user.id && (
-                  <div className="flex items-center gap-1 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => promoteMemberMutation.mutate(member.id)}
-                      disabled={promoteMemberMutation.isPending}
-                      title="Transfer ownership"
-                      data-testid={`button-promote-${member.id}`}
-                    >
-                      <Crown className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeMemberMutation.mutate(member.id)}
-                      disabled={removeMemberMutation.isPending}
-                      title="Remove member"
-                      data-testid={`button-remove-${member.id}`}
-                    >
-                      <UserMinus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
+              <input
+                type="radio"
+                name="camera-quality"
+                value="detailed"
+                checked={cameraQuality === 'detailed'}
+                onChange={() => handleQualityChange('detailed')}
+                className="w-4 h-4 text-primary"
+              />
+            </label>
           </div>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
-      {/* Team Performance Stats (Owner Only) */}
-      {user?.companyId && company?.ownerId === user.id && (
-        <TeamPerformanceStats />
-      )}
-
-      {/* Upload Queue */}
-      <Card 
-        className="p-4 space-y-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
-        onClick={() => setLocation('/upload-queue')}
-        data-testid="card-upload-queue"
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Upload Queue</h2>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-        
-        <p className="text-sm text-muted-foreground">
-          View pending photo uploads and retry failed items
-        </p>
-        
-        {syncStatus && syncStatus.pending > 0 && (
-          <div className="flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-yellow-500 animate-pulse" />
-            <span className="text-sm font-medium" data-testid="text-pending-count">
-              {syncStatus.pending} items pending
-            </span>
-          </div>
-        )}
-      </Card>
-
-      {/* Sync Status */}
-      <Card 
-        className="p-4 space-y-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
-        onClick={() => setLocation('/sync-status')}
-        data-testid="card-sync-status"
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Sync Status</h2>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          {isOnline ? (
-            <>
-              <Wifi className="w-5 h-5 text-green-500" />
-              <span className="text-sm text-muted-foreground" data-testid="text-online-status">
-                Online
-              </span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="w-5 h-5 text-destructive" />
-              <span className="text-sm text-muted-foreground" data-testid="text-offline-status">
-                Offline
-              </span>
-            </>
-          )}
-        </div>
-
-        {syncStatus && (
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Pending Items:</span>
-              <span className="font-medium" data-testid="text-pending-count">
-                {syncStatus.pending}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Projects:</span>
-              <span className="font-medium" data-testid="text-pending-projects">
-                {syncStatus.projects}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Photos:</span>
-              <span className="font-medium" data-testid="text-pending-photos">
-                {syncStatus.photos}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <Button
-          variant="default"
-          size="default"
-          className="w-full"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSync();
-          }}
-          disabled={!isOnline || (syncStatus?.pending === 0)}
-          data-testid="button-sync-now"
-        >
-          Sync Now
-        </Button>
-      </Card>
-
-      {/* Trash */}
-      <Card 
-        className="p-4 cursor-pointer hover-elevate active-elevate-2 transition-colors" 
-        onClick={() => setLocation('/trash')}
-        data-testid="card-trash"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Trash2 className="w-5 h-5 text-muted-foreground" />
-            <div>
-              <h2 className="text-lg font-semibold">Trash</h2>
-              <p className="text-sm text-muted-foreground">
-                Deleted items kept for 30 days
+      {/* Tags Dialog */}
+      <Dialog open={showTagsDialog} onOpenChange={setShowTagsDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Photo Tags</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {tags.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No tags yet. Create one to categorize your photos.
               </p>
-            </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-      </Card>
-
-      {/* Storage */}
-      <Card className="p-4 space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold">Offline Storage</h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Photos captured on this device for offline access
-          </p>
-        </div>
-        
-        {storageUsage ? (
-          <div className="space-y-3">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Used:</span>
-                <span className="font-medium text-lg" data-testid="text-storage-mb">
-                  {storageUsage.mb} MB
-                </span>
+            ) : (
+              <div className="space-y-2">
+                {tags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="flex items-center justify-between p-3 rounded-lg border"
+                    data-testid={`tag-item-${tag.id}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: tag.color }}
+                      />
+                      <span className="font-medium">{tag.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleOpenTagDialog(tag)}
+                        data-testid={`button-edit-tag-${tag.id}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteTagMutation.mutate(tag.id)}
+                        disabled={deleteTagMutation.isPending}
+                        data-testid={`button-delete-tag-${tag.id}`}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Local Photos:</span>
-                <span className="font-medium" data-testid="text-storage-photo-count">
-                  {storageUsage.photoCount}
-                </span>
-              </div>
-            </div>
+            )}
             
             <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCleanupOrphans}
-              disabled={isCleaningUp}
+              variant="default"
               className="w-full"
-              data-testid="button-cleanup-orphans"
+              onClick={() => handleOpenTagDialog()}
+              data-testid="button-create-tag"
             >
-              {isCleaningUp ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Cleaning Up...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clean Up Orphaned Photos
-                </>
-              )}
+              <Plus className="w-4 h-4 mr-2" />
+              Create Tag
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Removes photos that failed to upload or were deleted from sync queue
-            </p>
           </div>
-        ) : (
-          <div className="flex items-center justify-center py-2">
-            <div className="animate-spin rounded-full w-5 h-5 border-b-2 border-primary"></div>
-          </div>
-        )}
-      </Card>
-
-      {/* About */}
-      <Card className="p-4 space-y-2">
-        <h2 className="text-lg font-semibold">About</h2>
-        <p className="text-sm text-muted-foreground" data-testid="text-app-version">
-          Construction Photo PWA v1.0.0
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Offline-first photo documentation for construction sites
-        </p>
-      </Card>
+        </DialogContent>
+      </Dialog>
 
       {/* Tag Edit Dialog */}
       <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
@@ -1637,6 +1197,381 @@ export default function Settings() {
         </DialogContent>
       </Dialog>
 
+      {/* Team Dialog */}
+      <Dialog open={showTeamDialog} onOpenChange={setShowTeamDialog}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Team Members</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-4">
+              {company?.ownerId === user?.id && (
+                <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Team Size</span>
+                    <span className="font-medium">{members.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Monthly Cost</span>
+                    <span className="font-semibold">${(members.length * 19.99).toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
+              {company?.ownerId === user?.id && (
+                <div className="space-y-3">
+                  {company?.inviteLinkToken ? (
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium">Active Invite Link</p>
+                      <p className="text-xs text-muted-foreground">
+                        {company.inviteLinkUses} / {company.inviteLinkMaxUses} uses
+                        {company.inviteLinkExpiresAt && ` • Expires ${new Date(company.inviteLinkExpiresAt).toLocaleDateString()}`}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={copyInviteLink}
+                          data-testid="button-copy-invite"
+                        >
+                          {inviteLinkCopied ? (
+                            <>
+                              <Check className="w-4 h-4 mr-2" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Copy Link
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => revokeInviteMutation.mutate()}
+                          disabled={revokeInviteMutation.isPending}
+                          data-testid="button-revoke-invite"
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Revoke
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => generateInviteMutation.mutate()}
+                      disabled={generateInviteMutation.isPending}
+                      data-testid="button-generate-invite"
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      {generateInviteMutation.isPending ? 'Generating...' : 'Generate Invite Link'}
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {members.map((member: any) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-3 rounded-lg border"
+                    data-testid={`member-item-${member.id}`}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={member.profileImageUrl || undefined} />
+                        <AvatarFallback>
+                          {member.firstName?.[0] || member.email?.[0]?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate text-sm">
+                          {member.firstName && member.lastName 
+                            ? `${member.firstName} ${member.lastName}` 
+                            : member.email}
+                          {member.id === user?.id && (
+                            <span className="text-xs text-muted-foreground ml-2">(You)</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">{member.email}</p>
+                      </div>
+                      {company?.ownerId === member.id && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10">
+                          <Crown className="w-3 h-3 text-primary" />
+                          <span className="text-xs font-medium text-primary">Owner</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {company?.ownerId === user?.id && member.id !== user?.id && (
+                      <div className="flex items-center gap-1 ml-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => promoteMemberMutation.mutate(member.id)}
+                          disabled={promoteMemberMutation.isPending}
+                          title="Transfer ownership"
+                          data-testid={`button-promote-${member.id}`}
+                        >
+                          <Crown className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeMemberMutation.mutate(member.id)}
+                          disabled={removeMemberMutation.isPending}
+                          title="Remove member"
+                          data-testid={`button-remove-${member.id}`}
+                        >
+                          <UserMinus className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Settings Dialog */}
+      <Dialog open={showPdfDialog} onOpenChange={setShowPdfDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>PDF Export Settings</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-6 py-4">
+              {/* Logo Upload */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Company Logo</Label>
+                <p className="text-sm text-muted-foreground">Upload a logo to appear on exported PDFs</p>
+                <div className="flex items-center gap-4">
+                  {logoPreview && (
+                    <div className="w-32 h-32 border rounded-md overflow-hidden flex items-center justify-center bg-muted">
+                      <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      className="hidden"
+                      id="logo-upload"
+                      data-testid="input-logo-file"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                      data-testid="button-choose-logo"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Choose Image
+                    </Button>
+                    {logoFile && (
+                      <Button
+                        size="sm"
+                        onClick={handleLogoUpload}
+                        disabled={uploadLogoMutation.isPending}
+                        data-testid="button-upload-logo"
+                      >
+                        {uploadLogoMutation.isPending ? 'Uploading...' : 'Upload Logo'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Information */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Company Information</Label>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="pdf-company-name">Company Name</Label>
+                    <Input
+                      id="pdf-company-name"
+                      type="text"
+                      className="mt-1.5"
+                      value={pdfSettings.pdfCompanyName}
+                      onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyName: e.target.value })}
+                      placeholder="Enter company name"
+                      data-testid="input-pdf-company-name"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pdf-company-address">Company Address</Label>
+                    <textarea
+                      id="pdf-company-address"
+                      className="mt-1.5 w-full px-3 py-2 border rounded-md resize-none"
+                      rows={2}
+                      value={pdfSettings.pdfCompanyAddress}
+                      onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyAddress: e.target.value })}
+                      placeholder="Enter company address"
+                      data-testid="input-pdf-company-address"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pdf-company-phone">Company Phone</Label>
+                    <Input
+                      id="pdf-company-phone"
+                      type="tel"
+                      className="mt-1.5"
+                      value={pdfSettings.pdfCompanyPhone}
+                      onChange={(e) => setPdfSettings({ ...pdfSettings, pdfCompanyPhone: e.target.value })}
+                      placeholder="Enter phone number"
+                      data-testid="input-pdf-company-phone"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Header/Footer Text */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Default Header & Footer</Label>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="pdf-header-text">Header Text</Label>
+                    <Input
+                      id="pdf-header-text"
+                      type="text"
+                      className="mt-1.5"
+                      value={pdfSettings.pdfHeaderText}
+                      onChange={(e) => setPdfSettings({ ...pdfSettings, pdfHeaderText: e.target.value })}
+                      placeholder="Optional header text"
+                      data-testid="input-pdf-header-text"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pdf-footer-text">Footer Text</Label>
+                    <Input
+                      id="pdf-footer-text"
+                      type="text"
+                      className="mt-1.5"
+                      value={pdfSettings.pdfFooterText}
+                      onChange={(e) => setPdfSettings({ ...pdfSettings, pdfFooterText: e.target.value })}
+                      placeholder="Optional footer text"
+                      data-testid="input-pdf-footer-text"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Font Settings */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Font Settings</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="pdf-font-family">Font Family</Label>
+                    <Select
+                      value={pdfSettings.pdfFontFamily}
+                      onValueChange={(value: 'Arial' | 'Helvetica' | 'Times') => setPdfSettings({ ...pdfSettings, pdfFontFamily: value })}
+                    >
+                      <SelectTrigger id="pdf-font-family" className="mt-1.5" data-testid="select-pdf-font-family">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Arial">Arial</SelectItem>
+                        <SelectItem value="Helvetica">Helvetica</SelectItem>
+                        <SelectItem value="Times">Times</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="pdf-default-grid">Default Grid Layout</Label>
+                    <Select
+                      value={pdfSettings.pdfDefaultGridLayout.toString()}
+                      onValueChange={(value) => setPdfSettings({ ...pdfSettings, pdfDefaultGridLayout: parseInt(value) })}
+                    >
+                      <SelectTrigger id="pdf-default-grid" className="mt-1.5" data-testid="select-pdf-default-grid">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 photo per page</SelectItem>
+                        <SelectItem value="2">2 photos per page</SelectItem>
+                        <SelectItem value="3">3 photos per page</SelectItem>
+                        <SelectItem value="4">4 photos per page</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Photo Caption Options */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Photo Captions</Label>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="pdf-include-timestamp" className="font-normal">Include timestamp</Label>
+                    <Switch
+                      id="pdf-include-timestamp"
+                      checked={pdfSettings.pdfIncludeTimestamp}
+                      onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTimestamp: checked })}
+                      data-testid="switch-pdf-include-timestamp"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="pdf-include-tags" className="font-normal">Include tags</Label>
+                    <Switch
+                      id="pdf-include-tags"
+                      checked={pdfSettings.pdfIncludeTags}
+                      onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeTags: checked })}
+                      data-testid="switch-pdf-include-tags"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="pdf-include-annotations" className="font-normal">Include annotations</Label>
+                    <Switch
+                      id="pdf-include-annotations"
+                      checked={pdfSettings.pdfIncludeAnnotations}
+                      onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeAnnotations: checked })}
+                      data-testid="switch-pdf-include-annotations"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="pdf-include-signature" className="font-normal">Include signature line</Label>
+                    <Switch
+                      id="pdf-include-signature"
+                      checked={pdfSettings.pdfIncludeSignatureLine}
+                      onCheckedChange={(checked) => setPdfSettings({ ...pdfSettings, pdfIncludeSignatureLine: checked })}
+                      data-testid="switch-pdf-include-signature"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowPdfDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                handleSavePdfSettings();
+                setShowPdfDialog(false);
+              }}
+              disabled={savePdfSettingsMutation.isPending}
+              data-testid="button-save-pdf-settings"
+            >
+              {savePdfSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Cleanup Results Dialog */}
       <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
         <AlertDialogContent data-testid="dialog-cleanup-results">
@@ -1650,7 +1585,7 @@ export default function Settings() {
                   ) : (
                     <>
                       <p className="mb-3">
-                        Successfully removed <strong>{cleanupResults.deleted}</strong> orphaned {cleanupResults.deleted === 1 ? 'photo' : 'photos'} that {cleanupResults.deleted === 1 ? 'was' : 'were'} not synced and had no queue item.
+                        Successfully removed <strong>{cleanupResults.deleted}</strong> orphaned {cleanupResults.deleted === 1 ? 'photo' : 'photos'}.
                       </p>
                       {cleanupResults.photos.length > 0 && (
                         <div className="mt-3">
@@ -1721,97 +1656,6 @@ export default function Settings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-        </div>
-      </div>
     </div>
-  );
-}
-
-function TeamPerformanceStats() {
-  type TeamStat = {
-    userId: string;
-    userName: string;
-    photoCount: number;
-  };
-
-  const { data: stats = [], isLoading } = useQuery<TeamStat[]>({
-    queryKey: ['/api/team-stats/photo-uploads'],
-  });
-
-  if (isLoading) {
-    return (
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <Camera className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Team Performance</h2>
-        </div>
-        <div className="text-sm text-muted-foreground" data-testid="text-loading-stats">
-          Loading stats...
-        </div>
-      </Card>
-    );
-  }
-
-  if (stats.length === 0) {
-    return (
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <Camera className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Team Performance</h2>
-        </div>
-        <div className="text-sm text-muted-foreground" data-testid="text-no-stats">
-          No photo uploads yet. Start documenting your projects!
-        </div>
-      </Card>
-    );
-  }
-
-  const totalPhotos = stats.reduce((sum, stat) => sum + stat.photoCount, 0);
-  const sortedStats = [...stats].sort((a, b) => b.photoCount - a.photoCount);
-
-  return (
-    <Card className="p-4 space-y-4" data-testid="card-team-performance">
-      <div className="flex items-center gap-3">
-        <Camera className="w-5 h-5 text-muted-foreground" />
-        <h2 className="text-lg font-semibold">Team Performance</h2>
-      </div>
-
-      <div className="p-3 rounded-lg bg-muted/50">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Total Photos</span>
-          <span className="font-semibold text-lg" data-testid="text-total-photos">
-            {totalPhotos.toLocaleString()}
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Photo Uploads by Team Member</p>
-        {sortedStats.map((stat) => (
-          <div
-            key={stat.userId}
-            className="flex items-center justify-between p-3 rounded-lg border"
-            data-testid={`stat-item-${stat.userId}`}
-          >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <Avatar className="w-8 h-8">
-                <AvatarFallback>
-                  {stat.userName?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{stat.userName}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 ml-2">
-              <ImageIcon className="w-4 h-4 text-muted-foreground" />
-              <span className="font-semibold" data-testid={`photo-count-${stat.userId}`}>
-                {stat.photoCount.toLocaleString()}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
   );
 }
