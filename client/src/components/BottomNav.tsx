@@ -55,7 +55,7 @@ export default function BottomNav() {
       <div className="fixed bottom-0 left-0 right-0 h-28 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none pb-safe" />
       
       <nav
-        className="fixed bottom-4 left-0 right-0 z-50 bg-transparent pb-safe"
+        className="fixed bottom-4 left-0 right-0 z-[100] bg-transparent pb-safe"
         data-testid="nav-bottom"
       >
         <div className="flex items-center justify-around min-h-[44px] max-w-screen-sm mx-auto">
