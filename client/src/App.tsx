@@ -22,6 +22,7 @@ import SyncStatus from "./pages/SyncStatus";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
+import Help from "./pages/Help";
 import Login from "./pages/Login";
 import NativeAppLogin from "./pages/NativeAppLogin";
 import Landing from "./pages/Landing";
@@ -32,6 +33,10 @@ import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
+import { AppSidebar } from "./components/AppSidebar";
+import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
+import { Menu } from "lucide-react";
+import { Button } from "./components/ui/button";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
@@ -183,44 +188,78 @@ function AppContent() {
     );
   }
 
+  // Routes where sidebar should be hidden (camera, edit modes, full-screen views)
+  const hideSidebarRoutes = ['/camera', '/photo/:id/edit', '/photo/:id/view'];
+  const shouldShowSidebar = !hideSidebarRoutes.some(route => {
+    // Simple route matching
+    if (route.includes(':')) {
+      const pattern = route.replace(/:[^/]+/g, '[^/]+');
+      return new RegExp(`^${pattern}$`).test(location);
+    }
+    return location === route;
+  });
+
   return (
-    <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex flex-col">
-      {/* Universal swipe-back gesture (disabled on main pages) */}
-      <SwipeBackGesture disabled={disableSwipeBack} />
-      
-      {/* Global offline indicator */}
-      <OfflineIndicator />
-      
-      {/* Show payment notification for past_due users */}
-      <PaymentNotification />
-      
-      {/* Onboarding for authenticated, whitelisted users only */}
-      {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
-      
-      <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
-        <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
-          <Switch>
-            <Route path="/camera" component={Camera} />
-            <Route path="/projects" component={Projects} />
-            <Route path="/projects/:id" component={ProjectPhotos} />
-            <Route path="/activity" component={Activity} />
-            <Route path="/photo/:id/edit" component={PhotoEdit} />
-            <Route path="/photo/:id/view" component={PhotoView} />
-            <Route path="/my-tasks" component={MyTasks} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/upload-queue" component={UploadQueue} />
-            <Route path="/sync-status" component={SyncStatus} />
-            <Route path="/trash" component={Trash} />
-            <Route path="/map" component={Map} />
-            <Route path="/todos" component={ToDos} />
-            <Route path="/billing/success" component={BillingSuccess} />
-            <Route path="/share/:token" component={ShareView} />
-            <Route component={NotFound} />
-          </Switch>
-        </Suspense>
-      </main>
-      <BottomNav />
-    </div>
+    <SidebarProvider defaultOpen={false}>
+      <div className="h-screen overflow-hidden bg-white dark:bg-black text-foreground flex w-full">
+        {/* Universal swipe-back gesture (disabled on main pages) */}
+        <SwipeBackGesture disabled={disableSwipeBack} />
+        
+        {/* Global offline indicator */}
+        <OfflineIndicator />
+        
+        {/* Show payment notification for past_due users */}
+        <PaymentNotification />
+        
+        {/* Onboarding for authenticated, whitelisted users only */}
+        {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
+        
+        {/* Sidebar - only shown on non-camera pages */}
+        {shouldShowSidebar && <AppSidebar />}
+        
+        <div className="flex flex-col flex-1 min-w-0">
+          {/* Header with sidebar trigger - only shown when sidebar is visible */}
+          {shouldShowSidebar && (
+            <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <SidebarTrigger asChild>
+                <Button variant="ghost" size="icon" data-testid="sidebar-trigger">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SidebarTrigger>
+              <div className="flex-1 text-center">
+                <h1 className="text-sm font-semibold">FieldSnaps</h1>
+              </div>
+              <div className="w-9" /> {/* Spacer for symmetry */}
+            </header>
+          )}
+          
+          <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
+            <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <Switch>
+                <Route path="/camera" component={Camera} />
+                <Route path="/projects" component={Projects} />
+                <Route path="/projects/:id" component={ProjectPhotos} />
+                <Route path="/activity" component={Activity} />
+                <Route path="/photo/:id/edit" component={PhotoEdit} />
+                <Route path="/photo/:id/view" component={PhotoView} />
+                <Route path="/my-tasks" component={MyTasks} />
+                <Route path="/settings" component={Settings} />
+                <Route path="/help" component={Help} />
+                <Route path="/upload-queue" component={UploadQueue} />
+                <Route path="/sync-status" component={SyncStatus} />
+                <Route path="/trash" component={Trash} />
+                <Route path="/map" component={Map} />
+                <Route path="/todos" component={ToDos} />
+                <Route path="/billing/success" component={BillingSuccess} />
+                <Route path="/share/:token" component={ShareView} />
+                <Route component={NotFound} />
+              </Switch>
+            </Suspense>
+          </main>
+          <BottomNav />
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
 
