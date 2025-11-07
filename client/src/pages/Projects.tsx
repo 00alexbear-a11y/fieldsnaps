@@ -43,8 +43,11 @@ import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeDialogs } from "@/lib/nativeDialogs";
 import { Capacitor } from "@capacitor/core";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ProjectsSidebar } from "@/components/ProjectsSidebar";
 
-type SortOption = 'recent' | 'favorites' | 'lastActivity' | 'name' | 'created';
+type ViewFilter = 'all' | 'recent' | 'favorites';
+type SortOption = 'name-asc' | 'name-desc' | 'photos' | 'last-activity' | 'created';
 
 export default function Projects() {
   const [, setLocation] = useLocation();
@@ -58,7 +61,8 @@ export default function Projects() {
   useKeyboardManager();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>('lastActivity');
+  const [viewFilter, setViewFilter] = useState<ViewFilter>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('last-activity');
   
   // Debounce search query for better mobile performance (300ms delay)
   useEffect(() => {
@@ -160,6 +164,16 @@ export default function Projects() {
       filtered = filtered.filter(project => !project.completed);
     }
     
+    // Apply view filter
+    if (viewFilter === 'recent') {
+      // Show only recent projects
+      filtered = filtered.filter(project => recentProjectIds.includes(project.id));
+    } else if (viewFilter === 'favorites') {
+      // Show only favorite projects
+      filtered = filtered.filter(project => favoriteProjectIds.includes(project.id));
+    }
+    // 'all' view shows all projects (no additional filtering)
+    
     // Apply search filter (uses debounced value for better performance)
     if (debouncedSearchQuery.trim()) {
       const query = debouncedSearchQuery.toLowerCase();
@@ -173,32 +187,20 @@ export default function Projects() {
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
-        case 'recent':
-          // Sort by recent visits (user-specific)
-          const aRecentIndex = recentProjectIds.indexOf(a.id);
-          const bRecentIndex = recentProjectIds.indexOf(b.id);
-          // If both are in recent list, sort by index (earlier = more recent)
-          if (aRecentIndex !== -1 && bRecentIndex !== -1) {
-            return aRecentIndex - bRecentIndex;
-          }
-          // Prioritize items in recent list
-          if (aRecentIndex !== -1) return -1;
-          if (bRecentIndex !== -1) return 1;
-          // For non-recent items, sort by last activity
-          return new Date(b.lastActivityAt || b.createdAt).getTime() - new Date(a.lastActivityAt || a.createdAt).getTime();
-        case 'favorites':
-          // Show favorites first, then sort by name
-          const aIsFavorite = favoriteProjectIds.includes(a.id);
-          const bIsFavorite = favoriteProjectIds.includes(b.id);
-          if (aIsFavorite && !bIsFavorite) return -1;
-          if (!aIsFavorite && bIsFavorite) return 1;
-          // If both are favorites or both are not, sort alphabetically
+        case 'name-asc':
+          // Alphabetical A-Z
           return a.name.localeCompare(b.name);
-        case 'lastActivity':
-          // Most recent activity first (top to bottom)
+        case 'name-desc':
+          // Alphabetical Z-A
+          return b.name.localeCompare(a.name);
+        case 'photos':
+          // Most photos first
+          const aCount = getPhotoCount(a.id);
+          const bCount = getPhotoCount(b.id);
+          return bCount - aCount;
+        case 'last-activity':
+          // Most recent activity first
           return new Date(b.lastActivityAt || b.createdAt).getTime() - new Date(a.lastActivityAt || a.createdAt).getTime();
-        case 'name':
-          return a.name.localeCompare(b.name);
         case 'created':
           // Oldest first (ascending)
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -208,7 +210,7 @@ export default function Projects() {
     });
     
     return sorted;
-  }, [projects, debouncedSearchQuery, sortBy, showCompleted, favoriteProjectIds, recentProjectIds]);
+  }, [projects, debouncedSearchQuery, viewFilter, sortBy, showCompleted, favoriteProjectIds, recentProjectIds, getPhotoCount]);
 
   const createMutation = useMutation({
     mutationFn: async (data: { name: string; description?: string; address?: string; unitCount?: number }) => {
@@ -492,34 +494,51 @@ export default function Projects() {
 
   const isLoading = projectsLoading;
 
+  // Calculate counts for sidebar badges
+  const totalProjectsCount = projects.filter(p => showCompleted || !p.completed).length;
+  const recentProjectsCount = recentProjectIds.length;
+  const favoriteProjectsCount = favoriteProjectIds.length;
+
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-black">
-      {/* Top Navigation Bar - Sticky */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-black">
-        <div className="px-4 pt-safe-3 pb-3 space-y-1">
-          <div className="flex items-center justify-between">
+    <SidebarProvider>
+      <div className="flex h-screen w-full">
+        <ProjectsSidebar
+          currentView={viewFilter}
+          onViewChange={setViewFilter}
+          currentSort={sortBy}
+          onSortChange={setSortBy}
+          showCompleted={showCompleted}
+          onShowCompletedChange={setShowCompleted}
+          totalProjects={totalProjectsCount}
+          recentCount={recentProjectsCount}
+          favoritesCount={favoriteProjectsCount}
+        />
+        <div className="flex flex-col flex-1 h-full overflow-hidden">
+          {/* Top Navigation Bar */}
+          <div className="flex items-center gap-2 p-3 border-b">
+            <SidebarTrigger data-testid="button-sidebar-toggle" />
             <img 
               src={logoPath} 
               alt="FieldSnaps" 
               className="h-9 w-auto object-contain"
               data-testid="img-fieldsnaps-logo"
             />
-            <div className="flex items-center gap-2">
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <Button 
-                  className="h-12"
-                  data-testid="button-create-project"
-                  onClick={() => {
-                    if (!canWrite) {
-                      setUpgradeModalOpen(true);
-                    } else {
-                      setDialogOpen(true);
-                    }
-                  }}
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  New Project
-                </Button>
+            <div className="flex-1" />
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <Button 
+                className="h-9"
+                data-testid="button-create-project"
+                onClick={() => {
+                  if (!canWrite) {
+                    setUpgradeModalOpen(true);
+                  } else {
+                    setDialogOpen(true);
+                  }
+                }}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                New Project
+              </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Project</DialogTitle>
@@ -587,15 +606,29 @@ export default function Projects() {
                 </form>
               </DialogContent>
             </Dialog>
-            </div>
           </div>
           {syncStatus && syncStatus.pending > 0 && (
-            <p className="text-xs text-muted-foreground">
-              {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
-            </p>
+            <div className="px-4 py-2 border-b">
+              <p className="text-xs text-muted-foreground">
+                {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
+              </p>
+            </div>
           )}
-        </div>
-      </div>
+
+          {/* Search Bar */}
+          <div className="p-3 border-b">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-9"
+                data-testid="input-search-projects"
+              />
+            </div>
+          </div>
 
       {/* Projects List */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-52 bg-white dark:bg-black">
@@ -670,82 +703,6 @@ export default function Projects() {
             })}
           </div>
         )}
-      </div>
-
-      {/* Search & Sort Bar - Fixed at bottom for thumb reach */}
-      <div className="fixed bottom-24 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-3 z-40">
-        <div className="relative max-w-screen-sm mx-auto space-y-2">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-9"
-                data-testid="input-search-projects"
-              />
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-9 w-[140px]" data-testid="button-sort-filter">
-                  <ArrowUpDown className="w-4 h-4 mr-2" />
-                  <span className="text-sm">
-                    {sortBy === 'recent' ? 'Recent' : sortBy === 'favorites' ? 'Favorites' : sortBy === 'lastActivity' ? 'Activity' : sortBy === 'name' ? 'Name' : 'Date'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('recent')}
-                  data-testid="sort-recent"
-                >
-                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'recent' ? 'opacity-100' : 'opacity-0'}`} />
-                  Recent Visits
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('favorites')}
-                  data-testid="sort-favorites"
-                >
-                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'favorites' ? 'opacity-100' : 'opacity-0'}`} />
-                  Favorites
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('lastActivity')}
-                  data-testid="sort-recent-activity"
-                >
-                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'lastActivity' ? 'opacity-100' : 'opacity-0'}`} />
-                  Last Activity
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('name')}
-                  data-testid="sort-name"
-                >
-                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'name' ? 'opacity-100' : 'opacity-0'}`} />
-                  Name (A-Z)
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('created')}
-                  data-testid="sort-date-created"
-                >
-                  <Check className={`mr-2 h-4 w-4 ${sortBy === 'created' ? 'opacity-100' : 'opacity-0'}`} />
-                  Date Created
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={showCompleted}
-                  onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
-                  data-testid="switch-show-completed"
-                >
-                  Show completed
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -898,6 +855,8 @@ export default function Projects() {
         onClose={() => setUpgradeModalOpen(false)}
         reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
       />
-    </div>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
