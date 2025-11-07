@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
@@ -160,6 +161,8 @@ export function PhotosSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {(uploaders.length > 0 || sessions.length > 0) && <SidebarSeparator />}
 
         {/* Filter by Uploader */}
         {uploaders.length > 0 && (
