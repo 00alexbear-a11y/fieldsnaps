@@ -1,9 +1,10 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle, Clock } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle, Clock, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
@@ -565,23 +566,37 @@ export default function ToDos() {
   };
 
   const handleTouchEnd = (todo: TodoWithDetails) => {
-    const threshold = 50;
+    const completeThreshold = 60; // Swipe right threshold
+    const deleteThreshold = -100; // Swipe far left for delete
+    const revealThreshold = -50; // Swipe left for actions
     
-    // Snap to revealed position or reset based on current offset
-    if (currentOffsetRef.current < -threshold) {
-      // Swipe left - reveal actions (flag + delete)
-      currentOffsetRef.current = -150;
-      restingOffsetRef.current = -150;
-      setSwipeOffset(-150);
-    } else if (currentOffsetRef.current > threshold && !todo.completed) {
-      // Swipe right - complete immediately with haptic
+    // Swipe right - complete task immediately
+    if (currentOffsetRef.current > completeThreshold && !todo.completed) {
+      haptics.success(); // Success haptic for completion
       completeMutation.mutate(todo.id);
       setSwipedTodo(null);
       setSwipeOffset(0);
       currentOffsetRef.current = 0;
       restingOffsetRef.current = 0;
-    } else {
-      // Not enough swipe - reset to closed
+    } 
+    // Swipe far left - delete immediately
+    else if (currentOffsetRef.current < deleteThreshold) {
+      haptics.warning(); // Warning haptic for destructive action
+      deleteMutation.mutate(todo.id);
+      setSwipedTodo(null);
+      setSwipeOffset(0);
+      currentOffsetRef.current = 0;
+      restingOffsetRef.current = 0;
+    }
+    // Swipe left (moderate) - reveal action buttons
+    else if (currentOffsetRef.current < revealThreshold) {
+      haptics.light(); // Light haptic for revealing actions
+      currentOffsetRef.current = -150;
+      restingOffsetRef.current = -150;
+      setSwipeOffset(-150);
+    } 
+    // Not enough swipe - reset to closed
+    else {
       setSwipedTodo(null);
       setSwipeOffset(0);
       currentOffsetRef.current = 0;
@@ -607,12 +622,28 @@ export default function ToDos() {
 
     return (
       <div className="relative overflow-hidden" key={todo.id}>
-        {/* Swipe action background - right (complete) */}
+        {/* Swipe action backgrounds with dynamic visual feedback */}
+        {/* Right swipe - complete action (green) */}
         <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4">
-          <Check className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-2">
+            <Check className="w-6 h-6 text-white" />
+            <span className="text-white font-medium">Complete</span>
+          </div>
         </div>
         
-        {/* Swipe action buttons - left (flag + delete) */}
+        {/* Left swipe - delete action (red shows when swiped far) */}
+        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors ${
+          currentOffset < -100 ? 'bg-red-500' : 'bg-orange-500'
+        }`}>
+          <div className="flex items-center gap-2">
+            <span className="text-white font-medium">
+              {currentOffset < -100 ? 'Delete' : 'Actions'}
+            </span>
+            <X className="w-6 h-6 text-white" />
+          </div>
+        </div>
+        
+        {/* Swipe action buttons - left (flag + delete) - shown when moderately swiped */}
         <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
           <Button
             size="icon"
@@ -688,14 +719,40 @@ export default function ToDos() {
             </div>
           )}
 
-          {/* Title - main content */}
-          <div className="flex-1 min-w-0">
+          {/* Title and metadata - main content */}
+          <div className="flex-1 min-w-0 space-y-1">
             <h3
               className={`font-medium text-base leading-snug truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
               data-testid={`text-todo-title-${todo.id}`}
             >
               {todo.title}
             </h3>
+            
+            {/* Metadata row - project, assignee, description */}
+            <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
+              {/* Project label */}
+              {todo.project && (
+                <Badge variant="secondary" className="text-xs font-normal" data-testid={`badge-project-${todo.id}`}>
+                  <FolderOpen className="w-3 h-3 mr-1" />
+                  {todo.project.name}
+                </Badge>
+              )}
+              
+              {/* Assignee */}
+              {todo.assignee && (
+                <span className="flex items-center gap-1" data-testid={`text-assignee-${todo.id}`}>
+                  <User className="w-3 h-3" />
+                  {getDisplayName(todo.assignee)}
+                </span>
+              )}
+              
+              {/* Description preview (first 50 chars) */}
+              {todo.description && (
+                <span className="truncate max-w-[200px]" data-testid={`text-description-preview-${todo.id}`}>
+                  {todo.description.substring(0, 50)}{todo.description.length > 50 ? '...' : ''}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Right indicators - flag and due date */}
@@ -1067,45 +1124,134 @@ export default function ToDos() {
               <SheetTitle>Task Details</SheetTitle>
             </SheetHeader>
             
-            <div className="flex-1 overflow-y-auto space-y-4 py-4">
+            <div className="flex-1 overflow-y-auto space-y-6 py-4">
+              {/* Photo Preview - larger, more prominent */}
               {selectedTodoForDetails?.photo && (
-                <img 
-                  src={selectedTodoForDetails.photo.url} 
-                  alt="Task photo"
-                  className="w-full h-48 object-cover rounded-lg" 
-                  data-testid="img-task-detail-photo"
-                />
+                <div 
+                  className="relative w-full h-64 rounded-lg overflow-hidden bg-muted cursor-pointer"
+                  onClick={() => {
+                    if (selectedTodoForDetails.photoId) {
+                      setLocation(`/photo/${selectedTodoForDetails.photoId}/view`);
+                    }
+                  }}
+                >
+                  <img 
+                    src={selectedTodoForDetails.photo.url} 
+                    alt="Task photo"
+                    className="w-full h-full object-cover" 
+                    data-testid="img-task-detail-photo"
+                  />
+                  <div className="absolute bottom-3 right-3 bg-black/60 text-white px-2 py-1 rounded-md text-xs">
+                    Tap to view
+                  </div>
+                </div>
               )}
               
-              <div className="flex items-start justify-between gap-2">
-                <h2 className="text-xl font-bold" data-testid="text-task-detail-title">
-                  {selectedTodoForDetails?.title}
-                </h2>
-                {selectedTodoForDetails?.flag && (
-                  <Flag className="w-5 h-5 text-orange-500 fill-orange-500 flex-shrink-0" />
+              {/* Title and status */}
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <h2 className="text-2xl font-bold flex-1" data-testid="text-task-detail-title">
+                    {selectedTodoForDetails?.title}
+                  </h2>
+                  {selectedTodoForDetails?.flag && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Flag className="w-3 h-3 text-orange-500 fill-orange-500" />
+                      Flagged
+                    </Badge>
+                  )}
+                </div>
+                
+                {/* Status badge */}
+                {selectedTodoForDetails && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {selectedTodoForDetails.completed ? (
+                      <Badge className="bg-green-500 text-white">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Completed
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">
+                        <Clock className="w-3 h-3 mr-1" />
+                        In Progress
+                      </Badge>
+                    )}
+                    
+                    {/* Due date status badge */}
+                    {selectedTodoForDetails.dueDate && !selectedTodoForDetails.completed && (() => {
+                      const date = new Date(selectedTodoForDetails.dueDate);
+                      const now = startOfDay(new Date());
+                      const due = startOfDay(date);
+                      
+                      if (isPast(due) && !isSameDay(due, now)) {
+                        return (
+                          <Badge variant="destructive">
+                            <Clock className="w-3 h-3 mr-1" />
+                            Overdue
+                          </Badge>
+                        );
+                      } else if (isToday(due)) {
+                        return (
+                          <Badge className="bg-orange-500 text-white">
+                            <Clock className="w-3 h-3 mr-1" />
+                            Due Today
+                          </Badge>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
                 )}
               </div>
               
-              <div className="space-y-3 pt-2">
+              {/* Metadata cards - clean, organized */}
+              <div className="grid gap-3">
                 {selectedTodoForDetails?.dueDate && (
-                  <div className="flex items-center gap-3">
-                    <CalendarIconOutline className="w-5 h-5 text-muted-foreground" />
-                    <span>Due: {format(new Date(selectedTodoForDetails.dueDate), "PPP")}</span>
-                  </div>
+                  <Card className="p-3">
+                    <div className="flex items-center gap-3">
+                      <CalendarIconOutline className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-muted-foreground">Due Date</p>
+                        <p className="font-medium">{format(new Date(selectedTodoForDetails.dueDate), "PPP")}</p>
+                      </div>
+                    </div>
+                  </Card>
                 )}
                 
                 {selectedTodoForDetails?.assignee && (
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-muted-foreground" />
-                    <span>Assigned: {getDisplayName(selectedTodoForDetails.assignee)}</span>
-                  </div>
+                  <Card className="p-3">
+                    <div className="flex items-center gap-3">
+                      <User className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-muted-foreground">Assigned To</p>
+                        <p className="font-medium">{getDisplayName(selectedTodoForDetails.assignee)}</p>
+                      </div>
+                    </div>
+                  </Card>
                 )}
                 
                 {selectedTodoForDetails?.project && (
-                  <div className="flex items-center gap-3">
-                    <Home className="w-5 h-5 text-muted-foreground" />
-                    <span>Project: {selectedTodoForDetails.project.name}</span>
-                  </div>
+                  <Card className="p-3">
+                    <div className="flex items-center gap-3">
+                      <FolderOpen className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-muted-foreground">Project</p>
+                        <p className="font-medium">{selectedTodoForDetails.project.name}</p>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+                
+                {/* Creator info */}
+                {selectedTodoForDetails?.creator && (
+                  <Card className="p-3">
+                    <div className="flex items-center gap-3">
+                      <User className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-muted-foreground">Created By</p>
+                        <p className="font-medium">{getDisplayName(selectedTodoForDetails.creator)}</p>
+                      </div>
+                    </div>
+                  </Card>
                 )}
               </div>
               

@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, Navigation, MapPin } from 'lucide-react';
+import { Loader2, Navigation, MapPin, Search, Star, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLocation } from 'wouter';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import type { Project } from '@shared/schema';
 
 // Google Maps types
@@ -12,22 +18,108 @@ declare global {
   }
 }
 
+// Calculate distance between two coordinates in km using Haversine formula
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+type ProjectWithDistance = Project & { distance?: number };
+
 export default function Map() {
+  const [, setLocation] = useLocation();
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const markerClustererRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  
+  // GPS and UI state
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'distance'>('name');
+  const [showProjectList, setShowProjectList] = useState(false);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
+  
+  // Get user's favorites
+  const { data: favoriteIds = [] } = useQuery<string[]>({
+    queryKey: ['/api/user/favorite-projects'],
+  });
 
-  // Filter projects with valid coordinates
-  const projectsWithCoords = projects.filter(
-    p => p.latitude && p.longitude && !p.deletedAt
-  );
+  // Filter projects with valid coordinates and calculate distances
+  const projectsWithCoords = useMemo(() => {
+    const filtered = projects.filter(
+      p => p.latitude && p.longitude && !p.deletedAt
+    );
+    
+    // Add distance calculation if user location is available
+    if (userLocation) {
+      return filtered.map(project => ({
+        ...project,
+        distance: calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          parseFloat(project.latitude!),
+          parseFloat(project.longitude!)
+        ),
+      })) as ProjectWithDistance[];
+    }
+    
+    return filtered as ProjectWithDistance[];
+  }, [projects, userLocation]);
+  
+  // Filter and sort projects based on search and sort options
+  const filteredSortedProjects = useMemo(() => {
+    let result = projectsWithCoords;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.address?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply sorting
+    if (sortBy === 'distance' && userLocation) {
+      result = [...result].sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    } else {
+      result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    return result;
+  }, [projectsWithCoords, searchQuery, sortBy, userLocation]);
+  
+  // Get user's current location
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log('Location access denied or unavailable:', error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+      );
+    }
+  }, []);
 
-  // Load Google Maps script
+  // Load Google Maps script and MarkerClusterer
   useEffect(() => {
     if (window.google?.maps) {
       setIsMapLoaded(true);
@@ -58,7 +150,7 @@ export default function Map() {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker,places&loading=async`;
     script.async = true;
     script.defer = true;
     
@@ -125,19 +217,27 @@ export default function Map() {
     }
   }, [isMapLoaded]);
 
-  // Add markers for projects
+  // Add markers for projects - using filtered/sorted list with clustering
   useEffect(() => {
     if (!googleMapRef.current || !window.google?.maps) return;
 
+    // Properly dispose of old clusterer to prevent memory leaks
+    if (markerClustererRef.current) {
+      markerClustererRef.current.clearMarkers();
+      markerClustererRef.current.setMap(null);
+      markerClustererRef.current = null;
+    }
+    
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
-    if (projectsWithCoords.length === 0) return;
+    if (filteredSortedProjects.length === 0) return;
 
     const bounds = new window.google.maps.LatLngBounds();
+    const markers: any[] = [];
 
-    projectsWithCoords.forEach(project => {
+    filteredSortedProjects.forEach(project => {
       // Validate coordinates are valid numbers
       const lat = parseFloat(project.latitude!);
       const lng = parseFloat(project.longitude!);
@@ -152,10 +252,22 @@ export default function Map() {
         lng,
       };
 
+      // Check if this project is favorited
+      const isFavorited = favoriteIds.includes(project.id);
+      
+      // Create custom marker with different color for favorites
+      // Note: Don't set map here - will be managed by MarkerClusterer
       const marker = new window.google.maps.Marker({
         position,
-        map: googleMapRef.current,
         title: project.name,
+        icon: isFavorited ? {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: '#f59e0b', // Orange for favorites
+          fillOpacity: 1,
+          strokeColor: '#fff',
+          strokeWeight: 2,
+          scale: 10,
+        } : undefined, // Default red marker for non-favorites
       });
 
       // Create info window content using DOM to prevent XSS
@@ -168,15 +280,33 @@ export default function Map() {
       title.style.fontWeight = '600';
       title.style.fontSize = '14px';
       title.textContent = project.name;
+      if (isFavorited) {
+        const star = document.createElement('span');
+        star.textContent = ' ⭐';
+        title.appendChild(star);
+      }
       infoContent.appendChild(title);
 
       if (project.address) {
         const address = document.createElement('p');
-        address.style.margin = '0 0 12px 0';
+        address.style.margin = '0 0 8px 0';
         address.style.color = '#666';
         address.style.fontSize = '12px';
         address.textContent = project.address;
         infoContent.appendChild(address);
+      }
+      
+      // Show distance if available
+      if (project.distance !== undefined) {
+        const distance = document.createElement('p');
+        distance.style.margin = '0 0 12px 0';
+        distance.style.color = '#0ea5e9';
+        distance.style.fontSize = '12px';
+        distance.style.fontWeight = '600';
+        distance.textContent = project.distance < 1
+          ? `${(project.distance * 1000).toFixed(0)}m away`
+          : `${project.distance.toFixed(1)}km away`;
+        infoContent.appendChild(distance);
       }
 
       const button = document.createElement('button');
@@ -207,12 +337,23 @@ export default function Map() {
         infoWindow.open(googleMapRef.current, marker);
       });
 
-      markersRef.current.push(marker);
+      markers.push(marker);
       bounds.extend(position);
     });
 
+    // Create MarkerClusterer to group nearby markers
+    if (markers.length > 0) {
+      markerClustererRef.current = new MarkerClusterer({
+        map: googleMapRef.current,
+        markers,
+        // Use default algorithm with custom radius for clustering
+      });
+      
+      markersRef.current = markers;
+    }
+
     // Fit map to show all markers
-    if (projectsWithCoords.length > 0) {
+    if (filteredSortedProjects.length > 0) {
       googleMapRef.current.fitBounds(bounds);
       
       // Prevent zooming in too much for single markers
@@ -226,7 +367,7 @@ export default function Map() {
         }
       );
     }
-  }, [projectsWithCoords, isMapLoaded]);
+  }, [filteredSortedProjects, isMapLoaded, favoriteIds]);
 
 
   if (isLoading) {
@@ -252,11 +393,47 @@ export default function Map() {
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-safe-3 pb-3 border-b border-border">
-        <h1 className="text-xl font-semibold" data-testid="text-page-title">Project Map</h1>
-        {projectsWithCoords.length > 0 && (
-          <div className="text-sm text-muted-foreground" data-testid="text-project-count">
-            {projectsWithCoords.length} {projectsWithCoords.length === 1 ? 'project' : 'projects'}
+      <div className="space-y-3 px-4 pt-safe-3 pb-3 border-b border-border">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold" data-testid="text-page-title">Locations</h1>
+          {filteredSortedProjects.length > 0 && (
+            <Badge variant="secondary" data-testid="badge-project-count">
+              {filteredSortedProjects.length} {filteredSortedProjects.length === 1 ? 'project' : 'projects'}
+            </Badge>
+          )}
+        </div>
+        
+        {/* Search and Sort Controls */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+              data-testid="input-search-projects"
+            />
+          </div>
+          <Select value={sortBy} onValueChange={(value: 'name' | 'distance') => setSortBy(value)}>
+            <SelectTrigger className="w-[140px]" data-testid="select-sort-by">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">By Name</SelectItem>
+              <SelectItem value="distance" disabled={!userLocation}>
+                By Distance {!userLocation && '(GPS off)'}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* User location status */}
+        {userLocation && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Navigation className="w-3 h-3" />
+            <span>Your location detected • Showing distances</span>
           </div>
         )}
       </div>

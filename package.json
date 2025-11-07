@@ -36,6 +36,7 @@
     "@capgo/capacitor-updater": "^7.22.0",
     "@capgo/cli": "^7.17.6",
     "@google-cloud/storage": "^7.17.2",
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@hookform/resolvers": "^3.10.0",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-accordion": "^1.2.4",
