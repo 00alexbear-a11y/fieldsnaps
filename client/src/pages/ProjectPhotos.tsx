@@ -45,6 +45,8 @@ import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
 import LazyImage from "@/components/LazyImage";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { PhotosSidebar, type DateFilter, type SortOption } from "@/components/PhotosSidebar";
 import type { Photo as BasePhoto, Project, Tag, ToDo } from "../../../shared/schema";
 
 type TodoWithDetails = ToDo & {
@@ -53,7 +55,7 @@ type TodoWithDetails = ToDo & {
   assignee: { id: string; firstName: string | null; lastName: string | null };
   creator: { id: string; firstName: string | null; lastName: string | null };
 };
-import { format, startOfDay, endOfDay, isWithinInterval, formatDistanceToNow } from "date-fns";
+import { format, startOfDay, endOfDay, isWithinInterval, formatDistanceToNow, isToday, isThisWeek, isThisMonth, subDays } from "date-fns";
 
 // Extend Photo to include tags
 type Photo = BasePhoto & { tags?: Tag[] };
@@ -80,6 +82,8 @@ export default function ProjectPhotos() {
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [columnCount, setColumnCount] = useState(5); // 1-10 columns, default 5
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks' | 'pdfs'>('photos');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
+  const [sortOption, setSortOption] = useState<SortOption>('date-desc');
   const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
   const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -177,22 +181,56 @@ export default function ProjectPhotos() {
     });
   }, [projectId, isOnline]);
 
-  // Filter photos by selected tags (for use in viewer and display)
+  // Filter photos by selected tags AND date filter
   const filteredPhotos = useMemo(() => {
-    if (selectedTagIds.size === 0) return photos;
-    return photos.filter(photo => 
-      photo.tags?.some(tag => selectedTagIds.has(tag.id))
-    );
-  }, [photos, selectedTagIds]);
+    let filtered = photos;
+    
+    // Filter by tags
+    if (selectedTagIds.size > 0) {
+      filtered = filtered.filter(photo => 
+        photo.tags?.some(tag => selectedTagIds.has(tag.id))
+      );
+    }
+    
+    // Filter by date
+    if (dateFilter !== 'all') {
+      filtered = filtered.filter(photo => {
+        const photoDate = new Date(photo.createdAt);
+        switch (dateFilter) {
+          case 'today':
+            return isToday(photoDate);
+          case 'this-week':
+            return isThisWeek(photoDate, { weekStartsOn: 0 });
+          case 'this-month':
+            return isThisMonth(photoDate);
+          default:
+            return true;
+        }
+      });
+    }
+    
+    return filtered;
+  }, [photos, selectedTagIds, dateFilter]);
 
-  // Group photos by date (newest first) using filtered photos
+  // Sort and group photos by date using filtered photos
   const photosByDate = useMemo(() => {
     if (!filteredPhotos.length) return [];
 
-    // Sort photos by createdAt (newest first)
-    const sortedPhotos = [...filteredPhotos].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    // Sort photos based on sortOption
+    const sortedPhotos = [...filteredPhotos].sort((a, b) => {
+      switch (sortOption) {
+        case 'date-asc':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'date-desc':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'name-asc':
+          return ((a as any).name || a.id || '').localeCompare((b as any).name || b.id || '');
+        case 'name-desc':
+          return ((b as any).name || b.id || '').localeCompare((a as any).name || a.id || '');
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
 
     // Group by date
     const groups = new Map<string, Photo[]>();
@@ -209,7 +247,7 @@ export default function ProjectPhotos() {
       date,
       photos,
     }));
-  }, [filteredPhotos]);
+  }, [filteredPhotos, sortOption]);
 
   // Flatten photosByDate into virtualization-friendly rows
   type VirtualRow = 
@@ -1264,8 +1302,17 @@ export default function ProjectPhotos() {
   };
 
   return (
-    <>
-      <div className="h-screen flex flex-col overflow-hidden pb-20">
+    <SidebarProvider defaultOpen={false}>
+      <div className="flex h-screen w-full">
+        <PhotosSidebar
+          dateFilter={dateFilter}
+          onDateFilterChange={setDateFilter}
+          sortOption={sortOption}
+          onSortChange={setSortOption}
+          photoCount={filteredPhotos.length}
+        />
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="h-screen flex flex-col overflow-hidden pb-20">
         <header className="border-b pt-safe-3 pb-3 px-4 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between gap-2">
           {/* Tag Filter Dropdown on left */}
@@ -2568,6 +2615,9 @@ export default function ProjectPhotos() {
         className="hidden"
         data-testid="input-photo-upload"
       />
-    </>
+        </div>
+      </div>
+    </div>
+    </SidebarProvider>
   );
 }
