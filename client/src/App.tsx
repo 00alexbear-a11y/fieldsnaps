@@ -35,7 +35,6 @@ import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
-import { Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
@@ -223,15 +222,17 @@ function AppContent() {
         {shouldShowSidebar && <AppSidebar />}
         
         <div className="flex flex-col flex-1 min-w-0">
-          {/* Header with sidebar trigger - only shown when sidebar is visible */}
+          {/* Header with logo as sidebar trigger - only shown when sidebar is visible */}
           {shouldShowSidebar && (
             <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
-              <SidebarTrigger className="-ml-1" data-testid="sidebar-trigger">
-                <Menu className="h-5 w-5" />
+              <SidebarTrigger asChild data-testid="sidebar-trigger">
+                <button className="flex items-center gap-2 hover-elevate active-elevate-2 px-2 py-1 rounded-md transition-colors">
+                  <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
+                    <span className="text-primary-foreground font-bold text-xs">F</span>
+                  </div>
+                  <span className="text-sm font-semibold">FieldSnaps</span>
+                </button>
               </SidebarTrigger>
-              <div className="flex-1 text-center">
-                <h1 className="text-sm font-semibold">FieldSnaps</h1>
-              </div>
               <div className="w-9" /> {/* Spacer for symmetry */}
             </header>
           )}
