@@ -822,6 +822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       height?: number;
       mimeType: string;
       thumbnailObjectPath?: string;
+      unitLabel?: string;
     };
     createdAt: Date;
   }>();
@@ -829,7 +830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/photos/presigned-upload", isAuthenticatedAndWhitelisted, uploadRateLimiter, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { projectId, caption, mediaType, width, height, mimeType } = req.body;
+      const { projectId, caption, mediaType, width, height, mimeType, unitLabel } = req.body;
 
       if (!projectId || !mediaType || !mimeType) {
         return res.status(400).json({ error: "Missing required fields: projectId, mediaType, mimeType" });
@@ -859,6 +860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           width: width ? parseInt(width) : undefined,
           height: height ? parseInt(height) : undefined,
           mimeType,
+          unitLabel,
         },
         createdAt: new Date(),
       });
@@ -940,6 +942,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         height: session.metadata.height,
         photographerId,
         photographerName,
+        unitLabel: session.metadata.unitLabel,
       });
 
       const photo = await storage.createPhoto(validated);
@@ -955,6 +958,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Log activity for accountability
       if (user.companyId) {
+        // Extract basic device info from User-Agent for accountability
+        const userAgent = req.headers['user-agent'] || 'Unknown Device';
+        const deviceInfo = userAgent.includes('Mobile') 
+          ? (userAgent.includes('iPhone') || userAgent.includes('iPad') ? 'iOS Device' : 'Mobile Device')
+          : (userAgent.includes('Mac') ? 'Mac' : 'Desktop');
+
         await storage.createActivityLog({
           userId,
           companyId: user.companyId,
@@ -966,6 +975,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             projectName: project?.name || 'Unknown Project',
             photoCaption: photo.caption,
             mediaType: photo.mediaType,
+            unitLabel: photo.unitLabel || undefined,
+            deviceInfo,
           },
         });
       }

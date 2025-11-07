@@ -31,7 +31,7 @@ const actionConfig = {
     icon: Camera,
     color: 'text-sky-500',
     bgColor: 'bg-sky-50 dark:bg-sky-950',
-    label: 'uploaded a photo',
+    label: 'uploaded',
   },
   project_created: {
     icon: FolderPlus,
@@ -70,9 +70,26 @@ function ActivityItem({ activity }: { activity: ActivityLog }) {
   const getMetadataText = () => {
     switch (activity.action) {
       case 'photo_uploaded':
-        return activity.metadata.projectName 
-          ? `to ${activity.metadata.projectName}` 
-          : '';
+        const mediaType = activity.metadata.mediaType === 'video' ? 'video' : 'photo';
+        let text = `a ${mediaType}`;
+        
+        // Add project name
+        if (activity.metadata.projectName) {
+          text += ` to ${activity.metadata.projectName}`;
+        }
+        
+        // Add unit label (location within project)
+        if (activity.metadata.unitLabel) {
+          text += ` (${activity.metadata.unitLabel})`;
+        }
+        
+        // Add caption in quotes if available
+        if (activity.metadata.photoCaption) {
+          text += ` – "${activity.metadata.photoCaption}"`;
+        }
+        
+        return text;
+        
       case 'project_created':
         return activity.metadata.projectName || '';
       case 'todo_created':
@@ -105,6 +122,11 @@ function ActivityItem({ activity }: { activity: ActivityLog }) {
         </p>
         <p className="text-xs text-muted-foreground mt-1" data-testid={`activity-time-${activity.id}`}>
           {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+          {activity.metadata.deviceInfo && (
+            <span className="ml-2" data-testid={`activity-device-${activity.id}`}>
+              • {activity.metadata.deviceInfo}
+            </span>
+          )}
         </p>
       </div>
     </div>
