@@ -92,16 +92,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   // Content Security Policy
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Vite requires unsafe-inline/eval in dev
-    "style-src 'self' 'unsafe-inline'", // Tailwind requires unsafe-inline
-    "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
-    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://*.googleapis.com", // Vite + Google Maps
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind + Google Fonts
+    "img-src 'self' data: blob: https: https://*.googleapis.com https://*.gstatic.com", // Google Maps tiles
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com https://maps.googleapis.com",
     "media-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
+    "worker-src 'self' blob:",
   ].join('; ');
   
   res.setHeader('Content-Security-Policy', cspDirectives);
