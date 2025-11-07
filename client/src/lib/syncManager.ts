@@ -632,6 +632,10 @@ class SyncManager {
                 mediaType: photo.mediaType,
                 width: photo.width,
                 height: photo.height,
+                sessionId: photo.sessionId,
+                photographerId: photo.photographerId,
+                photographerName: photo.photographerName,
+                unitLabel: photo.unitLabel,
               }),
             });
             
@@ -662,10 +666,14 @@ class SyncManager {
                 width: photo.width,
                 height: photo.height,
                 mimeType,
+                sessionId: photo.sessionId,
+                photographerId: photo.photographerId,
+                photographerName: photo.photographerName,
+                unitLabel: photo.unitLabel,
               }),
             });
             
-            const { uploadURL, sessionId } = await this.safeJsonParse(initResponse);
+            const { uploadURL, sessionId: uploadSessionId } = await this.safeJsonParse(initResponse);
             console.log('[Sync] Got presigned URL, uploading directly to cloud...');
             
             // Step 2: Upload directly to object storage (bypasses backend!)
@@ -684,7 +692,7 @@ class SyncManager {
             console.log('[Sync] Direct upload complete, notifying backend...');
             
             // Step 3: Notify backend to create photo record (send fileSize for metrics)
-            const completeResponse = await fetch(`/api/photos/complete-presigned/${sessionId}`, {
+            const completeResponse = await fetch(`/api/photos/complete-presigned/${uploadSessionId}`, {
               method: 'POST',
               headers: {
                 ...this.getSyncHeaders(),
@@ -750,6 +758,19 @@ class SyncManager {
           }
           if (photo.height) {
             formData.append('height', photo.height.toString());
+          }
+          // Include session and photographer metadata
+          if (photo.sessionId) {
+            formData.append('sessionId', photo.sessionId);
+          }
+          if (photo.photographerId) {
+            formData.append('photographerId', photo.photographerId);
+          }
+          if (photo.photographerName) {
+            formData.append('photographerName', photo.photographerName);
+          }
+          if (photo.unitLabel) {
+            formData.append('unitLabel', photo.unitLabel);
           }
 
           // Get headers (without Content-Type for FormData)

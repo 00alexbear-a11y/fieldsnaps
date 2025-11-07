@@ -15,12 +15,30 @@ import { Badge } from "@/components/ui/badge";
 export type DateFilter = 'all' | 'today' | 'this-week' | 'this-month';
 export type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
 
+interface UploaderOption {
+  id: string;
+  name: string;
+  count: number;
+}
+
+interface SessionOption {
+  id: string;
+  label: string;
+  count: number;
+}
+
 interface PhotosSidebarProps {
   dateFilter: DateFilter;
   onDateFilterChange: (filter: DateFilter) => void;
   sortOption: SortOption;
   onSortChange: (sort: SortOption) => void;
   photoCount: number;
+  uploaders: UploaderOption[];
+  selectedUploaderId: string | null;
+  onUploaderChange: (uploaderId: string | null) => void;
+  sessions: SessionOption[];
+  selectedSessionId: string | null;
+  onSessionChange: (sessionId: string | null) => void;
 }
 
 export function PhotosSidebar({
@@ -29,6 +47,12 @@ export function PhotosSidebar({
   sortOption,
   onSortChange,
   photoCount,
+  uploaders,
+  selectedUploaderId,
+  onUploaderChange,
+  sessions,
+  selectedSessionId,
+  onSessionChange,
 }: PhotosSidebarProps) {
   const smartViews = [
     { id: 'all', label: 'All Photos', icon: CameraIcon, filter: 'all' as DateFilter },
@@ -98,6 +122,84 @@ export function PhotosSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Filter by Uploader */}
+        {uploaders.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Filter by Uploader</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => onUploaderChange(null)}
+                    isActive={selectedUploaderId === null}
+                    data-testid="filter-uploader-all"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>All Uploaders</span>
+                    <Badge variant="secondary" className="ml-auto">
+                      {photoCount}
+                    </Badge>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {uploaders.map((uploader) => (
+                  <SidebarMenuItem key={uploader.id}>
+                    <SidebarMenuButton
+                      onClick={() => onUploaderChange(uploader.id)}
+                      isActive={selectedUploaderId === uploader.id}
+                      data-testid={`filter-uploader-${uploader.id}`}
+                    >
+                      <User className="w-4 h-4" />
+                      <span>{uploader.name}</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {uploader.count}
+                      </Badge>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Filter by Session */}
+        {sessions.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Filter by Session</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => onSessionChange(null)}
+                    isActive={selectedSessionId === null}
+                    data-testid="filter-session-all"
+                  >
+                    <CameraIcon className="w-4 h-4" />
+                    <span>All Sessions</span>
+                    <Badge variant="secondary" className="ml-auto">
+                      {photoCount}
+                    </Badge>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {sessions.map((session) => (
+                  <SidebarMenuItem key={session.id}>
+                    <SidebarMenuButton
+                      onClick={() => onSessionChange(session.id)}
+                      isActive={selectedSessionId === session.id}
+                      data-testid={`filter-session-${session.id}`}
+                    >
+                      <CameraIcon className="w-4 h-4" />
+                      <span>{session.label}</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {session.count}
+                      </Badge>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );

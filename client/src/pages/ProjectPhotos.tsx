@@ -84,6 +84,8 @@ export default function ProjectPhotos() {
   const [activeTab, setActiveTab] = useState<'photos' | 'tasks' | 'pdfs'>('photos');
   const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('date-desc');
+  const [selectedUploaderId, setSelectedUploaderId] = useState<string | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [taskView, setTaskView] = useState<'my-tasks' | 'team-tasks' | 'i-created'>('my-tasks');
   const [taskFilterCompleted, setTaskFilterCompleted] = useState<'active' | 'completed' | 'all'>('active');
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -209,8 +211,69 @@ export default function ProjectPhotos() {
       });
     }
     
+    // Filter by uploader
+    if (selectedUploaderId) {
+      filtered = filtered.filter(photo => photo.photographerId === selectedUploaderId);
+    }
+    
+    // Filter by session
+    if (selectedSessionId) {
+      filtered = filtered.filter(photo => photo.sessionId === selectedSessionId);
+    }
+    
     return filtered;
-  }, [photos, selectedTagIds, dateFilter]);
+  }, [photos, selectedTagIds, dateFilter, selectedUploaderId, selectedSessionId]);
+
+  // Compute uploader list (from ALL photos, not filtered)
+  const uploaders = useMemo(() => {
+    const uploaderMap = new Map<string, { id: string; name: string; count: number }>();
+    
+    photos.forEach(photo => {
+      if (photo.photographerId && photo.photographerName) {
+        const existing = uploaderMap.get(photo.photographerId);
+        if (existing) {
+          existing.count++;
+        } else {
+          uploaderMap.set(photo.photographerId, {
+            id: photo.photographerId,
+            name: photo.photographerName,
+            count: 1,
+          });
+        }
+      }
+    });
+    
+    return Array.from(uploaderMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [photos]);
+
+  // Compute session list (from ALL photos, not filtered)
+  const sessions = useMemo(() => {
+    const sessionMap = new Map<string, { id: string; label: string; count: number; latestDate: Date }>();
+    
+    photos.forEach(photo => {
+      if (photo.sessionId) {
+        const existing = sessionMap.get(photo.sessionId);
+        const photoDate = new Date(photo.createdAt);
+        
+        if (existing) {
+          existing.count++;
+          if (photoDate > existing.latestDate) {
+            existing.latestDate = photoDate;
+          }
+        } else {
+          sessionMap.set(photo.sessionId, {
+            id: photo.sessionId,
+            label: format(photoDate, 'MMM d, yyyy h:mm a'),
+            count: 1,
+            latestDate: photoDate,
+          });
+        }
+      }
+    });
+    
+    // Sort by latest date (most recent first)
+    return Array.from(sessionMap.values()).sort((a, b) => b.latestDate.getTime() - a.latestDate.getTime());
+  }, [photos]);
 
   // Sort and group photos by date using filtered photos
   const photosByDate = useMemo(() => {
@@ -1310,6 +1373,12 @@ export default function ProjectPhotos() {
           sortOption={sortOption}
           onSortChange={setSortOption}
           photoCount={filteredPhotos.length}
+          uploaders={uploaders}
+          selectedUploaderId={selectedUploaderId}
+          onUploaderChange={setSelectedUploaderId}
+          sessions={sessions}
+          selectedSessionId={selectedSessionId}
+          onSessionChange={setSelectedSessionId}
         />
         <div className="flex-1 flex flex-col min-w-0">
           <div className="h-screen flex flex-col overflow-hidden pb-20">
@@ -1940,7 +2009,6 @@ export default function ProjectPhotos() {
           </div>
         )}
       </main>
-      </div>
 
       {/* Photo size selector moved to header area to avoid overlap with buttons */}
 

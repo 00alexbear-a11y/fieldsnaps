@@ -168,6 +168,7 @@ export const photos = pgTable("photos", {
   height: integer("height"), // Original photo height in pixels
   photographerId: varchar("photographer_id").references(() => users.id), // Who took the photo
   photographerName: varchar("photographer_name"), // Cached name for offline display
+  sessionId: varchar("session_id"), // Camera session identifier for grouping photos taken in same session
   unitLabel: varchar("unit_label", { length: 100 }), // Which unit/apartment this photo belongs to (e.g., "Unit 15")
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"), // Soft delete - null means not deleted
