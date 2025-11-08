@@ -23,11 +23,11 @@ export function ClockStatusCard() {
 
   const clockMutation = useMutation({
     mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end' }) => {
-      return await apiRequest('/api/clock', 'POST', data);
+      return await apiRequest('POST', '/api/clock', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
-      haptics.impact('medium');
+      haptics.medium();
     },
     onError: (error: any) => {
       toast({
