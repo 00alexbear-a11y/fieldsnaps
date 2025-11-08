@@ -102,10 +102,10 @@ export function ClockStatusCard() {
   if (!status.isClockedIn) {
     return (
       <Card className="mb-6 bg-gradient-to-br from-card to-card/80" data-testid="clock-status-card">
-        <CardContent className="p-8">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Clock className="h-8 w-8 text-primary" />
+        <CardContent className="p-5">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Clock className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground" data-testid="clock-status-title">
@@ -119,7 +119,7 @@ export function ClockStatusCard() {
               size="lg"
               onClick={handleClockIn}
               disabled={clockMutation.isPending}
-              className="mt-2 min-w-[200px]"
+              className="min-w-[200px]"
               data-testid="button-clock-in"
             >
               <Play className="mr-2 h-5 w-5" />
