@@ -14,18 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -65,7 +53,30 @@ export default function ToDos() {
   
   useKeyboardManager();
   
-  const [selectedList, setSelectedList] = useState<SmartList>('assigned-to-me');
+  // Read selected list from URL query params (managed by AppSidebar)
+  const getSelectedList = (): SmartList => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('list') || 'assigned-to-me') as SmartList;
+  };
+  
+  const [selectedList, setSelectedList] = useState<SmartList>(getSelectedList());
+  
+  // Listen for filter changes from AppSidebar and browser history navigation
+  useEffect(() => {
+    const handleFilterChange = () => {
+      setSelectedList(getSelectedList());
+    };
+    
+    // Listen for custom filterChange event from AppSidebar
+    window.addEventListener('filterChange', handleFilterChange);
+    // Listen for browser back/forward navigation
+    window.addEventListener('popstate', handleFilterChange);
+    
+    return () => {
+      window.removeEventListener('filterChange', handleFilterChange);
+      window.removeEventListener('popstate', handleFilterChange);
+    };
+  }, []);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
@@ -844,71 +855,31 @@ export default function ToDos() {
     );
   };
 
-  // Smart list items
-  const smartLists = [
-    { id: 'today' as SmartList, label: 'Today', icon: CalendarIcon, count: smartListCounts.today },
-    { id: 'flagged' as SmartList, label: 'Flagged', icon: Flag, count: smartListCounts.flagged },
-    { id: 'assigned-to-me' as SmartList, label: 'Assigned to Me', icon: User, count: smartListCounts.assignedToMe },
-    { id: 'all' as SmartList, label: 'All', icon: ListTodo, count: smartListCounts.all },
-    { id: 'completed' as SmartList, label: 'Completed', icon: CheckCircle, count: smartListCounts.completed },
-  ];
-
-  const sidebarStyle = {
-    "--sidebar-width": "16rem",
+  // Smart list labels for display
+  const smartListLabels: Record<SmartList, string> = {
+    'today': 'Today',
+    'flagged': 'Flagged',
+    'assigned-to-me': 'Assigned to Me',
+    'all': 'All',
+    'completed': 'Completed',
   };
 
   return (
-    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full">
-        {/* Sidebar */}
-        <Sidebar>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Smart Lists</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {smartLists.map((list) => (
-                    <SidebarMenuItem key={list.id}>
-                      <SidebarMenuButton
-                        onClick={() => setSelectedList(list.id)}
-                        isActive={selectedList === list.id}
-                        data-testid={`sidebar-${list.id}`}
-                      >
-                        <list.icon className="w-4 h-4" />
-                        <span>{list.label}</span>
-                        {list.count > 0 && (
-                          <span className="ml-auto text-xs bg-muted px-2 py-0.5 rounded-full" data-testid={`count-${list.id}`}>
-                            {list.count}
-                          </span>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-
-        {/* Main Content */}
-        <div className="flex flex-col flex-1">
-          {/* Header */}
-          <header className="flex items-center justify-between p-4 border-b">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
-              <h1 className="text-xl font-semibold" data-testid="text-list-title">
-                {smartLists.find(l => l.id === selectedList)?.label}
-              </h1>
-            </div>
-            <Button
-              onClick={() => setShowAddDialog(true)}
-              size="sm"
-              data-testid="button-add-todo"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Task
-            </Button>
-          </header>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-between p-3 border-b">
+        <h1 className="text-xl font-semibold" data-testid="text-list-title">
+          {smartListLabels[selectedList]}
+        </h1>
+        <Button
+          onClick={() => setShowAddDialog(true)}
+          size="sm"
+          data-testid="button-add-todo"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Task
+        </Button>
+      </div>
 
           {/* Content */}
           <main className="flex-1 overflow-y-auto p-4 pb-20">
@@ -948,7 +919,6 @@ export default function ToDos() {
               </div>
             )}
           </main>
-        </div>
 
         {/* Add/Edit Dialog */}
         <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
@@ -1319,7 +1289,6 @@ export default function ToDos() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }
