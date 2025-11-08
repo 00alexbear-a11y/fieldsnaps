@@ -31,6 +31,7 @@ import Impact from "./pages/Impact";
 import BillingSuccess from "./pages/BillingSuccess";
 import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
+import Timesheets from "./pages/Timesheets";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
@@ -249,6 +250,7 @@ function AppContent() {
                 <Route path="/photo/:id/edit" component={PhotoEdit} />
                 <Route path="/photo/:id/view" component={PhotoView} />
                 <Route path="/my-tasks" component={MyTasks} />
+                <Route path="/timesheets" component={Timesheets} />
                 <Route path="/settings" component={Settings} />
                 <Route path="/help" component={Help} />
                 <Route path="/upload-queue" component={UploadQueue} />

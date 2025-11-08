@@ -168,6 +168,7 @@ export interface IStorage {
   createClockEntry(data: InsertClockEntry): Promise<ClockEntry>;
   getClockEntries(companyId: string, options?: { userId?: string; startDate?: Date; endDate?: Date }): Promise<(ClockEntry & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
   getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number }>;
+  getClockEntriesForUser(userId: string, startDate: Date, endDate: Date): Promise<ClockEntry[]>;
   updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined>;
 }
 
@@ -1533,6 +1534,27 @@ export class DbStorage implements IStorage {
       clockInTime,
       totalHoursToday,
     };
+  }
+
+  async getClockEntriesForUser(userId: string, startDate: Date, endDate: Date): Promise<ClockEntry[]> {
+    // Expand range by 24 hours on each side to capture overnight shifts/breaks
+    const expandedStart = new Date(startDate);
+    expandedStart.setHours(expandedStart.getHours() - 24);
+    
+    const expandedEnd = new Date(endDate);
+    expandedEnd.setHours(expandedEnd.getHours() + 24);
+    
+    const entries = await db
+      .select()
+      .from(clockEntries)
+      .where(and(
+        eq(clockEntries.userId, userId),
+        sql`${clockEntries.timestamp} >= ${expandedStart}`,
+        sql`${clockEntries.timestamp} <= ${expandedEnd}`
+      ))
+      .orderBy(clockEntries.timestamp);
+    
+    return entries;
   }
 
   async updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined> {
