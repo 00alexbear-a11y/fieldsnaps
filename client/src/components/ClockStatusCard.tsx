@@ -22,12 +22,34 @@ export function ClockStatusCard() {
   });
 
   const clockMutation = useMutation({
-    mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end' }) => {
+    mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number }) => {
       return await apiRequest('POST', '/api/clock', data);
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
       haptics.medium();
+      
+      // Show success toast only after server confirms
+      const toastMessages = {
+        clock_in: {
+          title: "Clocked In",
+          description: "Your day has started. Have a productive day!",
+        },
+        clock_out: {
+          title: "Clocked Out",
+          description: `You worked ${formatHours(variables.totalHoursToday || 0)} today. Great job!`,
+        },
+        break_start: {
+          title: "Break Started",
+          description: "Take your time. Your break timer has started.",
+        },
+        break_end: {
+          title: "Break Ended",
+          description: "Welcome back! Your work timer has resumed.",
+        },
+      };
+      
+      toast(toastMessages[variables.type]);
     },
     onError: (error: any) => {
       toast({
@@ -40,34 +62,18 @@ export function ClockStatusCard() {
 
   const handleClockIn = () => {
     clockMutation.mutate({ type: 'clock_in' });
-    toast({
-      title: "Clocked In",
-      description: "Your day has started. Have a productive day!",
-    });
   };
 
   const handleClockOut = () => {
-    clockMutation.mutate({ type: 'clock_out' });
-    toast({
-      title: "Clocked Out",
-      description: `You worked ${formatHours(status?.totalHoursToday || 0)} today. Great job!`,
-    });
+    clockMutation.mutate({ type: 'clock_out', totalHoursToday: status?.totalHoursToday });
   };
 
   const handleBreakStart = () => {
     clockMutation.mutate({ type: 'break_start' });
-    toast({
-      title: "Break Started",
-      description: "Take your time. Your break timer has started.",
-    });
   };
 
   const handleBreakEnd = () => {
     clockMutation.mutate({ type: 'break_end' });
-    toast({
-      title: "Break Ended",
-      description: "Welcome back! Your work timer has resumed.",
-    });
   };
 
   const formatHours = (hours: number): string => {
