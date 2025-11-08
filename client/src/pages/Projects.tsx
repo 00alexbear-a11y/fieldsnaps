@@ -59,8 +59,36 @@ export default function Projects() {
   useKeyboardManager();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [viewFilter, setViewFilter] = useState<ViewFilter>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('last-activity');
+  
+  // Read filter/sort state from URL query params (managed by AppSidebar)
+  const getUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      viewFilter: (params.get('view') || 'all') as ViewFilter,
+      sortBy: (params.get('sort') || 'last-activity') as SortOption,
+      showCompleted: params.get('completed') === 'true',
+    };
+  };
+
+  const [urlParams, setUrlParams] = useState(getUrlParams());
+  const { viewFilter, sortBy, showCompleted } = urlParams;
+  
+  // Listen for filter changes from AppSidebar and browser history navigation
+  useEffect(() => {
+    const handleFilterChange = () => {
+      setUrlParams(getUrlParams());
+    };
+    
+    // Listen for custom filterChange event from AppSidebar
+    window.addEventListener('filterChange', handleFilterChange);
+    // Listen for browser back/forward navigation
+    window.addEventListener('popstate', handleFilterChange);
+    
+    return () => {
+      window.removeEventListener('filterChange', handleFilterChange);
+      window.removeEventListener('popstate', handleFilterChange);
+    };
+  }, []);
   
   // Debounce search query for better mobile performance (300ms delay)
   useEffect(() => {
@@ -81,7 +109,6 @@ export default function Projects() {
   useEffect(() => {
     setDebouncedSearchQuery(searchQuery);
   }, []);
-  const [showCompleted, setShowCompleted] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
@@ -601,73 +628,6 @@ export default function Projects() {
               />
             </div>
             
-            {/* Filter and Sort Controls */}
-            <div className="flex items-center gap-2 mt-3">
-              {/* View Filter */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <Home className="w-4 h-4 mr-2" />
-                    {viewFilter === 'all' ? 'All' : viewFilter === 'recent' ? 'Recent' : 'Favorites'}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuLabel>View</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setViewFilter('all')}>
-                    All Projects
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setViewFilter('recent')}>
-                    Recent
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setViewFilter('favorites')}>
-                    Favorites
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Sort */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <ArrowUpDown className="w-4 h-4 mr-2" />
-                    Sort
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setSortBy('last-activity')}>
-                    Last Activity
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('name-asc')}>
-                    Name (A-Z)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('name-desc')}>
-                    Name (Z-A)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('photos')}>
-                    Photo Count
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy('created')}>
-                    Date Created
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Show Completed Toggle */}
-              <div className="flex items-center gap-2 ml-auto">
-                <Checkbox
-                  id="show-completed"
-                  checked={showCompleted}
-                  onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
-                  data-testid="checkbox-show-completed"
-                />
-                <Label htmlFor="show-completed" className="text-sm cursor-pointer">
-                  Show completed
-                </Label>
-              </div>
-            </div>
           </div>
 
       {/* Projects List */}
