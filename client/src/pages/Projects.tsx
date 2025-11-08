@@ -7,7 +7,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpgradeModal } from "@/components/UpgradeModal";
@@ -44,8 +43,6 @@ import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeDialogs } from "@/lib/nativeDialogs";
 import { Capacitor } from "@capacitor/core";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ProjectsSidebar } from "@/components/ProjectsSidebar";
 
 type ViewFilter = 'all' | 'recent' | 'favorites';
 type SortOption = 'name-asc' | 'name-desc' | 'photos' | 'last-activity' | 'created';
@@ -495,51 +492,25 @@ export default function Projects() {
 
   const isLoading = projectsLoading;
 
-  // Calculate counts for sidebar badges
-  const totalProjectsCount = projects.filter(p => showCompleted || !p.completed).length;
-  const recentProjectsCount = recentProjectIds.length;
-  const favoriteProjectsCount = favoriteProjectIds.length;
-
   return (
-    <SidebarProvider>
-      <div className="flex h-screen w-full">
-        <ProjectsSidebar
-          currentView={viewFilter}
-          onViewChange={setViewFilter}
-          currentSort={sortBy}
-          onSortChange={setSortBy}
-          showCompleted={showCompleted}
-          onShowCompletedChange={setShowCompleted}
-          totalProjects={totalProjectsCount}
-          recentCount={recentProjectsCount}
-          favoritesCount={favoriteProjectsCount}
-        />
-        <div className="flex flex-col flex-1 h-full overflow-hidden">
-          {/* Top Navigation Bar */}
-          <div className="flex items-center gap-2 p-3 border-b">
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
-            <img 
-              src={logoPath} 
-              alt="FieldSnaps" 
-              className="h-9 w-auto object-contain"
-              data-testid="img-fieldsnaps-logo"
-            />
-            <div className="flex-1" />
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <Button 
-                className="h-9"
-                data-testid="button-create-project"
-                onClick={() => {
-                  if (!canWrite) {
-                    setUpgradeModalOpen(true);
-                  } else {
-                    setDialogOpen(true);
-                  }
-                }}
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                New Project
-              </Button>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-end gap-2 p-3 border-b">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Button 
+            className="h-9"
+            data-testid="button-create-project"
+            onClick={() => {
+              if (!canWrite) {
+                setUpgradeModalOpen(true);
+              } else {
+                setDialogOpen(true);
+              }
+            }}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            New Project
+          </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Create New Project</DialogTitle>
@@ -628,6 +599,74 @@ export default function Projects() {
                 className="pl-10 h-9"
                 data-testid="input-search-projects"
               />
+            </div>
+            
+            {/* Filter and Sort Controls */}
+            <div className="flex items-center gap-2 mt-3">
+              {/* View Filter */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Home className="w-4 h-4 mr-2" />
+                    {viewFilter === 'all' ? 'All' : viewFilter === 'recent' ? 'Recent' : 'Favorites'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuLabel>View</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setViewFilter('all')}>
+                    All Projects
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setViewFilter('recent')}>
+                    Recent
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setViewFilter('favorites')}>
+                    Favorites
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Sort */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8">
+                    <ArrowUpDown className="w-4 h-4 mr-2" />
+                    Sort
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSortBy('last-activity')}>
+                    Last Activity
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('name-asc')}>
+                    Name (A-Z)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('name-desc')}>
+                    Name (Z-A)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('photos')}>
+                    Photo Count
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('created')}>
+                    Date Created
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Show Completed Toggle */}
+              <div className="flex items-center gap-2 ml-auto">
+                <Checkbox
+                  id="show-completed"
+                  checked={showCompleted}
+                  onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+                  data-testid="checkbox-show-completed"
+                />
+                <Label htmlFor="show-completed" className="text-sm cursor-pointer">
+                  Show completed
+                </Label>
+              </div>
             </div>
           </div>
 
@@ -861,8 +900,6 @@ export default function Projects() {
         onClose={() => setUpgradeModalOpen(false)}
         reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
       />
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }
