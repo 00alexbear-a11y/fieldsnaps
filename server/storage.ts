@@ -1,14 +1,14 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits, clockEntries } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
-  Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit,
+  Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit, ClockEntry,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
-  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit
+  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit, InsertClockEntry
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -163,6 +163,12 @@ export interface IStorage {
   markAllNotificationsAsRead(userId: string): Promise<void>;
   getUnreadNotificationCount(userId: string): Promise<number>;
   deleteNotification(id: string): Promise<boolean>;
+  
+  // Clock Entries (time tracking)
+  createClockEntry(data: InsertClockEntry): Promise<ClockEntry>;
+  getClockEntries(companyId: string, options?: { userId?: string; startDate?: Date; endDate?: Date }): Promise<(ClockEntry & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
+  getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number }>;
+  updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined>;
 }
 
 export class DbStorage implements IStorage {
@@ -1411,6 +1417,136 @@ export class DbStorage implements IStorage {
       .where(eq(notifications.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  // Clock Entries (time tracking)
+  async createClockEntry(data: InsertClockEntry): Promise<ClockEntry> {
+    const result = await db
+      .insert(clockEntries)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getClockEntries(companyId: string, options?: { userId?: string; startDate?: Date; endDate?: Date }): Promise<(ClockEntry & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]> {
+    const conditions = [eq(clockEntries.companyId, companyId)];
+    
+    if (options?.userId) {
+      conditions.push(eq(clockEntries.userId, options.userId));
+    }
+    
+    if (options?.startDate) {
+      conditions.push(sql`${clockEntries.timestamp} >= ${options.startDate}`);
+    }
+    
+    if (options?.endDate) {
+      conditions.push(sql`${clockEntries.timestamp} <= ${options.endDate}`);
+    }
+    
+    const result = await db
+      .select({
+        id: clockEntries.id,
+        userId: clockEntries.userId,
+        companyId: clockEntries.companyId,
+        type: clockEntries.type,
+        timestamp: clockEntries.timestamp,
+        location: clockEntries.location,
+        notes: clockEntries.notes,
+        editedBy: clockEntries.editedBy,
+        editReason: clockEntries.editReason,
+        originalTimestamp: clockEntries.originalTimestamp,
+        createdAt: clockEntries.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          email: users.email,
+        },
+      })
+      .from(clockEntries)
+      .leftJoin(users, eq(clockEntries.userId, users.id))
+      .where(and(...conditions))
+      .orderBy(desc(clockEntries.timestamp));
+    
+    return result;
+  }
+
+  async getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const entries = await db
+      .select()
+      .from(clockEntries)
+      .where(and(
+        eq(clockEntries.userId, userId),
+        sql`${clockEntries.timestamp} >= ${today}`,
+        sql`${clockEntries.timestamp} < ${tomorrow}`
+      ))
+      .orderBy(clockEntries.timestamp);
+    
+    let isClockedIn = false;
+    let onBreak = false;
+    let clockInTime: Date | undefined;
+    let totalMs = 0;
+    let lastClockIn: Date | null = null;
+    let lastBreakStart: Date | null = null;
+    
+    for (const entry of entries) {
+      if (entry.type === 'clock_in') {
+        isClockedIn = true;
+        lastClockIn = entry.timestamp;
+        clockInTime = entry.timestamp;
+      } else if (entry.type === 'clock_out') {
+        if (lastClockIn) {
+          totalMs += entry.timestamp.getTime() - lastClockIn.getTime();
+          lastClockIn = null;
+        }
+        isClockedIn = false;
+        onBreak = false;
+      } else if (entry.type === 'break_start') {
+        if (lastClockIn) {
+          totalMs += entry.timestamp.getTime() - lastClockIn.getTime();
+        }
+        onBreak = true;
+        lastBreakStart = entry.timestamp;
+        lastClockIn = null;
+      } else if (entry.type === 'break_end') {
+        onBreak = false;
+        lastClockIn = entry.timestamp;
+        lastBreakStart = null;
+      }
+    }
+    
+    // If still clocked in, add time up to now
+    if (lastClockIn && isClockedIn && !onBreak) {
+      totalMs += Date.now() - lastClockIn.getTime();
+    }
+    
+    const totalHoursToday = totalMs / (1000 * 60 * 60);
+    
+    return {
+      isClockedIn,
+      onBreak,
+      clockInTime,
+      totalHoursToday,
+    };
+  }
+
+  async updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined> {
+    const result = await db
+      .update(clockEntries)
+      .set({
+        timestamp: data.timestamp,
+        editedBy: data.editedBy,
+        editReason: data.editReason,
+        originalTimestamp: data.originalTimestamp,
+      })
+      .where(eq(clockEntries.id, id))
+      .returning();
+    return result[0];
   }
 }
 
