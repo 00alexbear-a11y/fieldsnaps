@@ -3002,6 +3002,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/timesheets", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Date range is required
+      if (!req.query.startDate || !req.query.endDate) {
+        return res.status(400).json({ error: "startDate and endDate query parameters are required" });
+      }
+
+      const startDate = new Date(req.query.startDate as string);
+      const endDate = new Date(req.query.endDate as string);
+
+      // Validate dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).json({ error: "Invalid date format" });
+      }
+
+      const entries = await storage.getClockEntriesForUser(userId, startDate, endDate);
+      res.json(entries);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
   app.patch("/api/clock/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
     try {
       const user = await getUserWithCompany(req, res);
