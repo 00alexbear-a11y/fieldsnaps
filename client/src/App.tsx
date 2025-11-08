@@ -52,6 +52,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isNativePlatform } from './lib/nativeNavigation';
 import { nativeStatusBar } from './lib/nativeStatusBar';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -229,12 +230,14 @@ function AppContent() {
             <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
               <SidebarTrigger 
                 data-testid="button-sidebar-trigger"
-                className="flex items-center gap-2 hover-elevate active-elevate-2 px-2 py-1 rounded-md transition-colors"
+                className="flex items-center hover-elevate active-elevate-2 px-2 py-1 rounded-md transition-colors"
               >
-                <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xs">F</span>
-                </div>
-                <span className="text-sm font-semibold">FieldSnaps</span>
+                <img 
+                  src={logoPath} 
+                  alt="FieldSnaps" 
+                  className="h-9 w-auto object-contain"
+                  data-testid="img-fieldsnaps-logo"
+                />
               </SidebarTrigger>
               <NotificationPanel />
             </header>
