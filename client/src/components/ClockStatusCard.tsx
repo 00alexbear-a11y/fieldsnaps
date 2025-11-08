@@ -108,7 +108,7 @@ export function ClockStatusCard() {
               <Clock className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-foreground" data-testid="clock-status-title">
+              <h3 className="text-lg font-semibold text-foreground" data-testid="clock-status-title">
                 Ready to start your day?
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
