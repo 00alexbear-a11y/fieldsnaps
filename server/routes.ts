@@ -2917,6 +2917,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================================
+  // Clock Entry Routes - time tracking
+  // ========================================
+
+  app.post("/api/clock", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const { type, location, notes } = req.body;
+
+      // Validate type
+      const validTypes = ['clock_in', 'clock_out', 'break_start', 'break_end'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ error: "Invalid clock entry type" });
+      }
+
+      // Get current status to validate action
+      const currentStatus = await storage.getTodayClockStatus(user.id);
+
+      // Validate transitions
+      if (type === 'clock_in' && currentStatus.isClockedIn) {
+        return res.status(400).json({ error: "Already clocked in" });
+      }
+      if (type === 'clock_out' && !currentStatus.isClockedIn) {
+        return res.status(400).json({ error: "Not clocked in" });
+      }
+      if (type === 'break_start' && (!currentStatus.isClockedIn || currentStatus.onBreak)) {
+        return res.status(400).json({ error: "Must be clocked in and not on break to start break" });
+      }
+      if (type === 'break_end' && !currentStatus.onBreak) {
+        return res.status(400).json({ error: "Not on break" });
+      }
+
+      const clockEntry = await storage.createClockEntry({
+        userId: user.id,
+        companyId: user.companyId,
+        type,
+        location,
+        notes,
+        timestamp: new Date(),
+      });
+
+      res.json(clockEntry);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.get("/api/clock/status", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const status = await storage.getTodayClockStatus(userId);
+      res.json(status);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.get("/api/clock/entries", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const options: { userId?: string; startDate?: Date; endDate?: Date } = {};
+
+      // Filter by specific user (if provided)
+      if (req.query.userId) {
+        options.userId = req.query.userId as string;
+      }
+
+      // Filter by date range
+      if (req.query.startDate) {
+        options.startDate = new Date(req.query.startDate as string);
+      }
+      if (req.query.endDate) {
+        options.endDate = new Date(req.query.endDate as string);
+      }
+
+      const entries = await storage.getClockEntries(user.companyId, options);
+      res.json(entries);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  app.patch("/api/clock/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Only supervisors/owners can edit clock entries
+      if (user.role !== 'owner') {
+        return res.status(403).json({ error: "Only company owners can edit clock entries" });
+      }
+
+      const { timestamp, editReason } = req.body;
+
+      if (!timestamp || !editReason) {
+        return res.status(400).json({ error: "Timestamp and edit reason are required" });
+      }
+
+      // Get the original entry to save original timestamp
+      const entries = await storage.getClockEntries(user.companyId, {});
+      const originalEntry = entries.find(e => e.id === req.params.id);
+
+      if (!originalEntry) {
+        return res.status(404).json({ error: "Clock entry not found" });
+      }
+
+      const updated = await storage.updateClockEntry(req.params.id, {
+        timestamp: new Date(timestamp),
+        editedBy: user.id,
+        editReason,
+        originalTimestamp: originalEntry.timestamp,
+      });
+
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
   // Team Stats Routes - for company owners
   // ========================================
 

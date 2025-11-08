@@ -432,6 +432,28 @@ export const waitlist = pgTable("waitlist", {
   index("idx_waitlist_created_at").on(table.createdAt.desc()),
 ]);
 
+// Clock Entries table - employee time tracking (clock in/out, breaks)
+export const clockEntries = pgTable("clock_entries", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Who clocked in/out
+  companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }), // Team visibility
+  type: varchar("type", { length: 20 }).notNull(), // clock_in, clock_out, break_start, break_end
+  timestamp: timestamp("timestamp").defaultNow().notNull(), // When the action occurred
+  location: text("location"), // Optional GPS location or address
+  notes: text("notes"), // Optional notes (e.g., "arrived early", "extended lunch")
+  editedBy: varchar("edited_by").references(() => users.id, { onDelete: "set null" }), // Supervisor who edited (if applicable)
+  editReason: text("edit_reason"), // Why the time was adjusted
+  originalTimestamp: timestamp("original_timestamp"), // Original time before edit (for audit trail)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_clock_entries_user_id").on(table.userId),
+  index("idx_clock_entries_company_id").on(table.companyId),
+  index("idx_clock_entries_timestamp").on(table.timestamp.desc()), // Most recent first
+  index("idx_clock_entries_type").on(table.type),
+  // Composite index for efficient user+date queries
+  index("idx_clock_entries_user_timestamp").on(table.userId, table.timestamp.desc()),
+]);
+
 // Zod schemas for validation
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
@@ -460,6 +482,7 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ i
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 export const insertProjectFavoriteSchema = createInsertSchema(projectFavorites).omit({ id: true, createdAt: true });
 export const insertProjectVisitSchema = createInsertSchema(projectVisits).omit({ id: true, visitedAt: true });
+export const insertClockEntrySchema = createInsertSchema(clockEntries).omit({ id: true, createdAt: true });
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
@@ -508,6 +531,8 @@ export type ProjectFavorite = typeof projectFavorites.$inferSelect;
 export type InsertProjectFavorite = z.infer<typeof insertProjectFavoriteSchema>;
 export type ProjectVisit = typeof projectVisits.$inferSelect;
 export type InsertProjectVisit = z.infer<typeof insertProjectVisitSchema>;
+export type ClockEntry = typeof clockEntries.$inferSelect;
+export type InsertClockEntry = z.infer<typeof insertClockEntrySchema>;
 
 // Annotation types for frontend
 export interface Annotation {
