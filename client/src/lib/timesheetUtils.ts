@@ -115,8 +115,60 @@ function buildBreaks(sortedEntries: ClockEntry[]): Break[] {
 }
 
 /**
+ * Clamps a shift to fit within the date range, calculating only the portion inside the window
+ */
+function clampShiftToRange(shift: Shift, startDate: Date, endDate: Date): Shift | null {
+  const shiftStart = shift.clockIn;
+  const shiftEnd = shift.clockOut || new Date(); // In-progress shifts use current time
+  
+  // If shift is completely outside range, exclude it
+  if (shiftEnd < startDate || shiftStart > endDate) {
+    return null;
+  }
+  
+  // Calculate effective start/end within the range
+  const effectiveStart = shiftStart < startDate ? startDate : shiftStart;
+  const effectiveEnd = shiftEnd > endDate ? endDate : shiftEnd;
+  
+  // Recalculate hours for the clamped portion
+  const hours = (effectiveEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60);
+  
+  return {
+    ...shift,
+    clockIn: effectiveStart,
+    clockOut: shift.clockOut ? effectiveEnd : undefined,
+    hours,
+    clockInStr: effectiveStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    clockOutStr: shift.clockOut ? effectiveEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : undefined,
+  };
+}
+
+/**
+ * Clamps a break to fit within the date range
+ */
+function clampBreakToRange(breakItem: Break, startDate: Date, endDate: Date): Break | null {
+  // If break is completely outside range, exclude it
+  if (breakItem.end < startDate || breakItem.start > endDate) {
+    return null;
+  }
+  
+  // Calculate effective start/end within the range
+  const effectiveStart = breakItem.start < startDate ? startDate : breakItem.start;
+  const effectiveEnd = breakItem.end > endDate ? endDate : breakItem.end;
+  
+  // Recalculate minutes for the clamped portion
+  const minutes = (effectiveEnd.getTime() - effectiveStart.getTime()) / (1000 * 60);
+  
+  return {
+    start: effectiveStart,
+    end: effectiveEnd,
+    minutes,
+  };
+}
+
+/**
  * Assigns shifts and breaks to days based on start time (local timezone)
- * This ensures overnight shifts/breaks are attributed to the correct day
+ * Only includes the portion of shifts/breaks within the requested date range
  */
 function assignToDays(
   shifts: Shift[],
@@ -126,9 +178,19 @@ function assignToDays(
 ): DayData[] {
   const days: DayData[] = [];
   
-  // Group shifts by clock-in date (local)
+  // Clamp shifts to the requested range
+  const clampedShifts = shifts
+    .map(shift => clampShiftToRange(shift, startDate, endDate))
+    .filter((shift): shift is Shift => shift !== null);
+  
+  // Clamp breaks to the requested range
+  const clampedBreaks = breaks
+    .map(breakItem => clampBreakToRange(breakItem, startDate, endDate))
+    .filter((breakItem): breakItem is Break => breakItem !== null);
+  
+  // Group clamped shifts by clock-in date (local)
   const shiftsByDay = new Map<string, Shift[]>();
-  for (const shift of shifts) {
+  for (const shift of clampedShifts) {
     const localDateKey = shift.clockIn.toLocaleDateString('en-CA'); // YYYY-MM-DD
     if (!shiftsByDay.has(localDateKey)) {
       shiftsByDay.set(localDateKey, []);
@@ -136,9 +198,9 @@ function assignToDays(
     shiftsByDay.get(localDateKey)!.push(shift);
   }
   
-  // Group breaks by start date (local)
+  // Group clamped breaks by start date (local)
   const breaksByDay = new Map<string, number>();
-  for (const breakItem of breaks) {
+  for (const breakItem of clampedBreaks) {
     const localDateKey = breakItem.start.toLocaleDateString('en-CA');
     breaksByDay.set(localDateKey, (breaksByDay.get(localDateKey) || 0) + breakItem.minutes);
   }
