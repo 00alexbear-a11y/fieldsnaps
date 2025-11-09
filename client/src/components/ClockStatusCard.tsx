@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TimeReviewDialog } from "@/components/TimeReviewDialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
@@ -25,6 +26,7 @@ export function ClockStatusCard() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [showSwitchDialog, setShowSwitchDialog] = useState(false);
   const [newProjectId, setNewProjectId] = useState<string>("");
+  const [showTimeReview, setShowTimeReview] = useState(false);
 
   const { data: status, isLoading } = useQuery<ClockStatus>({
     queryKey: ['/api/clock/status'],
@@ -113,7 +115,14 @@ export function ClockStatusCard() {
   };
 
   const handleClockOut = () => {
+    // Open time review dialog instead of immediately clocking out
+    setShowTimeReview(true);
+  };
+
+  const handleConfirmClockOut = () => {
+    // Actually clock out after review confirmation
     clockMutation.mutate({ type: 'clock_out', totalHoursToday: status?.totalHoursToday });
+    setShowTimeReview(false);
   };
 
   const handleBreakStart = () => {
@@ -341,6 +350,15 @@ export function ClockStatusCard() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Time Review Dialog */}
+        <TimeReviewDialog
+          open={showTimeReview}
+          onOpenChange={setShowTimeReview}
+          onConfirmClockOut={handleConfirmClockOut}
+          isClockingOut={clockMutation.isPending}
+          totalHoursToday={status?.totalHoursToday || 0}
+        />
       </CardContent>
     </Card>
   );

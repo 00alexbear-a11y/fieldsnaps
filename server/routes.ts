@@ -3088,23 +3088,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
 
-      // Only supervisors/owners can edit clock entries
-      if (user.role !== 'owner') {
-        return res.status(403).json({ error: "Only company owners can edit clock entries" });
-      }
-
       const { timestamp, editReason } = req.body;
 
       if (!timestamp || !editReason) {
         return res.status(400).json({ error: "Timestamp and edit reason are required" });
       }
 
-      // Get the original entry to save original timestamp
+      // Get the original entry to verify ownership and save original timestamp
       const entries = await storage.getClockEntries(user.companyId, {});
       const originalEntry = entries.find(e => e.id === req.params.id);
 
       if (!originalEntry) {
         return res.status(404).json({ error: "Clock entry not found" });
+      }
+
+      // Allow workers to edit their own entries OR owners to edit any entry
+      const canEdit = originalEntry.userId === user.id || user.role === 'owner';
+      if (!canEdit) {
+        return res.status(403).json({ error: "You can only edit your own clock entries" });
       }
 
       const updated = await storage.updateClockEntry(req.params.id, {
