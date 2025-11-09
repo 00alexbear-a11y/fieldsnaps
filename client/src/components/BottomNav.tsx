@@ -64,7 +64,7 @@ export default function BottomNav() {
         className="fixed bottom-4 left-0 right-0 z-[100] bg-transparent pb-safe"
         data-testid="nav-bottom"
       >
-        <div className="flex items-center justify-around min-h-[44px] max-w-screen-sm mx-auto">
+        <div className="flex items-center justify-around gap-1 min-h-[44px] max-w-screen-sm mx-auto px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = isActive(tab.path);
@@ -72,16 +72,16 @@ export default function BottomNav() {
           return (
             <Link key={tab.id} href={tab.path}>
               <button
-                className="flex flex-col items-center justify-center min-w-[88px] min-h-[44px] space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="flex flex-col items-center justify-center min-w-[60px] min-h-[44px] space-y-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 data-testid={`button-tab-${tab.id}`}
               >
                 <Icon
-                  className={`w-6 h-6 transition-colors ${
+                  className={`w-5 h-5 transition-colors ${
                     active ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 />
                 <span
-                  className={`text-xs font-medium transition-colors ${
+                  className={`text-[10px] font-medium transition-colors whitespace-nowrap ${
                     active ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >

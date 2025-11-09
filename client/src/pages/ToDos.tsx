@@ -84,6 +84,8 @@ export default function ToDos() {
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -159,25 +161,44 @@ export default function ToDos() {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    let todos: TodoWithDetails[] = [];
+    
     switch (selectedList) {
       case 'today':
-        return allTodos.filter(todo => {
+        todos = allTodos.filter(todo => {
           if (todo.completed || !todo.dueDate) return false;
           const dueDate = new Date(todo.dueDate);
           return dueDate >= now && dueDate < tomorrow;
         });
+        break;
       case 'flagged':
-        return allTodos.filter(todo => todo.flag);
+        todos = allTodos.filter(todo => todo.flag);
+        break;
       case 'assigned-to-me':
-        return allTodos.filter(todo => todo.assignedTo === user?.id && !todo.completed);
+        todos = allTodos.filter(todo => todo.assignedTo === user?.id && !todo.completed);
+        break;
       case 'all':
-        return allTodos.filter(todo => !todo.completed);
+        todos = allTodos.filter(todo => !todo.completed);
+        break;
       case 'completed':
-        return allTodos.filter(todo => todo.completed);
+        todos = allTodos.filter(todo => todo.completed);
+        break;
       default:
-        return allTodos;
+        todos = allTodos;
     }
-  }, [allTodos, selectedList, user?.id]);
+    
+    // Apply date filter if set
+    if (dateFilter) {
+      const filterDate = startOfDay(dateFilter);
+      todos = todos.filter(todo => {
+        if (!todo.dueDate) return false;
+        const dueDate = startOfDay(new Date(todo.dueDate));
+        return isSameDay(dueDate, filterDate);
+      });
+    }
+    
+    return todos;
+  }, [allTodos, selectedList, user?.id, dateFilter]);
 
   // Calculate badge counts for all smart lists (from full dataset)
   const smartListCounts = useMemo(() => {
@@ -683,7 +704,7 @@ export default function ToDos() {
         </div>
 
         <Card
-          className={`relative cursor-pointer ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''}`}
+          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''}`}
           style={{ transform: `translateX(${currentOffset}px)` }}
           onClick={() => { 
             if (!isSwiping.current) {
@@ -871,14 +892,57 @@ export default function ToDos() {
         <h1 className="text-xl font-semibold" data-testid="text-list-title">
           {smartListLabels[selectedList]}
         </h1>
-        <Button
-          onClick={() => setShowAddDialog(true)}
-          size="sm"
-          data-testid="button-add-todo"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Task
-        </Button>
+        <div className="flex items-center gap-2">
+          <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+            <PopoverTrigger asChild>
+              <Button
+                variant={dateFilter ? "default" : "outline"}
+                size="sm"
+                data-testid="button-date-filter"
+              >
+                <CalendarIconOutline className="w-4 h-4" />
+                {dateFilter && (
+                  <span className="ml-2">{format(dateFilter, 'MMM d')}</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={dateFilter}
+                onSelect={(date) => {
+                  setDateFilter(date);
+                  setShowDatePicker(false);
+                }}
+                initialFocus
+              />
+              {dateFilter && (
+                <div className="p-2 border-t">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDateFilter(undefined);
+                      setShowDatePicker(false);
+                    }}
+                    className="w-full"
+                    data-testid="button-clear-date-filter"
+                  >
+                    Clear Filter
+                  </Button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+          <Button
+            onClick={() => setShowAddDialog(true)}
+            size="sm"
+            data-testid="button-add-todo"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Task
+          </Button>
+        </div>
       </div>
 
           {/* Content */}

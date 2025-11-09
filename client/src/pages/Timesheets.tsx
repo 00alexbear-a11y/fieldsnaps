@@ -94,42 +94,48 @@ export default function Timesheets() {
         </div>
 
         {/* Week Navigator */}
-        <div className="flex items-center justify-between px-4 pb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setWeekOffset(weekOffset - 1)}
-            data-testid="button-previous-week"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous Week
-          </Button>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium" data-testid="text-week-range">
-              {formatWeekRange()}
-            </span>
-            {weekOffset !== 0 && (
+        <div className="flex flex-col gap-2 px-4 pb-4">
+          <div className="flex items-center justify-between gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setWeekOffset(weekOffset - 1)}
+              data-testid="button-previous-week"
+              className="flex-shrink-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline ml-1">Previous Week</span>
+            </Button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium whitespace-nowrap" data-testid="text-week-range">
+                {formatWeekRange()}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setWeekOffset(weekOffset + 1)}
+              disabled={weekOffset >= 0}
+              data-testid="button-next-week"
+              className="flex-shrink-0"
+            >
+              <span className="hidden sm:inline mr-1">Next Week</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          {weekOffset !== 0 && (
+            <div className="text-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setWeekOffset(0)}
                 data-testid="button-current-week"
               >
-                Current Week
+                Jump to Current Week
               </Button>
-            )}
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setWeekOffset(weekOffset + 1)}
-            disabled={weekOffset >= 0}
-            data-testid="button-next-week"
-          >
-            Next Week
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
+            </div>
+          )}
         </div>
       </div>
 
