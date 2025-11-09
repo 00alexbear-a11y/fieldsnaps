@@ -1,9 +1,10 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Clock, Play, Square, Coffee, CheckCircle2 } from "lucide-react";
+import { Clock, Play, Square, Coffee, CheckCircle2, ArrowRightLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
@@ -16,11 +17,14 @@ interface ClockStatus {
   onBreak: boolean;
   clockInTime?: string;
   totalHoursToday: number;
+  currentProjectId?: string | null;
 }
 
 export function ClockStatusCard() {
   const { toast } = useToast();
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [showSwitchDialog, setShowSwitchDialog] = useState(false);
+  const [newProjectId, setNewProjectId] = useState<string>("");
 
   const { data: status, isLoading } = useQuery<ClockStatus>({
     queryKey: ['/api/clock/status'],
@@ -67,6 +71,31 @@ export function ClockStatusCard() {
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to update clock status",
+      });
+    },
+  });
+
+  const switchProjectMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      return await apiRequest('POST', '/api/clock/switch-project', { projectId });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/clock/entries'] });
+      haptics.medium();
+      setShowSwitchDialog(false);
+      setNewProjectId("");
+      
+      toast({
+        title: "Project Switched",
+        description: `Now working on: ${data.project.name}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to switch project",
       });
     },
   });
@@ -210,6 +239,17 @@ export function ClockStatusCard() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2">
+            {!status.onBreak && (
+              <Button
+                variant="outline"
+                onClick={() => setShowSwitchDialog(true)}
+                disabled={clockMutation.isPending || switchProjectMutation.isPending}
+                data-testid="button-switch-project"
+              >
+                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                Switch Project
+              </Button>
+            )}
             {status.onBreak ? (
               <Button
                 variant="default"
@@ -242,6 +282,65 @@ export function ClockStatusCard() {
             </Button>
           </div>
         </div>
+
+        {/* Switch Project Dialog */}
+        <Dialog open={showSwitchDialog} onOpenChange={setShowSwitchDialog}>
+          <DialogContent data-testid="dialog-switch-project">
+            <DialogHeader>
+              <DialogTitle>Switch Project</DialogTitle>
+              <DialogDescription>
+                Select a new project to switch to. Your current time will be clocked out and you'll be clocked into the new project seamlessly.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-project-select">Select New Project</Label>
+                <Select value={newProjectId} onValueChange={setNewProjectId}>
+                  <SelectTrigger id="new-project-select" data-testid="select-new-project">
+                    <SelectValue placeholder="Choose a project..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.filter(p => p.id !== status?.currentProjectId).length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground text-center">
+                        No other projects available
+                      </div>
+                    ) : (
+                      projects
+                        .filter(p => p.id !== status?.currentProjectId)
+                        .map((project) => (
+                          <SelectItem key={project.id} value={project.id}>
+                            {project.name}
+                          </SelectItem>
+                        ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowSwitchDialog(false);
+                  setNewProjectId("");
+                }}
+                disabled={switchProjectMutation.isPending}
+                data-testid="button-cancel-switch"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => switchProjectMutation.mutate(newProjectId)}
+                disabled={switchProjectMutation.isPending || !newProjectId}
+                data-testid="button-confirm-switch"
+              >
+                {switchProjectMutation.isPending ? "Switching..." : "Switch Project"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

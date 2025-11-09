@@ -3016,6 +3016,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/clock/switch-project", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const { projectId, location, notes } = req.body;
+
+      // Validate projectId is provided
+      if (!projectId) {
+        return res.status(400).json({ error: "Project ID is required to switch projects" });
+      }
+
+      // Validate projectId belongs to user's company
+      const project = await storage.getProject(projectId);
+      if (!project || project.companyId !== user.companyId) {
+        return res.status(400).json({ error: "Invalid project or project does not belong to your company" });
+      }
+
+      // Call storage method with transaction safety
+      const result = await storage.switchProject(
+        user.id,
+        user.companyId,
+        projectId,
+        location,
+        notes
+      );
+
+      res.json({
+        previousEntry: result.clockOutEntry,
+        newEntry: result.clockInEntry,
+        timestamp: result.clockInEntry.timestamp,
+        project,
+      });
+    } catch (error: any) {
+      // Handle specific validation errors from storage
+      if (error.message.includes("not currently clocked in") || 
+          error.message.includes("same project")) {
+        return res.status(400).json({ error: error.message });
+      }
+      handleError(res, error);
+    }
+  });
+
   app.get("/api/timesheets", isAuthenticatedAndWhitelisted, async (req, res) => {
     try {
       const userId = req.user.claims.sub;
