@@ -669,7 +669,7 @@ export default function ToDos() {
       <div className="relative overflow-hidden rounded-lg" key={todo.id}>
         {/* Swipe action backgrounds with dynamic visual feedback */}
         {/* Right swipe - complete action (green) */}
-        <div className="absolute inset-0 bg-green-500/90 flex items-center justify-start px-4 rounded-lg overflow-hidden">
+        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-lg overflow-hidden">
           <div className="flex items-center gap-2">
             <Check className="w-6 h-6 text-white" />
             <span className="text-white font-medium">Complete</span>
@@ -678,7 +678,7 @@ export default function ToDos() {
         
         {/* Left swipe - delete action (red shows when swiped far, gray for reveal) */}
         <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-lg overflow-hidden ${
-          currentOffset < -100 ? 'bg-red-500/90' : 'bg-muted'
+          currentOffset < -100 ? 'bg-red-500' : 'bg-muted'
         }`}>
           <div className="flex items-center gap-2">
             <span className={`font-medium ${currentOffset < -100 ? 'text-white' : 'text-foreground'}`}>
