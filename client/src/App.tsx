@@ -32,6 +32,7 @@ import BillingSuccess from "./pages/BillingSuccess";
 import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
 import Timesheets from "./pages/Timesheets";
+import Time from "./pages/Time";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
@@ -278,6 +279,7 @@ function AppContent() {
                 <Route path="/trash" component={Trash} />
                 <Route path="/map" component={Map} />
                 <Route path="/todos" component={ToDos} />
+                <Route path="/time" component={Time} />
                 <Route path="/billing/success" component={BillingSuccess} />
                 <Route path="/share/:token" component={ShareView} />
                 <Route component={NotFound} />
