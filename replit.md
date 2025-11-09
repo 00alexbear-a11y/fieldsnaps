@@ -30,9 +30,7 @@ FieldSnaps operates as an offline-first PWA, leveraging Service Workers for cach
 - Fixed race condition in clock-out flow: Made mutation's `onSuccess` callback async and ensured cache invalidation completes before closing the Time Review dialog, ensuring UI updates correctly
 - Time Review dialog now properly fetches and displays today's clock entries with correct date range parameters
 - Clock status calculation uses `timestamp` (actual event time) for ordering to support legitimate retroactive/backfill edits during timesheet audits
-
-**Known Limitations & Future Enhancements:**
-- Timestamp Edit Validation: Currently, editing a clock entry's timestamp can create invalid state transitions if moved out of logical sequence. Future enhancement: Add `validateClockEntriesForDay()` function that replays the state machine after edits and rejects changes creating impossible transitions (e.g., clock-out before clock-in). Implementation requires wrapping create/edit/switch endpoints in transactional validation.
+- **Implemented state validation**: Added `validateClockEntryState()` function that replays the state machine before creating or editing clock entries, preventing invalid state transitions (e.g., clocking out when not clocked in, editing timestamp to create impossible sequence). Validation provides clear error messages for corrective action.
 
 **Unified Navigation (Completed Nov 2025):** Single context-aware AppSidebar replaces duplicate sidebars across pages. Header displays separate hamburger menu icon (sidebar trigger) and FieldSnaps logo for clear visual separation. Sidebar shows route-specific sections: Projects Smart Views/Sort/Options on /projects, ToDos Smart Lists on /todos, global navigation (Activity/Settings/Help) on all pages. Filter and sort state managed via URL query parameters with browser history support. Both AppSidebar and page components listen to popstate (browser back/forward) and custom filterChange events to maintain synchronization. Route detection uses window.location.pathname to ignore query params, enabling contextual sections to remain visible when filters add query strings.
 
