@@ -437,6 +437,7 @@ export const clockEntries = pgTable("clock_entries", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Who clocked in/out
   companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }), // Team visibility
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Which project (nullable for legacy/travel time)
   type: varchar("type", { length: 20 }).notNull(), // clock_in, clock_out, break_start, break_end
   timestamp: timestamp("timestamp").defaultNow().notNull(), // When the action occurred
   location: text("location"), // Optional GPS location or address
@@ -452,6 +453,8 @@ export const clockEntries = pgTable("clock_entries", {
   index("idx_clock_entries_type").on(table.type),
   // Composite index for efficient user+date queries
   index("idx_clock_entries_user_timestamp").on(table.userId, table.timestamp.desc()),
+  // Composite index for filtered timesheet queries
+  index("idx_clock_entries_company_project_time").on(table.companyId, table.projectId, table.timestamp.desc()),
 ]);
 
 // Zod schemas for validation
@@ -482,7 +485,9 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ i
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 export const insertProjectFavoriteSchema = createInsertSchema(projectFavorites).omit({ id: true, createdAt: true });
 export const insertProjectVisitSchema = createInsertSchema(projectVisits).omit({ id: true, visitedAt: true });
-export const insertClockEntrySchema = createInsertSchema(clockEntries).omit({ id: true, createdAt: true });
+export const insertClockEntrySchema = createInsertSchema(clockEntries).omit({ id: true, createdAt: true }).extend({
+  projectId: z.string().optional().nullable(), // Optional for legacy entries and travel time
+});
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
