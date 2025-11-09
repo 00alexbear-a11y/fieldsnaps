@@ -35,7 +35,6 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
-import { ClockStatusCard } from "@/components/ClockStatusCard";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
 import { nativeClipboard } from "@/lib/nativeClipboard";
@@ -512,11 +511,6 @@ export default function Projects() {
 
       {/* Projects List */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-52 bg-white dark:bg-black">
-        {/* Clock In/Out Card */}
-        <div className="px-4 pt-4">
-          <ClockStatusCard />
-        </div>
-
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground">Loading projects...</div>
