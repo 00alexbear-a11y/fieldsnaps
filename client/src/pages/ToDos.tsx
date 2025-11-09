@@ -632,10 +632,10 @@ export default function ToDos() {
     const currentOffset = isThisTodoSwiped ? swipeOffset : 0;
 
     return (
-      <div className="relative overflow-hidden" key={todo.id}>
+      <div className="relative overflow-hidden rounded-lg" key={todo.id}>
         {/* Swipe action backgrounds with dynamic visual feedback */}
         {/* Right swipe - complete action (green) */}
-        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4">
+        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-lg">
           <div className="flex items-center gap-2">
             <Check className="w-6 h-6 text-white" />
             <span className="text-white font-medium">Complete</span>
@@ -643,7 +643,7 @@ export default function ToDos() {
         </div>
         
         {/* Left swipe - delete action (red shows when swiped far) */}
-        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors ${
+        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-lg ${
           currentOffset < -100 ? 'bg-red-500' : 'bg-orange-500'
         }`}>
           <div className="flex items-center gap-2">
