@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -109,10 +108,6 @@ export default function Projects() {
   useEffect(() => {
     setDebouncedSearchQuery(searchQuery);
   }, []);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [address, setAddress] = useState("");
-  const [unitCount, setUnitCount] = useState(1);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editAddress, setEditAddress] = useState("");
@@ -123,7 +118,6 @@ export default function Projects() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
     pending: number;
     projects: number;
@@ -237,30 +231,6 @@ export default function Projects() {
     return sorted;
   }, [projects, debouncedSearchQuery, viewFilter, sortBy, showCompleted, favoriteProjectIds, recentProjectIds, getPhotoCount]);
 
-  const createMutation = useMutation({
-    mutationFn: async (data: { name: string; description?: string; address?: string; unitCount?: number }) => {
-      const res = await apiRequest("POST", "/api/projects", data);
-      return await res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects/with-counts"] });
-      setDialogOpen(false);
-      setName("");
-      setDescription("");
-      setAddress("");
-      setUnitCount(1);
-      toast({ title: "Project created successfully" });
-    },
-    onError: (error: any) => {
-      console.error('Project creation error:', error);
-      toast({ 
-        title: "Error creating project", 
-        description: error.message || "Please try again",
-        variant: "destructive"
-      });
-    },
-  });
 
   const editMutation = useMutation({
     mutationFn: async (data: { id: string; name?: string; description?: string; address?: string; unitCount?: number }) => {
@@ -389,11 +359,6 @@ export default function Projects() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    createMutation.mutate({ name, description, address, unitCount });
-  };
 
   const handleDeleteProject = async (project: Project) => {
     // On iOS: use native confirmation dialog
@@ -521,98 +486,13 @@ export default function Projects() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Top Action Bar */}
-      <div className="flex items-center justify-end gap-2 p-3 border-b">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <Button 
-            className="h-9"
-            data-testid="button-create-project"
-            onClick={() => {
-              if (!canWrite) {
-                setUpgradeModalOpen(true);
-              } else {
-                setDialogOpen(true);
-              }
-            }}
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            New Project
-          </Button>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Project</DialogTitle>
-                  <DialogDescription>
-                    Enter details for your new construction project.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Project Name</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter project name"
-                      data-testid="input-project-name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Job site address"
-                      data-testid="input-project-address"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="unitCount">Number of Units</Label>
-                    <Input
-                      id="unitCount"
-                      type="number"
-                      min="1"
-                      max="999"
-                      value={unitCount}
-                      onChange={(e) => setUnitCount(parseInt(e.target.value) || 1)}
-                      placeholder="1 for single-site projects"
-                      data-testid="input-project-unit-count"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Set to 1 for single-site projects. For multi-unit buildings, specify the number of units to enable unit labels in camera.
-                    </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description (optional)</Label>
-                    <Textarea
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Enter project description"
-                      rows={3}
-                      data-testid="input-project-description"
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={createMutation.isPending}
-                    data-testid="button-submit-project"
-                  >
-                    {createMutation.isPending ? "Creating..." : "Create Project"}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-          {syncStatus && syncStatus.pending > 0 && (
-            <div className="px-4 py-2 border-b">
-              <p className="text-xs text-muted-foreground">
-                {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
-              </p>
-            </div>
-          )}
+      {syncStatus && syncStatus.pending > 0 && (
+        <div className="px-4 py-2 border-b">
+          <p className="text-xs text-muted-foreground">
+            {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
+          </p>
+        </div>
+      )}
 
           {/* Search Bar */}
           <div className="p-3 border-b">
@@ -652,22 +532,10 @@ export default function Projects() {
                 <p className="text-muted-foreground text-lg">
                   Your 7-day free trial starts when you create your first project
                 </p>
+                <p className="text-sm text-muted-foreground pt-4">
+                  Click the <span className="font-semibold">New</span> button above to get started
+                </p>
               </div>
-              <Button 
-                size="lg" 
-                className="w-full"
-                onClick={() => {
-                  if (!canWrite) {
-                    setUpgradeModalOpen(true);
-                  } else {
-                    setDialogOpen(true);
-                  }
-                }}
-                data-testid="button-create-first-project"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Create Project
-              </Button>
               <p className="text-sm text-muted-foreground">
                 No credit card required • Full access to all features
               </p>
@@ -853,13 +721,6 @@ export default function Projects() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Upgrade Modal */}
-      <UpgradeModal 
-        open={upgradeModalOpen} 
-        onClose={() => setUpgradeModalOpen(false)}
-        reason={isTrialExpired ? 'trial_expired' : isPastDue ? 'past_due' : isCanceled ? 'canceled' : 'trial_expired'}
-      />
     </div>
   );
 }

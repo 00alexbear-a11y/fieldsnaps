@@ -43,9 +43,12 @@ import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import Onboarding from "./components/Onboarding";
+import { CreateProjectDialog } from "./components/CreateProjectDialog";
+import { UpgradeModal } from "./components/UpgradeModal";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
 import { useIsNativeApp } from "./hooks/usePlatform";
+import { useSubscriptionAccess } from "./hooks/useSubscriptionAccess";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { App as CapacitorApp } from '@capacitor/app';
@@ -65,6 +68,8 @@ function AppContent() {
   
   const { isAuthenticated, isLoading, user } = useAuth();
   const isNativeApp = useIsNativeApp();
+  const { canWrite } = useSubscriptionAccess();
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   
   // Email whitelist - only these emails can access the app
   const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local'];
@@ -243,6 +248,13 @@ function AppContent() {
                   className="h-8 w-auto object-contain"
                   data-testid="img-fieldsnaps-logo"
                 />
+                {/* New Project button - only shown on /projects route */}
+                {pathname === '/projects' && (
+                  <CreateProjectDialog 
+                    canWrite={canWrite} 
+                    onUpgradeRequired={() => setUpgradeModalOpen(true)} 
+                  />
+                )}
               </div>
               <NotificationPanel />
             </header>
@@ -274,6 +286,9 @@ function AppContent() {
           </main>
           <BottomNav />
         </div>
+        
+        {/* Upgrade Modal */}
+        <UpgradeModal open={upgradeModalOpen} onClose={() => setUpgradeModalOpen(false)} />
       </div>
     </SidebarProvider>
   );
