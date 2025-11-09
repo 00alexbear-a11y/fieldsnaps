@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
+import { format } from "date-fns";
 
 interface ClockStatus {
   isClockedIn: boolean;
@@ -149,7 +150,12 @@ export function ClockStatusCard() {
               <h3 className="text-lg font-semibold text-foreground" data-testid="clock-status-title">
                 {status.onBreak ? "On Break" : "Clocked In"}
               </h3>
-              <div className="flex items-baseline gap-2">
+              {status.clockInTime && (
+                <p className="text-xs text-muted-foreground" data-testid="text-clock-in-time">
+                  Started: {format(new Date(status.clockInTime), 'h:mm a')}
+                </p>
+              )}
+              <div className="flex items-baseline gap-2 mt-1">
                 <p className="text-2xl font-bold text-primary" data-testid="text-hours-today">
                   {formatHours(status.totalHoursToday)}
                 </p>
