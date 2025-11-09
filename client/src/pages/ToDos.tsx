@@ -12,9 +12,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { useForm } from "react-hook-form";
+import { FullScreenCalendar } from "@/components/FullScreenCalendar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay } from "date-fns";
@@ -85,7 +84,7 @@ export default function ToDos() {
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -218,6 +217,20 @@ export default function ToDos() {
       completed: allTodos.filter(todo => todo.completed).length,
     };
   }, [allTodos, user?.id]);
+
+  // Calculate task counts by date for calendar
+  const taskCountByDate = useMemo(() => {
+    const counts = new Map<string, number>();
+    
+    allTodos.forEach(todo => {
+      if (!todo.dueDate) return;
+      const dueDate = startOfDay(new Date(todo.dueDate));
+      const dateKey = format(dueDate, 'yyyy-MM-dd');
+      counts.set(dateKey, (counts.get(dateKey) || 0) + 1);
+    });
+    
+    return counts;
+  }, [allTodos]);
 
   // Group todos by urgency (for non-completed views)
   const groupedTodos = useMemo(() => {
@@ -587,9 +600,9 @@ export default function ToDos() {
       // Calculate offset from resting position (synchronous)
       const newOffset = restingOffsetRef.current + diff;
       
-      // Clamp: max 150px left, 80px right
+      // Clamp: max 150px left, 120px right (increased to allow completion threshold)
       const maxLeft = -150;
-      const maxRight = 80;
+      const maxRight = 120;
       const clampedOffset = Math.max(maxLeft, Math.min(maxRight, newOffset));
       
       currentOffsetRef.current = clampedOffset;
@@ -598,9 +611,9 @@ export default function ToDos() {
   };
 
   const handleTouchEnd = (todo: TodoWithDetails) => {
-    const completeThreshold = 60; // Swipe right threshold
-    const deleteThreshold = -100; // Swipe far left for delete
-    const revealThreshold = -50; // Swipe left for actions
+    const completeThreshold = 100; // Swipe right threshold (increased for slower trigger)
+    const deleteThreshold = -130; // Swipe far left for delete (increased for slower trigger)
+    const revealThreshold = -70; // Swipe left for actions (increased for slower trigger)
     
     // Swipe right - complete task immediately
     if (currentOffsetRef.current > completeThreshold && !todo.completed) {
@@ -656,22 +669,22 @@ export default function ToDos() {
       <div className="relative overflow-hidden rounded-lg" key={todo.id}>
         {/* Swipe action backgrounds with dynamic visual feedback */}
         {/* Right swipe - complete action (green) */}
-        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-lg">
+        <div className="absolute inset-0 bg-green-500/90 flex items-center justify-start px-4 rounded-lg overflow-hidden">
           <div className="flex items-center gap-2">
             <Check className="w-6 h-6 text-white" />
             <span className="text-white font-medium">Complete</span>
           </div>
         </div>
         
-        {/* Left swipe - delete action (red shows when swiped far) */}
-        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-lg ${
-          currentOffset < -100 ? 'bg-red-500' : 'bg-orange-500'
+        {/* Left swipe - delete action (red shows when swiped far, gray for reveal) */}
+        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-lg overflow-hidden ${
+          currentOffset < -100 ? 'bg-red-500/90' : 'bg-muted'
         }`}>
           <div className="flex items-center gap-2">
-            <span className="text-white font-medium">
+            <span className={`font-medium ${currentOffset < -100 ? 'text-white' : 'text-foreground'}`}>
               {currentOffset < -100 ? 'Delete' : 'Actions'}
             </span>
-            <X className="w-6 h-6 text-white" />
+            <X className={`w-6 h-6 ${currentOffset < -100 ? 'text-white' : 'text-foreground'}`} />
           </div>
         </div>
         
@@ -680,7 +693,7 @@ export default function ToDos() {
           <Button
             size="icon"
             variant="ghost"
-            className="h-12 w-12 bg-orange-500 hover:bg-orange-600 text-white"
+            className="h-12 w-12 bg-blue-500 hover:bg-blue-600 text-white"
             onClick={(e) => {
               e.stopPropagation();
               handleSwipeAction(() => toggleFlagMutation.mutate(todo.id));
@@ -893,47 +906,17 @@ export default function ToDos() {
           {smartListLabels[selectedList]}
         </h1>
         <div className="flex items-center gap-2">
-          <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
-            <PopoverTrigger asChild>
-              <Button
-                variant={dateFilter ? "default" : "outline"}
-                size="sm"
-                data-testid="button-date-filter"
-              >
-                <CalendarIconOutline className="w-4 h-4" />
-                {dateFilter && (
-                  <span className="ml-2">{format(dateFilter, 'MMM d')}</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={dateFilter}
-                onSelect={(date) => {
-                  setDateFilter(date);
-                  setShowDatePicker(false);
-                }}
-                initialFocus
-              />
-              {dateFilter && (
-                <div className="p-2 border-t">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setDateFilter(undefined);
-                      setShowDatePicker(false);
-                    }}
-                    className="w-full"
-                    data-testid="button-clear-date-filter"
-                  >
-                    Clear Filter
-                  </Button>
-                </div>
-              )}
-            </PopoverContent>
-          </Popover>
+          <Button
+            variant={dateFilter ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowFullScreenCalendar(true)}
+            data-testid="button-date-filter"
+          >
+            <CalendarIconOutline className="w-4 h-4" />
+            {dateFilter && (
+              <span className="ml-2">{format(dateFilter, 'MMM d')}</span>
+            )}
+          </Button>
           <Button
             onClick={() => setShowAddDialog(true)}
             size="sm"
@@ -1353,6 +1336,15 @@ export default function ToDos() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
+
+      {/* Full-Screen Calendar */}
+      <FullScreenCalendar
+        open={showFullScreenCalendar}
+        onOpenChange={setShowFullScreenCalendar}
+        selectedDate={dateFilter}
+        taskCountByDate={taskCountByDate}
+        onSelectDay={(date) => setDateFilter(date)}
+      />
     </div>
   );
 }
