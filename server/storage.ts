@@ -1422,7 +1422,132 @@ export class DbStorage implements IStorage {
   }
 
   // Clock Entries (time tracking)
+  
+  // Helper function to validate clock entry state transitions
+  private async validateClockEntryState(
+    userId: string,
+    timestamp: Date,
+    entryType: string,
+    excludeId?: string
+  ): Promise<{ valid: boolean; error?: string }> {
+    // Get day boundaries for the timestamp
+    const day = new Date(timestamp);
+    day.setHours(0, 0, 0, 0);
+    const nextDay = new Date(day);
+    nextDay.setDate(nextDay.getDate() + 1);
+    
+    // Fetch all entries for the day (excluding the one being edited if applicable)
+    const conditions = [
+      eq(clockEntries.userId, userId),
+      sql`${clockEntries.timestamp} >= ${day}`,
+      sql`${clockEntries.timestamp} < ${nextDay}`
+    ];
+    
+    if (excludeId) {
+      conditions.push(sql`${clockEntries.id} != ${excludeId}`);
+    }
+    
+    const existingEntries = await db
+      .select()
+      .from(clockEntries)
+      .where(and(...conditions))
+      .orderBy(clockEntries.timestamp);
+    
+    // Find entries immediately before and after the new timestamp
+    const entriesBefore = existingEntries.filter(e => e.timestamp < timestamp);
+    const entriesAfter = existingEntries.filter(e => e.timestamp > timestamp);
+    
+    // Determine current state right before this entry
+    let stateBefore = { isClockedIn: false, onBreak: false };
+    for (const entry of entriesBefore) {
+      if (entry.type === 'clock_in') {
+        stateBefore = { isClockedIn: true, onBreak: false };
+      } else if (entry.type === 'clock_out') {
+        stateBefore = { isClockedIn: false, onBreak: false };
+      } else if (entry.type === 'break_start') {
+        stateBefore.onBreak = true;
+      } else if (entry.type === 'break_end') {
+        stateBefore.onBreak = false;
+      }
+    }
+    
+    // Validate the specific action being attempted
+    if (entryType === 'clock_in' && stateBefore.isClockedIn) {
+      return {
+        valid: false,
+        error: 'Cannot clock in at this time - already clocked in. Clock out first.'
+      };
+    }
+    
+    if (entryType === 'clock_out' && !stateBefore.isClockedIn) {
+      return {
+        valid: false,
+        error: 'Cannot clock out at this time - not clocked in.'
+      };
+    }
+    
+    if (entryType === 'break_start') {
+      if (!stateBefore.isClockedIn) {
+        return { valid: false, error: 'Cannot start break - not clocked in.' };
+      }
+      if (stateBefore.onBreak) {
+        return { valid: false, error: 'Cannot start break - already on break.' };
+      }
+    }
+    
+    if (entryType === 'break_end' && !stateBefore.onBreak) {
+      return {
+        valid: false,
+        error: 'Cannot end break at this time - not on break.'
+      };
+    }
+    
+    // Determine state after this entry
+    let stateAfter = { ...stateBefore };
+    if (entryType === 'clock_in') {
+      stateAfter = { isClockedIn: true, onBreak: false };
+    } else if (entryType === 'clock_out') {
+      stateAfter = { isClockedIn: false, onBreak: false };
+    } else if (entryType === 'break_start') {
+      stateAfter.onBreak = true;
+    } else if (entryType === 'break_end') {
+      stateAfter.onBreak = false;
+    }
+    
+    // Validate the first entry after this one is compatible with the new state
+    if (entriesAfter.length > 0) {
+      const nextEntry = entriesAfter[0];
+      
+      if (nextEntry.type === 'clock_in' && stateAfter.isClockedIn) {
+        return {
+          valid: false,
+          error: 'This timestamp would create an invalid sequence - next entry is clock-in but state would be clocked-in.'
+        };
+      }
+      
+      if (nextEntry.type === 'clock_out' && !stateAfter.isClockedIn) {
+        return {
+          valid: false,
+          error: 'This timestamp would create an invalid sequence - next entry is clock-out but state would be clocked-out.'
+        };
+      }
+    }
+    
+    return { valid: true };
+  }
+  
   async createClockEntry(data: InsertClockEntry): Promise<ClockEntry> {
+    // Validate the state transition
+    const validation = await this.validateClockEntryState(
+      data.userId,
+      data.timestamp,
+      data.type
+    );
+    
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
+    
     const result = await db
       .insert(clockEntries)
       .values(data)
@@ -1563,6 +1688,31 @@ export class DbStorage implements IStorage {
   }
 
   async updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined> {
+    // Get the existing entry to know its type and userId
+    const existing = await db
+      .select()
+      .from(clockEntries)
+      .where(eq(clockEntries.id, id))
+      .limit(1);
+    
+    if (!existing || existing.length === 0) {
+      throw new Error('Clock entry not found');
+    }
+    
+    const entry = existing[0];
+    
+    // Validate the new timestamp doesn't create invalid state
+    const validation = await this.validateClockEntryState(
+      entry.userId,
+      data.timestamp,
+      entry.type,
+      id // Exclude this entry from validation check
+    );
+    
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
+    
     const result = await db
       .update(clockEntries)
       .set({
