@@ -717,7 +717,7 @@ export default function ToDos() {
         </div>
 
         <Card
-          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''}`}
+          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''}`}
           style={{ transform: `translateX(${currentOffset}px)` }}
           onClick={() => { 
             if (!isSwiping.current) {
