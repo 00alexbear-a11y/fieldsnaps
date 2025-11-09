@@ -1487,7 +1487,7 @@ export class DbStorage implements IStorage {
         sql`${clockEntries.timestamp} >= ${today}`,
         sql`${clockEntries.timestamp} < ${tomorrow}`
       ))
-      .orderBy(clockEntries.timestamp);
+      .orderBy(clockEntries.timestamp); // Order by actual event time (not creation time) to support retroactive/backfill edits
     
     let isClockedIn = false;
     let onBreak = false;
