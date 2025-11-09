@@ -2,10 +2,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Clock, Play, Square, Coffee, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
 import { format } from "date-fns";
+import { useState } from "react";
+import type { Project } from "@shared/schema";
 
 interface ClockStatus {
   isClockedIn: boolean;
@@ -16,14 +20,20 @@ interface ClockStatus {
 
 export function ClockStatusCard() {
   const { toast } = useToast();
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
   const { data: status, isLoading } = useQuery<ClockStatus>({
     queryKey: ['/api/clock/status'],
     refetchInterval: 60000, // Refresh every minute
   });
 
+  // Fetch projects for selection
+  const { data: projects = [] } = useQuery<Project[]>({
+    queryKey: ['/api/projects'],
+  });
+
   const clockMutation = useMutation({
-    mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number }) => {
+    mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number; projectId?: string }) => {
       return await apiRequest('POST', '/api/clock', data);
     },
     onSuccess: (_data, variables) => {
@@ -62,7 +72,15 @@ export function ClockStatusCard() {
   });
 
   const handleClockIn = () => {
-    clockMutation.mutate({ type: 'clock_in' });
+    if (!selectedProjectId) {
+      toast({
+        variant: "destructive",
+        title: "Project Required",
+        description: "Please select a project before clocking in",
+      });
+      return;
+    }
+    clockMutation.mutate({ type: 'clock_in', projectId: selectedProjectId });
   };
 
   const handleClockOut = () => {
@@ -104,7 +122,7 @@ export function ClockStatusCard() {
     return (
       <Card className="mb-6 bg-gradient-to-br from-card to-card/80" data-testid="clock-status-card">
         <CardContent className="p-5">
-          <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <Clock className="h-6 w-6 text-primary" />
             </div>
@@ -113,13 +131,39 @@ export function ClockStatusCard() {
                 Ready to start your day?
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Clock in to track your time today
+                Select a project and clock in to track your time
               </p>
             </div>
+            
+            {/* Project Selector */}
+            <div className="w-full max-w-xs space-y-2">
+              <Label htmlFor="project-select" className="text-sm font-medium">
+                Select Project *
+              </Label>
+              <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                <SelectTrigger id="project-select" data-testid="select-project">
+                  <SelectValue placeholder="Choose a project..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground text-center">
+                      No projects available
+                    </div>
+                  ) : (
+                    projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
             <Button
               size="lg"
               onClick={handleClockIn}
-              disabled={clockMutation.isPending}
+              disabled={clockMutation.isPending || !selectedProjectId}
               className="min-w-[200px]"
               data-testid="button-clock-in"
             >

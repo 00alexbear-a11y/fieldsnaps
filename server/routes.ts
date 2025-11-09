@@ -2925,12 +2925,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await getUserWithCompany(req, res);
       if (!user) return;
 
-      const { type, location, notes } = req.body;
+      const { type, location, notes, projectId } = req.body;
 
       // Validate type
       const validTypes = ['clock_in', 'clock_out', 'break_start', 'break_end'];
       if (!validTypes.includes(type)) {
         return res.status(400).json({ error: "Invalid clock entry type" });
+      }
+
+      // Require projectId for clock_in
+      if (type === 'clock_in' && !projectId) {
+        return res.status(400).json({ error: "Project selection is required to clock in" });
+      }
+
+      // Validate projectId belongs to user's company (if provided)
+      if (projectId) {
+        const project = await storage.getProject(projectId);
+        if (!project || project.companyId !== user.companyId) {
+          return res.status(400).json({ error: "Invalid project or project does not belong to your company" });
+        }
       }
 
       // Get current status to validate action
@@ -2953,6 +2966,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const clockEntry = await storage.createClockEntry({
         userId: user.id,
         companyId: user.companyId,
+        projectId: projectId || null,
         type,
         location,
         notes,
