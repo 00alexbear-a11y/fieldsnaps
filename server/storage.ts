@@ -167,9 +167,10 @@ export interface IStorage {
   // Clock Entries (time tracking)
   createClockEntry(data: InsertClockEntry): Promise<ClockEntry>;
   getClockEntries(companyId: string, options?: { userId?: string; startDate?: Date; endDate?: Date }): Promise<(ClockEntry & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
-  getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number }>;
+  getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null }>;
   getClockEntriesForUser(userId: string, startDate: Date, endDate: Date): Promise<ClockEntry[]>;
   updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined>;
+  switchProject(userId: string, companyId: string, newProjectId: string, location?: string, notes?: string): Promise<{ clockOutEntry: ClockEntry; clockInEntry: ClockEntry }>;
 }
 
 export class DbStorage implements IStorage {
@@ -1472,7 +1473,7 @@ export class DbStorage implements IStorage {
     return result;
   }
 
-  async getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number }> {
+  async getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -1491,6 +1492,7 @@ export class DbStorage implements IStorage {
     let isClockedIn = false;
     let onBreak = false;
     let clockInTime: Date | undefined;
+    let currentProjectId: string | null = null;
     let totalMs = 0;
     let lastClockIn: Date | null = null;
     let lastBreakStart: Date | null = null;
@@ -1500,6 +1502,7 @@ export class DbStorage implements IStorage {
         isClockedIn = true;
         lastClockIn = entry.timestamp;
         clockInTime = entry.timestamp;
+        currentProjectId = entry.projectId;
       } else if (entry.type === 'clock_out') {
         if (lastClockIn) {
           totalMs += entry.timestamp.getTime() - lastClockIn.getTime();
@@ -1507,6 +1510,7 @@ export class DbStorage implements IStorage {
         }
         isClockedIn = false;
         onBreak = false;
+        currentProjectId = null;
       } else if (entry.type === 'break_start') {
         if (lastClockIn) {
           totalMs += entry.timestamp.getTime() - lastClockIn.getTime();
@@ -1533,6 +1537,7 @@ export class DbStorage implements IStorage {
       onBreak,
       clockInTime,
       totalHoursToday,
+      currentProjectId,
     };
   }
 
@@ -1569,6 +1574,85 @@ export class DbStorage implements IStorage {
       .where(eq(clockEntries.id, id))
       .returning();
     return result[0];
+  }
+
+  async switchProject(userId: string, companyId: string, newProjectId: string, location?: string, notes?: string): Promise<{ clockOutEntry: ClockEntry; clockInEntry: ClockEntry }> {
+    // Use database transaction to ensure atomicity
+    return await db.transaction(async (tx) => {
+      // Get current clock status to verify user is clocked in
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const entries = await tx
+        .select()
+        .from(clockEntries)
+        .where(and(
+          eq(clockEntries.userId, userId),
+          sql`${clockEntries.timestamp} >= ${today}`,
+          sql`${clockEntries.timestamp} < ${tomorrow}`
+        ))
+        .orderBy(clockEntries.timestamp);
+      
+      // Calculate status from entries
+      let isClockedIn = false;
+      let currentProjectId: string | null = null;
+      
+      for (const entry of entries) {
+        if (entry.type === 'clock_in') {
+          isClockedIn = true;
+          currentProjectId = entry.projectId;
+        } else if (entry.type === 'clock_out') {
+          isClockedIn = false;
+          currentProjectId = null;
+        }
+      }
+      
+      if (!isClockedIn) {
+        throw new Error("Cannot switch project - not currently clocked in");
+      }
+      
+      if (currentProjectId === newProjectId) {
+        throw new Error("Cannot switch to the same project");
+      }
+      
+      // Create atomic timestamp for both entries
+      const switchTimestamp = new Date();
+      
+      // Create clock_out entry for old project
+      const clockOutResult = await tx
+        .insert(clockEntries)
+        .values({
+          userId,
+          companyId,
+          projectId: currentProjectId,
+          type: 'clock_out',
+          timestamp: switchTimestamp,
+          location,
+          notes: notes ? `Project switch: ${notes}` : 'Project switch',
+        })
+        .returning();
+      
+      // Create clock_in entry for new project
+      const clockInResult = await tx
+        .insert(clockEntries)
+        .values({
+          userId,
+          companyId,
+          projectId: newProjectId,
+          type: 'clock_in',
+          timestamp: switchTimestamp,
+          location,
+          notes: notes ? `Project switch: ${notes}` : 'Project switch',
+        })
+        .returning();
+      
+      return {
+        clockOutEntry: clockOutResult[0],
+        clockInEntry: clockInResult[0],
+      };
+    });
   }
 }
 
