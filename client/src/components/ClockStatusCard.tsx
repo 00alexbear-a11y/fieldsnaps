@@ -42,9 +42,16 @@ export function ClockStatusCard() {
     mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number; projectId?: string }) => {
       return await apiRequest('POST', '/api/clock', data);
     },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
+    onSuccess: async (_data, variables) => {
+      // Wait for cache invalidation to complete before closing dialog
+      await queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
+      
       haptics.medium();
+      
+      // Close time review dialog if this was a clock out
+      if (variables.type === 'clock_out') {
+        setShowTimeReview(false);
+      }
       
       // Show success toast only after server confirms
       const toastMessages = {
@@ -121,8 +128,8 @@ export function ClockStatusCard() {
 
   const handleConfirmClockOut = () => {
     // Actually clock out after review confirmation
+    // Dialog will close automatically in mutation's onSuccess callback
     clockMutation.mutate({ type: 'clock_out', totalHoursToday: status?.totalHoursToday });
-    setShowTimeReview(false);
   };
 
   const handleBreakStart = () => {

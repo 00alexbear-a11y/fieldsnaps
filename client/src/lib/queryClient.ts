@@ -40,7 +40,42 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const url = queryKey.join("/") as string;
+    // Build URL from queryKey segments
+    let url = "";
+    let queryParams: Record<string, any> | null = null;
+    
+    // Process queryKey elements
+    for (let i = 0; i < queryKey.length; i++) {
+      const segment = queryKey[i];
+      
+      // If it's an object, treat as query parameters (should be last element)
+      if (typeof segment === 'object' && segment !== null) {
+        queryParams = segment as Record<string, any>;
+        break;
+      }
+      
+      // Otherwise, it's a path segment
+      if (i === 0) {
+        url = String(segment);
+      } else {
+        url += `/${String(segment)}`;
+      }
+    }
+    
+    // Append query parameters if present
+    if (queryParams) {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(queryParams)) {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      }
+      
+      const queryString = params.toString();
+      if (queryString) {
+        url = `${url}?${queryString}`;
+      }
+    }
     
     // Add JWT token if available (for native apps)
     const token = await tokenManager.getValidAccessToken();
