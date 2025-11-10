@@ -1131,6 +1131,11 @@ export default function Camera() {
       setCameraMode(newMode);
       setIsTransitioning(false);
       modeTransitionTimeoutRef.current = null;
+      
+      // Show instruction screen when switching TO todo mode (not from todo to another mode)
+      if (newMode === 'todo' && todoInstruction.shouldShow) {
+        // Instruction will be shown by the conditional render below
+      }
     }, 250);
   };
 
@@ -2590,8 +2595,8 @@ export default function Camera() {
         onAutoSaveChange={setAutoSave}
       />
 
-      {/* TODO Mode: Instruction Screen */}
-      {todoInstruction.shouldShow && (
+      {/* TODO Mode: Instruction Screen - Only show when in TODO mode */}
+      {cameraMode === 'todo' && todoInstruction.shouldShow && (
         <ToDoInstructionScreen
           onDismiss={todoInstruction.dismiss}
         />
