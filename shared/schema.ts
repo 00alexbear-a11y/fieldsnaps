@@ -470,6 +470,22 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, creat
 export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, createdAt: true }).extend({
   dueDate: z.coerce.date().optional(),
 });
+
+// Batch todo creation schema for camera-to-do voice sessions
+export const batchTodoSchema = z.object({
+  projectId: z.string().optional().nullable(),
+  todos: z.array(
+    z.object({
+      photoId: z.string(),
+      title: z.string().min(1),
+      description: z.string().optional().nullable(),
+      assignedTo: z.string().optional().nullable(), // Optional assignee
+      dueDate: z.coerce.date().optional().nullable(),
+      flag: z.boolean().optional(),
+    })
+  ).min(1), // At least one todo required
+});
+
 export const insertCredentialSchema = createInsertSchema(credentials).omit({ id: true, createdAt: true });
 export const insertShareSchema = createInsertSchema(shares).omit({ id: true, createdAt: true });
 export const insertShareViewLogSchema = createInsertSchema(shareViewLogs).omit({ id: true, viewedAt: true });
@@ -520,6 +536,7 @@ export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertToDo = z.infer<typeof insertTodoSchema>;
+export type BatchTodoInput = z.infer<typeof batchTodoSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertShareViewLog = z.infer<typeof insertShareViewLogSchema>;
 export type InsertTag = z.infer<typeof insertTagSchema>;
