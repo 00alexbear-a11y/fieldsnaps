@@ -2847,16 +2847,32 @@ export default function Camera() {
         const item = todoSession.items.find(i => i.localId === selectedTodoItemForAnnotation);
         if (!item) return null;
         
+        // Convert DB annotations to client Annotation format
+        const clientAnnotations = item.annotations.map(a => ({
+          id: crypto.randomUUID(),
+          type: a.type as "text" | "arrow" | "line" | "circle" | "pen" | "measurement",
+          content: a.content ?? undefined,
+          color: a.color,
+          strokeWidth: a.strokeWidth ?? 4,
+          fontSize: a.fontSize ?? undefined,
+          position: a.position as any,
+        }));
+        
         return (
           <PhotoAnnotationEditor
             photoUrl={item.photoUrl}
             photoId={selectedTodoItemForAnnotation}
-            existingAnnotations={item.annotations}
+            existingAnnotations={clientAnnotations}
             onSave={(annotations) => {
+              // Convert client Annotation format to DB PhotoAnnotation format
               todoSession.updateItem(selectedTodoItemForAnnotation, {
                 annotations: annotations.map(a => ({
-                  ...a,
+                  type: a.type,
                   content: a.content ?? null,
+                  color: a.color,
+                  strokeWidth: a.strokeWidth,
+                  fontSize: a.fontSize ?? null,
+                  position: a.position,
                   userId: null,
                 })),
               });
