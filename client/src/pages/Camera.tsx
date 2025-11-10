@@ -2593,9 +2593,7 @@ export default function Camera() {
       {/* TODO Mode: Instruction Screen */}
       {todoInstruction.shouldShow && (
         <ToDoInstructionScreen
-          onGetStarted={() => {
-            todoInstruction.markAsShown();
-          }}
+          onDismiss={todoInstruction.dismiss}
         />
       )}
 
@@ -2611,7 +2609,7 @@ export default function Camera() {
         }}
         onStartRecording={async () => {
           try {
-            await speechRecognition.start();
+            await speechRecognition.startListening();
           } catch (error) {
             console.error('Speech recognition start failed:', error);
             toast({
@@ -2623,7 +2621,7 @@ export default function Camera() {
         }}
         onStopRecording={() => {
           try {
-            speechRecognition.stop();
+            speechRecognition.stopListening();
             // Sync speech recognition result to local state
             setVoiceTranscript(speechRecognition.transcript);
           } catch (error) {
@@ -2641,7 +2639,7 @@ export default function Camera() {
         onDone={() => {
           try {
             if (speechRecognition.isListening) {
-              speechRecognition.stop();
+              speechRecognition.stopListening();
               // Capture any final transcript updates
               setVoiceTranscript(speechRecognition.transcript);
             }
@@ -2655,8 +2653,9 @@ export default function Camera() {
                 photoUrl: currentTodoCapture.url,
                 thumbnailUrl: currentTodoCapture.thumbnailUrl,
                 transcript: finalTranscript,
+                annotations: [],
               });
-              haptics.impact('light');
+              haptics.light();
               toast({
                 title: 'Task Added',
                 description: 'Capture another or review your tasks',
@@ -2680,7 +2679,7 @@ export default function Camera() {
         onCancel={() => {
           try {
             if (speechRecognition.isListening) {
-              speechRecognition.stop();
+              speechRecognition.stopListening();
             }
             
             // Discard capture and clean up
