@@ -178,6 +178,24 @@ export default function Camera() {
   const [voiceTranscript, setVoiceTranscript] = useState('');
   const [selectedTodoItemForAnnotation, setSelectedTodoItemForAnnotation] = useState<string | null>(null);
   
+  // Track blob URLs for cleanup when session clears or component unmounts
+  const sessionBlobUrlsRef = useRef<Set<string>>(new Set());
+  
+  // Cleanup effect: Revoke all session blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      sessionBlobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+      sessionBlobUrlsRef.current.clear();
+    };
+  }, []);
+  
+  // Sync speech recognition transcript to local state in real-time
+  useEffect(() => {
+    if (speechRecognition.isListening && speechRecognition.transcript) {
+      setVoiceTranscript(speechRecognition.transcript);
+    }
+  }, [speechRecognition.transcript, speechRecognition.isListening]);
+  
   // Swipe gesture refs for session preview overlay
   const previewSwipeStartY = useRef<number | null>(null);
   const previewSwipeStartTime = useRef<number>(0);
@@ -1446,6 +1464,7 @@ export default function Camera() {
       // TODO Mode: Store photo and open voice sheet instead of saving to project
       if (cameraMode === 'todo') {
         const photoUrl = URL.createObjectURL(compressionResult.blob);
+        sessionBlobUrlsRef.current.add(photoUrl); // Track for cleanup
         
         // Create thumbnail for voice sheet preview
         const thumbnailCanvas = document.createElement('canvas');
@@ -1465,6 +1484,7 @@ export default function Camera() {
           );
         });
         const thumbnailUrl = URL.createObjectURL(thumbnailBlob);
+        sessionBlobUrlsRef.current.add(thumbnailUrl); // Track for cleanup
 
         setCurrentTodoCapture({
           blob: compressionResult.blob,
@@ -2582,33 +2602,100 @@ export default function Camera() {
       {/* TODO Mode: Voice Capture Sheet */}
       <VoiceCaptureSheet
         isOpen={showVoiceSheet}
-        onClose={() => {
-          setShowVoiceSheet(false);
-          setCurrentTodoCapture(null);
-          setVoiceTranscript('');
-        }}
-        thumbnailUrl={currentTodoCapture?.thumbnailUrl || currentTodoCapture?.url}
+        thumbnailUrl={currentTodoCapture?.thumbnailUrl || currentTodoCapture?.url || ''}
         transcript={voiceTranscript}
-        onTranscriptChange={setVoiceTranscript}
-        onDone={() => {
-          if (currentTodoCapture && voiceTranscript.trim()) {
-            todoSession.addItem({
-              photoBlob: currentTodoCapture.blob,
-              photoUrl: currentTodoCapture.url,
-              thumbnailUrl: currentTodoCapture.thumbnailUrl,
-              transcript: voiceTranscript.trim(),
-            });
-            haptics.impact('light');
-            setShowVoiceSheet(false);
-            setCurrentTodoCapture(null);
-            setVoiceTranscript('');
+        isRecording={speechRecognition.isListening}
+        onTranscriptChange={(text) => {
+          // Manual edit - just update local state (single source of truth)
+          setVoiceTranscript(text);
+        }}
+        onStartRecording={async () => {
+          try {
+            await speechRecognition.start();
+          } catch (error) {
+            console.error('Speech recognition start failed:', error);
             toast({
-              title: 'Task Added',
-              description: 'Capture another or review your tasks',
+              title: 'Microphone Error',
+              description: 'Could not access microphone. Please check permissions.',
+              variant: 'destructive',
             });
           }
         }}
-        speechRecognition={speechRecognition}
+        onStopRecording={() => {
+          try {
+            speechRecognition.stop();
+            // Sync speech recognition result to local state
+            setVoiceTranscript(speechRecognition.transcript);
+          } catch (error) {
+            console.error('Speech recognition stop failed:', error);
+          }
+        }}
+        onReRecord={() => {
+          try {
+            speechRecognition.resetTranscript();
+            setVoiceTranscript('');
+          } catch (error) {
+            console.error('Speech recognition reset failed:', error);
+          }
+        }}
+        onDone={() => {
+          try {
+            if (speechRecognition.isListening) {
+              speechRecognition.stop();
+              // Capture any final transcript updates
+              setVoiceTranscript(speechRecognition.transcript);
+            }
+            
+            // Use voiceTranscript as single source of truth
+            const finalTranscript = voiceTranscript.trim();
+            
+            if (currentTodoCapture && finalTranscript) {
+              todoSession.addItem({
+                photoBlob: currentTodoCapture.blob,
+                photoUrl: currentTodoCapture.url,
+                thumbnailUrl: currentTodoCapture.thumbnailUrl,
+                transcript: finalTranscript,
+              });
+              haptics.impact('light');
+              toast({
+                title: 'Task Added',
+                description: 'Capture another or review your tasks',
+              });
+            }
+            
+            // Clean up
+            setShowVoiceSheet(false);
+            setCurrentTodoCapture(null);
+            setVoiceTranscript('');
+            speechRecognition.resetTranscript();
+          } catch (error) {
+            console.error('Voice sheet done failed:', error);
+            toast({
+              title: 'Error',
+              description: 'Failed to save task. Please try again.',
+              variant: 'destructive',
+            });
+          }
+        }}
+        onCancel={() => {
+          try {
+            if (speechRecognition.isListening) {
+              speechRecognition.stop();
+            }
+            
+            // Discard capture and clean up
+            setShowVoiceSheet(false);
+            setCurrentTodoCapture(null);
+            setVoiceTranscript('');
+            speechRecognition.resetTranscript();
+          } catch (error) {
+            console.error('Voice sheet cancel failed:', error);
+            // Still cleanup even if speech recognition fails
+            setShowVoiceSheet(false);
+            setCurrentTodoCapture(null);
+            setVoiceTranscript('');
+          }
+        }}
       />
 
       {/* TODO Mode: Session Review Screen */}
@@ -2633,9 +2720,12 @@ export default function Camera() {
               return;
             }
 
-            // Upload all photos to object storage first
-            const uploadedPhotos = await Promise.all(
-              todoSession.items.map(async (item) => {
+            // Upload photos one by one with early exit on failure (transactional approach)
+            const uploadedPhotos: Array<{ itemId: string; photoId: string; photoUrl: string }> = [];
+            const uploadedPhotoIds: string[] = []; // Track for potential cleanup
+            
+            try {
+              for (const item of todoSession.items) {
                 const formData = new FormData();
                 formData.append('photo', item.photoBlob, `todo-${item.id}.jpg`);
                 formData.append('projectId', selectedProject);
@@ -2645,13 +2735,40 @@ export default function Camera() {
                   body: formData,
                 });
                 
-                return {
+                uploadedPhotos.push({
                   itemId: item.id,
                   photoId: response.id,
                   photoUrl: response.url,
-                };
-              })
-            );
+                });
+                uploadedPhotoIds.push(response.id);
+              }
+            } catch (uploadError) {
+              // Photo upload failed - rollback uploaded photos and show specific error
+              console.error('Photo upload failed:', uploadError);
+              
+              // Attempt to delete already-uploaded photos (best effort cleanup)
+              if (uploadedPhotoIds.length > 0) {
+                console.log(`Rolling back ${uploadedPhotoIds.length} uploaded photo(s)...`);
+                try {
+                  await Promise.all(
+                    uploadedPhotoIds.map(photoId =>
+                      apiRequest(`/api/photos/${photoId}`, { method: 'DELETE' })
+                        .catch(err => console.error(`Failed to delete photo ${photoId}:`, err))
+                    )
+                  );
+                } catch (rollbackError) {
+                  console.error('Rollback failed:', rollbackError);
+                }
+              }
+              
+              haptics.light();
+              toast({
+                title: 'Upload Failed',
+                description: `Failed to upload photo ${uploadedPhotos.length + 1} of ${todoSession.items.length}. Check your connection and try again.`,
+                variant: 'destructive',
+              });
+              return; // Exit early, session remains intact for retry
+            }
 
             // Build todos array for batch creation
             const todos = todoSession.items.map((item) => {
@@ -2666,19 +2783,36 @@ export default function Camera() {
             });
 
             // Submit batch todo creation
-            await apiRequest('/api/todo-sessions', {
-              method: 'POST',
-              body: JSON.stringify({
-                projectId: selectedProject,
-                todos,
-              }),
-            });
+            try {
+              await apiRequest('/api/todo-sessions', {
+                method: 'POST',
+                body: JSON.stringify({
+                  projectId: selectedProject,
+                  todos,
+                }),
+              });
+            } catch (createError) {
+              // Todo creation failed - photos are uploaded but todos not created
+              console.error('Todo creation failed:', createError);
+              haptics.light();
+              toast({
+                title: 'Creation Failed',
+                description: 'Photos uploaded but tasks not created. Close review and try again or contact support.',
+                variant: 'destructive',
+              });
+              return; // Exit early, session remains for retry
+            }
 
+            // Success! All operations completed
             haptics.heavy();
             toast({
               title: 'Tasks Created',
               description: `${todoSession.items.length} task${todoSession.items.length > 1 ? 's' : ''} added to project`,
             });
+
+            // Clean up blob URLs before clearing session
+            sessionBlobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+            sessionBlobUrlsRef.current.clear();
 
             // Clear session and close review
             todoSession.clearSession();
@@ -2689,11 +2823,12 @@ export default function Camera() {
             await queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject] });
             
           } catch (error) {
+            // Unexpected error - wrap entire save in try/catch for network/parse errors
             console.error('Batch save error:', error);
             haptics.light();
             toast({
               title: 'Save Failed',
-              description: error instanceof Error ? error.message : 'Failed to save tasks. Please try again.',
+              description: error instanceof Error ? error.message : 'Unexpected error. Please try again.',
               variant: 'destructive',
             });
           }
