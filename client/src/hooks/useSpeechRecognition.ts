@@ -187,6 +187,26 @@ export function useSpeechRecognition() {
       }
     }
 
+    // For web (especially Safari), explicitly request microphone access via getUserMedia
+    // This triggers the browser's permission prompt before Web Speech API starts
+    if (!isNative && permissionStatus !== 'granted') {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Stop the stream immediately - we just needed it to trigger permission
+        stream.getTracks().forEach(track => track.stop());
+        setPermissionStatus('granted');
+      } catch (err: any) {
+        console.error('[SpeechRecognition] Microphone permission request failed:', err);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setError('Microphone permission denied. Please allow microphone access in your browser settings.');
+          setPermissionStatus('denied');
+        } else {
+          setError('Could not access microphone. Please check your browser settings.');
+        }
+        return;
+      }
+    }
+
     if (isNative) {
       // Native platform: Use Capacitor plugin
       let listenerHandle: any = null;
