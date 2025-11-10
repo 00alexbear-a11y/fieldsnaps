@@ -1,15 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, StopCircle, RotateCcw, Check, X } from "lucide-react";
+import { Mic, StopCircle, RotateCcw, Check, X, Loader2 } from "lucide-react";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Capacitor } from "@capacitor/core";
+import { VoiceCaptureState } from "@/hooks/useSpeechRecognition";
 
 interface VoiceCaptureSheetProps {
   isOpen: boolean;
   thumbnailUrl: string;
   transcript: string;
   isRecording: boolean;
+  captureState: VoiceCaptureState;
+  error: string | null;
   onTranscriptChange: (text: string) => void;
   onStartRecording: () => void;
   onStopRecording: () => void;
@@ -23,6 +26,8 @@ export function VoiceCaptureSheet({
   thumbnailUrl,
   transcript,
   isRecording,
+  captureState,
+  error,
   onTranscriptChange,
   onStartRecording,
   onStopRecording,
@@ -32,6 +37,14 @@ export function VoiceCaptureSheet({
 }: VoiceCaptureSheetProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [shouldAutoStart, setShouldAutoStart] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
+
+  // Detect Safari browser for helpful messaging
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isSafariBrowser = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
+    setIsSafari(isSafariBrowser);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -145,26 +158,64 @@ export function VoiceCaptureSheet({
             />
           </div>
 
-          {/* Recording Status */}
-          {isRecording && (
+          {/* Recording/Initializing Status */}
+          {captureState === 'initializing' && (
+            <div className="flex items-center justify-center gap-3 mb-4" data-testid="status-initializing">
+              <Loader2 className="w-4 h-4 text-blue-600 animate-spin motion-reduce:animate-none" />
+              <span className="text-sm font-medium text-blue-600">
+                {isSafari ? 'Initializing microphone...' : 'Getting ready...'}
+              </span>
+            </div>
+          )}
+          
+          {captureState === 'listening' && isRecording && (
             <div className="flex items-center justify-center gap-3 mb-4" data-testid="status-recording">
-              <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-red-600">Recording...</span>
+              <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse motion-reduce:animate-none" />
+              <span className="text-sm font-medium text-red-600">Listening...</span>
+            </div>
+          )}
+          
+          {captureState === 'processing' && (
+            <div className="flex items-center justify-center gap-3 mb-4" data-testid="status-processing">
+              <Loader2 className="w-4 h-4 text-green-600 animate-spin motion-reduce:animate-none" />
+              <span className="text-sm font-medium text-green-600">Processing...</span>
+            </div>
+          )}
+          
+          {captureState === 'error' && (
+            <div className="flex flex-col gap-2 mb-4 p-3 bg-destructive/10 rounded-lg border border-destructive/20" data-testid="status-error">
+              <div className="flex items-center gap-3">
+                <X className="w-4 h-4 text-destructive flex-shrink-0" />
+                <span className="text-sm font-medium text-destructive">
+                  {error || "Microphone error occurred"}
+                </span>
+              </div>
+              {isSafari && error?.toLowerCase().includes('no speech') && (
+                <p className="text-xs text-destructive/80 pl-7">
+                  Safari requires 2-3 seconds to initialize the microphone. Please wait a moment after tapping Record before speaking.
+                </p>
+              )}
             </div>
           )}
 
-          {/* Transcript Input */}
+          {/* Transcript Input with Blinking Cursor */}
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2">
               Task description
             </label>
-            <Textarea
-              value={transcript}
-              onChange={(e) => onTranscriptChange(e.target.value)}
-              placeholder="Speak or type the task details..."
-              className="min-h-[120px] resize-none text-base"
-              data-testid="input-transcript"
-            />
+            <div className="relative">
+              <Textarea
+                value={transcript}
+                onChange={(e) => onTranscriptChange(e.target.value)}
+                placeholder="Speak or type the task details..."
+                className="min-h-[120px] resize-none text-base"
+                data-testid="input-transcript"
+              />
+              {/* Blinking cursor when initializing or listening with no text */}
+              {(captureState === 'initializing' || (captureState === 'listening' && !transcript)) && (
+                <div className="absolute top-3 left-3 w-0.5 h-5 bg-foreground animate-pulse motion-reduce:animate-none motion-reduce:opacity-100" />
+              )}
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -215,8 +266,14 @@ export function VoiceCaptureSheet({
 
           {/* Helper Text */}
           <p className="text-sm text-muted-foreground text-center mt-4">
-            {isRecording 
+            {captureState === 'initializing' 
+              ? (isSafari ? "Please wait 2-3 seconds while Safari initializes the microphone..." : "Preparing microphone...")
+              : captureState === 'listening' && isRecording
               ? "Speak clearly and tap Stop when finished"
+              : captureState === 'processing'
+              ? "Finalizing transcript..."
+              : captureState === 'error'
+              ? "You can type the task manually or tap Record to try again"
               : "Tap Record to add more details or Done to continue"
             }
           </p>

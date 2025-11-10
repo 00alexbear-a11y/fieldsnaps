@@ -2608,6 +2608,8 @@ export default function Camera() {
         thumbnailUrl={currentTodoCapture?.thumbnailUrl || currentTodoCapture?.url || ''}
         transcript={voiceTranscript}
         isRecording={speechRecognition.isListening}
+        captureState={speechRecognition.captureState}
+        error={speechRecognition.error}
         onTranscriptChange={(text) => {
           // Manual edit - just update local state (single source of truth)
           setVoiceTranscript(text);
