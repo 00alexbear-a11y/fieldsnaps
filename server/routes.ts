@@ -6,7 +6,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, insertWaitlistSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema } from "../shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
@@ -1156,6 +1156,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateProject(req.params.id, { lastActivityAt: new Date() });
       
       res.json(project);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get project members for assignment dropdown in to-do creation
+  app.get("/api/projects/:id/members", isAuthenticatedAndWhitelisted, validateUuidParam('id'), cacheMiddleware(120), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // Verify project belongs to user's company
+      if (project.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get all active members of the company (excluding removed users)
+      const members = await storage.getCompanyMembers(user.companyId);
+      
+      // Return simplified member info for dropdown
+      const memberList = members.map(member => ({
+        id: member.id,
+        firstName: member.firstName,
+        lastName: member.lastName,
+        email: member.email,
+        profileImageUrl: member.profileImageUrl,
+      }));
+      
+      res.json(memberList);
     } catch (error: any) {
       handleError(res, error);
     }
@@ -2648,6 +2686,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(todo);
     } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Rate limiter for batch todo creation - prevent abuse
+  const batchTodoRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 30, // Max 30 batch creates per window per user
+    message: 'Too many batch todo requests, please try again later',
+    standardHeaders: true,
+    keyGenerator: (req: any) => req.user?.claims?.sub || 'anonymous',
+  });
+
+  // Batch todo creation for camera-to-do voice sessions
+  app.post("/api/todo-sessions", isAuthenticatedAndWhitelisted, batchTodoRateLimiter, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Validate batch payload
+      const validated = batchTodoSchema.parse(req.body);
+
+      // Create all todos in batch (includes security validation)
+      const todos = await storage.createTodosBatch(user.id, validated);
+
+      res.status(201).json(todos);
+    } catch (error: any) {
+      // Map validation errors to 400, others to 500
+      if (error.message && (
+        error.message.includes('not found') ||
+        error.message.includes('required') ||
+        error.message.includes('exceed') ||
+        error.message.includes('belong') ||
+        error.message.includes('removed')
+      )) {
+        return res.status(400).json({ error: error.message });
+      }
       handleError(res, error);
     }
   });

@@ -473,7 +473,7 @@ export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, creat
 
 // Batch todo creation schema for camera-to-do voice sessions
 export const batchTodoSchema = z.object({
-  projectId: z.string().optional().nullable(),
+  projectId: z.string().min(1), // Required for proper validation
   todos: z.array(
     z.object({
       photoId: z.string(),

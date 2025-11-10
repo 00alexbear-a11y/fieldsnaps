@@ -8,7 +8,8 @@ import type {
   Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
   Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit, ClockEntry,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
-  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit, InsertClockEntry
+  InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit, InsertClockEntry,
+  BatchTodoInput
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -125,6 +126,7 @@ export interface IStorage {
   getTodo(id: string): Promise<ToDo | undefined>;
   getTodos(companyId: string, userId: string, filters?: { projectId?: string; completed?: boolean; flag?: boolean; dueToday?: boolean; view?: 'my-tasks' | 'team-tasks' | 'i-created' | 'flagged' }): Promise<(ToDo & { project?: { id: string; name: string }; photo?: { id: string; url: string }; assignee: { id: string; firstName: string | null; lastName: string | null }; creator: { id: string; firstName: string | null; lastName: string | null } })[]>;
   createTodo(data: InsertToDo): Promise<ToDo>;
+  createTodosBatch(userId: string, data: BatchTodoInput): Promise<ToDo[]>; // Batch creation for camera-to-do voice sessions
   updateTodo(id: string, data: Partial<InsertToDo>): Promise<ToDo | undefined>;
   completeTodo(id: string, userId: string): Promise<ToDo | undefined>;
   toggleTodoFlag(id: string): Promise<ToDo | undefined>;
@@ -1095,6 +1097,121 @@ export class DbStorage implements IStorage {
   async createTodo(data: InsertToDo): Promise<ToDo> {
     const result = await db.insert(todos).values(data).returning();
     return result[0];
+  }
+
+  async createTodosBatch(userId: string, data: BatchTodoInput): Promise<ToDo[]> {
+    // Enforce batch size limit
+    const MAX_BATCH_SIZE = 50;
+    if (data.todos.length === 0) {
+      throw new Error('Batch must contain at least one todo');
+    }
+    if (data.todos.length > MAX_BATCH_SIZE) {
+      throw new Error(`Batch size cannot exceed ${MAX_BATCH_SIZE} todos`);
+    }
+
+    // Require projectId for proper validation
+    if (!data.projectId) {
+      throw new Error('Project ID is required for batch todo creation');
+    }
+
+    // Get user's company for validation
+    const user = await this.getUser(userId);
+    if (!user || !user.companyId) {
+      throw new Error('User must belong to a company to create todos');
+    }
+
+    // Validate project ownership
+    const project = await this.getProject(data.projectId);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    if (project.companyId !== user.companyId) {
+      throw new Error('Project does not belong to your company');
+    }
+
+    // Collect all photoIds and assigneeIds for validation
+    const photoIds = data.todos.map(t => t.photoId).filter(Boolean);
+    const assigneeIds = data.todos.map(t => t.assignedTo).filter(Boolean) as string[];
+
+    // Validate all photos belong to the exact project
+    if (photoIds.length > 0) {
+      const photosResult = await db
+        .select({ id: photos.id, projectId: photos.projectId })
+        .from(photos)
+        .where(inArray(photos.id, photoIds));
+
+      if (photosResult.length !== photoIds.length) {
+        throw new Error('One or more photos not found');
+      }
+
+      // Ensure ALL photos belong to the target project
+      for (const photo of photosResult) {
+        if (photo.projectId !== data.projectId) {
+          throw new Error('All photos must belong to the target project');
+        }
+      }
+    }
+
+    // Validate all assignees belong to the same company and are not removed
+    if (assigneeIds.length > 0) {
+      const assigneesResult = await db
+        .select({ id: users.id, companyId: users.companyId, removedAt: users.removedAt })
+        .from(users)
+        .where(inArray(users.id, assigneeIds));
+
+      if (assigneesResult.length !== assigneeIds.length) {
+        throw new Error('One or more assignees not found');
+      }
+
+      for (const assignee of assigneesResult) {
+        if (assignee.companyId !== user.companyId) {
+          throw new Error('One or more assignees do not belong to your company');
+        }
+        if (assignee.removedAt) {
+          throw new Error('One or more assignees have been removed from the company');
+        }
+      }
+    }
+
+    // Use transaction to ensure data consistency
+    return await db.transaction(async (tx) => {
+      // Transform batch input into insertable todos
+      const todosToInsert: InsertToDo[] = data.todos.map(todo => ({
+        title: todo.title,
+        description: todo.description || null,
+        projectId: data.projectId!,
+        photoId: todo.photoId,
+        assignedTo: todo.assignedTo || null,
+        createdBy: userId,
+        dueDate: todo.dueDate || null,
+        flag: todo.flag || false,
+        completed: false,
+      }));
+
+      // Insert all todos atomically
+      const result = await tx.insert(todos).values(todosToInsert).returning();
+
+      // Create activity logs within same transaction
+      if (result.length > 0) {
+        const activityLogsToInsert = result.map(todo => ({
+          userId,
+          companyId: user.companyId!,
+          action: 'todo_created' as const,
+          entityType: 'todo' as const,
+          entityId: todo.id,
+          metadata: {
+            todoTitle: todo.title,
+            projectId: todo.projectId,
+            assignedTo: todo.assignedTo,
+            batchSize: result.length,
+          },
+        }));
+
+        await tx.insert(activityLogs).values(activityLogsToInsert);
+      }
+
+      return result;
+    });
   }
 
   async updateTodo(id: string, data: Partial<InsertToDo>): Promise<ToDo | undefined> {
