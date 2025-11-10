@@ -2233,7 +2233,7 @@ export default function Camera() {
             <button
               onClick={quickCapture}
               disabled={isCapturing || !selectedProject}
-              className="w-20 h-20 rounded-full bg-blue-600 border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg"
+              className="w-20 h-20 rounded-full bg-blue-600 border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg flex items-center justify-center"
               data-testid="button-capture-todo"
             >
               <CheckSquare className="w-10 h-10 text-white" />
@@ -2824,6 +2824,11 @@ export default function Camera() {
             // Clear session and close review
             todoSession.clearSession();
             setShowSessionReview(false);
+            
+            // Reset camera state to allow new captures
+            setIsCapturing(false);
+            setCurrentTodoCapture(null);
+            setSelectedTodoItemForAnnotation(null);
             
             // Invalidate cache to refresh todos list
             await queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
