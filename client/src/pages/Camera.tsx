@@ -49,6 +49,7 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { ToDoInstructionScreen, useTodoInstructionScreen } from '@/components/ToDoInstructionScreen';
 import { VoiceCaptureSheet } from '@/components/VoiceCaptureSheet';
 import { SessionReviewScreen } from '@/components/SessionReviewScreen';
+import { PhotoAnnotationEditor } from '@/components/PhotoAnnotationEditor';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
   { value: 'quick', label: 'S', description: '200KB - Fast upload' },
@@ -2623,6 +2624,33 @@ export default function Camera() {
           console.log('Save session:', todoSession.items);
         }}
       />
+
+      {/* TODO Mode: Photo Annotation Editor */}
+      {selectedTodoItemForAnnotation && (() => {
+        const item = todoSession.items.find(i => i.id === selectedTodoItemForAnnotation);
+        if (!item) return null;
+        
+        return (
+          <PhotoAnnotationEditor
+            isOpen={true}
+            onClose={() => setSelectedTodoItemForAnnotation(null)}
+            photoUrl={item.photoUrl}
+            photoId={selectedTodoItemForAnnotation}
+            onSave={(annotations) => {
+              todoSession.updateItem(selectedTodoItemForAnnotation, {
+                annotations: annotations,
+              });
+              haptics.light();
+              setSelectedTodoItemForAnnotation(null);
+              toast({
+                title: 'Annotations Saved',
+                description: 'Markup will be included when you save tasks',
+              });
+            }}
+            initialAnnotations={item.annotations}
+          />
+        );
+      })()}
     </div>
   );
 }
