@@ -2214,17 +2214,32 @@ export default function Camera() {
             </button>
           )}
           
-          {/* Utility Button - Tags & To-Do (Liquid Glass) */}
-          {!isAttachMode && (
-            <Sheet>
-              <SheetTrigger asChild>
-                <button
-                  className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/25 active:bg-white/35 transition-all flex items-center justify-center text-white shadow-2xl border border-white/20"
-                  data-testid="button-utility"
-                >
-                  <CheckSquare className="w-5 h-5" />
-                </button>
-              </SheetTrigger>
+          {/* TODO Mode: Review & Save Button */}
+          {cameraMode === 'todo' && !isAttachMode && todoSession.items.length > 0 ? (
+            <button
+              onClick={() => {
+                haptics.light();
+                setShowSessionReview(true);
+              }}
+              className="relative w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transition-all flex flex-col items-center justify-center text-white shadow-2xl border-2 border-white/30"
+              data-testid="button-review-session"
+            >
+              <ListTodo className="w-5 h-5" />
+              <span className="text-[9px] font-bold mt-0.5">{todoSession.items.length}</span>
+            </button>
+          ) : (
+            <>
+              {/* Utility Button - Tags & To-Do (Liquid Glass) */}
+              {!isAttachMode && (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button
+                      className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-xl hover:bg-white/25 active:bg-white/35 transition-all flex items-center justify-center text-white shadow-2xl border border-white/20"
+                      data-testid="button-utility"
+                    >
+                      <CheckSquare className="w-5 h-5" />
+                    </button>
+                  </SheetTrigger>
               <SheetContent side="bottom" className="bg-black/95 backdrop-blur-md border-white/10">
                 <SheetHeader>
                   <SheetTitle className="text-white">Quick Actions</SheetTitle>
@@ -2312,6 +2327,8 @@ export default function Camera() {
                 </div>
               </SheetContent>
             </Sheet>
+              )}
+            </>
           )}
           {isAttachMode && <div className="w-12 h-12" />}
         </div>
