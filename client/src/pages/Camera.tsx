@@ -1442,6 +1442,41 @@ export default function Camera() {
 
       const compressionResult = await photoCompressionWorker.compressPhoto(blob, selectedQuality);
 
+      // TODO Mode: Store photo and open voice sheet instead of saving to project
+      if (cameraMode === 'todo') {
+        const photoUrl = URL.createObjectURL(compressionResult.blob);
+        
+        // Create thumbnail for voice sheet preview
+        const thumbnailCanvas = document.createElement('canvas');
+        const maxThumbSize = 200;
+        const scale = Math.min(maxThumbSize / canvas.width, maxThumbSize / canvas.height);
+        thumbnailCanvas.width = canvas.width * scale;
+        thumbnailCanvas.height = canvas.height * scale;
+        const thumbCtx = thumbnailCanvas.getContext('2d');
+        if (thumbCtx) {
+          thumbCtx.drawImage(canvas, 0, 0, thumbnailCanvas.width, thumbnailCanvas.height);
+        }
+        const thumbnailBlob = await new Promise<Blob>((resolve, reject) => {
+          thumbnailCanvas.toBlob(
+            (b) => (b ? resolve(b) : reject(new Error('Failed to create thumbnail'))),
+            'image/jpeg',
+            0.7
+          );
+        });
+        const thumbnailUrl = URL.createObjectURL(thumbnailBlob);
+
+        setCurrentTodoCapture({
+          blob: compressionResult.blob,
+          url: photoUrl,
+          thumbnailUrl,
+        });
+        
+        haptics.medium();
+        setShowVoiceSheet(true);
+        setIsCapturing(false);
+        return;
+      }
+
       const project = projects.find(p => p.id === selectedProject);
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-');
