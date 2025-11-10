@@ -2516,6 +2516,61 @@ export default function Camera() {
         autoSave={autoSave}
         onAutoSaveChange={setAutoSave}
       />
+
+      {/* TODO Mode: Instruction Screen */}
+      {todoInstruction.shouldShow && (
+        <ToDoInstructionScreen
+          onGetStarted={() => {
+            todoInstruction.markAsShown();
+          }}
+        />
+      )}
+
+      {/* TODO Mode: Voice Capture Sheet */}
+      <VoiceCaptureSheet
+        isOpen={showVoiceSheet}
+        onClose={() => {
+          setShowVoiceSheet(false);
+          setCurrentTodoCapture(null);
+          setVoiceTranscript('');
+        }}
+        thumbnailUrl={currentTodoCapture?.thumbnailUrl || currentTodoCapture?.url}
+        transcript={voiceTranscript}
+        onTranscriptChange={setVoiceTranscript}
+        onDone={() => {
+          if (currentTodoCapture && voiceTranscript.trim()) {
+            todoSession.addItem({
+              photoBlob: currentTodoCapture.blob,
+              photoUrl: currentTodoCapture.url,
+              thumbnailUrl: currentTodoCapture.thumbnailUrl,
+              transcript: voiceTranscript.trim(),
+            });
+            haptics.impact('light');
+            setShowVoiceSheet(false);
+            setCurrentTodoCapture(null);
+            setVoiceTranscript('');
+            toast({
+              title: 'Task Added',
+              description: 'Capture another or review your tasks',
+            });
+          }
+        }}
+        speechRecognition={speechRecognition}
+      />
+
+      {/* TODO Mode: Session Review Screen */}
+      <SessionReviewScreen
+        isOpen={showSessionReview}
+        onBack={() => setShowSessionReview(false)}
+        projectId={selectedProject}
+        onAnnotate={(itemId) => {
+          setSelectedTodoItemForAnnotation(itemId);
+        }}
+        onSave={async () => {
+          // Batch save implementation will be added next
+          console.log('Save session:', todoSession.items);
+        }}
+      />
     </div>
   );
 }
