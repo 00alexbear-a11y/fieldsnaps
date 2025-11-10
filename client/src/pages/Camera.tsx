@@ -77,7 +77,7 @@ interface CameraDevice {
   zoomLevel: 0.5 | 1 | 2 | 3;
 }
 
-type CameraMode = 'photo' | 'video' | 'edit';
+type CameraMode = 'photo' | 'video' | 'edit' | 'todo';
 type CameraFacing = 'environment' | 'user';
 
 export default function Camera() {
@@ -2153,6 +2153,17 @@ export default function Camera() {
             </button>
           )}
           
+          {cameraMode === 'todo' && (
+            <button
+              onClick={quickCapture}
+              disabled={isCapturing || !selectedProject}
+              className="w-20 h-20 rounded-full bg-blue-600 border-4 border-white/30 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 shadow-lg"
+              data-testid="button-capture-todo"
+            >
+              <CheckSquare className="w-10 h-10 text-white" />
+            </button>
+          )}
+          
           {/* Utility Button - Tags & To-Do (Liquid Glass) */}
           {!isAttachMode && (
             <Sheet>
@@ -2295,6 +2306,19 @@ export default function Camera() {
             data-testid="button-mode-edit"
           >
             EDIT
+          </button>
+          <button
+            onClick={() => switchCameraMode('todo')}
+            disabled={isTransitioning || isRecording}
+            aria-pressed={cameraMode === 'todo'}
+            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+              cameraMode === 'todo'
+                ? 'bg-white text-black'
+                : 'text-white/70 hover:text-white/90 active:text-white/95'
+            } disabled:opacity-50`}
+            data-testid="button-mode-todo"
+          >
+            TODO
           </button>
         </div>
       </div>
