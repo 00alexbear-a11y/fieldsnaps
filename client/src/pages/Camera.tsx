@@ -2848,15 +2848,31 @@ export default function Camera() {
         if (!item) return null;
         
         // Convert DB annotations to client Annotation format
-        const clientAnnotations = item.annotations.map(a => ({
-          id: crypto.randomUUID(),
-          type: a.type as "text" | "arrow" | "line" | "circle" | "pen" | "measurement",
-          content: a.content ?? undefined,
-          color: a.color,
-          strokeWidth: a.strokeWidth ?? 4,
-          fontSize: a.fontSize ?? undefined,
-          position: a.position as any,
-        }));
+        // Preserve ALL properties including rotation, scale, feet, inches, etc.
+        const clientAnnotations = item.annotations.map(a => {
+          const position = a.position as any;
+          const annotation: any = {
+            id: crypto.randomUUID(),
+            type: a.type as "text" | "arrow" | "line" | "circle" | "pen" | "measurement",
+            color: a.color,
+            strokeWidth: a.strokeWidth ?? 4,
+            position: position,
+          };
+          
+          // Add optional properties only if they exist
+          if (a.content !== null && a.content !== undefined) annotation.content = a.content;
+          if (a.fontSize !== null && a.fontSize !== undefined) annotation.fontSize = a.fontSize;
+          
+          // Preserve measurement properties (feet/inches) if present in position
+          if (position?.feet !== undefined) annotation.feet = position.feet;
+          if (position?.inches !== undefined) annotation.inches = position.inches;
+          
+          // Preserve transform properties if present in position
+          if (position?.rotation !== undefined) annotation.rotation = position.rotation;
+          if (position?.scale !== undefined) annotation.scale = position.scale;
+          
+          return annotation;
+        });
         
         return (
           <PhotoAnnotationEditor
@@ -2865,16 +2881,30 @@ export default function Camera() {
             existingAnnotations={clientAnnotations}
             onSave={(annotations) => {
               // Convert client Annotation format to DB PhotoAnnotation format
+              // Preserve ALL properties including rotation, scale, feet, inches in position
               todoSession.updateItem(selectedTodoItemForAnnotation, {
-                annotations: annotations.map(a => ({
-                  type: a.type,
-                  content: a.content ?? null,
-                  color: a.color,
-                  strokeWidth: a.strokeWidth,
-                  fontSize: a.fontSize ?? null,
-                  position: a.position,
-                  userId: null,
-                })),
+                annotations: annotations.map(a => {
+                  // Build position object with ALL possible properties
+                  const position: any = { ...a.position };
+                  
+                  // Preserve measurement properties at root level in position if present
+                  if (a.feet !== undefined) position.feet = a.feet;
+                  if (a.inches !== undefined) position.inches = a.inches;
+                  
+                  // Preserve transform properties at root level in position if present
+                  if (a.rotation !== undefined) position.rotation = a.rotation;
+                  if (a.scale !== undefined) position.scale = a.scale;
+                  
+                  return {
+                    type: a.type,
+                    content: a.content ?? null,
+                    color: a.color,
+                    strokeWidth: a.strokeWidth,
+                    fontSize: a.fontSize ?? null,
+                    position: position,
+                    userId: null,
+                  };
+                }),
               });
               haptics.light();
               setSelectedTodoItemForAnnotation(null);
