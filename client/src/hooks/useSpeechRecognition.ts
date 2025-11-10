@@ -55,8 +55,11 @@ declare global {
   }
 }
 
+export type VoiceCaptureState = 'idle' | 'initializing' | 'listening' | 'processing' | 'complete' | 'error';
+
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
+  const [captureState, setCaptureState] = useState<VoiceCaptureState>('idle');
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
@@ -105,6 +108,7 @@ export function useSpeechRecognition() {
     recognition.onstart = () => {
       console.log('[SpeechRecognition] Web Speech Started');
       setIsListening(true);
+      setCaptureState('listening');
       setError(null);
     };
 
@@ -120,6 +124,8 @@ export function useSpeechRecognition() {
 
       if (finalTranscript) {
         setTranscript(prev => (prev + finalTranscript).trim());
+        // Got final result, mark as processing
+        setCaptureState('processing');
       }
     };
 
@@ -137,6 +143,7 @@ export function useSpeechRecognition() {
       
       setError(errorMessages[event.error] || `Error: ${event.error}. Please type manually or try again.`);
       setIsListening(false);
+      setCaptureState('error');
       
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         setPermissionStatus('denied');
@@ -146,6 +153,8 @@ export function useSpeechRecognition() {
     recognition.onend = () => {
       console.log('[SpeechRecognition] Web Speech Ended');
       setIsListening(false);
+      // Only mark complete if we were in an active state - preserve error/idle states
+      setCaptureState(prev => (prev === 'listening' || prev === 'initializing' || prev === 'processing') ? 'complete' : prev);
     };
 
     recognitionRef.current = recognition;
@@ -177,12 +186,14 @@ export function useSpeechRecognition() {
 
   const startListening = useCallback(async () => {
     setError(null);
+    setCaptureState('initializing');
 
     // Request permission if needed
     if (permissionStatus !== 'granted' && isNative) {
       const granted = await requestPermission();
       if (!granted) {
         setError('Microphone permission is required. Please enable it in your device settings.');
+        setCaptureState('error');
         return;
       }
     }
@@ -200,8 +211,10 @@ export function useSpeechRecognition() {
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
           setError('Microphone permission denied. Please allow microphone access in your browser settings.');
           setPermissionStatus('denied');
+          setCaptureState('error');
         } else {
           setError('Could not access microphone. Please check your browser settings.');
+          setCaptureState('error');
         }
         return;
       }
@@ -223,6 +236,7 @@ export function useSpeechRecognition() {
         });
 
         setIsListening(true);
+        setCaptureState('listening');
 
         // Start returns final matches when session ends
         const result = await CapacitorSpeechRecognition.start({
@@ -239,6 +253,7 @@ export function useSpeechRecognition() {
         }
         
         setIsListening(false);
+        setCaptureState('complete');
 
       } catch (err: any) {
         console.error('[SpeechRecognition] Native start failed:', err);
@@ -250,6 +265,7 @@ export function useSpeechRecognition() {
           setError('Failed to start speech recognition. Please type manually or try again.');
         }
         setIsListening(false);
+        setCaptureState('error');
       } finally {
         // Always remove listener when session ends (naturally or via error)
         if (listenerHandle) {
@@ -266,6 +282,7 @@ export function useSpeechRecognition() {
       try {
         setTranscript(''); // Reset on new start  
         setError(null);
+        // State will change to 'listening' when onstart fires
         recognitionRef.current.start();
       } catch (err: any) {
         console.error('[SpeechRecognition] Web start failed:', err);
@@ -277,6 +294,7 @@ export function useSpeechRecognition() {
           setError('Failed to start speech recognition. Please type manually or refresh the page.');
         }
         setIsListening(false);
+        setCaptureState('error');
       }
     }
   }, [isNative, permissionStatus]);
@@ -290,15 +308,19 @@ export function useSpeechRecognition() {
         recognitionRef.current.stop();
       }
       setIsListening(false);
+      // Transition to processing state while waiting for final transcript
+      setCaptureState('processing');
     } catch (err) {
       console.error('[SpeechRecognition] Stop failed:', err);
       setIsListening(false);
+      setCaptureState('error');
     }
   }, [isNative]);
 
   const resetTranscript = useCallback(() => {
     setTranscript('');
     setError(null);
+    setCaptureState('idle');
   }, []);
 
   // Cleanup on unmount
@@ -315,6 +337,7 @@ export function useSpeechRecognition() {
 
   return {
     isListening,
+    captureState,
     transcript,
     error,
     isSupported,
