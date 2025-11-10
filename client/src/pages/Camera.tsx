@@ -2731,16 +2731,22 @@ export default function Camera() {
             try {
               for (const item of todoSession.items) {
                 const formData = new FormData();
-                formData.append('photo', item.photoBlob, `todo-${item.id}.jpg`);
+                formData.append('photo', item.photoBlob, `todo-${item.localId}.jpg`);
                 formData.append('projectId', selectedProject);
                 
-                const response = await apiRequest('/api/photos/upload', {
+                const res = await fetch('/api/photos/upload', {
                   method: 'POST',
                   body: formData,
                 });
                 
+                if (!res.ok) {
+                  throw new Error(`Upload failed: ${res.statusText}`);
+                }
+                
+                const response = await res.json();
+                
                 uploadedPhotos.push({
-                  itemId: item.id,
+                  itemId: item.localId,
                   photoId: response.id,
                   photoUrl: response.url,
                 });
@@ -2756,7 +2762,7 @@ export default function Camera() {
                 try {
                   await Promise.all(
                     uploadedPhotoIds.map(photoId =>
-                      apiRequest(`/api/photos/${photoId}`, { method: 'DELETE' })
+                      apiRequest('DELETE', `/api/photos/${photoId}`)
                         .catch(err => console.error(`Failed to delete photo ${photoId}:`, err))
                     )
                   );
@@ -2776,24 +2782,21 @@ export default function Camera() {
 
             // Build todos array for batch creation
             const todos = todoSession.items.map((item) => {
-              const uploadedPhoto = uploadedPhotos.find(p => p.itemId === item.id);
+              const uploadedPhoto = uploadedPhotos.find(p => p.itemId === item.localId);
               
               return {
                 transcript: item.transcript,
                 photoId: uploadedPhoto?.photoId,
-                assignedToId: item.assignedToId,
+                assignedToId: item.assignedTo,
                 annotations: item.annotations,
               };
             });
 
             // Submit batch todo creation
             try {
-              await apiRequest('/api/todo-sessions', {
-                method: 'POST',
-                body: JSON.stringify({
-                  projectId: selectedProject,
-                  todos,
-                }),
+              await apiRequest('POST', '/api/todo-sessions', {
+                projectId: selectedProject,
+                todos,
               });
             } catch (createError) {
               // Todo creation failed - photos are uploaded but todos not created
@@ -2841,18 +2844,21 @@ export default function Camera() {
 
       {/* TODO Mode: Photo Annotation Editor */}
       {selectedTodoItemForAnnotation && (() => {
-        const item = todoSession.items.find(i => i.id === selectedTodoItemForAnnotation);
+        const item = todoSession.items.find(i => i.localId === selectedTodoItemForAnnotation);
         if (!item) return null;
         
         return (
           <PhotoAnnotationEditor
-            isOpen={true}
-            onClose={() => setSelectedTodoItemForAnnotation(null)}
             photoUrl={item.photoUrl}
             photoId={selectedTodoItemForAnnotation}
+            existingAnnotations={item.annotations}
             onSave={(annotations) => {
               todoSession.updateItem(selectedTodoItemForAnnotation, {
-                annotations: annotations,
+                annotations: annotations.map(a => ({
+                  ...a,
+                  content: a.content ?? null,
+                  userId: null,
+                })),
               });
               haptics.light();
               setSelectedTodoItemForAnnotation(null);
@@ -2861,7 +2867,7 @@ export default function Camera() {
                 description: 'Markup will be included when you save tasks',
               });
             }}
-            initialAnnotations={item.annotations}
+            onCancel={() => setSelectedTodoItemForAnnotation(null)}
           />
         );
       })()}
