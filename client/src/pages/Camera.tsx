@@ -2620,8 +2620,83 @@ export default function Camera() {
           setSelectedTodoItemForAnnotation(itemId);
         }}
         onSave={async () => {
-          // Batch save implementation will be added next
-          console.log('Save session:', todoSession.items);
+          try {
+            haptics.medium();
+            
+            // Validate that we have items to save
+            if (todoSession.items.length === 0) {
+              toast({
+                title: 'No Tasks',
+                description: 'Capture photos and add descriptions first',
+                variant: 'destructive',
+              });
+              return;
+            }
+
+            // Upload all photos to object storage first
+            const uploadedPhotos = await Promise.all(
+              todoSession.items.map(async (item) => {
+                const formData = new FormData();
+                formData.append('photo', item.photoBlob, `todo-${item.id}.jpg`);
+                formData.append('projectId', selectedProject);
+                
+                const response = await apiRequest('/api/photos/upload', {
+                  method: 'POST',
+                  body: formData,
+                });
+                
+                return {
+                  itemId: item.id,
+                  photoId: response.id,
+                  photoUrl: response.url,
+                };
+              })
+            );
+
+            // Build todos array for batch creation
+            const todos = todoSession.items.map((item) => {
+              const uploadedPhoto = uploadedPhotos.find(p => p.itemId === item.id);
+              
+              return {
+                transcript: item.transcript,
+                photoId: uploadedPhoto?.photoId,
+                assignedToId: item.assignedToId,
+                annotations: item.annotations,
+              };
+            });
+
+            // Submit batch todo creation
+            await apiRequest('/api/todo-sessions', {
+              method: 'POST',
+              body: JSON.stringify({
+                projectId: selectedProject,
+                todos,
+              }),
+            });
+
+            haptics.heavy();
+            toast({
+              title: 'Tasks Created',
+              description: `${todoSession.items.length} task${todoSession.items.length > 1 ? 's' : ''} added to project`,
+            });
+
+            // Clear session and close review
+            todoSession.clearSession();
+            setShowSessionReview(false);
+            
+            // Invalidate cache to refresh todos list
+            await queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+            await queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject] });
+            
+          } catch (error) {
+            console.error('Batch save error:', error);
+            haptics.light();
+            toast({
+              title: 'Save Failed',
+              description: error instanceof Error ? error.message : 'Failed to save tasks. Please try again.',
+              variant: 'destructive',
+            });
+          }
         }}
       />
 
