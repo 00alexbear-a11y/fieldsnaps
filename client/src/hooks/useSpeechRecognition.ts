@@ -98,7 +98,7 @@ export function useSpeechRecognition() {
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = false; // Stop after first final result
+    recognition.continuous = true; // Keep listening until explicitly stopped
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
