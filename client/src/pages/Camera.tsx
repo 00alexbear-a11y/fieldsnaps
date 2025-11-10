@@ -44,6 +44,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useMutation } from '@tanstack/react-query';
+import { useTodoSession } from '@/contexts/TodoSessionContext';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { ToDoInstructionScreen, useTodoInstructionScreen } from '@/components/ToDoInstructionScreen';
+import { VoiceCaptureSheet } from '@/components/VoiceCaptureSheet';
+import { SessionReviewScreen } from '@/components/SessionReviewScreen';
 
 const QUALITY_PRESETS: { value: QualityPreset; label: string; description: string }[] = [
   { value: 'quick', label: 'S', description: '200KB - Fast upload' },
@@ -161,6 +166,16 @@ export default function Camera() {
   const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  
+  // TODO mode state and hooks
+  const todoSession = useTodoSession();
+  const speechRecognition = useSpeechRecognition();
+  const todoInstruction = useTodoInstructionScreen();
+  const [currentTodoCapture, setCurrentTodoCapture] = useState<{ blob: Blob; url: string; thumbnailUrl?: string } | null>(null);
+  const [showVoiceSheet, setShowVoiceSheet] = useState(false);
+  const [showSessionReview, setShowSessionReview] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [selectedTodoItemForAnnotation, setSelectedTodoItemForAnnotation] = useState<string | null>(null);
   
   // Swipe gesture refs for session preview overlay
   const previewSwipeStartY = useRef<number | null>(null);
