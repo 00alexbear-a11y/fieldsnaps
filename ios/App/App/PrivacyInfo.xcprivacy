@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Privacy Manifest for FieldSnaps Time Tracking -->
+    <!-- Required by Apple since May 2024 for apps using location data -->
+    
+    <!-- Data Collection -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <!-- Precise Location -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePreciseLocation</string>
+            
+            <!-- Linked to user identity (automatic time tracking for payroll) -->
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            
+            <!-- Not used for tracking across apps/websites -->
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            
+            <!-- Purpose: App Functionality (automatic time tracking) -->
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!-- Tracking (we do NOT track users across apps/websites) -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    
+    <!-- Tracking Domains (none - we don't use third-party trackers) -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    
+    <!-- API Usage -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!-- User Defaults (for local app preferences) -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- CA92.1: Access info from same app -->
+                <string>CA92.1</string>
+            </array>
+        </dict>
+        
+        <!-- File Timestamp (for photo metadata) -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- C617.1: Access files created by the app -->
+                <string>C617.1</string>
+            </array>
+        </dict>
+        
+        <!-- System Boot Time (for tracking uptime analytics) -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- 35F9.1: Measure time between events within the app -->
+                <string>35F9.1</string>
+            </array>
+        </dict>
+        
+        <!-- Disk Space (for checking available storage before photo upload) -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- E174.1: Display available storage to the user -->
+                <string>E174.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
