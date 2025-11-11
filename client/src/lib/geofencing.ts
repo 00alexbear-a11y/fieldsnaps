@@ -72,14 +72,19 @@ export const GEOFENCING_CONFIG = {
   
   // Android specific
   foregroundService: true, // Required for Android 8+
-  notificationTitle: "FieldSnaps Time Tracking",
-  notificationText: "Tracking your work hours",
-  notificationColor: "#4A90E2", // FieldSnaps blue
-  notificationSmallIcon: "mipmap/ic_launcher",
-  notificationLargeIcon: "mipmap/ic_launcher",
-  notificationChannelName: "Time Tracking",
   startOnBoot: true, // Restart tracking after device reboot
   enableHeadless: true, // Allow background operation when app is closed
+  
+  // Android Foreground Service Notification (required for Android 8+)
+  notification: {
+    title: "FieldSnaps Auto Time Tracking",
+    text: "Monitoring your location for automatic clock-in/out",
+    channelName: "Time Tracking Service",
+    color: "#4A90E2", // FieldSnaps brand color
+    smallIcon: "mipmap/ic_launcher",
+    largeIcon: "mipmap/ic_launcher",
+    sticky: true, // Always show notification (full transparency to users)
+  },
   
   // iOS specific
   preventSuspend: true, // Prevent iOS from suspending the app
