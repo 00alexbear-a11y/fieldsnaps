@@ -235,7 +235,7 @@ function AppContent() {
         <div className="flex flex-col flex-1 min-w-0">
           {/* Header with menu button and logo - only shown when sidebar is visible */}
           {shouldShowSidebar && (
-            <header className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
+            <header className="flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
               <div className="flex items-center gap-3">
                 <SidebarTrigger 
                   data-testid="button-sidebar-trigger"

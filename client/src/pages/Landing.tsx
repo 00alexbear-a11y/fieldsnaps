@@ -106,9 +106,9 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-50">
+      <header className="border-b border-border sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-50 pt-safe-3 pb-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between min-h-[44px]">
             <img 
               src={logoPath} 
               alt="FieldSnaps" 
