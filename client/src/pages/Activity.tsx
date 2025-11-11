@@ -195,8 +195,8 @@ export default function Activity() {
           activityCount={activities.length}
         />
         <SidebarInset className="flex flex-col">
-          <div className="sticky top-0 z-10 bg-background border-b border-border">
-            <div className="flex items-center gap-2 px-4 py-4">
+          <div className="sticky top-0 z-10 bg-background border-b border-border pt-safe-3 pb-3">
+            <div className="flex items-center gap-2 px-4">
               <SidebarTrigger data-testid="button-sidebar-toggle" />
               <h1 className="text-2xl font-semibold text-foreground" data-testid="heading-activity">
                 Team Activity

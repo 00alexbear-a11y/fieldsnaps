@@ -94,7 +94,7 @@ export default function SyncBanner() {
   // Success banner (green)
   if (showSuccessBanner) {
     return (
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm animate-in slide-in-from-top overflow-hidden">
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm animate-in slide-in-from-top overflow-hidden pt-safe">
         <div className="h-1 bg-green-600" />
         <div className="px-4 py-1.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export default function SyncBanner() {
   // Offline banner (red)
   if (!isOnline) {
     return (
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden pt-safe">
         <div className="h-1 bg-red-600" />
         <div className="px-4 py-1.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export default function SyncBanner() {
   // Syncing banner (blue) with animated progress bar
   if (isSyncing) {
     return (
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden pt-safe">
         <div className="h-1 bg-primary/20 relative">
           <div 
             className="absolute top-0 left-0 h-full bg-primary animate-[slide-progress_1.5s_ease-in-out_infinite]" 
@@ -147,7 +147,7 @@ export default function SyncBanner() {
 
   // Pending banner (orange)
   return (
-    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden">
+    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm overflow-hidden pt-safe">
       <div className="h-1 bg-orange-600" />
       <div className="px-4 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
