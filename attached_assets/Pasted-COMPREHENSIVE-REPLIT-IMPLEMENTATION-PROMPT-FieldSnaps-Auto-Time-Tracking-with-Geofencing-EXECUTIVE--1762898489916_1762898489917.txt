@@ -1,0 +1,1130 @@
+COMPREHENSIVE REPLIT IMPLEMENTATION PROMPT: FieldSnaps Auto Time Tracking with Geofencing
+EXECUTIVE SUMMARY
+Build a production-ready, automatic time tracking system for FieldSnaps that uses geofencing and motion detection to clock users in/out of construction job sites. This feature must be enterprise-grade, Apple-quality, and pass strict App Store/Play Store compliance for background location tracking.
+
+Key Goals:
+
+Zero manual clock-in friction for contractors
+10-15% battery drain max over 8-hour shift
+Pass iOS/Android store reviews on first submission
+Multi-user company support with role-based permissions
+QuickBooks integration for seamless payroll export
+Professional, Apple-like UI throughout
+1. TECHNICAL ARCHITECTURE
+1.1 Core Technology Stack
+Copy// Required Dependencies
+{
+  "@transistorsoft/capacitor-background-geolocation": "^4.15.3",
+  "@capacitor/geolocation": "^5.0.6",
+  "@supabase/supabase-js": "^2.x",
+  "date-fns": "^2.x" // For timezone handling
+}
+1.2 Database Schema Extensions
+Copy-- New table: geofences
+CREATE TABLE geofences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  company_id UUID REFERENCES companies(id),
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+  radius INTEGER NOT NULL DEFAULT 150, -- meters
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- New table: location_logs
+CREATE TABLE location_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  project_id UUID REFERENCES projects(id),
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+  accuracy DECIMAL(5, 2), -- GPS accuracy in meters
+  battery_level INTEGER, -- 0-100
+  is_moving BOOLEAN,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+-- Extend clockEntries table
+ALTER TABLE clockEntries ADD COLUMN entry_type VARCHAR(20) DEFAULT 'manual';
+-- Options: 'manual', 'geofence_auto', 'geofence_prompted', 'admin_override'
+
+ALTER TABLE clockEntries ADD COLUMN clock_in_lat DECIMAL(10, 8);
+ALTER TABLE clockEntries ADD COLUMN clock_in_lng DECIMAL(11, 8);
+ALTER TABLE clockEntries ADD COLUMN clock_in_accuracy DECIMAL(5, 2);
+
+ALTER TABLE clockEntries ADD COLUMN clock_out_lat DECIMAL(10, 8);
+ALTER TABLE clockEntries ADD COLUMN clock_out_lng DECIMAL(11, 8);
+ALTER TABLE clockEntries ADD COLUMN clock_out_accuracy DECIMAL(5, 2);
+
+-- New table: user_permissions (role-based access control)
+CREATE TABLE user_permissions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  role VARCHAR(20) NOT NULL, -- 'owner', 'admin', 'pm', 'foreman', 'laborer'
+  can_bypass_geofence BOOLEAN DEFAULT false,
+  can_edit_others_time BOOLEAN DEFAULT false,
+  can_approve_timesheets BOOLEAN DEFAULT false,
+  can_manage_projects BOOLEAN DEFAULT false,
+  can_view_all_data BOOLEAN DEFAULT false,
+  assigned_projects UUID[], -- Array of project IDs (for PM/Foreman)
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- New table: time_entry_edits (audit trail)
+CREATE TABLE time_entry_edits (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  clock_entry_id UUID REFERENCES clockEntries(id),
+  edited_by UUID REFERENCES users(id),
+  field_changed VARCHAR(50),
+  old_value TEXT,
+  new_value TEXT,
+  reason TEXT,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+1.3 TransistorSoft Configuration
+Copy// capacitor.config.ts - CRITICAL: Add this to prevent Android tracking issues
+{
+  android: {
+    useLegacyBridge: true // Prevents 5-minute timeout issue
+  }
+}
+
+// BackgroundGeolocation setup
+import BackgroundGeolocation from '@transistorsoft/capacitor-background-geolocation';
+
+const config = {
+  // ===== BATTERY OPTIMIZATION SETTINGS =====
+  desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH, // ~10m accuracy
+  distanceFilter: 50, // Only log location every 50 meters
+  stationaryRadius: 25, // Consider stationary after 25m
+  locationUpdateInterval: 5000, // 5 seconds when moving
+  fastestLocationUpdateInterval: 1000, // Max 1 update/second
+  
+  // ===== MOTION DETECTION (KEY FOR BATTERY SAVING) =====
+  stopTimeout: 5, // Stop tracking after 5 min stationary
+  stopOnStationary: false, // Keep tracking for geofence detection
+  disableMotionActivityUpdates: false, // MUST be false for motion detection
+  activityRecognitionInterval: 10000, // Check motion every 10 seconds
+  minimumActivityRecognitionConfidence: 75, // 75% confidence required
+  
+  // ===== GEOFENCING SETTINGS =====
+  geofenceProximityRadius: 1000, // Activate tracking within 1km of geofences
+  geofenceInitialTriggerEntry: true, // Trigger on first entry
+  
+  // ===== ANDROID SPECIFIC =====
+  foregroundService: true, // REQUIRED for Android background tracking
+  notificationTitle: "FieldSnaps Time Tracking",
+  notificationText: "Tracking your work hours",
+  notificationColor: "#4A90E2", // FieldSnaps blue
+  notificationChannelName: "Time Tracking",
+  startOnBoot: true, // Auto-restart after device reboot
+  enableHeadless: true, // Critical for background operation
+  
+  // ===== iOS SPECIFIC =====
+  preventSuspend: true, // CRITICAL: Prevent iOS from killing process
+  pausesLocationUpdatesAutomatically: false, // Never auto-pause
+  showsBackgroundLocationIndicator: true, // Show blue bar (required by Apple)
+  
+  // ===== POWER SAVING =====
+  disableElasticity: false, // Adjust accuracy based on speed
+  elasticityMultiplier: 3, // Reduce accuracy when moving slowly
+  
+  // ===== LOGGING =====
+  debug: false, // Set to true during development only
+  logLevel: BackgroundGeolocation.LOG_LEVEL_WARNING
+};
+
+await BackgroundGeolocation.ready(config);
+2. iOS APP STORE COMPLIANCE (CRITICAL)
+2.1 Required Files & Permissions
+PrivacyInfo.xcprivacy (NEW - Required since May 2024)
+
+Copy<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryLocation</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>DDA9.1</string> <!-- Active tracking of user's location -->
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
+Info.plist (Location Permission Descriptions)
+
+Copy<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>FieldSnaps needs Always Allow location access to automatically clock you in when you arrive at job sites and clock you out when you leave. This saves you time and ensures accurate timesheets for payroll.</string>
+
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>FieldSnaps uses your location to show nearby job sites and verify you're at the correct location when clocking in.</string>
+
+<key>NSLocationAlwaysUsageDescription</key>
+<string>FieldSnaps tracks your location in the background to automatically clock you in/out at job sites.</string>
+
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+    <string>fetch</string>
+    <string>processing</string>
+</array>
+2.2 App Review Notes (REQUIRED)
+In App Store Connect, under "App Review Information" > "Notes":
+
+BACKGROUND LOCATION JUSTIFICATION:
+
+FieldSnaps is a time tracking app for construction companies. Background location is ESSENTIAL for our core feature: automatic clock-in/clock-out at job sites.
+
+HOW IT WORKS:
+1. Company admins create geofences around construction project locations
+2. When an employee arrives at a job site, the app automatically prompts them to clock in
+3. When they leave, it prompts them to clock out
+4. This eliminates time theft and manual timesheet errors
+
+WHY ALWAYS ALLOW IS REQUIRED:
+- Construction workers move between multiple job sites daily
+- They cannot manually clock in/out each time (hands are dirty, wearing gloves, etc.)
+- GPS verification prevents time theft (buddy punching)
+- Automatic tracking saves 2-3 hours/week per employee
+
+BATTERY OPTIMIZATION:
+- Uses motion detection to only track when moving
+- Average drain: 10-15% over 8-hour shift
+- Respects iOS low power mode
+
+TEST ACCOUNT:
+Email: appreviewer@fieldsnaps.com
+Password: [provide secure password]
+Test company has 3 active geofences set up in Cupertino area
+2.3 Permission Flow (Step-by-Step)
+Copy// Step 1: Request "When In Use" first
+async function requestLocationPermission() {
+  // Show pre-permission dialog explaining why
+  const userConsent = await showDialog({
+    title: "Enable Auto Time Tracking?",
+    message: "FieldSnaps can automatically clock you in when you arrive at job sites. This requires location access.",
+    buttons: ["Not Now", "Enable"]
+  });
+  
+  if (userConsent === "Enable") {
+    // Request When In Use first (iOS requirement)
+    const whenInUse = await Geolocation.requestPermissions();
+    
+    if (whenInUse.location === 'granted') {
+      // Step 2: After user uses app, request Always Allow
+      setTimeout(() => {
+        requestAlwaysAllowUpgrade();
+      }, 3000); // Wait 3 seconds
+    }
+  }
+}
+
+async function requestAlwaysAllowUpgrade() {
+  // Show clear explanation BEFORE system prompt
+  await showDialog({
+    title: "Change to Always Allow",
+    message: "To automatically track your time, please tap 'Change to Always Allow' on the next screen.\n\nThis lets FieldSnaps detect when you arrive at job sites—even when the app is closed.",
+    image: "/assets/always-allow-guide.png"
+  });
+  
+  // Now request Always Allow
+  await BackgroundGeolocation.requestPermission();
+}
+CRITICAL: iOS shows "Still using your location" alert after 3 days. Handle it:
+
+Copy// Remind users every 2 days to prevent surprise
+BackgroundGeolocation.onProviderChange((event) => {
+  if (event.status === BackgroundGeolocation.AUTHORIZATION_STATUS_WHEN_IN_USE) {
+    // User downgraded to When In Use
+    showNotification({
+      title: "Auto tracking paused",
+      body: "Please change location setting back to Always Allow to continue auto time tracking"
+    });
+  }
+});
+3. ANDROID PLAY STORE COMPLIANCE
+3.1 AndroidManifest.xml
+Copy<manifest>
+    <!-- LOCATION PERMISSIONS -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    
+    <!-- FOREGROUND SERVICE (Android 10+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    
+    <!-- BOOT RECEIVER -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <application>
+        <!-- FOREGROUND SERVICE DECLARATION (Android 14+) -->
+        <service
+            android:name="com.transistorsoft.locationmanager.service.TrackingService"
+            android:foregroundServiceType="location"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
+</manifest>
+3.2 Android Permission Flow
+Copy// Android 12+ requires TWO-STEP permission request
+async function requestAndroidPermissions() {
+  // Step 1: Request Foreground Location FIRST
+  const foreground = await Geolocation.requestPermissions();
+  
+  if (foreground.location === 'granted') {
+    // Step 2: Show explanation, then request background
+    await showDialog({
+      title: "Enable Background Location",
+      message: "To automatically track time at job sites, FieldSnaps needs to access your location all the time—even when the app is closed.\n\nTap 'Allow all the time' on the next screen."
+    });
+    
+    // Request background location
+    await BackgroundGeolocation.requestPermission();
+  }
+}
+3.3 Play Store Declaration
+In Google Play Console > "App content" > "Location":
+
+Why does your app need background location?
+
+FieldSnaps is a time tracking app for construction workers. We use background location to automatically detect when employees arrive at and leave job sites, triggering clock-in/clock-out prompts. This eliminates manual time entry and prevents time theft.
+
+Core feature that requires background location:
+- Geofence-based automatic time tracking
+- GPS-verified timesheets for payroll
+- Real-time crew location visibility for project managers
+
+Without background location, users would need to manually clock in/out, defeating the core value proposition of our app.
+4. GEOFENCING IMPLEMENTATION
+4.1 Optimal Geofence Parameters
+Copyinterface GeofenceConfig {
+  radius: 150; // meters - OPTIMAL for construction sites
+  notifyOnEntry: true;
+  notifyOnExit: true;
+  notifyOnDwell: true;
+  loiteringDelay: 120000; // 2 minutes dwell time before triggering
+}
+
+// Why 150m radius?
+// - Too small (50-100m): GPS accuracy issues cause false negatives
+// - Too large (300m+): False positives when driving past site
+// - 150m: Sweet spot for construction sites
+4.2 Geofence Creation (Admin/PM Only)
+Copyasync function createGeofenceForProject(projectId: string, location: {lat: number, lng: number}) {
+  // Add to database
+  const { data: geofence } = await supabase
+    .from('geofences')
+    .insert({
+      project_id: projectId,
+      company_id: currentUser.company_id,
+      latitude: location.lat,
+      longitude: location.lng,
+      radius: 150
+    })
+    .single();
+  
+  // Add to TransistorSoft
+  await BackgroundGeolocation.addGeofence({
+    identifier: geofence.id,
+    radius: 150,
+    latitude: location.lat,
+    longitude: location.lng,
+    notifyOnEntry: true,
+    notifyOnExit: true,
+    notifyOnDwell: true,
+    loiteringDelay: 120000 // 2 minute dwell time
+  });
+  
+  return geofence;
+}
+4.3 Geofence Event Handling
+CopyBackgroundGeolocation.onGeofence(async (event) => {
+  const geofence = event.geofence;
+  const location = event.location;
+  
+  // CRITICAL: Check GPS accuracy before trusting this event
+  if (location.coords.accuracy > 50) {
+    console.log('GPS accuracy too low, ignoring geofence event');
+    return; // Don't trigger if accuracy > 50m
+  }
+  
+  // Get project details
+  const { data: project } = await supabase
+    .from('geofences')
+    .select('*, projects(*)')
+    .eq('id', geofence.identifier)
+    .single();
+  
+  if (event.action === 'ENTER' || event.action === 'DWELL') {
+    // User arrived at job site - show clock-in prompt
+    await showClockInPrompt(project, location);
+  } 
+  else if (event.action === 'EXIT') {
+    // User left job site - show clock-out prompt
+    await showClockOutPrompt(project, location);
+  }
+});
+
+async function showClockInPrompt(project, location) {
+  // Check if already clocked in
+  const { data: activeEntry } = await supabase
+    .from('clockEntries')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .is('clockOutTime', null)
+    .single();
+  
+  if (activeEntry) {
+    // Already clocked in somewhere else - ask to switch projects
+    const response = await showNotification({
+      title: "Switch to " + project.name + "?",
+      body: "You're currently clocked into " + activeEntry.project.name,
+      actions: ["Switch", "Stay"]
+    });
+    
+    if (response === "Switch") {
+      // Clock out of old project, clock into new one
+      await clockOut(activeEntry.id, location);
+      await clockIn(project.id, location, 'geofence_prompted');
+    }
+  } else {
+    // Show simple clock-in notification
+    const response = await showNotification({
+      title: "Clock in to " + project.name + "?",
+      body: "You're at the job site",
+      actions: ["Clock In", "Dismiss"]
+    });
+    
+    if (response === "Clock In") {
+      await clockIn(project.id, location, 'geofence_prompted');
+    }
+  }
+}
+5. ROLE-BASED PERMISSIONS SYSTEM
+5.1 Permission Matrix
+Feature	Owner	Admin	PM	Foreman	Laborer
+View own time	✅	✅	✅	✅	✅
+Clock in/out	✅	✅	✅	✅	✅
+Bypass geofence	✅	✅	❌	❌	❌
+Edit own time	✅	✅	✅	✅	❌
+View team time	✅	✅	✅ (assigned)	✅ (assigned)	❌
+Edit team time	✅	✅	✅ (assigned)	❌	❌
+Approve timesheets	✅	✅	✅ (assigned)	✅ (assigned)	❌
+Create projects	✅	✅	❌	❌	❌
+Manage geofences	✅	✅	✅ (assigned)	❌	❌
+Export payroll	✅	✅	❌	❌	❌
+Manage users	✅	✅	❌	❌	❌
+Billing access	✅	❌	❌	❌	❌
+5.2 Permission Middleware
+Copyasync function checkPermission(userId: string, action: string, resourceId?: string) {
+  const { data: permissions } = await supabase
+    .from('user_permissions')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  
+  switch(action) {
+    case 'edit_others_time':
+      if (!permissions.can_edit_others_time) {
+        throw new Error('Permission denied');
+      }
+      
+      // PM/Foreman can only edit assigned projects
+      if (permissions.role === 'pm' || permissions.role === 'foreman') {
+        const { data: entry } = await supabase
+          .from('clockEntries')
+          .select('project_id')
+          .eq('id', resourceId)
+          .single();
+        
+        if (!permissions.assigned_projects.includes(entry.project_id)) {
+          throw new Error('Not assigned to this project');
+        }
+      }
+      break;
+      
+    case 'bypass_geofence':
+      return permissions.can_bypass_geofence;
+      
+    // ... more cases
+  }
+}
+6. CONTRACTOR-FOCUSED FEATURES
+6.1 Priority Feature List (Based on Research)
+Real-time crew location map - See who's at which job site
+One-tap manual override - Clock in from anywhere if geofence fails
+Travel time tracking - Paid travel between job sites (toggle on/off)
+Late arrival alerts - Notify PM when crew doesn't clock in by 7:30am
+Photo-time linking - Automatically associate photos with active time entry
+Offline mode - Queue clock-ins when no internet, sync later
+Weekly time summary - Push notification every Sunday with hours worked
+Dispute system - Flag incorrect auto clock-outs for review
+6.2 Manual Override Feature
+Copy// Allow manual clock-in when geofence isn't working
+async function manualClockIn(projectId: string) {
+  const location = await Geolocation.getCurrentPosition();
+  
+  // Calculate distance to project geofence
+  const distance = calculateDistance(
+    location.coords,
+    project.geofence
+  );
+  
+  if (distance > 500) {
+    // Far from job site - require reason
+    const reason = await showDialog({
+      title: "You're far from the job site",
+      message: `You're ${Math.round(distance)}m away from ${project.name}. Why are you clocking in manually?`,
+      input: "text",
+      buttons: ["Cancel", "Clock In Anyway"]
+    });
+    
+    if (reason) {
+      await clockIn(projectId, location, 'manual', reason);
+    }
+  } else {
+    // Close enough, allow it
+    await clockIn(projectId, location, 'manual');
+  }
+}
+7. DATA EXPORT & QUICKBOOKS INTEGRATION
+7.1 CSV Export Format
+Copyasync function exportTimesheets(
+  startDate: Date,
+  endDate: Date,
+  format: 'csv' | 'excel' | 'quickbooks_iif' | 'adp'
+) {
+  const { data: entries } = await supabase
+    .from('clockEntries')
+    .select(`
+      *,
+      user:users(first_name, last_name, email),
+      project:projects(name, code)
+    `)
+    .gte('clockInTime', startDate.toISOString())
+    .lte('clockInTime', endDate.toISOString());
+  
+  // Calculate hours worked
+  const rows = entries.map(entry => ({
+    'Employee Name': `${entry.user.first_name} ${entry.user.last_name}`,
+    'Employee Email': entry.user.email,
+    'Project': entry.project.name,
+    'Project Code': entry.project.code,
+    'Date': format(entry.clockInTime, 'yyyy-MM-dd'),
+    'Clock In': format(entry.clockInTime, 'HH:mm:ss'),
+    'Clock Out': entry.clockOutTime ? format(entry.clockOutTime, 'HH:mm:ss') : '',
+    'Total Hours': calculateHours(entry.clockInTime, entry.clockOutTime),
+    'Entry Type': entry.entry_type,
+    'Clock In Location': `${entry.clock_in_lat},${entry.clock_in_lng}`,
+    'Clock Out Location': entry.clock_out_lat ? `${entry.clock_out_lat},${entry.clock_out_lng}` : '',
+    'GPS Accuracy (m)': entry.clock_in_accuracy
+  }));
+  
+  if (format === 'csv') {
+    return convertToCSV(rows);
+  } else if (format === 'quickbooks_iif') {
+    return convertToQuickBooksIIF(rows);
+  }
+  // ... other formats
+}
+7.2 QuickBooks Time API Integration (Optional - Premium Feature)
+Copy// OAuth 2.0 authentication
+async function connectQuickBooks() {
+  const authUrl = `https://appcenter.intuit.com/connect/oauth2?
+    client_id=${QB_CLIENT_ID}&
+    redirect_uri=${REDIRECT_URI}&
+    response_type=code&
+    scope=com.intuit.quickbooks.accounting`;
+  
+  // Open OAuth flow
+  const { code } = await Browser.open({ url: authUrl });
+  
+  // Exchange code for access token
+  const tokens = await fetch('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', {
+    method: 'POST',
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: REDIRECT_URI
+    }),
+    headers: {
+      'Authorization': `Basic ${btoa(QB_CLIENT_ID + ':' + QB_CLIENT_SECRET)}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  }).then(r => r.json());
+  
+  // Store tokens securely
+  await supabase
+    .from('integrations')
+    .upsert({
+      company_id: currentUser.company_id,
+      provider: 'quickbooks',
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires_at: Date.now() + (tokens.expires_in * 1000)
+    });
+}
+
+// Sync timesheets to QuickBooks Time
+async function syncToQuickBooks(weekStartDate: Date) {
+  const { data: entries } = await supabase
+    .from('clockEntries')
+    .select('*, user:users(*), project:projects(*)')
+    .gte('clockInTime', weekStartDate.toISOString())
+    .lt('clockInTime', addDays(weekStartDate, 7).toISOString());
+  
+  // Get QuickBooks access token
+  const { data: integration } = await supabase
+    .from('integrations')
+    .select('*')
+    .eq('provider', 'quickbooks')
+    .single();
+  
+  // Create timesheet entries in QuickBooks
+  for (const entry of entries) {
+    await fetch(`https://api.quickbooks.com/v3/company/${REALM_ID}/timeactivity`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${integration.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        NameOf: 'Employee',
+        EmployeeRef: {
+          value: entry.user.quickbooks_id
+        },
+        ItemRef: {
+          value: entry.project.quickbooks_jobcode
+        },
+        TxnDate: format(entry.clockInTime, 'yyyy-MM-dd'),
+        StartTime: format(entry.clockInTime, 'HH:mm:ss'),
+        EndTime: format(entry.clockOutTime, 'HH:mm:ss')
+      })
+    });
+  }
+}
+8. APPLE-LIKE UI DESIGN
+8.1 Design Principles
+Copy// Design Tokens
+$primary-color: #4A90E2; // FieldSnaps blue
+$background: #FFFFFF;
+$surface: #F8F9FA;
+$text-primary: #1A1A1A;
+$text-secondary: #6C757D;
+$success: #28A745;
+$error: #DC3545;
+
+// Typography
+$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+$heading-large: 34px;
+$heading-medium: 28px;
+$heading-small: 20px;
+$body-large: 17px;
+$body: 15px;
+$caption: 13px;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+// Touch Targets
+$touch-target-min: 44px; // iOS minimum
+8.2 Auto Tracking Screen Design
+Copy// Main Time Tracking Screen
+<Screen>
+  {/* Hero Section - Current Status */}
+  <StatusCard elevated={true} padding={$spacing-lg}>
+    {activeEntry ? (
+      <>
+        <Badge color={$success}>Clocked In</Badge>
+        <Heading size="large" weight="semibold" marginTop={$spacing-sm}>
+          {activeEntry.project.name}
+        </Heading>
+        <ElapsedTime startTime={activeEntry.clockInTime} />
+        <Button
+          size="large"
+          variant="secondary"
+          onPress={() => manualClockOut()}
+          marginTop={$spacing-lg}
+        >
+          Clock Out
+        </Button>
+      </>
+    ) : (
+      <>
+        <Icon name="check-circle" size={48} color={$text-secondary} />
+        <Heading size="medium" marginTop={$spacing-md}>
+          Auto tracking enabled
+        </Heading>
+        <Text color={$text-secondary} align="center">
+          You'll be notified when you arrive at a job site
+        </Text>
+      </>
+    )}
+  </StatusCard>
+
+  {/* Nearby Projects List */}
+  <SectionHeader marginTop={$spacing-xl}>
+    Nearby Job Sites
+  </SectionHeader>
+  
+  {nearbyProjects.map(project => (
+    <ProjectCard key={project.id}>
+      <ProjectName>{project.name}</ProjectName>
+      <Distance>{project.distance}m away</Distance>
+      <Button
+        variant="ghost"
+        onPress={() => manualClockIn(project.id)}
+      >
+        Clock In Manually
+      </Button>
+    </ProjectCard>
+  ))}
+
+  {/* This Week Summary */}
+  <SectionHeader marginTop={$spacing-xl}>
+    This Week
+  </SectionHeader>
+  
+  <WeeklySummaryCard>
+    <StatItem>
+      <StatValue>{weekHours}h</StatValue>
+      <StatLabel>Total Hours</StatLabel>
+    </StatItem>
+    <StatItem>
+      <StatValue>{projectCount}</StatValue>
+      <StatLabel>Projects</StatLabel>
+    </StatItem>
+  </WeeklySummaryCard>
+</Screen>
+8.3 Permission Prompt Screen
+Copy<OnboardingScreen>
+  <Image src="/assets/geofence-illustration.png" />
+  
+  <Heading size="large" align="center">
+    Never forget to clock in again
+  </Heading>
+  
+  <Text align="center" color={$text-secondary} marginTop={$spacing-md}>
+    FieldSnaps automatically tracks your time at job sites using your location—even when the app is closed.
+  </Text>
+  
+  <FeatureList marginTop={$spacing-xl}>
+    <Feature>
+      <Icon name="clock" />
+      <FeatureText>
+        <Strong>Save 2-3 hours per week</Strong>
+        <br />
+        No more manual time entries
+      </FeatureText>
+    </Feature>
+    
+    <Feature>
+      <Icon name="battery" />
+      <FeatureText>
+        <Strong>Battery efficient</Strong>
+        <br />
+        Uses motion detection to minimize drain
+      </FeatureText>
+    </Feature>
+    
+    <Feature>
+      <Icon name="shield" />
+      <FeatureText>
+        <Strong>Private and secure</Strong>
+        <br />
+        Only tracked during work hours
+      </FeatureText>
+    </Feature>
+  </FeatureList>
+  
+  <Button
+    size="large"
+    variant="primary"
+    onPress={() => requestLocationPermission()}
+    marginTop={$spacing-xl}
+  >
+    Enable Auto Tracking
+  </Button>
+  
+  <TextButton onPress={() => skipOnboarding()}>
+    I'll clock in manually
+  </TextButton>
+</OnboardingScreen>
+9. TESTING & QUALITY ASSURANCE
+9.1 Pre-Launch Testing Checklist
+iOS Testing:
+
+ Test on iPhone 12+, iOS 15+
+ Verify blue status bar appears when tracking in background
+ Test permission flow: When In Use → Always Allow
+ Verify geofence triggers after 3-day permission prompt
+ Test with Low Power Mode enabled
+ Verify tracking survives app force-quit
+ Test battery drain over 8-hour period (<15%)
+ Verify Privacy Manifest is included
+Android Testing:
+
+ Test on Android 11, 12, 13, 14
+ Verify persistent notification appears
+ Test two-step permission flow
+ Verify tracking after device reboot
+ Test with battery optimization enabled/disabled
+ Verify foreground service survives app swipe-away
+ Test on Huawei/Samsung devices (aggressive battery management)
+Geofence Accuracy Testing:
+
+ Test with 100m, 150m, 200m radius - verify 150m is optimal
+ Test entry/exit triggers with 2-minute dwell time
+ Verify GPS accuracy filtering (<50m threshold)
+ Test false positive rate (driving past job site)
+ Test in poor GPS conditions (tall buildings, trees)
+Permission & Compliance:
+
+ iOS: Submit test build, verify no rejection for background location
+ Android: Complete Play Store declaration form
+ Verify GDPR consent flow for EU users
+ Test data deletion (user requests data removal)
+9.2 Known Issues & Solutions
+Issue	Platform	Solution
+Tracking stops after 5 min	Android	Set useLegacyBridge: true in capacitor.config
+IncompatibleClassChangeError	Android	Match @capacitor/geolocation version with play-services-location
+Blue bar annoying users	iOS	Cannot remove (Apple requirement), educate users it's normal
+Permission revoked after 3 days	iOS	Send reminder notifications, show in-app alert
+Geofence triggers late	Both	Increase geofenceProximityRadius to 1000m
+Battery drain > 20%	Both	Verify stopTimeout: 5 and motion detection is enabled
+10. IMPLEMENTATION TIMELINE
+Phase 1: Foundation (Week 1-2)
+ Install TransistorSoft plugin ($299 license purchase)
+ Set up database schema (geofences, location_logs, permissions)
+ Configure TransistorSoft with battery optimization settings
+ Implement basic geofence CRUD (create, read, update, delete)
+Phase 2: iOS Compliance (Week 3)
+ Create PrivacyInfo.xcprivacy manifest
+ Write permission flow (When In Use → Always Allow)
+ Design permission education screens
+ Test on iOS 15, 16, 17
+Phase 3: Android Compliance (Week 4)
+ Update AndroidManifest.xml with foreground service
+ Implement two-step permission flow
+ Design persistent notification
+ Test on Android 11-14
+Phase 4: Core Features (Week 5-6)
+ Implement geofence event handlers
+ Build clock-in/out prompt UI
+ Add manual override feature
+ Create weekly time summary
+Phase 5: Role-Based Permissions (Week 7)
+ Implement permission middleware
+ Build admin dashboard for role assignment
+ Add audit trail for time edits
+ Test permission boundaries
+Phase 6: Data Export & QuickBooks (Week 8)
+ Build CSV/Excel export
+ Implement QuickBooks OAuth flow (optional)
+ Create payroll report templates
+ Test export with sample data
+Phase 7: UI Polish (Week 9)
+ Implement Apple-like design system
+ Build onboarding flow
+ Add animations and loading states
+ Accessibility audit (VoiceOver, TalkBack)
+Phase 8: Testing & Launch (Week 10)
+ Complete QA checklist
+ Beta test with 10 real users
+ Submit to App Store & Play Store
+ Monitor first 100 installs for crashes
+11. EDGE CASES & ERROR HANDLING
+11.1 Critical Edge Cases
+Copy// Edge Case 1: User clocked in, phone dies
+// Solution: Auto clock-out after 12 hours
+async function handleStaleClockEntry() {
+  const { data: staleEntries } = await supabase
+    .from('clockEntries')
+    .select('*')
+    .is('clockOutTime', null)
+    .lt('clockInTime', subHours(new Date(), 12));
+  
+  for (const entry of staleEntries) {
+    await supabase
+      .from('clockEntries')
+      .update({
+        clockOutTime: addHours(entry.clockInTime, 10), // Assume 10-hour shift
+        entry_type: 'auto_corrected',
+        notes: 'Auto-corrected: No clock out detected within 12 hours'
+      })
+      .eq('id', entry.id);
+  }
+}
+
+// Edge Case 2: Overlapping geofences (2 job sites close together)
+// Solution: Always prefer currently clocked-in project
+BackgroundGeolocation.onGeofence((event) => {
+  if (event.action === 'ENTER') {
+    // Check if already clocked in to a different nearby project
+    if (activeEntry && activeEntry.project_id !== event.geofence.identifier) {
+      // Don't auto-switch, just notify
+      showNotification({
+        title: "Entered " + newProject.name,
+        body: "Still clocked into " + activeEntry.project.name + ". Tap to switch.",
+        data: { newProjectId: newProject.id }
+      });
+      return; // Don't auto clock-in
+    }
+  }
+});
+
+// Edge Case 3: Geofence triggers while user is passenger in car
+// Solution: Require 2-minute dwell time before prompting
+// Already handled by loiteringDelay: 120000 in config
+
+// Edge Case 4: User crosses into geofence at midnight
+// Solution: Split into two separate clock entries
+async function clockIn(projectId, location, type) {
+  const now = new Date();
+  const midnightToday = startOfDay(now);
+  
+  if (lastEntry && lastEntry.clockInTime < midnightToday && !lastEntry.clockOutTime) {
+    // Clock out previous entry at 11:59:59 PM
+    await clockOut(lastEntry.id, null, subSeconds(midnightToday, 1));
+    
+    // Clock in new entry at 12:00:00 AM
+    await createClockEntry(projectId, midnightToday, location, type);
+  } else {
+    await createClockEntry(projectId, now, location, type);
+  }
+}
+
+// Edge Case 5: GPS accuracy suddenly drops to 500m
+// Solution: Ignore all location updates until accuracy improves
+let lastKnownGoodLocation = null;
+
+BackgroundGeolocation.onLocation((location) => {
+  if (location.coords.accuracy < 50) {
+    lastKnownGoodLocation = location;
+    processLocationUpdate(location);
+  } else {
+    console.log(`GPS accuracy too low (${location.coords.accuracy}m), using last known good location`);
+    // Use lastKnownGoodLocation for UI, but don't trigger geofence events
+  }
+});
+12. PRIVACY & LEGAL COMPLIANCE
+12.1 GDPR Compliance (EU Users)
+Copy// Required consent flow for EU users
+async function showGDPRConsent() {
+  const userCountry = await detectUserCountry();
+  
+  if (EU_COUNTRIES.includes(userCountry)) {
+    const consent = await showDialog({
+      title: "Location Data Consent",
+      message: `
+FieldSnaps will collect your location data for automatic time tracking. 
+
+WHAT WE COLLECT:
+- Your GPS coordinates when entering/leaving job sites
+- Timestamps of your arrivals and departures
+- Battery level and motion activity
+
+WHY WE COLLECT IT:
+- To automatically clock you in/out at job sites
+- To generate accurate timesheets for payroll
+- To verify you were at the correct location
+
+WHO CAN SEE IT:
+- Your company administrators
+- Project managers assigned to your projects
+- Payroll processors (for timesheet verification)
+
+HOW LONG WE KEEP IT:
+- Location logs: 90 days
+- Timesheet data: 2 years (tax requirement)
+
+YOUR RIGHTS:
+- Request deletion of your data at any time
+- Export your data in CSV format
+- Opt out (requires manual time tracking)
+
+By tapping "I Consent", you agree to this data collection.
+      `,
+      buttons: ["I Do Not Consent", "I Consent"]
+    });
+    
+    if (consent !== "I Consent") {
+      // User declined - disable auto tracking
+      await updateUserSettings({ autoTrackingEnabled: false });
+      return false;
+    }
+    
+    // Log consent
+    await supabase.from('user_consents').insert({
+      user_id: currentUser.id,
+      consent_type: 'location_tracking',
+      consented_at: new Date(),
+      ip_address: await getIPAddress(),
+      user_agent: navigator.userAgent
+    });
+  }
+  
+  return true;
+}
+
+// Data deletion request (GDPR Right to be Forgotten)
+async function deleteUserLocationData(userId: string) {
+  // Delete location logs
+  await supabase.from('location_logs').delete().eq('user_id', userId);
+  
+  // Anonymize clock entries (keep for payroll, but remove GPS data)
+  await supabase
+    .from('clockEntries')
+    .update({
+      clock_in_lat: null,
+      clock_in_lng: null,
+      clock_out_lat: null,
+      clock_out_lng: null,
+      notes: 'Location data deleted per user request'
+    })
+    .eq('user_id', userId);
+}
+12.2 Privacy Policy Update
+Add this section to your privacy policy:
+
+AUTOMATIC TIME TRACKING WITH LOCATION DATA
+
+FieldSnaps uses your device's location to automatically track your work hours at job sites.
+
+What location data we collect:
+- GPS coordinates (latitude/longitude)
+- Timestamp of location check
+- GPS accuracy radius (in meters)
+- Battery level at time of location check
+- Motion activity status (stationary, walking, driving)
+
+When we collect it:
+- When you enter a job site geofence (virtual boundary)
+- When you exit a job site geofence
+- Periodically while you're clocked into a job site (every 5-10 minutes)
+- Only during hours you've designated as "work hours" (default 6 AM - 8 PM)
+
+How we use it:
+- To automatically clock you in when you arrive at job sites
+- To automatically clock you out when you leave
+- To generate GPS-verified timesheets for payroll processing
+- To show real-time crew location to project managers
+
+Who can see it:
+- Company administrators
+- Project managers assigned to your projects
+- You can view your own location history
+
+We DO NOT:
+- Track your location outside of work hours (unless you manually override)
+- Share your location with third parties
+- Use your location for advertising or marketing
+- Track your location when you're not clocked in (unless within 1km of a job site)
+
+How to opt out:
+- Go to Settings > Auto Tracking > Disable
+- You can still use FieldSnaps with manual clock-in/out
+
+Data retention:
+- Location logs: Deleted after 90 days
+- Clock-in/out coordinates: Kept for 2 years (for payroll audit compliance)
+
+Your rights:
+- Request deletion of your location data
+- Export your location history as CSV
+- Revoke location permissions (will disable auto tracking)
+13. SUCCESS METRICS
+Track these KPIs after launch:
+
+Adoption Rate: % of users who enable auto tracking (target: >80%)
+Permission Grant Rate: % who grant Always Allow (target: >70%)
+Battery Drain: Average % drain over 8-hour shift (target: <15%)
+Geofence Accuracy: % of triggers that are correct (target: >95%)
+Time Saved: Average minutes saved per user per week (target: >120 min)
+App Store Rating: Maintain 4.5+ stars
+Crash-Free Sessions: Target >99.5%
+Permission Retention: % still using Always Allow after 30 days (target: >60%)
+14. POST-LAUNCH MONITORING
+14.1 Firebase Crashlytics Events
+Copy// Log critical events for monitoring
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
+
+// Track geofence accuracy
+BackgroundGeolocation.onGeofence((event) => {
+  FirebaseCrashlytics.log({
+    message: 'Geofence triggered',
+    params: {
+      action: event.action,
+      accuracy: event.location.coords.accuracy,
+      project_id: event.geofence.identifier
+    }
+  });
+  
+  // Alert if accuracy is concerning
+  if (event.location.coords.accuracy > 100) {
+    FirebaseCrashlytics.recordException({
+      message: 'Low GPS accuracy geofence trigger',
+      accuracy: event.location.coords.accuracy
+    });
+  }
+});
+
+// Track permission changes
+BackgroundGeolocation.onProviderChange((event) => {
+  FirebaseCrashlytics.log({
+    message: 'Location permission changed',
+    params: {
+      status: event.status,
+      platform: Capacitor.getPlatform()
+    }
+  });
+});
+
+// Track battery drain
+setInterval(async () => {
+  const battery = await Device.getBatteryInfo();
+  
+  if (battery.batteryLevel < 20 && isTracking) {
+    FirebaseCrashlytics.log({
+      message: 'Low battery while tracking',
+      params: {
+        level: battery.batteryLevel,
+        tracking_duration: getTrackingDuration()
+      }
+    });
+  }
+}, 300000); // Every 5 minutes
+15. FALLBACK PLAN (If Geofencing Fails)
+If after 2 weeks of beta testing, geofencing proves unreliable:
+
+Plan B: Bluetooth Beacon-Based Tracking
+
+Install $30 Bluetooth beacons at job site trailers
+App detects beacon proximity (more reliable than GPS)
+Still automatic, but requires hardware investment
+Plan C: NFC Tag Check-In
+
+Mount NFC stickers at job site entrances ($2 each)
+Tap phone to clock in/out
+Still eliminates time theft, but requires physical action
+FINAL NOTES
+This implementation will take approximately 10 weeks with one full-time developer. The most critical success factors are:
+
+Pass App Store review on first try - Follow iOS compliance section exactly
+Battery efficiency - Use motion detection settings exactly as specified
+User education - Clearly explain why Always Allow is needed
+Geofence tuning - Start with 150m radius, adjust based on data
+Permission retention - Send proactive reminders when iOS prompts to revoke

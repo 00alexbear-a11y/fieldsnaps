@@ -442,6 +442,16 @@ export const clockEntries = pgTable("clock_entries", {
   timestamp: timestamp("timestamp").defaultNow().notNull(), // When the action occurred
   location: text("location"), // Optional GPS location or address
   notes: text("notes"), // Optional notes (e.g., "arrived early", "extended lunch")
+  
+  // GPS verification for auto time tracking (NEW)
+  entryMethod: varchar("entry_method", { length: 30 }).default("manual"), // 'manual', 'geofence_notification', 'geofence_auto', 'admin_override'
+  clockInLatitude: text("clock_in_latitude"),
+  clockInLongitude: text("clock_in_longitude"),
+  clockInAccuracy: integer("clock_in_accuracy"), // meters
+  clockOutLatitude: text("clock_out_latitude"),
+  clockOutLongitude: text("clock_out_longitude"),
+  clockOutAccuracy: integer("clock_out_accuracy"), // meters
+  
   editedBy: varchar("edited_by").references(() => users.id, { onDelete: "set null" }), // Supervisor who edited (if applicable)
   editReason: text("edit_reason"), // Why the time was adjusted
   originalTimestamp: timestamp("original_timestamp"), // Original time before edit (for audit trail)
@@ -455,6 +465,75 @@ export const clockEntries = pgTable("clock_entries", {
   index("idx_clock_entries_user_timestamp").on(table.userId, table.timestamp.desc()),
   // Composite index for filtered timesheet queries
   index("idx_clock_entries_company_project_time").on(table.companyId, table.projectId, table.timestamp.desc()),
+]);
+
+// Geofences table - virtual boundaries around job sites for auto time tracking
+export const geofences = pgTable("geofences", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  latitude: text("latitude").notNull(), // Matches projects.latitude type
+  longitude: text("longitude").notNull(), // Matches projects.longitude type
+  radius: integer("radius").default(150).notNull(), // meters (500ft default, configurable per project)
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_geofences_project_id").on(table.projectId),
+  index("idx_geofences_company_id").on(table.companyId),
+  index("idx_geofences_active").on(table.isActive),
+]);
+
+// Location Logs table - 5-minute location pings when clocked in
+export const locationLogs = pgTable("location_logs", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }),
+  latitude: text("latitude").notNull(),
+  longitude: text("longitude").notNull(),
+  accuracy: integer("accuracy"), // GPS accuracy in meters
+  batteryLevel: integer("battery_level"), // 0-100
+  isMoving: boolean("is_moving"), // Detected by accelerometer
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => [
+  index("idx_location_logs_user_id").on(table.userId),
+  index("idx_location_logs_project_id").on(table.projectId),
+  index("idx_location_logs_timestamp").on(table.timestamp.desc()),
+  // Composite index for user location history queries
+  index("idx_location_logs_user_timestamp").on(table.userId, table.timestamp.desc()),
+]);
+
+// User Permissions table - role-based access control for time tracking
+export const userPermissions = pgTable("user_permissions", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  role: varchar("role", { length: 20 }).notNull(), // 'admin', 'pm', 'foreman', 'laborer'
+  canBypassGeofence: boolean("can_bypass_geofence").default(false).notNull(),
+  canEditOthersTime: boolean("can_edit_others_time").default(false).notNull(),
+  canApproveTimesheets: boolean("can_approve_timesheets").default(false).notNull(),
+  canManageProjects: boolean("can_manage_projects").default(false).notNull(),
+  canViewAllData: boolean("can_view_all_data").default(false).notNull(),
+  assignedProjects: text("assigned_projects").array(), // Array of project IDs for PM/Foreman
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_user_permissions_user_id").on(table.userId),
+  index("idx_user_permissions_role").on(table.role),
+]);
+
+// Time Entry Edits table - audit trail for time modifications
+export const timeEntryEdits = pgTable("time_entry_edits", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  clockEntryId: varchar("clock_entry_id").notNull().references(() => clockEntries.id, { onDelete: "cascade" }),
+  editedBy: varchar("edited_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  fieldChanged: varchar("field_changed", { length: 50 }).notNull(),
+  oldValue: text("old_value"),
+  newValue: text("new_value"),
+  reason: text("reason"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => [
+  index("idx_time_entry_edits_clock_entry_id").on(table.clockEntryId),
+  index("idx_time_entry_edits_edited_by").on(table.editedBy),
+  index("idx_time_entry_edits_timestamp").on(table.timestamp.desc()),
 ]);
 
 // Zod schemas for validation
@@ -504,6 +583,12 @@ export const insertProjectVisitSchema = createInsertSchema(projectVisits).omit({
 export const insertClockEntrySchema = createInsertSchema(clockEntries).omit({ id: true, createdAt: true }).extend({
   projectId: z.string().optional().nullable(), // Optional for legacy entries and travel time
 });
+
+// Auto time tracking schemas (NEW)
+export const insertGeofenceSchema = createInsertSchema(geofences).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertLocationLogSchema = createInsertSchema(locationLogs).omit({ id: true, timestamp: true });
+export const insertUserPermissionSchema = createInsertSchema(userPermissions).omit({ id: true, createdAt: true });
+export const insertTimeEntryEditSchema = createInsertSchema(timeEntryEdits).omit({ id: true, timestamp: true });
 
 // TypeScript types
 export type Company = typeof companies.$inferSelect;
@@ -555,6 +640,16 @@ export type ProjectVisit = typeof projectVisits.$inferSelect;
 export type InsertProjectVisit = z.infer<typeof insertProjectVisitSchema>;
 export type ClockEntry = typeof clockEntries.$inferSelect;
 export type InsertClockEntry = z.infer<typeof insertClockEntrySchema>;
+
+// Auto time tracking types (NEW)
+export type Geofence = typeof geofences.$inferSelect;
+export type InsertGeofence = z.infer<typeof insertGeofenceSchema>;
+export type LocationLog = typeof locationLogs.$inferSelect;
+export type InsertLocationLog = z.infer<typeof insertLocationLogSchema>;
+export type UserPermission = typeof userPermissions.$inferSelect;
+export type InsertUserPermission = z.infer<typeof insertUserPermissionSchema>;
+export type TimeEntryEdit = typeof timeEntryEdits.$inferSelect;
+export type InsertTimeEntryEdit = z.infer<typeof insertTimeEntryEditSchema>;
 
 // Annotation types for frontend
 export interface Annotation {
