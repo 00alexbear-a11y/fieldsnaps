@@ -2643,7 +2643,7 @@ export default function Camera() {
             console.error('Speech recognition reset failed:', error);
           }
         }}
-        onDone={() => {
+        onDone={async () => {
           try {
             if (speechRecognition.isListening) {
               speechRecognition.stopListening();
@@ -2654,26 +2654,94 @@ export default function Camera() {
             // Use voiceTranscript as single source of truth
             const finalTranscript = voiceTranscript.trim();
             
-            if (currentTodoCapture && finalTranscript) {
-              todoSession.addItem({
-                photoBlob: currentTodoCapture.blob,
-                photoUrl: currentTodoCapture.url,
-                thumbnailUrl: currentTodoCapture.thumbnailUrl,
-                transcript: finalTranscript,
-                annotations: [],
-              });
-              haptics.light();
-              toast({
-                title: 'Task Added',
-                description: 'Capture another or review your tasks',
-              });
+            if (!currentTodoCapture || !finalTranscript) {
+              setShowVoiceSheet(false);
+              setCurrentTodoCapture(null);
+              setVoiceTranscript('');
+              speechRecognition.resetTranscript();
+              return;
             }
-            
-            // Clean up
+
+            // Capture photo blob reference before clearing state
+            const photoBlob = currentTodoCapture.blob;
+
+            // Add item to session immediately with isSaved=false (optimistic UI)
+            const localId = todoSession.addItem({
+              photoBlob: currentTodoCapture.blob,
+              photoUrl: currentTodoCapture.url,
+              thumbnailUrl: currentTodoCapture.thumbnailUrl,
+              transcript: finalTranscript,
+              annotations: [],
+              isSaved: false, // Mark as not saved yet
+            });
+
+            // Show saving toast
+            toast({
+              title: 'Saving Task...',
+              description: 'Uploading photo and creating task',
+            });
+
+            // Close voice sheet and clean up UI
             setShowVoiceSheet(false);
             setCurrentTodoCapture(null);
             setVoiceTranscript('');
             speechRecognition.resetTranscript();
+
+            // Save to backend asynchronously
+            try {
+              // 1. Upload photo
+              const formData = new FormData();
+              formData.append('photo', photoBlob, `todo-${localId}.jpg`);
+              formData.append('projectId', selectedProject);
+              
+              const photoRes = await fetch('/api/photos/upload', {
+                method: 'POST',
+                body: formData,
+              });
+              
+              if (!photoRes.ok) {
+                throw new Error(`Photo upload failed: ${photoRes.statusText}`);
+              }
+              
+              const photoData = await photoRes.json();
+
+              // 2. Create todo
+              const todoRes: any = await apiRequest('POST', '/api/todos', {
+                title: finalTranscript,
+                projectId: selectedProject,
+                photoId: photoData.id,
+                annotations: [],
+              });
+
+              // 3. Update session item with server IDs
+              todoSession.updateItem(localId, {
+                serverId: todoRes.id as string,
+                photoServerId: photoData.id,
+                isSaved: true,
+              });
+
+              // 4. Invalidate cache to refresh todos list
+              await queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+              await queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject] });
+
+              haptics.heavy();
+              toast({
+                title: 'Task Saved',
+                description: 'Task added to project successfully',
+              });
+            } catch (saveError) {
+              console.error('Todo save failed:', saveError);
+              // Mark as failed so user can retry
+              todoSession.updateItem(localId, {
+                isSaved: false,
+              });
+              haptics.light();
+              toast({
+                title: 'Save Failed',
+                description: 'Task captured but not saved. You can retry from the review screen.',
+                variant: 'destructive',
+              });
+            }
           } catch (error) {
             console.error('Voice sheet done failed:', error);
             toast({
@@ -2716,129 +2784,114 @@ export default function Camera() {
           try {
             haptics.medium();
             
-            // Validate that we have items to save
-            if (todoSession.items.length === 0) {
-              toast({
-                title: 'No Tasks',
-                description: 'Capture photos and add descriptions first',
-                variant: 'destructive',
-              });
+            // Filter for items that need saving (not already saved)
+            const unsavedItems = todoSession.items.filter(item => !item.isSaved);
+            
+            // If all items are already saved, just close the review
+            if (unsavedItems.length === 0) {
+              haptics.light();
+              
+              // Clean up blob URLs before clearing session
+              sessionBlobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+              sessionBlobUrlsRef.current.clear();
+
+              // Clear session and close review
+              todoSession.clearSession();
+              setShowSessionReview(false);
+              
+              // Reset camera state to allow new captures
+              setIsCapturing(false);
+              setCurrentTodoCapture(null);
+              setSelectedTodoItemForAnnotation(null);
               return;
             }
 
-            // Upload photos one by one with early exit on failure (transactional approach)
-            const uploadedPhotos: Array<{ itemId: string; photoId: string; photoUrl: string }> = [];
-            const uploadedPhotoIds: string[] = []; // Track for potential cleanup
-            
-            try {
-              for (const item of todoSession.items) {
+            // Show retry toast for unsaved items
+            toast({
+              title: 'Retrying Failed Items',
+              description: `Saving ${unsavedItems.length} task${unsavedItems.length > 1 ? 's' : ''} that failed earlier`,
+            });
+
+            // Retry saving failed items one by one
+            let successCount = 0;
+            for (const item of unsavedItems) {
+              try {
+                // 1. Upload photo
                 const formData = new FormData();
                 formData.append('photo', item.photoBlob, `todo-${item.localId}.jpg`);
                 formData.append('projectId', selectedProject);
                 
-                const res = await fetch('/api/photos/upload', {
+                const photoRes = await fetch('/api/photos/upload', {
                   method: 'POST',
                   body: formData,
                 });
                 
-                if (!res.ok) {
-                  throw new Error(`Upload failed: ${res.statusText}`);
+                if (!photoRes.ok) {
+                  throw new Error(`Photo upload failed: ${photoRes.statusText}`);
                 }
                 
-                const response = await res.json();
-                
-                uploadedPhotos.push({
-                  itemId: item.localId,
-                  photoId: response.id,
-                  photoUrl: response.url,
+                const photoData = await photoRes.json();
+
+                // 2. Create todo
+                const todoRes: any = await apiRequest('POST', '/api/todos', {
+                  title: item.transcript,
+                  projectId: selectedProject,
+                  photoId: photoData.id,
+                  annotations: item.annotations,
+                  assignedToId: item.assignedTo,
                 });
-                uploadedPhotoIds.push(response.id);
+
+                // 3. Update session item with server IDs
+                todoSession.updateItem(item.localId, {
+                  serverId: todoRes.id as string,
+                  photoServerId: photoData.id,
+                  isSaved: true,
+                });
+
+                successCount++;
+              } catch (itemError) {
+                console.error(`Failed to save item ${item.localId}:`, itemError);
+                // Keep isSaved=false so user can retry again
               }
-            } catch (uploadError) {
-              // Photo upload failed - rollback uploaded photos and show specific error
-              console.error('Photo upload failed:', uploadError);
-              
-              // Attempt to delete already-uploaded photos (best effort cleanup)
-              if (uploadedPhotoIds.length > 0) {
-                console.log(`Rolling back ${uploadedPhotoIds.length} uploaded photo(s)...`);
-                try {
-                  await Promise.all(
-                    uploadedPhotoIds.map(photoId =>
-                      apiRequest('DELETE', `/api/photos/${photoId}`)
-                        .catch(err => console.error(`Failed to delete photo ${photoId}:`, err))
-                    )
-                  );
-                } catch (rollbackError) {
-                  console.error('Rollback failed:', rollbackError);
-                }
-              }
-              
-              haptics.light();
-              toast({
-                title: 'Upload Failed',
-                description: `Failed to upload photo ${uploadedPhotos.length + 1} of ${todoSession.items.length}. Check your connection and try again.`,
-                variant: 'destructive',
-              });
-              return; // Exit early, session remains intact for retry
             }
 
-            // Build todos array for batch creation
-            const todos = todoSession.items.map((item) => {
-              const uploadedPhoto = uploadedPhotos.find(p => p.itemId === item.localId);
-              
-              return {
-                transcript: item.transcript,
-                photoId: uploadedPhoto?.photoId,
-                assignedToId: item.assignedTo,
-                annotations: item.annotations,
-              };
-            });
-
-            // Submit batch todo creation
-            try {
-              await apiRequest('POST', '/api/todo-sessions', {
-                projectId: selectedProject,
-                todos,
-              });
-            } catch (createError) {
-              // Todo creation failed - photos are uploaded but todos not created
-              console.error('Todo creation failed:', createError);
-              haptics.light();
-              toast({
-                title: 'Creation Failed',
-                description: 'Photos uploaded but tasks not created. Close review and try again or contact support.',
-                variant: 'destructive',
-              });
-              return; // Exit early, session remains for retry
-            }
-
-            // Success! All operations completed
-            haptics.heavy();
-            toast({
-              title: 'Tasks Created',
-              description: `${todoSession.items.length} task${todoSession.items.length > 1 ? 's' : ''} added to project`,
-            });
-
-            // Clean up blob URLs before clearing session
-            sessionBlobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
-            sessionBlobUrlsRef.current.clear();
-
-            // Clear session and close review
-            todoSession.clearSession();
-            setShowSessionReview(false);
-            
-            // Reset camera state to allow new captures
-            setIsCapturing(false);
-            setCurrentTodoCapture(null);
-            setSelectedTodoItemForAnnotation(null);
-            
             // Invalidate cache to refresh todos list
             await queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
             await queryClient.invalidateQueries({ queryKey: ['/api/projects', selectedProject] });
-            
+
+            if (successCount === unsavedItems.length) {
+              // All retries succeeded
+              haptics.heavy();
+              toast({
+                title: 'All Tasks Saved',
+                description: `${successCount} task${successCount > 1 ? 's' : ''} saved successfully`,
+              });
+
+              // Clean up blob URLs before clearing session
+              sessionBlobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+              sessionBlobUrlsRef.current.clear();
+
+              // Clear session and close review
+              todoSession.clearSession();
+              setShowSessionReview(false);
+              
+              // Reset camera state to allow new captures
+              setIsCapturing(false);
+              setCurrentTodoCapture(null);
+              setSelectedTodoItemForAnnotation(null);
+            } else {
+              // Some retries failed
+              haptics.light();
+              const failedCount = unsavedItems.length - successCount;
+              toast({
+                title: 'Partial Save',
+                description: `${successCount} saved, ${failedCount} still need retry. Check connection and try again.`,
+                variant: 'destructive',
+              });
+            }
           } catch (error) {
-            // Unexpected error - wrap entire save in try/catch for network/parse errors
-            console.error('Batch save error:', error);
+            // Unexpected error
+            console.error('Save error:', error);
             haptics.light();
             toast({
               title: 'Save Failed',
