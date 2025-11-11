@@ -9,6 +9,9 @@ export interface TodoSessionItem {
   transcript: string;
   assignedTo?: string;
   annotations: Omit<PhotoAnnotation, 'id' | 'photoId' | 'createdAt'>[];
+  serverId?: string; // Track backend ID for already-saved todos
+  photoServerId?: string; // Track backend photo ID for already-saved photos
+  isSaved?: boolean; // Track whether this todo has been saved to backend
 }
 
 interface TodoSessionContextType {

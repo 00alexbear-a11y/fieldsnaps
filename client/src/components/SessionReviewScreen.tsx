@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { X, Trash2, Edit3, User, Save, ArrowLeft } from "lucide-react";
+import { X, Trash2, Edit3, User, Save, ArrowLeft, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useTodoSession, type TodoSessionItem } from "@/contexts/TodoSessionContext";
 import { useQuery } from "@tanstack/react-query";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
@@ -64,6 +64,11 @@ export function SessionReviewScreen({
 
   if (!isOpen) return null;
 
+  // Calculate save status
+  const savedCount = items.filter(item => item.isSaved).length;
+  const unsavedCount = items.length - savedCount;
+  const allSaved = unsavedCount === 0;
+
   return (
     <div
       className={`fixed inset-0 z-[280] bg-background transition-opacity duration-300 ${
@@ -82,17 +87,38 @@ export function SessionReviewScreen({
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Back</span>
           </button>
-          <h1 className="text-xl font-semibold tracking-tight">
-            Review To-Dos ({items.length})
-          </h1>
+          <div className="text-center">
+            <h1 className="text-xl font-semibold tracking-tight">
+              Review To-Dos ({items.length})
+            </h1>
+            {!allSaved && unsavedCount > 0 && (
+              <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                {unsavedCount} need{unsavedCount > 1 ? '' : 's'} retry
+              </p>
+            )}
+            {allSaved && savedCount > 0 && (
+              <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+                All saved ✓
+              </p>
+            )}
+          </div>
           <Button
             onClick={handleSave}
             disabled={items.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={allSaved ? "bg-green-600 hover:bg-green-700 text-white" : "bg-orange-600 hover:bg-orange-700 text-white"}
             data-testid="button-save-all"
           >
-            <Save className="w-4 h-4 mr-2" />
-            Save All
+            {allSaved ? (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Done
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Retry ({unsavedCount})
+              </>
+            )}
           </Button>
         </div>
       </div>
