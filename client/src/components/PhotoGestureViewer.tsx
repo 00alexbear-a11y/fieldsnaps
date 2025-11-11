@@ -391,7 +391,7 @@ export function PhotoGestureViewer({
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* Top Controls - Counter only */}
       <div
-        className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10"
+        className="absolute top-0 left-0 right-0 px-4 pb-4 pt-safe-4 bg-gradient-to-b from-black/60 to-transparent z-10"
       >
         <div className="flex items-center justify-center max-w-screen-xl mx-auto">
           <div className="text-white text-sm">
@@ -692,7 +692,7 @@ export function PhotoGestureViewer({
 
       {/* Comments Panel */}
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-background border-t max-h-[50vh] flex flex-col transition-transform duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 bg-background border-t max-h-[50vh] flex flex-col pb-safe transition-transform duration-300 ${
           showComments ? "translate-y-0" : "translate-y-full"
         } ${!showComments ? "pointer-events-none" : ""}`}
         aria-hidden={!showComments}
