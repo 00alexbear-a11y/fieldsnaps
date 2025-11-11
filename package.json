@@ -71,6 +71,8 @@
     "@simplewebauthn/server": "^13.2.2",
     "@tanstack/react-query": "^5.60.5",
     "@tanstack/react-virtual": "^3.13.12",
+    "@transistorsoft/capacitor-background-fetch": "^7.1.0",
+    "@transistorsoft/capacitor-background-geolocation": "^7.2.4",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",

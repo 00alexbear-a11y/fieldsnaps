@@ -34,6 +34,9 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
   },
+  android: {
+    useLegacyBridge: true, // CRITICAL: Prevents 5-minute timeout issue with TransistorSoft Background Geolocation
+  },
 };
 
 export default config;
