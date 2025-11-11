@@ -176,6 +176,13 @@ export default function SwipeableProjectCard({
         handler: onEdit,
       });
       
+      if (onToggleFavorite) {
+        buttons.push({
+          title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+          handler: onToggleFavorite,
+        });
+      }
+      
       if (project.address) {
         buttons.push({
           title: 'Go to Map',
@@ -237,7 +244,7 @@ export default function SwipeableProjectCard({
       {/* Project Card - swipes left to reveal delete */}
       <div
         ref={cardRef}
-        className="flex gap-3 sm:gap-4 p-3 sm:p-4 overflow-visible hover-elevate active-elevate-2 cursor-pointer bg-card backdrop-blur-xl border border-border/50 rounded-2xl"
+        className={`flex gap-3 sm:gap-4 p-3 sm:p-4 overflow-visible hover-elevate active-elevate-2 cursor-pointer bg-card backdrop-blur-xl border border-border/50 rounded-2xl ${isFavorite ? 'border-l-4 border-l-yellow-400' : ''}`}
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -315,23 +322,6 @@ export default function SwipeableProjectCard({
               </div>
             )}
             
-            {/* Favorite Button - Phase 3.4 */}
-            {onToggleFavorite && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-11 h-11"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite();
-                }}
-                data-testid={`button-favorite-${project.id}`}
-                aria-label={isFavorite ? `Remove ${project.name} from favorites` : `Add ${project.name} to favorites`}
-              >
-                <Star className={`w-5 h-5 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-              </Button>
-            )}
-            
             {/* Camera Button - Always visible */}
             <Button
               variant="ghost"
@@ -384,6 +374,18 @@ export default function SwipeableProjectCard({
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Project
                   </DropdownMenuItem>
+                  {onToggleFavorite && (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFavorite();
+                      }}
+                      data-testid={`menu-favorite-${project.id}`}
+                    >
+                      <Star className={`w-4 h-4 mr-2 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                      {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                    </DropdownMenuItem>
+                  )}
                   {project.address && (
                     <DropdownMenuItem
                       onClick={(e) => {
