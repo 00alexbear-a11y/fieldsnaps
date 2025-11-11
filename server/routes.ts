@@ -6,7 +6,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema, insertGeofenceSchema, insertLocationLogSchema, insertUserPermissionSchema, insertTimeEntryEditSchema } from "../shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./replitAuth";
 import { setupWebAuthn } from "./webauthn";
@@ -98,6 +98,23 @@ const authRateLimiter = rateLimit({
   },
 });
 
+// Rate limiting for location log endpoints - prevents abuse from geofencing plugin
+// 12 requests per minute = one ping every 5 minutes per user with buffer
+const locationLogRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 12, // Max 12 location pings per minute per user
+  message: 'Too many location updates, please slow down',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: any) => {
+    return req.user?.claims?.sub || 'anonymous';
+  },
+  skip: (req: any) => {
+    // Skip rate limiting in development mode
+    return process.env.NODE_ENV === 'development';
+  },
+});
+
 // UUID validation middleware for route parameters
 
 const validateUuidParam = (paramName: string) => {
@@ -133,8 +150,13 @@ const validateUuidParams = (...paramNames: string[]) => {
   };
 };
 
+// Type for authenticated user with company (narrowed companyId)
+type CompanyUser = NonNullable<Awaited<ReturnType<typeof storage.getUser>>> & {
+  companyId: string;
+};
+
 // Helper to get authenticated user with company
-async function getUserWithCompany(req: any, res: any) {
+async function getUserWithCompany(req: any, res: any): Promise<CompanyUser | null> {
   const userId = req.user?.claims?.sub;
   if (!userId) {
     res.status(401).json({ error: "Unauthorized" });
@@ -147,7 +169,20 @@ async function getUserWithCompany(req: any, res: any) {
     return null;
   }
 
-  return user;
+  // Type assertion is safe because we checked !user.companyId above
+  return user as CompanyUser;
+}
+
+function isCompanyAdmin(user: any): boolean {
+  return user.role === 'owner';
+}
+
+function assertCompanyAdmin(user: any, res: any): boolean {
+  if (!isCompanyAdmin(user)) {
+    res.status(403).json({ error: "Admin access required" });
+    return false;
+  }
+  return true;
 }
 
 // Generic helper to verify company access for any resource
@@ -3166,6 +3201,336 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Geofence Routes - automatic time tracking boundaries
+  // ========================================
+
+  // Create geofence (admin only)
+  app.post("/api/geofences", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      if (!assertCompanyAdmin(user, res)) return;
+
+      const validatedData = insertGeofenceSchema.parse({
+        ...req.body,
+        companyId: user.companyId, // Use authenticated user's company
+      });
+
+      const geofence = await storage.createGeofence(validatedData);
+      res.json(geofence);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get all geofences for company (optionally filter by project)
+  app.get("/api/geofences", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      let geofences = await storage.getGeofencesByCompany(user.companyId);
+
+      // Optional project filter
+      if (req.query.projectId) {
+        geofences = geofences.filter(g => g.projectId === req.query.projectId);
+      }
+
+      res.json(geofences);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get single geofence by ID
+  app.get("/api/geofences/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const geofence = await storage.getGeofence(req.params.id);
+      
+      if (!geofence) {
+        return res.status(404).json({ error: "Geofence not found" });
+      }
+
+      // Verify company ownership
+      if (geofence.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      res.json(geofence);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Update geofence (admin only)
+  app.patch("/api/geofences/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      if (!assertCompanyAdmin(user, res)) return;
+
+      // Verify geofence exists and belongs to company
+      const existing = await storage.getGeofence(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Geofence not found" });
+      }
+      if (existing.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Validate partial update
+      const partialSchema = insertGeofenceSchema.partial();
+      const validatedData = partialSchema.parse(req.body);
+
+      const updated = await storage.updateGeofence(req.params.id, validatedData);
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Delete geofence (admin only)
+  app.delete("/api/geofences/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      if (!assertCompanyAdmin(user, res)) return;
+
+      // Verify geofence exists and belongs to company
+      const existing = await storage.getGeofence(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Geofence not found" });
+      }
+      if (existing.companyId !== user.companyId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const success = await storage.deleteGeofence(req.params.id);
+      res.json({ success });
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Location Log Routes - 5-minute location pings
+  // ========================================
+
+  // Create location log (from geofencing plugin)
+  app.post("/api/locations", isAuthenticatedAndWhitelisted, locationLogRateLimiter, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Validate and create location log
+      const validatedData = insertLocationLogSchema.parse({
+        ...req.body,
+        userId, // Force authenticated user's ID (ignore client-provided userId)
+      });
+
+      const locationLog = await storage.createLocationLog(validatedData);
+      res.json(locationLog);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get user's own location logs
+  app.get("/api/locations/user", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      const options: { startDate?: Date; endDate?: Date } = {};
+      
+      if (req.query.startDate) {
+        options.startDate = new Date(req.query.startDate as string);
+        if (isNaN(options.startDate.getTime())) {
+          return res.status(400).json({ error: "Invalid startDate format" });
+        }
+      }
+      
+      if (req.query.endDate) {
+        options.endDate = new Date(req.query.endDate as string);
+        if (isNaN(options.endDate.getTime())) {
+          return res.status(400).json({ error: "Invalid endDate format" });
+        }
+      }
+
+      const logs = await storage.getLocationLogs(userId, options);
+      res.json(logs);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get recent location logs for admin dashboard (owner only)
+  app.get("/api/locations/recent", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Only owner can view all users' locations
+      if (!assertCompanyAdmin(user, res)) return;
+
+      const minutes = req.query.minutes ? parseInt(req.query.minutes as string) : 5;
+      
+      if (isNaN(minutes) || minutes < 1 || minutes > 120) {
+        return res.status(400).json({ error: "Invalid minutes parameter (1-120)" });
+      }
+
+      const logs = await storage.getRecentLocationLogs(user.companyId, minutes);
+      res.json(logs);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // User Permission Routes - role-based access control
+  // ========================================
+
+  // Create or update user permissions (admin only) - using upsert pattern
+  app.post("/api/permissions", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      if (!assertCompanyAdmin(user, res)) return;
+
+      const validatedData = insertUserPermissionSchema.parse(req.body);
+
+      // Check if permission already exists (upsert pattern)
+      const existing = await storage.getUserPermission(validatedData.userId);
+      
+      let permission;
+      if (existing) {
+        permission = await storage.updateUserPermission(validatedData.userId, validatedData);
+      } else {
+        permission = await storage.createUserPermission(validatedData);
+      }
+
+      res.json(permission);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get user permissions
+  app.get("/api/permissions/:userId", isAuthenticatedAndWhitelisted, validateUuidParam('userId'), async (req, res) => {
+    try {
+      const currentUser = await getUserWithCompany(req, res);
+      if (!currentUser) return;
+
+      // Users can view their own permissions, admins can view anyone's
+      const targetUserId = req.params.userId;
+      if (targetUserId !== currentUser.id && !isCompanyAdmin(currentUser)) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Verify target user is in same company
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser || targetUser.companyId !== currentUser.companyId) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const permission = await storage.getUserPermission(targetUserId);
+      
+      if (!permission) {
+        return res.status(404).json({ error: "Permissions not found" });
+      }
+
+      res.json(permission);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Update user permissions (admin only)
+  app.patch("/api/permissions/:userId", isAuthenticatedAndWhitelisted, validateUuidParam('userId'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      if (!assertCompanyAdmin(user, res)) return;
+
+      // Verify target user is in same company
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser || targetUser.companyId !== user.companyId) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const partialSchema = insertUserPermissionSchema.partial();
+      const validatedData = partialSchema.parse(req.body);
+
+      const updated = await storage.updateUserPermission(req.params.userId, validatedData);
+      
+      if (!updated) {
+        return res.status(404).json({ error: "Permissions not found" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Time Entry Edit Audit Routes
+  // ========================================
+
+  // Create time entry edit log (internal use - called when clock entry is edited)
+  app.post("/api/time-edits", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      const validatedData = insertTimeEntryEditSchema.parse({
+        ...req.body,
+        editedBy: user.id, // Force authenticated user as editor
+      });
+
+      // Verify clock entry exists and belongs to user's company
+      const entries = await storage.getClockEntries(user.companyId, {});
+      const clockEntry = entries.find(e => e.id === validatedData.clockEntryId);
+      
+      if (!clockEntry) {
+        return res.status(404).json({ error: "Clock entry not found" });
+      }
+
+      const audit = await storage.createTimeEntryEdit(validatedData);
+      res.json(audit);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get edit history for a time entry
+  app.get("/api/time-edits/:clockEntryId", isAuthenticatedAndWhitelisted, validateUuidParam('clockEntryId'), async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+
+      // Verify clock entry exists and belongs to user's company
+      const entries = await storage.getClockEntries(user.companyId, {});
+      const clockEntry = entries.find(e => e.id === req.params.clockEntryId);
+      
+      if (!clockEntry) {
+        return res.status(404).json({ error: "Clock entry not found" });
+      }
+
+      const edits = await storage.getTimeEntryEdits(req.params.clockEntryId);
+      res.json(edits);
     } catch (error: any) {
       handleError(res, error);
     }
