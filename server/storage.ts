@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits, clockEntries } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits, clockEntries, geofences, locationLogs, userPermissions, timeEntryEdits } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
@@ -7,8 +7,10 @@ import type {
   Credential, InsertCredential,
   Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
   Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit, ClockEntry,
+  Geofence, LocationLog, UserPermission, TimeEntryEdit,
   InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
   InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit, InsertClockEntry,
+  InsertGeofence, InsertLocationLog, InsertUserPermission, InsertTimeEntryEdit,
   BatchTodoInput
 } from "../shared/schema";
 import { eq, inArray, isNull, isNotNull, and, lt, count, sql, desc } from "drizzle-orm";
@@ -173,6 +175,29 @@ export interface IStorage {
   getClockEntriesForUser(userId: string, startDate: Date, endDate: Date): Promise<ClockEntry[]>;
   updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined>;
   switchProject(userId: string, companyId: string, newProjectId: string, location?: string, notes?: string): Promise<{ clockOutEntry: ClockEntry; clockInEntry: ClockEntry }>;
+  
+  // Geofences (automatic time tracking boundaries)
+  createGeofence(data: InsertGeofence): Promise<Geofence>;
+  getGeofence(id: string): Promise<Geofence | undefined>;
+  getGeofencesByCompany(companyId: string): Promise<Geofence[]>;
+  getGeofencesByProject(projectId: string): Promise<Geofence[]>;
+  updateGeofence(id: string, data: Partial<InsertGeofence>): Promise<Geofence | undefined>;
+  deleteGeofence(id: string): Promise<boolean>;
+  
+  // Location Logs (5-minute location pings when clocked in)
+  createLocationLog(data: InsertLocationLog): Promise<LocationLog>;
+  getLocationLogs(userId: string, options?: { startDate?: Date; endDate?: Date }): Promise<LocationLog[]>;
+  getRecentLocationLogs(companyId: string, minutes?: number): Promise<(LocationLog & { user: { id: string; firstName: string | null; lastName: string | null }; project?: { id: string; name: string } | null })[]>;
+  
+  // User Permissions (role-based access control)
+  createUserPermission(data: InsertUserPermission): Promise<UserPermission>;
+  getUserPermission(userId: string): Promise<UserPermission | undefined>;
+  updateUserPermission(userId: string, data: Partial<InsertUserPermission>): Promise<UserPermission | undefined>;
+  deleteUserPermission(userId: string): Promise<boolean>;
+  
+  // Time Entry Edits (audit trail for time modifications)
+  createTimeEntryEdit(data: InsertTimeEntryEdit): Promise<TimeEntryEdit>;
+  getTimeEntryEdits(clockEntryId: string): Promise<(TimeEntryEdit & { editor: { id: string; firstName: string | null; lastName: string | null } })[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -1920,6 +1945,214 @@ export class DbStorage implements IStorage {
         clockInEntry: clockInResult[0],
       };
     });
+  }
+
+  // Geofences (automatic time tracking boundaries)
+  
+  async createGeofence(data: InsertGeofence): Promise<Geofence> {
+    const result = await db
+      .insert(geofences)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getGeofence(id: string): Promise<Geofence | undefined> {
+    const result = await db
+      .select()
+      .from(geofences)
+      .where(eq(geofences.id, id));
+    return result[0];
+  }
+
+  async getGeofencesByCompany(companyId: string): Promise<Geofence[]> {
+    return await db
+      .select()
+      .from(geofences)
+      .where(eq(geofences.companyId, companyId))
+      .orderBy(geofences.createdAt);
+  }
+
+  async getGeofencesByProject(projectId: string): Promise<Geofence[]> {
+    return await db
+      .select()
+      .from(geofences)
+      .where(eq(geofences.projectId, projectId));
+  }
+
+  async updateGeofence(id: string, data: Partial<InsertGeofence>): Promise<Geofence | undefined> {
+    const result = await db
+      .update(geofences)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(geofences.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteGeofence(id: string): Promise<boolean> {
+    const result = await db
+      .delete(geofences)
+      .where(eq(geofences.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  // Location Logs (5-minute location pings when clocked in)
+  
+  async createLocationLog(data: InsertLocationLog): Promise<LocationLog> {
+    const result = await db
+      .insert(locationLogs)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getLocationLogs(userId: string, options?: { startDate?: Date; endDate?: Date }): Promise<LocationLog[]> {
+    const conditions = [eq(locationLogs.userId, userId)];
+    
+    if (options?.startDate) {
+      conditions.push(sql`${locationLogs.timestamp} >= ${options.startDate}`);
+    }
+    
+    if (options?.endDate) {
+      conditions.push(sql`${locationLogs.timestamp} <= ${options.endDate}`);
+    }
+    
+    return await db
+      .select()
+      .from(locationLogs)
+      .where(and(...conditions))
+      .orderBy(desc(locationLogs.timestamp));
+  }
+
+  async getRecentLocationLogs(companyId: string, minutes: number = 5): Promise<(LocationLog & { user: { id: string; firstName: string | null; lastName: string | null }; project?: { id: string; name: string } | null })[]> {
+    // Calculate cutoff time (e.g., last 5 minutes)
+    const cutoffTime = new Date();
+    cutoffTime.setMinutes(cutoffTime.getMinutes() - minutes);
+    
+    // Join locationLogs with users and projects to get full context
+    const logs = await db
+      .select({
+        // Location log fields
+        id: locationLogs.id,
+        userId: locationLogs.userId,
+        projectId: locationLogs.projectId,
+        latitude: locationLogs.latitude,
+        longitude: locationLogs.longitude,
+        accuracy: locationLogs.accuracy,
+        batteryLevel: locationLogs.batteryLevel,
+        isMoving: locationLogs.isMoving,
+        timestamp: locationLogs.timestamp,
+        // User fields
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+        },
+        // Project fields (nullable)
+        project: {
+          id: projects.id,
+          name: projects.name,
+        },
+      })
+      .from(locationLogs)
+      .innerJoin(users, eq(locationLogs.userId, users.id))
+      .leftJoin(projects, eq(locationLogs.projectId, projects.id))
+      .where(and(
+        eq(users.companyId, companyId),
+        sql`${locationLogs.timestamp} >= ${cutoffTime}`
+      ))
+      .orderBy(desc(locationLogs.timestamp));
+    
+    // Transform the result to match the expected shape
+    return logs.map(log => ({
+      id: log.id,
+      userId: log.userId,
+      projectId: log.projectId,
+      latitude: log.latitude,
+      longitude: log.longitude,
+      accuracy: log.accuracy,
+      batteryLevel: log.batteryLevel,
+      isMoving: log.isMoving,
+      timestamp: log.timestamp,
+      user: log.user,
+      project: log.project.id ? log.project : null,
+    }));
+  }
+
+  // User Permissions (role-based access control)
+  
+  async createUserPermission(data: InsertUserPermission): Promise<UserPermission> {
+    const result = await db
+      .insert(userPermissions)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getUserPermission(userId: string): Promise<UserPermission | undefined> {
+    const result = await db
+      .select()
+      .from(userPermissions)
+      .where(eq(userPermissions.userId, userId));
+    return result[0];
+  }
+
+  async updateUserPermission(userId: string, data: Partial<InsertUserPermission>): Promise<UserPermission | undefined> {
+    const result = await db
+      .update(userPermissions)
+      .set(data)
+      .where(eq(userPermissions.userId, userId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteUserPermission(userId: string): Promise<boolean> {
+    const result = await db
+      .delete(userPermissions)
+      .where(eq(userPermissions.userId, userId))
+      .returning();
+    return result.length > 0;
+  }
+
+  // Time Entry Edits (audit trail for time modifications)
+  
+  async createTimeEntryEdit(data: InsertTimeEntryEdit): Promise<TimeEntryEdit> {
+    const result = await db
+      .insert(timeEntryEdits)
+      .values(data)
+      .returning();
+    return result[0];
+  }
+
+  async getTimeEntryEdits(clockEntryId: string): Promise<(TimeEntryEdit & { editor: { id: string; firstName: string | null; lastName: string | null } })[]> {
+    const edits = await db
+      .select({
+        // Time entry edit fields
+        id: timeEntryEdits.id,
+        clockEntryId: timeEntryEdits.clockEntryId,
+        editedBy: timeEntryEdits.editedBy,
+        fieldChanged: timeEntryEdits.fieldChanged,
+        oldValue: timeEntryEdits.oldValue,
+        newValue: timeEntryEdits.newValue,
+        reason: timeEntryEdits.reason,
+        timestamp: timeEntryEdits.timestamp,
+        // Editor user fields
+        editor: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+        },
+      })
+      .from(timeEntryEdits)
+      .innerJoin(users, eq(timeEntryEdits.editedBy, users.id))
+      .where(eq(timeEntryEdits.clockEntryId, clockEntryId))
+      .orderBy(desc(timeEntryEdits.timestamp));
+    
+    return edits;
   }
 }
 
