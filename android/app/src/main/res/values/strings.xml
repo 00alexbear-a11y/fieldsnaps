@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FieldSnaps</string>
+    <string name="title_activity_main">FieldSnaps</string>
+    <string name="package_name">com.fieldsnaps.app</string>
+    <string name="custom_url_scheme">com.fieldsnaps.app</string>
+</resources>
