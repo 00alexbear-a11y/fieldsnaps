@@ -26,6 +26,8 @@ FieldSnaps is an offline-first PWA, utilizing Service Workers, IndexedDB, and th
 ### System Design Choices
 The architecture prioritizes simplicity and an invisible interface. The PWA uses a Service Worker for hourly updates and offline caching. Storage uses IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance is optimized through database indexing, query optimization, code-splitting, and virtualization. The offline sync system includes queue limits, exponential backoff, atomic deduplication, and persistent failed sync items. Manual deletion checks for `serverId`. Global error notifications are managed via TanStack Query. Production readiness is ensured with React Error Boundaries, consistent empty states, haptic feedback, and robust security headers. Backend optimizations include compression, field filtering, upload resilience, per-user rate limiting, and a 3-tier upload system.
 
+**iOS Safe Area Standards**: All sticky/fixed UI elements respect iOS notch and home indicator using Tailwind utilities: `pt-safe-3` for marketing page headers, `pt-safe-3 pb-3` for in-app headers with status icons, `pt-safe-4 pb-safe-4` for fullscreen/immersive views (Camera, PhotoGestureViewer, SessionReviewScreen), and `pb-safe` for bottom navigation/sheets. Safe area classes are defined in `index.css` using `env(safe-area-inset-*)` CSS variables.
+
 ## External Dependencies
 
 ### Frontend
