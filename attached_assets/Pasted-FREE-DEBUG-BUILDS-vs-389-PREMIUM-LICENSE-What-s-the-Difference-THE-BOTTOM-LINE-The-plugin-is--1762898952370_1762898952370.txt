@@ -1,0 +1,104 @@
+FREE DEBUG BUILDS vs $389 PREMIUM LICENSE: What's the Difference?
+🎯 THE BOTTOM LINE:
+The plugin is FULLY FUNCTIONAL in DEBUG builds for FREE. The $389 license ONLY unlocks Android RELEASE builds (production apps you submit to Google Play Store).
+
+📊 FEATURE COMPARISON:
+Feature	FREE (Debug Builds)	PREMIUM ($389)
+ALL plugin features	✅ YES	✅ YES
+iOS (both debug & release)	✅ 100% FREE	✅ FREE
+Android DEBUG builds	✅ 100% FREE	✅ FREE
+Android RELEASE builds	❌ Won't work	✅ WORKS
+Background tracking	✅	✅
+Geofencing	✅	✅
+Motion detection	✅	✅
+HTTP sync	✅	✅
+SQLite persistence	✅	✅
+Battery optimization	✅	✅
+All configuration options	✅	✅
+GitHub support	✅	✅
+Updates for 1 year	✅	✅
+🔍 WHAT EXACTLY IS THE DIFFERENCE?
+FREE DEBUG BUILDS:
+✅ iOS: Works perfectly in both debug AND release (always free)
+✅ Android Debug: Works perfectly when testing via USB/emulator
+⚠️ Android Release: Does NOT work (app will crash or tracking won't start)
+⚠️ Shows toast message: "License Validation Failure" on Android (just ignore it during testing)
+PREMIUM LICENSE ($389):
+✅ iOS: Same as free (no license needed)
+✅ Android Debug: Same as free
+✅ Android Release: NOW WORKS - can publish to Google Play Store
+✅ No toast message
+💡 WHAT THIS MEANS FOR YOU:
+You can develop & test FieldSnaps 100% FREE:
+Build your entire auto time-tracking feature
+Test on real Android devices (debug builds)
+Test on real iPhones (always free)
+Make sure everything works perfectly
+Show it to beta users (using debug APKs)
+You ONLY need the $389 license when:
+You're ready to publish FieldSnaps to Google Play Store
+You want to release a production Android app to customers
+🚀 RECOMMENDED WORKFLOW:
+Phase 1: FREE Development (Weeks 1-8)
+✅ Install plugin (free)
+✅ Build all features
+✅ Test on iOS (works perfectly, no license needed)
+✅ Test on Android debug builds (works perfectly, free)
+✅ Beta test with 10 users (send them debug APKs)
+✅ Make sure battery life, geofencing, etc. all work
+Phase 2: Purchase License (Week 9)
+💰 Only buy license when you're 100% confident it works
+✅ Add license key to AndroidManifest.xml
+✅ Build Android RELEASE APK
+✅ Publish to Google Play Store
+❓ COMMON QUESTIONS:
+Q: Can I test the full feature set for free?
+A: YES! Android debug builds have 100% of features enabled.
+
+Q: Do I need to buy the license to test on real Android phones?
+A: NO! Just install debug APKs via USB. They work perfectly.
+
+Q: What happens if I try to publish without a license?
+A: The Android release build won't work - tracking will fail to start or crash.
+
+Q: Is iOS always free?
+A: YES! iOS never requires a license (debug or release).
+
+Q: Will the "License Validation Failure" toast affect my testing?
+A: NO - it's just a harmless warning. The plugin works 100% normally in debug builds.
+
+Q: Can I get a refund if it doesn't work?
+A: No refunds, BUT you can test everything FREE first before buying, so there's zero risk.
+
+Q: Do I need to pay annually?
+A: NO! $389 is one-time payment. Includes 1 year of updates, but plugin continues working forever.
+
+💰 ACTUAL COST BREAKDOWN:
+If you test first (RECOMMENDED):
+Weeks 1-8: $0 (free development & testing)
+Week 9: $389 (only when ready to publish)
+Total: $389
+If you buy immediately:
+Day 1: $389 (same features as free, just removes toast message)
+Waste: $0 (but you could have tested free first)
+🎯 MY RECOMMENDATION:
+START FREE, BUY LATER:
+
+Don't buy the license yet
+Build the entire feature using FREE debug builds
+Test thoroughly on both iOS and Android (debug)
+Show it to your buddy who uses Construction Clock
+Get 10 real contractors to test it (send debug APKs)
+ONLY buy the $389 license when you're 100% confident and ready to publish to Google Play Store
+This way:
+
+✅ Zero financial risk
+✅ You test everything before committing
+✅ You validate the feature works for contractors
+✅ You only pay when you're ready to launch
+⚠️ ONE CAVEAT:
+The toast message "License Validation Failure" will show on Android debug builds. Your developers will see it during testing. Just tell them to ignore it - it's normal and doesn't affect functionality.
+
+TL;DR: The free debug builds give you 100% of features to fully test FieldSnaps. You only need the $389 license to publish the Android app to production. iOS is always free.
+
+Should you buy now? No. Test first with free debug builds, then buy when you're ready to launch.
