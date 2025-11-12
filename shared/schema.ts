@@ -132,6 +132,9 @@ export const projects = pgTable("projects", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   address: text("address"), // Job site address
+  city: varchar("city", { length: 100 }), // City name from Places API
+  state: varchar("state", { length: 50 }), // State/province from Places API
+  zipCode: varchar("zip_code", { length: 20 }), // Postal code from Places API
   latitude: text("latitude"), // GPS latitude for map view
   longitude: text("longitude"), // GPS longitude for map view
   coverPhotoId: varchar("cover_photo_id"), // Reference to photos.id for cover image
