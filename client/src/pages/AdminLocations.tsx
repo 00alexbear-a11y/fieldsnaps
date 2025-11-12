@@ -42,10 +42,15 @@ export default function AdminLocations() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
+  const [hasInitialCentered, setHasInitialCentered] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
+  const watchIdRef = useRef<number | null>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef<number>(0);
+  const isDragging = useRef<boolean>(false);
 
   // Fetch recent location logs
   const { data: locationLogs = [], isLoading, refetch } = useQuery<LocationLog[]>({
@@ -72,10 +77,10 @@ export default function AdminLocations() {
     return workerName.includes(query) || projectName.includes(query);
   });
 
-  // Get user's current location
+  // Watch user's current location (continuous tracking)
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
@@ -83,12 +88,28 @@ export default function AdminLocations() {
           });
         },
         (error) => {
-          console.error('Error getting user location:', error);
+          console.error('Error watching user location:', error);
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
       );
     }
+
+    // Cleanup watch on unmount
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
   }, []);
+
+  // Auto-center map on user location when it first becomes available
+  useEffect(() => {
+    if (googleMapRef.current && userLocation && !hasInitialCentered && isMapLoaded) {
+      googleMapRef.current.setCenter(userLocation);
+      googleMapRef.current.setZoom(14);
+      setHasInitialCentered(true);
+    }
+  }, [userLocation, isMapLoaded, hasInitialCentered]);
 
   // Update user location marker
   useEffect(() => {
@@ -245,6 +266,75 @@ export default function AdminLocations() {
     googleMapRef.current.setZoom(currentZoom + (direction === 'in' ? 1 : -1));
   };
 
+  // Bottom sheet swipe gesture handlers
+  const handleSheetPointerDown = (e: React.PointerEvent) => {
+    dragStartY.current = e.clientY;
+    isDragging.current = false;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = 'none';
+    }
+  };
+
+  const handleSheetPointerMove = (e: React.PointerEvent) => {
+    if (dragStartY.current === 0) return;
+    
+    const deltaY = e.clientY - dragStartY.current;
+    
+    // Mark as dragging if moved more than 3px
+    if (Math.abs(deltaY) > 3) {
+      isDragging.current = true;
+    }
+    
+    if (sheetRef.current) {
+      if (isBottomSheetExpanded) {
+        // When expanded: allow dragging down (positive deltaY), clamp at 0
+        const translateY = Math.max(0, deltaY);
+        sheetRef.current.style.transform = `translateY(${translateY}px)`;
+      } else {
+        // When collapsed: allow dragging up (negative deltaY), start from collapsed position
+        // Collapsed position is calc(100% - 120px), so upward drag reduces this
+        const translateY = Math.min(0, deltaY); // Negative values for upward drag
+        sheetRef.current.style.transform = `translateY(calc(100% - 120px + ${translateY}px))`;
+      }
+    }
+  };
+
+  const handleSheetPointerUp = (e: React.PointerEvent) => {
+    if (dragStartY.current === 0) return;
+    
+    const deltaY = e.clientY - dragStartY.current;
+    const threshold = 50;
+    
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = 'transform 0.3s ease-out';
+      sheetRef.current.style.transform = '';
+    }
+    
+    // Only process swipe if user actually dragged
+    if (isDragging.current) {
+      // Swipe down to collapse
+      if (isBottomSheetExpanded && deltaY > threshold) {
+        setIsBottomSheetExpanded(false);
+      }
+      // Swipe up to expand
+      else if (!isBottomSheetExpanded && deltaY < -threshold) {
+        setIsBottomSheetExpanded(true);
+      }
+    }
+    
+    dragStartY.current = 0;
+  };
+
+  const handleSheetClick = () => {
+    // Only toggle on click if user didn't drag
+    if (!isDragging.current) {
+      setIsBottomSheetExpanded(!isBottomSheetExpanded);
+    }
+  };
+
   if (!import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
@@ -356,6 +446,7 @@ export default function AdminLocations() {
 
       {/* Bottom Sheet - Worker List */}
       <div 
+        ref={sheetRef}
         className={`absolute left-0 right-0 bottom-0 z-20 bg-background rounded-t-2xl shadow-2xl border-t transition-transform duration-300 ${
           isBottomSheetExpanded ? 'translate-y-0' : 'translate-y-[calc(100%-120px)]'
         }`}
@@ -363,8 +454,11 @@ export default function AdminLocations() {
       >
         {/* Handle for swipe */}
         <div 
-          className="flex justify-center pt-3 pb-2 cursor-pointer"
-          onClick={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
+          className="flex justify-center pt-3 pb-2 cursor-pointer touch-none"
+          onPointerDown={handleSheetPointerDown}
+          onPointerMove={handleSheetPointerMove}
+          onPointerUp={handleSheetPointerUp}
+          onClick={handleSheetClick}
           data-testid="button-toggle-bottom-sheet"
         >
           <div className="w-12 h-1 rounded-full bg-muted-foreground/30" />
