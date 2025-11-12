@@ -48,6 +48,7 @@ import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import Onboarding from "./components/Onboarding";
 import { CreateProjectDialog } from "./components/CreateProjectDialog";
+import { ProfileSetupDialog } from "./components/ProfileSetupDialog";
 import { UpgradeModal } from "./components/UpgradeModal";
 import { useAuth } from "./hooks/useAuth";
 import { useTheme } from "./hooks/useTheme";
@@ -101,6 +102,33 @@ function AppContent() {
       const onboardingKey = `onboarding_complete_${user.id}`;
       localStorage.setItem(onboardingKey, 'true');
       setShowOnboarding(false);
+    }
+  };
+
+  // Profile setup state - show before onboarding if user is missing name
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && isWhitelisted && user?.id) {
+      // Check if user has completed profile setup or has name data
+      const profileKey = `profile_setup_complete_${user.id}`;
+      const hasCompletedProfileSetup = localStorage.getItem(profileKey);
+      const hasName = user.firstName && user.lastName;
+      
+      // Show profile setup if not completed and missing name
+      if (!hasCompletedProfileSetup && !hasName) {
+        setShowProfileSetup(true);
+      }
+    }
+  }, [isAuthenticated, isWhitelisted, user]);
+
+  const handleProfileSetupComplete = () => {
+    // Only called on successful save or explicit skip
+    if (user?.id) {
+      const profileKey = `profile_setup_complete_${user.id}`;
+      localStorage.setItem(profileKey, 'true');
+      // Refetch user data to update UI
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
     }
   };
   
@@ -229,8 +257,19 @@ function AppContent() {
         {/* Show payment notification for past_due users */}
         <PaymentNotification />
         
-        {/* Onboarding for authenticated, whitelisted users only */}
-        {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
+        {/* Profile setup for first-time login (show before onboarding) */}
+        {showProfileSetup && (
+          <ProfileSetupDialog
+            open={showProfileSetup}
+            onOpenChange={setShowProfileSetup}
+            user={user || null}
+            isFirstTime={true}
+            onComplete={handleProfileSetupComplete}
+          />
+        )}
+        
+        {/* Onboarding for authenticated, whitelisted users only (gated by profile setup) */}
+        {!showProfileSetup && showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
         
         {/* Sidebar - only shown on non-camera pages */}
         {shouldShowSidebar && <AppSidebar />}

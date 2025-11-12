@@ -15,7 +15,14 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  // Detect if data is FormData - don't set Content-Type (browser sets it with boundary)
+  const isFormData = data instanceof FormData;
+  const headers: Record<string, string> = {};
+  
+  // Only set Content-Type for JSON data
+  if (data && !isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
   
   // Add JWT token if available (for native apps)
   const token = await tokenManager.getValidAccessToken();
@@ -26,7 +33,8 @@ export async function apiRequest(
   const res = await fetch(getApiUrl(url), {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    // FormData is sent as-is, JSON data is stringified
+    body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
     credentials: "include", // Still include for web session-based auth fallback
   });
 

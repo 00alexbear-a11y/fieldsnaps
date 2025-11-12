@@ -18,6 +18,7 @@ import { emailService } from "./email";
 import { cacheMiddleware, invalidateUserCache, invalidateCachePattern } from "./cache";
 import { fieldFilterMiddleware } from "./fieldFilter";
 import { geocodeAddress } from "./geocoding";
+import { Client } from "@replit/object-storage";
 import {
   initChunkedUpload,
   initUploadSession,
@@ -1104,6 +1105,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching authenticated user:", error);
       return res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Profile photo upload
+  app.post('/api/user/profile-photo', isAuthenticatedAndWhitelisted, uploadRateLimiter, upload.single('photo'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      if (!req.file) {
+        return res.status(400).json({ error: "No photo file provided" });
+      }
+
+      // Validate it's an image
+      const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+      if (!imageTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({ error: "Invalid file type. Only images are allowed." });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+
+      // Get presigned upload URL
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+
+      // Upload to object storage
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'PUT',
+        body: req.file.buffer,
+        headers: {
+          'Content-Type': req.file.mimetype,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+      }
+
+      // Set ACL policy - profile photos should be public so they can be displayed
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        uploadURL,
+        {
+          owner: userId,
+          visibility: "public",
+        }
+      );
+
+      // Update user profile with new photo URL
+      await storage.updateUser(userId, { profileImageUrl: objectPath });
+
+      // Invalidate user cache
+      invalidateCachePattern(userId, '/api/auth/user');
+
+      return res.json({ profileImageUrl: objectPath });
+    } catch (error: any) {
+      console.error("Error uploading profile photo:", error);
+      return res.status(500).json({ error: error.message || "Failed to upload profile photo" });
+    }
+  });
+
+  // Update user profile (name and other fields)
+  app.patch('/api/user/profile', isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const updateSchema = z.object({
+        firstName: z.string().min(1).max(100).optional(),
+        lastName: z.string().min(1).max(100).optional(),
+      });
+
+      const data = updateSchema.parse(req.body);
+
+      const updatedUser = await storage.updateUser(userId, data);
+
+      // Invalidate user cache
+      invalidateCachePattern(userId, '/api/auth/user');
+
+      return res.json(updatedUser);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      console.error("Error updating user profile:", error);
+      return res.status(500).json({ message: "Failed to update profile" });
     }
   });
 

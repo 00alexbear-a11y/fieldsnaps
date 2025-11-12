@@ -23,6 +23,8 @@ import { nativeClipboard } from '@/lib/nativeClipboard';
 import { haptics } from '@/lib/nativeHaptics';
 import type { Tag, Company, User as UserType } from '@shared/schema';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+import { ProfilePhotoUpload } from '@/components/ProfilePhotoUpload';
+import { ProfileSetupDialog } from '@/components/ProfileSetupDialog';
 
 const TAG_COLORS = [
   { value: 'red', label: 'Red' },
@@ -101,6 +103,7 @@ export default function Settings() {
   const [showTagsDialog, setShowTagsDialog] = useState(false);
   const [showTeamDialog, setShowTeamDialog] = useState(false);
   const [showCameraDialog, setShowCameraDialog] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
 
   const [pdfSettings, setPdfSettings] = useState({
     pdfCompanyName: '',
@@ -610,6 +613,19 @@ export default function Settings() {
                 )}
               </div>
             </div>
+            
+            <Separator />
+            <button
+              onClick={() => setShowProfileDialog(true)}
+              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+              data-testid="button-edit-profile"
+            >
+              <div className="flex items-center gap-3">
+                <UserCircle className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Edit Profile</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
             
             {biometricSupported && (
               <>
@@ -1656,6 +1672,14 @@ export default function Settings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Profile Setup Dialog */}
+      <ProfileSetupDialog
+        open={showProfileDialog}
+        onOpenChange={setShowProfileDialog}
+        user={user}
+        isFirstTime={false}
+      />
     </div>
   );
 }
