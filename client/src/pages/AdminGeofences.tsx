@@ -56,7 +56,7 @@ export default function AdminGeofences() {
         latitude: data.latitude, // Keep as string - database stores text
         longitude: data.longitude, // Keep as string - database stores text
         radius: parseFloat(data.radius),
-        projectId: data.projectId || null,
+        projectId: data.projectId && data.projectId !== 'none' ? data.projectId : null,
       });
     },
     onSuccess: () => {
@@ -82,7 +82,7 @@ export default function AdminGeofences() {
         latitude: data.latitude, // Keep as string - database stores text
         longitude: data.longitude, // Keep as string - database stores text
         radius: parseFloat(data.radius),
-        projectId: data.projectId || null,
+        projectId: data.projectId && data.projectId !== 'none' ? data.projectId : null,
       });
     },
     onSuccess: () => {
@@ -278,7 +278,7 @@ export default function AdminGeofences() {
           latitude: geofence.latitude.toString(),
           longitude: geofence.longitude.toString(),
           radius: geofence.radius.toString(),
-          projectId: geofence.projectId || '',
+          projectId: geofence.projectId || 'none',
         });
         setIsCreating(false);
       });
@@ -290,7 +290,7 @@ export default function AdminGeofences() {
           latitude: geofence.latitude.toString(),
           longitude: geofence.longitude.toString(),
           radius: geofence.radius.toString(),
-          projectId: geofence.projectId || '',
+          projectId: geofence.projectId || 'none',
         });
         setIsCreating(false);
       });
@@ -424,7 +424,7 @@ export default function AdminGeofences() {
                     <SelectValue placeholder="Select project..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No project</SelectItem>
+                    <SelectItem value="none">No project</SelectItem>
                     {projects
                       .filter((p: Project) => !p.deletedAt)
                       .map((project: Project) => (
@@ -563,7 +563,7 @@ export default function AdminGeofences() {
                         latitude: geofence.latitude.toString(),
                         longitude: geofence.longitude.toString(),
                         radius: geofence.radius.toString(),
-                        projectId: geofence.projectId || '',
+                        projectId: geofence.projectId || 'none',
                       });
                       setIsCreating(false);
                       

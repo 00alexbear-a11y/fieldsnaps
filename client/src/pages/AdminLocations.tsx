@@ -43,7 +43,7 @@ export default function AdminLocations() {
 
   // Fetch recent location logs
   const { data: locationLogs = [], isLoading, refetch } = useQuery<LocationLog[]>({
-    queryKey: ['/api/locations/recent', timeWindow],
+    queryKey: ['/api/locations/recent', { minutes: timeWindow }],
     refetchInterval: 30000, // Auto-refresh every 30 seconds
   });
 

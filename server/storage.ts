@@ -2079,7 +2079,7 @@ export class DbStorage implements IStorage {
       isMoving: log.isMoving,
       timestamp: log.timestamp,
       user: log.user,
-      project: log.project.id ? log.project : null,
+      project: log.project && log.project.id ? log.project : null,
     }));
   }
 
