@@ -8,6 +8,7 @@ import BackgroundGeolocation, {
   Geofence as TSGeofence,
 } from "@transistorsoft/capacitor-background-geolocation";
 import { Capacitor } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 /**
  * FieldSnaps Geofencing Service
@@ -36,6 +37,9 @@ export interface GeofencingConfig {
 
 let isInitialized = false;
 let currentConfig: GeofencingConfig | null = null;
+let locationLoggingInterval: ReturnType<typeof setInterval> | null = null;
+let cachedClockStatus: { isClockedIn: boolean; lastChecked: number } | null = null;
+let notificationActionListener: any = null;
 
 /**
  * Battery-optimized configuration for construction sites
@@ -132,8 +136,12 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
     // Set up event listeners
     setupEventListeners(config);
 
-    // TODO: Phase 5 - Configure Background Fetch for periodic location sync
-    // Will implement background sync when building location logging API
+    // Set up notification action handlers (ALWAYS register, even if permissions denied)
+    // This ensures handlers work when permissions are granted later
+    await setupNotificationActionHandlers();
+
+    // Request notification permissions for clock-in/out prompts
+    await requestNotificationPermissions();
 
     isInitialized = true;
   } catch (error) {
@@ -143,18 +151,82 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
 }
 
 /**
+ * Request notification permissions (required for local notifications)
+ */
+async function requestNotificationPermissions(): Promise<void> {
+  try {
+    const result = await LocalNotifications.requestPermissions();
+    if (result.display === 'granted') {
+      console.log("[Geofencing] Notification permissions granted");
+    } else {
+      console.warn("[Geofencing] Notification permissions denied - user will need to enable in Settings");
+    }
+  } catch (error) {
+    console.error("[Geofencing] Failed to request notification permissions:", error);
+  }
+}
+
+/**
+ * Set up notification action handlers (clock in/out via tap)
+ * CRITICAL: Must be called on every init, regardless of permission status
+ */
+async function setupNotificationActionHandlers(): Promise<void> {
+  // Remove existing listener if any
+  if (notificationActionListener) {
+    try {
+      await notificationActionListener.remove();
+    } catch (error) {
+      console.warn("[Geofencing] Error removing old notification listener:", error);
+    } finally {
+      notificationActionListener = null;
+    }
+  }
+
+  // Handle notification taps (works for both tap on body and action buttons)
+  notificationActionListener = await LocalNotifications.addListener(
+    'localNotificationActionPerformed',
+    async (notification) => {
+      console.log("[Notification] Action performed:", notification.actionId, notification);
+      
+      const { actionId, notification: notif } = notification;
+      const geofenceId = notif.extra?.geofenceId;
+      const action = notif.extra?.action;
+      
+      if (!geofenceId || !action) {
+        console.warn("[Notification] Missing geofenceId or action in notification extra data");
+        return;
+      }
+      
+      // Handle both "tap" (notification body) and specific action IDs
+      // Default actionId is "tap" when user taps the notification itself
+      if ((actionId === 'tap' || actionId === 'clock-in') && action === 'clock-in') {
+        await performClockIn(geofenceId);
+      } else if ((actionId === 'tap' || actionId === 'clock-out') && action === 'clock-out') {
+        await performClockOut(geofenceId);
+      } else {
+        console.warn("[Notification] Unknown action:", action);
+      }
+    }
+  );
+  
+  console.log("[Geofencing] Notification action handlers registered");
+}
+
+/**
  * Set up event listeners for geofencing and location updates
  */
 function setupEventListeners(config: GeofencingConfig) {
   // Geofence events
-  BackgroundGeolocation.onGeofence((event: GeofenceEvent) => {
+  BackgroundGeolocation.onGeofence(async (event: GeofenceEvent) => {
     console.log("[Geofence] Event:", event.action, event.identifier);
     
     switch (event.action) {
       case "ENTER":
+        await handleGeofenceEnter(event);
         config.onGeofenceEnter?.(event);
         break;
       case "EXIT":
+        await handleGeofenceExit(event);
         config.onGeofenceExit?.(event);
         break;
       case "DWELL":
@@ -164,7 +236,7 @@ function setupEventListeners(config: GeofencingConfig) {
   });
 
   // Location updates (every 5 minutes when moving)
-  BackgroundGeolocation.onLocation((location: Location) => {
+  BackgroundGeolocation.onLocation(async (location: Location) => {
     console.log("[Location] Update:", {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
@@ -172,6 +244,9 @@ function setupEventListeners(config: GeofencingConfig) {
       battery: location.battery?.level,
       isMoving: location.is_moving,
     });
+    
+    // Log location to server (only when clocked in)
+    await logLocationToServer(location);
     
     config.onLocationUpdate?.(location);
   });
@@ -208,6 +283,413 @@ function setupEventListeners(config: GeofencingConfig) {
 }
 
 /**
+ * Handle geofence ENTER event - prompt user to clock in
+ */
+async function handleGeofenceEnter(event: GeofenceEvent): Promise<void> {
+  try {
+    console.log("[Geofence] Entered job site:", event.identifier);
+    
+    // Check if already clocked in
+    const clockStatus = await fetchClockStatus();
+    if (clockStatus?.isClockedIn) {
+      console.log("[Geofence] Already clocked in - skipping notification");
+      return;
+    }
+
+    // Get geofence details from server to show project name
+    const geofence = await fetchGeofenceDetails(event.identifier);
+    const projectName = geofence?.projectName || "Job Site";
+
+    // Show notification prompt
+    await showClockInNotification(event.identifier, projectName);
+  } catch (error) {
+    console.error("[Geofence] Error handling ENTER event:", error);
+  }
+}
+
+/**
+ * Handle geofence EXIT event - prompt user to clock out
+ */
+async function handleGeofenceExit(event: GeofenceEvent): Promise<void> {
+  try {
+    console.log("[Geofence] Exited job site:", event.identifier);
+    
+    // Check if clocked in
+    const clockStatus = await fetchClockStatus();
+    if (!clockStatus?.isClockedIn) {
+      console.log("[Geofence] Not clocked in - skipping notification");
+      return;
+    }
+
+    // Get geofence details
+    const geofence = await fetchGeofenceDetails(event.identifier);
+    const projectName = geofence?.projectName || "Job Site";
+
+    // Show notification prompt
+    await showClockOutNotification(event.identifier, projectName);
+  } catch (error) {
+    console.error("[Geofence] Error handling EXIT event:", error);
+  }
+}
+
+/**
+ * Show clock-in notification when entering geofence
+ * Uses LocalNotifications to work in background
+ */
+async function showClockInNotification(geofenceId: string, projectName: string): Promise<void> {
+  try {
+    // Schedule notification that works in background
+    // User taps notification to trigger clock-in
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 1000000),
+          title: "Arrived at Job Site",
+          body: `You've arrived at ${projectName}. Tap to clock in.`,
+          extra: {
+            geofenceId,
+            projectName,
+            action: 'clock-in',
+          },
+          schedule: { at: new Date(Date.now() + 100) }, // Fire immediately
+          sound: 'default',
+          smallIcon: 'ic_notification',
+        }
+      ]
+    });
+
+    console.log("[Geofence] Scheduled clock-in notification");
+  } catch (error) {
+    console.error("[Geofence] Error showing clock-in notification:", error);
+  }
+}
+
+/**
+ * Show clock-out notification when exiting geofence
+ * Uses LocalNotifications to work in background
+ */
+async function showClockOutNotification(geofenceId: string, projectName: string): Promise<void> {
+  try {
+    // Schedule notification that works in background
+    // User taps notification to trigger clock-out
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 1000000),
+          title: "Leaving Job Site",
+          body: `You're leaving ${projectName}. Tap to clock out.`,
+          extra: {
+            geofenceId,
+            projectName,
+            action: 'clock-out',
+          },
+          schedule: { at: new Date(Date.now() + 100) }, // Fire immediately
+          sound: 'default',
+          smallIcon: 'ic_notification',
+        }
+      ]
+    });
+
+    console.log("[Geofence] Scheduled clock-out notification");
+  } catch (error) {
+    console.error("[Geofence] Error showing clock-out notification:", error);
+  }
+}
+
+/**
+ * Perform clock-in with GPS location
+ */
+async function performClockIn(geofenceId: string): Promise<void> {
+  try {
+    // Get current location
+    const location = await getCurrentLocation();
+    
+    // Get geofence details to extract projectId
+    const geofence = await fetchGeofenceDetails(geofenceId);
+    
+    if (!geofence || !geofence.projectId) {
+      console.error("[Geofence] Missing projectId for clock-in");
+      await showErrorNotification("Clock In Failed", "Unable to determine project. Please clock in manually.");
+      return;
+    }
+
+    // Clock in via API
+    const response = await fetch('/api/clock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        type: 'clock_in',
+        projectId: geofence.projectId,
+        gpsLatitude: location.coords.latitude,
+        gpsLongitude: location.coords.longitude,
+        gpsAccuracy: location.coords.accuracy,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to clock in');
+    }
+
+    console.log("[Geofence] Successfully clocked in via geofence");
+    
+    // Update cached clock status
+    cachedClockStatus = {
+      isClockedIn: true,
+      lastChecked: Date.now(),
+    };
+    
+    // Start 5-minute location logging
+    startLocationLogging();
+    
+    // Show success notification
+    await showSuccessNotification("Clocked In", `Successfully clocked in at ${geofence.projectName}`);
+  } catch (error) {
+    console.error("[Geofence] Error performing clock-in:", error);
+    await showErrorNotification("Clock In Failed", "Please try clocking in manually.");
+  }
+}
+
+/**
+ * Perform clock-out with GPS location
+ */
+async function performClockOut(geofenceId: string): Promise<void> {
+  try {
+    // Get current location
+    const location = await getCurrentLocation();
+    
+    // Clock out via API
+    const response = await fetch('/api/clock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        type: 'clock_out',
+        gpsLatitude: location.coords.latitude,
+        gpsLongitude: location.coords.longitude,
+        gpsAccuracy: location.coords.accuracy,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to clock out');
+    }
+
+    console.log("[Geofence] Successfully clocked out via geofence");
+    
+    // Update cached clock status
+    cachedClockStatus = {
+      isClockedIn: false,
+      lastChecked: Date.now(),
+    };
+    
+    // Stop location logging
+    stopLocationLogging();
+    
+    // Show success notification
+    await showSuccessNotification("Clocked Out", "Successfully clocked out");
+  } catch (error) {
+    console.error("[Geofence] Error performing clock-out:", error);
+    await showErrorNotification("Clock Out Failed", "Please try clocking out manually.");
+  }
+}
+
+/**
+ * Fetch current clock status from server (with caching)
+ */
+async function fetchClockStatus(): Promise<{ isClockedIn: boolean } | null> {
+  try {
+    // Use cached status if less than 30 seconds old
+    if (cachedClockStatus && (Date.now() - cachedClockStatus.lastChecked) < 30000) {
+      console.log("[Clock] Using cached status:", cachedClockStatus.isClockedIn);
+      return { isClockedIn: cachedClockStatus.isClockedIn };
+    }
+
+    const response = await fetch('/api/clock/status', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      // If network fails, use cached status if available
+      if (cachedClockStatus) {
+        console.warn("[Clock] API failed, using cached status");
+        return { isClockedIn: cachedClockStatus.isClockedIn };
+      }
+      return null;
+    }
+
+    const data = await response.json();
+    const isClockedIn = !!data.clockInTime;
+    
+    // Update cache
+    cachedClockStatus = {
+      isClockedIn,
+      lastChecked: Date.now(),
+    };
+    
+    return { isClockedIn };
+  } catch (error) {
+    console.error("[Geofence] Error fetching clock status:", error);
+    
+    // Fallback to cached status if available
+    if (cachedClockStatus) {
+      console.warn("[Clock] Error fetching status, using cached value");
+      return { isClockedIn: cachedClockStatus.isClockedIn };
+    }
+    
+    return null;
+  }
+}
+
+/**
+ * Fetch geofence details from server
+ */
+async function fetchGeofenceDetails(geofenceId: string): Promise<{ projectId: string; projectName: string } | null> {
+  try {
+    const response = await fetch(`/api/geofences/${geofenceId}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return {
+      projectId: data.projectId,
+      projectName: data.projectName || data.name,
+    };
+  } catch (error) {
+    console.error("[Geofence] Error fetching geofence details:", error);
+    return null;
+  }
+}
+
+/**
+ * Log location to server (called every 5 minutes when clocked in)
+ * Uses cached clock status to reduce API calls
+ */
+async function logLocationToServer(location: Location): Promise<void> {
+  try {
+    // Check cached clock status first (only fetches if cache is stale)
+    const clockStatus = await fetchClockStatus();
+    if (!clockStatus?.isClockedIn) {
+      console.log("[Location] Not clocked in - skipping location log");
+      return;
+    }
+
+    // Send location to server
+    const response = await fetch('/api/locations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        accuracy: location.coords.accuracy,
+        altitude: location.coords.altitude,
+        speed: location.coords.speed,
+        heading: location.coords.heading,
+        batteryLevel: location.battery?.level,
+        batteryCharging: location.battery?.is_charging,
+        activityType: location.activity?.type,
+        activityConfidence: location.activity?.confidence,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("[Location] Failed to log location:", response.statusText);
+    } else {
+      console.log("[Location] Successfully logged location to server");
+    }
+  } catch (error) {
+    console.error("[Location] Error logging location:", error);
+  }
+}
+
+/**
+ * Show success notification
+ */
+async function showSuccessNotification(title: string, body: string): Promise<void> {
+  try {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 1000000),
+          title,
+          body,
+          schedule: { at: new Date(Date.now() + 100) },
+          sound: 'default',
+          smallIcon: 'ic_notification',
+        }
+      ]
+    });
+  } catch (error) {
+    console.error("[Notification] Error showing success notification:", error);
+  }
+}
+
+/**
+ * Show error notification
+ */
+async function showErrorNotification(title: string, body: string): Promise<void> {
+  try {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: Math.floor(Math.random() * 1000000),
+          title,
+          body,
+          schedule: { at: new Date(Date.now() + 100) },
+          sound: 'default',
+          smallIcon: 'ic_notification',
+        }
+      ]
+    });
+  } catch (error) {
+    console.error("[Notification] Error showing error notification:", error);
+  }
+}
+
+/**
+ * Start 5-minute location logging interval
+ */
+function startLocationLogging(): void {
+  // Clear existing interval if any
+  stopLocationLogging();
+
+  console.log("[Location] Starting 5-minute location logging");
+  
+  // Log immediately
+  getCurrentLocation().then(logLocationToServer).catch(console.error);
+
+  // Then log every 5 minutes
+  locationLoggingInterval = setInterval(async () => {
+    try {
+      const location = await getCurrentLocation();
+      await logLocationToServer(location);
+    } catch (error) {
+      console.error("[Location] Error in logging interval:", error);
+    }
+  }, 5 * 60 * 1000); // 5 minutes
+}
+
+/**
+ * Stop location logging interval
+ */
+function stopLocationLogging(): void {
+  if (locationLoggingInterval) {
+    clearInterval(locationLoggingInterval);
+    locationLoggingInterval = null;
+    console.log("[Location] Stopped 5-minute location logging");
+  }
+}
+
+/**
  * Start geofencing (begin tracking)
  */
 export async function startGeofencing(): Promise<void> {
@@ -217,6 +699,12 @@ export async function startGeofencing(): Promise<void> {
 
   const state = await BackgroundGeolocation.start();
   console.log("[Geofencing] Started", { enabled: state.enabled });
+  
+  // Start location logging if already clocked in
+  const clockStatus = await fetchClockStatus();
+  if (clockStatus?.isClockedIn) {
+    startLocationLogging();
+  }
 }
 
 /**
@@ -227,6 +715,9 @@ export async function stopGeofencing(): Promise<void> {
 
   const state = await BackgroundGeolocation.stop();
   console.log("[Geofencing] Stopped", { enabled: state.enabled });
+  
+  // Stop location logging
+  stopLocationLogging();
 }
 
 /**
@@ -249,7 +740,7 @@ export async function addGeofence(geofence: {
     radius: geofence.radius,
     notifyOnEntry: geofence.notifyOnEntry ?? true,
     notifyOnExit: geofence.notifyOnExit ?? true,
-    notifyOnDwell: geofence.notifyOnDwell ?? true,
+    notifyOnDwell: geofence.notifyOnDwell ?? false, // Disabled by default (not using DWELL events)
     loiteringDelay: geofence.loiteringDelay ?? 120000, // 2 minutes default (prevents false triggers)
   };
 
@@ -315,38 +806,6 @@ export async function requestLocationPermission(): Promise<number> {
 }
 
 /**
- * Sync location data to server
- * Called periodically by Background Fetch
- */
-async function syncLocationData(): Promise<void> {
-  try {
-    // Get any pending locations from local database
-    const locations = await BackgroundGeolocation.getLocations();
-    
-    if (locations.length === 0) {
-      console.log("[Sync] No pending locations to sync");
-      return;
-    }
-
-    console.log(`[Sync] Syncing ${locations.length} locations to server`);
-    
-    // TODO: Phase 5 - Implement API call to POST locations to server
-    // await fetch('/api/locations/batch', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ locations }),
-    // });
-    
-    // Clear synced locations from local database
-    await BackgroundGeolocation.destroyLocations();
-    
-    console.log("[Sync] Successfully synced locations");
-  } catch (error) {
-    console.error("[Sync] Failed to sync locations:", error);
-    // Will retry on next background fetch
-  }
-}
-
-/**
  * Get current tracking state
  */
 export async function getState(): Promise<State> {
@@ -370,11 +829,27 @@ export async function changePace(isMoving: boolean): Promise<void> {
 export async function destroyGeofencing(): Promise<void> {
   if (!isInitialized) return;
 
+  // Stop location logging
+  stopLocationLogging();
+
+  // Remove our specific notification listener (not all app listeners)
+  if (notificationActionListener) {
+    try {
+      await notificationActionListener.remove();
+    } catch (error) {
+      console.warn("[Geofencing] Error removing notification listener:", error);
+    } finally {
+      notificationActionListener = null;
+    }
+  }
+
+  // Remove geolocation listeners
   await BackgroundGeolocation.removeListeners();
   await BackgroundGeolocation.stop();
   
   isInitialized = false;
   currentConfig = null;
+  cachedClockStatus = null; // Clear cached status
   
   console.log("[Geofencing] Destroyed");
 }
