@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo, MapPin } from 'lucide-react';
+import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo, MapPin, Radio, FileText } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
@@ -153,6 +153,16 @@ export function AppSidebar() {
       title: 'Geofences',
       icon: MapPin,
       href: '/admin/geofences',
+    },
+    {
+      title: 'Live Tracking',
+      icon: Radio,
+      href: '/admin/locations',
+    },
+    {
+      title: 'Timesheets',
+      icon: FileText,
+      href: '/admin/timesheets',
     },
   ] : [];
 
