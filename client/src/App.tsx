@@ -34,6 +34,8 @@ import MyTasks from "./pages/MyTasks";
 import Timesheets from "./pages/Timesheets";
 import Time from "./pages/Time";
 import AdminGeofences from "./pages/AdminGeofences";
+import AdminLocations from "./pages/AdminLocations";
+import AdminTimesheets from "./pages/AdminTimesheets";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
@@ -283,6 +285,8 @@ function AppContent() {
                 <Route path="/todos" component={ToDos} />
                 <Route path="/time" component={Time} />
                 <Route path="/admin/geofences" component={AdminGeofences} />
+                <Route path="/admin/locations" component={AdminLocations} />
+                <Route path="/admin/timesheets" component={AdminTimesheets} />
                 <Route path="/billing/success" component={BillingSuccess} />
                 <Route path="/share/:token" component={ShareView} />
                 <Route component={NotFound} />
