@@ -1404,18 +1404,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate with partial schema (all fields optional)
       const validated = insertProjectSchema.partial().parse(req.body);
       
+      // Track if location changed for geofence updates
+      let locationChanged = false;
+      
       // Geocode address if provided to get GPS coordinates
       if (validated.address) {
         const geocodeResult = await geocodeAddress(validated.address);
         if (geocodeResult) {
           validated.latitude = geocodeResult.latitude;
           validated.longitude = geocodeResult.longitude;
+          
+          // Check if location actually changed (normalize to numbers for comparison)
+          const oldLat = project.latitude ? parseFloat(project.latitude) : null;
+          const oldLng = project.longitude ? parseFloat(project.longitude) : null;
+          const newLat = parseFloat(geocodeResult.latitude);
+          const newLng = parseFloat(geocodeResult.longitude);
+          
+          if (oldLat !== newLat || oldLng !== newLng) {
+            locationChanged = true;
+          }
         }
       }
       
       const updated = await storage.updateProject(req.params.id, validated);
       if (!updated) {
         return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // If location changed, update associated geofences
+      if (locationChanged && updated.latitude && updated.longitude) {
+        const projectGeofences = await storage.getGeofencesByProject(req.params.id);
+        
+        for (const geofence of projectGeofences) {
+          await storage.updateGeofence(geofence.id, {
+            latitude: updated.latitude,
+            longitude: updated.longitude,
+          });
+        }
       }
       
       // Invalidate projects cache after update
@@ -3326,7 +3351,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         geofences = geofences.filter(g => g.projectId === req.query.projectId);
       }
 
-      res.json(geofences);
+      // Attach project information for each geofence
+      const geofencesWithProjects = await Promise.all(
+        geofences.map(async (geofence) => {
+          if (geofence.projectId) {
+            const project = await storage.getProject(geofence.projectId);
+            return {
+              ...geofence,
+              project: project ? { id: project.id, name: project.name } : null,
+            };
+          }
+          return { ...geofence, project: null };
+        })
+      );
+
+      res.json(geofencesWithProjects);
     } catch (error: any) {
       handleError(res, error);
     }

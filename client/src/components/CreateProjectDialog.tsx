@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import Autocomplete from "react-google-autocomplete";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -19,11 +20,22 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [unitCount, setUnitCount] = useState(1);
   const { toast } = useToast();
 
   const createMutation = useMutation({
-    mutationFn: async (data: { name: string; description?: string; address?: string; unitCount?: number }) => {
+    mutationFn: async (data: { 
+      name: string; 
+      description?: string; 
+      address?: string; 
+      city?: string;
+      state?: string;
+      zipCode?: string;
+      unitCount?: number 
+    }) => {
       const res = await apiRequest("POST", "/api/projects", data);
       return await res.json();
     },
@@ -34,6 +46,9 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
       setName("");
       setDescription("");
       setAddress("");
+      setCity("");
+      setState("");
+      setZipCode("");
       setUnitCount(1);
       toast({ title: "Project created successfully" });
     },
@@ -47,10 +62,41 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
     },
   });
 
+  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
+    if (!place.formatted_address) return;
+
+    setAddress(place.formatted_address);
+
+    const addressComponents = place.address_components || [];
+    let cityValue = "";
+    let stateValue = "";
+    let zipValue = "";
+
+    for (const component of addressComponents) {
+      const types = component.types;
+      
+      if (types.includes("locality")) {
+        cityValue = component.long_name;
+      }
+      
+      if (types.includes("administrative_area_level_1")) {
+        stateValue = component.short_name;
+      }
+      
+      if (types.includes("postal_code")) {
+        zipValue = component.long_name;
+      }
+    }
+
+    setCity(cityValue);
+    setState(stateValue);
+    setZipCode(zipValue);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createMutation.mutate({ name, description, address, unitCount });
+    createMutation.mutate({ name, description, address, city, state, zipCode, unitCount });
   };
 
   return (
@@ -90,13 +136,24 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
           </div>
           <div>
             <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
+            <Autocomplete
+              apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Job site address"
+              onPlaceSelected={handlePlaceSelected}
+              options={{
+                types: ['address'],
+                fields: ['formatted_address', 'address_components', 'geometry'],
+              }}
+              placeholder="Start typing address..."
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               data-testid="input-project-address"
             />
+            {city && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {city}, {state} {zipCode}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="unitCount">Number of Units</Label>
