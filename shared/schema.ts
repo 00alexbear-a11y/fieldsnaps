@@ -470,7 +470,8 @@ export const clockEntries = pgTable("clock_entries", {
 // Geofences table - virtual boundaries around job sites for auto time tracking
 export const geofences = pgTable("geofences", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
   latitude: text("latitude").notNull(), // Matches projects.latitude type
   longitude: text("longitude").notNull(), // Matches projects.longitude type

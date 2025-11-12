@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo } from 'lucide-react';
+import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo, MapPin } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
@@ -147,8 +147,18 @@ export function AppSidebar() {
   const allCount = Array.isArray(todos) ? todos.filter((t: any) => !t.completed).length : 0;
   const completedCount = Array.isArray(todos) ? todos.filter((t: any) => t.completed).length : 0;
 
+  // Admin-only menu items
+  const adminMenuItems = user?.role === 'owner' ? [
+    {
+      title: 'Geofences',
+      icon: MapPin,
+      href: '/admin/geofences',
+    },
+  ] : [];
+
   // Menu items (always visible)
   const menuItems = [
+    ...adminMenuItems,
     {
       title: 'Activity',
       icon: ActivityIcon,
