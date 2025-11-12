@@ -1358,6 +1358,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const project = await storage.createProject(projectData);
 
+      // Create geofence if project has location data
+      if (project.latitude && project.longitude) {
+        console.log(`[Geofence] Creating geofence for new project ${project.id} (${project.name})`);
+        await storage.createGeofence({
+          name: `${project.name} Geofence`,
+          projectId: project.id,
+          companyId: project.companyId,
+          latitude: project.latitude,
+          longitude: project.longitude,
+          radius: 150, // 500ft default (150 meters ≈ 492 feet)
+          isActive: true,
+        });
+      }
+
       // Log activity for accountability
       if (user.companyId) {
         await storage.createActivityLog({
