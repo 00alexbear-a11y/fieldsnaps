@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, MapPin, Battery, Clock, Navigation, RefreshCw } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, MapPin, Battery, Clock, Navigation, Locate, Plus, Minus, Layers } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface LocationLog {
@@ -37,9 +38,14 @@ declare global {
 export default function AdminLocations() {
   const [timeWindow, setTimeWindow] = useState<string>('30'); // minutes
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite'>('roadmap');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
 
   // Fetch recent location logs
   const { data: locationLogs = [], isLoading, refetch } = useQuery<LocationLog[]>({
@@ -57,6 +63,65 @@ export default function AdminLocations() {
 
   const workerLocations = Object.values(latestLocationsByUser);
 
+  // Filter worker locations based on search
+  const filteredWorkers = workerLocations.filter(log => {
+    if (!searchQuery.trim()) return true;
+    const workerName = `${log.user.firstName || ''} ${log.user.lastName || ''}`.trim().toLowerCase();
+    const projectName = log.project?.name.toLowerCase() || '';
+    const query = searchQuery.toLowerCase();
+    return workerName.includes(query) || projectName.includes(query);
+  });
+
+  // Get user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
+
+  // Update user location marker
+  useEffect(() => {
+    if (!googleMapRef.current || !isMapLoaded || !userLocation) return;
+
+    // Remove existing user marker
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setMap(null);
+    }
+
+    // Create blue pulsing dot for user location
+    userMarkerRef.current = new window.google.maps.Marker({
+      position: userLocation,
+      map: googleMapRef.current,
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: '#3B82F6',
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 3,
+      },
+      zIndex: 1000,
+    });
+  }, [userLocation, isMapLoaded]);
+
+  // Toggle map type
+  useEffect(() => {
+    if (googleMapRef.current && isMapLoaded) {
+      googleMapRef.current.setMapTypeId(mapType);
+    }
+  }, [mapType, isMapLoaded]);
+
   // Initialize Google Maps
   useEffect(() => {
     if (!import.meta.env.VITE_GOOGLE_MAPS_API_KEY) return;
@@ -69,10 +134,13 @@ export default function AdminLocations() {
       if (mapRef.current && !googleMapRef.current) {
         googleMapRef.current = new window.google.maps.Map(mapRef.current, {
           zoom: 12,
-          center: { lat: 37.7749, lng: -122.4194 }, // Default to SF
+          center: userLocation || { lat: 37.7749, lng: -122.4194 }, // Default to user or SF
           mapTypeId: 'roadmap',
           streetViewControl: false,
-          fullscreenControl: true,
+          fullscreenControl: false,
+          mapTypeControl: false,
+          zoomControl: false,
+          gestureHandling: 'greedy',
         });
         setIsMapLoaded(true);
       }
@@ -94,13 +162,13 @@ export default function AdminLocations() {
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
-    if (workerLocations.length === 0) return;
+    if (filteredWorkers.length === 0) return;
 
     // Create bounds to fit all markers
     const bounds = new window.google.maps.LatLngBounds();
 
     // Add markers for each worker
-    workerLocations.forEach((log) => {
+    filteredWorkers.forEach((log) => {
       const lat = parseFloat(log.latitude);
       const lng = parseFloat(log.longitude);
       const position = { lat, lng };
@@ -160,7 +228,22 @@ export default function AdminLocations() {
         }
       });
     }
-  }, [workerLocations, isMapLoaded]);
+  }, [filteredWorkers, isMapLoaded]);
+
+  // Helper function to center map on user location
+  const centerOnUser = () => {
+    if (googleMapRef.current && userLocation) {
+      googleMapRef.current.setCenter(userLocation);
+      googleMapRef.current.setZoom(15);
+    }
+  };
+
+  // Helper function to zoom in/out
+  const handleZoom = (direction: 'in' | 'out') => {
+    if (!googleMapRef.current) return;
+    const currentZoom = googleMapRef.current.getZoom() || 12;
+    googleMapRef.current.setZoom(currentZoom + (direction === 'in' ? 1 : -1));
+  };
 
   if (!import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
     return (
@@ -180,58 +263,146 @@ export default function AdminLocations() {
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-96 border-r flex flex-col bg-background">
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold">Worker Locations</h1>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => refetch()}
-              disabled={isLoading}
-              data-testid="button-refresh-locations"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Real-time tracking of worker locations and movement
-          </p>
+    <div className="relative h-screen w-full overflow-hidden">
+      {/* Full Viewport Map */}
+      <div ref={mapRef} className="absolute inset-0" data-testid="map-container" />
+      
+      {!isMapLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Time Window</label>
-            <Select value={timeWindow} onValueChange={setTimeWindow}>
-              <SelectTrigger data-testid="select-time-window">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">Last 5 minutes</SelectItem>
-                <SelectItem value="15">Last 15 minutes</SelectItem>
-                <SelectItem value="30">Last 30 minutes</SelectItem>
-                <SelectItem value="60">Last hour</SelectItem>
-                <SelectItem value="120">Last 2 hours</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Frosted Glass Top Control Bar */}
+      <div className="absolute top-0 left-0 right-0 z-10 p-3 backdrop-blur-md bg-background/80 border-b">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto">
+          <Input
+            type="search"
+            placeholder={`Search ${workerLocations.length} worker${workerLocations.length !== 1 ? 's' : ''} or projects...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 h-9 bg-background/50"
+            data-testid="input-search-workers"
+          />
+          <Select value={timeWindow} onValueChange={setTimeWindow}>
+            <SelectTrigger className="w-32 h-9 bg-background/50" data-testid="select-time-window">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5 min</SelectItem>
+              <SelectItem value="15">15 min</SelectItem>
+              <SelectItem value="30">30 min</SelectItem>
+              <SelectItem value="60">1 hour</SelectItem>
+              <SelectItem value="120">2 hours</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Floating Map/Satellite Toggle (Bottom-Left) */}
+      <div className="absolute bottom-24 left-3 z-10 flex gap-0 rounded-lg overflow-hidden shadow-lg">
+        <Button
+          variant={mapType === 'roadmap' ? 'default' : 'secondary'}
+          size="sm"
+          onClick={() => setMapType('roadmap')}
+          className="rounded-none rounded-l-lg"
+          data-testid="button-map-type-road"
+        >
+          Map
+        </Button>
+        <Button
+          variant={mapType === 'satellite' ? 'default' : 'secondary'}
+          size="sm"
+          onClick={() => setMapType('satellite')}
+          className="rounded-none rounded-r-lg"
+          data-testid="button-map-type-satellite"
+        >
+          Satellite
+        </Button>
+      </div>
+
+      {/* Floating Zoom & Locate Controls (Bottom-Right) */}
+      <div className="absolute bottom-24 right-3 z-10 flex flex-col gap-2">
+        {userLocation && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={centerOnUser}
+            className="shadow-lg"
+            data-testid="button-locate-user"
+          >
+            <Locate className="w-4 h-4" />
+          </Button>
+        )}
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => handleZoom('in')}
+          className="shadow-lg"
+          data-testid="button-zoom-in"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => handleZoom('out')}
+          className="shadow-lg"
+          data-testid="button-zoom-out"
+        >
+          <Minus className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Bottom Sheet - Worker List */}
+      <div 
+        className={`absolute left-0 right-0 bottom-0 z-20 bg-background rounded-t-2xl shadow-2xl border-t transition-transform duration-300 ${
+          isBottomSheetExpanded ? 'translate-y-0' : 'translate-y-[calc(100%-120px)]'
+        }`}
+        data-testid="bottom-sheet-workers"
+      >
+        {/* Handle for swipe */}
+        <div 
+          className="flex justify-center pt-3 pb-2 cursor-pointer"
+          onClick={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
+          data-testid="button-toggle-bottom-sheet"
+        >
+          <div className="w-12 h-1 rounded-full bg-muted-foreground/30" />
         </div>
 
-        {/* Worker List */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Worker List Header */}
+        <div className="px-4 pb-3 flex items-center justify-between">
+          <h2 className="font-semibold">
+            {filteredWorkers.length} Worker{filteredWorkers.length !== 1 ? 's' : ''} Nearby
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isLoading}
+            data-testid="button-refresh-locations"
+          >
+            <Loader2 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+
+        {/* Worker List Content */}
+        <div className="overflow-y-auto pb-safe" style={{ maxHeight: '60vh' }}>
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
-          ) : workerLocations.length === 0 ? (
+          ) : filteredWorkers.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>No recent location data</p>
-              <p className="text-xs mt-1">Workers need to grant location permissions</p>
+              <p>{searchQuery ? 'No workers found' : 'No recent location data'}</p>
+              {!searchQuery && (
+                <p className="text-xs mt-1">Workers need to grant location permissions</p>
+              )}
             </div>
           ) : (
-            <div className="p-2 space-y-2">
-              {workerLocations.map((log) => {
+            <div className="px-3 pb-4 space-y-2">
+              {filteredWorkers.map((log) => {
                 const workerName = `${log.user.firstName || ''} ${log.user.lastName || ''}`.trim() || 'Unknown';
                 const minutesAgo = Math.floor((Date.now() - new Date(log.timestamp).getTime()) / 1000 / 60);
                 
@@ -246,6 +417,7 @@ export default function AdminLocations() {
                           lng: parseFloat(log.longitude),
                         });
                         googleMapRef.current.setZoom(15);
+                        setIsBottomSheetExpanded(false);
                       }
                     }}
                     data-testid={`card-worker-${log.userId}`}
@@ -294,16 +466,6 @@ export default function AdminLocations() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Map */}
-      <div className="flex-1 relative">
-        {!isMapLoaded ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : null}
-        <div ref={mapRef} className="w-full h-full" data-testid="map-container" />
       </div>
     </div>
   );
