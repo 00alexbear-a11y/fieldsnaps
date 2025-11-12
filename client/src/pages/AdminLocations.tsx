@@ -45,7 +45,9 @@ export default function AdminLocations() {
   const [hasInitialCentered, setHasInitialCentered] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
+  const workerMarkersRef = useRef<google.maps.Marker[]>([]);
+  const geofenceMarkersRef = useRef<google.maps.Marker[]>([]);
+  const geofenceCirclesRef = useRef<google.maps.Circle[]>([]);
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -56,6 +58,19 @@ export default function AdminLocations() {
   const { data: locationLogs = [], isLoading, refetch } = useQuery<LocationLog[]>({
     queryKey: ['/api/locations/recent', { minutes: timeWindow }],
     refetchInterval: 30000, // Auto-refresh every 30 seconds
+  });
+
+  // Fetch geofences (project locations)
+  const { data: geofences = [] } = useQuery<Array<{
+    id: string;
+    projectId: string;
+    latitude: string;
+    longitude: string;
+    radiusMeters: number;
+    project?: { id: string; name: string };
+  }>>({
+    queryKey: ['/api/geofences'],
+    refetchInterval: 60000, // Refresh every minute to catch project updates
   });
 
   // Group locations by user (show most recent per user)
@@ -175,13 +190,78 @@ export default function AdminLocations() {
     };
   }, []);
 
-  // Update markers when locations change
+  // Update geofence circles when geofences change
   useEffect(() => {
     if (!googleMapRef.current || !isMapLoaded) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
-    markersRef.current = [];
+    // Clear existing geofence circles and markers
+    geofenceCirclesRef.current.forEach(circle => circle.setMap(null));
+    geofenceCirclesRef.current = [];
+    geofenceMarkersRef.current.forEach(marker => marker.setMap(null));
+    geofenceMarkersRef.current = [];
+
+    if (geofences.length === 0) return;
+
+    // Add circle for each geofence
+    geofences.forEach((geofence) => {
+      const lat = parseFloat(geofence.latitude);
+      const lng = parseFloat(geofence.longitude);
+      const position = { lat, lng };
+
+      // Create circle
+      const circle = new window.google.maps.Circle({
+        strokeColor: '#3B82F6',
+        strokeOpacity: 0.6,
+        strokeWeight: 2,
+        fillColor: '#3B82F6',
+        fillOpacity: 0.15,
+        map: googleMapRef.current,
+        center: position,
+        radius: geofence.radiusMeters,
+      });
+
+      geofenceCirclesRef.current.push(circle);
+
+      // Add marker at center
+      const marker = new window.google.maps.Marker({
+        position,
+        map: googleMapRef.current,
+        title: geofence.project?.name || 'Job Site',
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#3B82F6',
+          fillOpacity: 0.8,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+        },
+      });
+
+      // Info window
+      const infoWindow = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 8px;">
+            <h3 style="font-weight: 600; margin-bottom: 4px;">${geofence.project?.name || 'Job Site'}</h3>
+            <p style="font-size: 12px; color: #666;">Geofence radius: ${geofence.radiusMeters}m</p>
+          </div>
+        `,
+      });
+
+      marker.addListener('click', () => {
+        infoWindow.open(googleMapRef.current, marker);
+      });
+
+      geofenceMarkersRef.current.push(marker);
+    });
+  }, [geofences, isMapLoaded]);
+
+  // Update worker markers when locations change
+  useEffect(() => {
+    if (!googleMapRef.current || !isMapLoaded) return;
+
+    // Clear existing worker markers only
+    workerMarkersRef.current.forEach(marker => marker.setMap(null));
+    workerMarkersRef.current = [];
 
     if (filteredWorkers.length === 0) return;
 
@@ -214,6 +294,7 @@ export default function AdminLocations() {
           strokeColor: '#ffffff',
           strokeWeight: 3,
         },
+        zIndex: 500, // Higher than geofence markers
       });
 
       // Info window
@@ -233,7 +314,7 @@ export default function AdminLocations() {
         infoWindow.open(googleMapRef.current, marker);
       });
 
-      markersRef.current.push(marker);
+      workerMarkersRef.current.push(marker);
       bounds.extend(position);
     });
 
