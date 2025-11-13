@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Download, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Calendar, Download, ChevronLeft, ChevronRight, Clock, FileText, FileSpreadsheet } from "lucide-react";
 import { useState, useMemo } from "react";
-import type { ClockEntry } from "@shared/schema";
+import type { ClockEntry, User, Project } from "@shared/schema";
 import { processTimesheetData, generateCsvData, formatHours } from "@/lib/timesheetUtils";
+import { generateBasicTimecardPdf, generateDetailedTimecardPdf } from "@/lib/timesheetPdfUtils";
 
 export default function Timesheets() {
   const [weekOffset, setWeekOffset] = useState(0);
@@ -44,6 +51,39 @@ export default function Timesheets() {
     },
   });
 
+  // Fetch current user for employee name
+  const { data: user } = useQuery<User>({
+    queryKey: ['/api/user'],
+  });
+
+  // Fetch projects for project names mapping
+  const { data: projects } = useQuery<Project[]>({
+    queryKey: ['/api/projects'],
+  });
+
+  // Fetch location logs for travel time calculation (if available)
+  const { data: locationLogs } = useQuery<Array<{
+    timestamp: string;
+    isMoving: boolean;
+    projectId?: string | null;
+  }>>({
+    queryKey: ['/api/locations/user', startOfWeek.toISOString(), endOfWeek.toISOString()],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        startDate: startOfWeek.toISOString(),
+        endDate: endOfWeek.toISOString(),
+      });
+      const res = await fetch(`/api/locations/user?${params}`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        // Location logs are optional - return empty array if not available
+        return [];
+      }
+      return res.json();
+    },
+  });
+
   // Process raw entries into timesheet data (client-side, timezone-safe)
   const weekData = useMemo(() => {
     if (!rawEntries) return null;
@@ -56,7 +96,7 @@ export default function Timesheets() {
     return `${start} - ${end}`;
   };
 
-  const handleExport = () => {
+  const handleExportCsv = () => {
     if (!weekData) return;
 
     const csvContent = generateCsvData(weekData, startOfWeek);
@@ -71,6 +111,48 @@ export default function Timesheets() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPdf = (type: 'basic' | 'detailed') => {
+    if (!weekData || !rawEntries || !user) return;
+
+    // Build project names map
+    const projectNames = new Map<string, string>();
+    if (projects) {
+      for (const project of projects) {
+        projectNames.set(project.id, project.name);
+      }
+    }
+
+    const employeeName = user.firstName && user.lastName 
+      ? `${user.firstName} ${user.lastName}`
+      : user.email || 'Employee';
+
+    // Convert location logs timestamps to Date objects
+    const formattedLocationLogs = locationLogs?.map(log => ({
+      ...log,
+      timestamp: new Date(log.timestamp),
+    }));
+
+    const options = {
+      employeeName,
+      companyName: undefined, // TODO: Fetch company name from user.companyId
+      supervisorName: undefined, // TODO: Fetch supervisor if needed
+      weekData,
+      startDate: startOfWeek,
+      endDate: endOfWeek,
+      rawEntries,
+      projectNames,
+      locationLogs: formattedLocationLogs,
+    };
+
+    const doc = type === 'basic' 
+      ? generateBasicTimecardPdf(options)
+      : generateDetailedTimecardPdf(options);
+
+    // Download PDF
+    const filename = `timecard-${type}-${startOfWeek.toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
@@ -82,15 +164,41 @@ export default function Timesheets() {
               Timesheets
             </h1>
           </div>
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={!weekData || isLoading}
-            data-testid="button-export-csv"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={!weekData || isLoading}
+                data-testid="button-export"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={handleExportCsv}
+                data-testid="button-export-csv"
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                CSV (Spreadsheet)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleExportPdf('basic')}
+                data-testid="button-export-pdf-basic"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                PDF (Basic Timecard)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleExportPdf('detailed')}
+                data-testid="button-export-pdf-detailed"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                PDF (Detailed Report)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Week Navigator */}
