@@ -173,6 +173,12 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
                   setAddress(e.target.value);
                 }}
                 onPlaceSelected={handlePlaceSelected}
+                onKeyDown={(e: any) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    console.log('[Autocomplete] Enter key blocked to prevent form submission');
+                  }
+                }}
                 options={{
                   types: ['address'],
                   fields: ['formatted_address', 'address_components', 'geometry'],
