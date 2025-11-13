@@ -24,6 +24,9 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [unitCount, setUnitCount] = useState(1);
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const { toast } = useToast();
 
   // Fix Google Places autocomplete dropdown z-index and pointer events
@@ -57,7 +60,10 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
       city?: string;
       state?: string;
       zipCode?: string;
-      unitCount?: number 
+      unitCount?: number;
+      customerName?: string;
+      customerPhone?: string;
+      customerEmail?: string;
     }) => {
       const res = await apiRequest("POST", "/api/projects", data);
       return await res.json();
@@ -73,6 +79,9 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
       setState("");
       setZipCode("");
       setUnitCount(1);
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerEmail("");
       toast({ title: "Project created successfully" });
     },
     onError: (error: any) => {
@@ -92,39 +101,53 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
       return;
     }
 
-    setAddress(place.formatted_address);
+    // Prevent any immediate form submission by stopping event propagation
+    setTimeout(() => {
+      setAddress(place.formatted_address);
 
-    const addressComponents = place.address_components || [];
-    let cityValue = "";
-    let stateValue = "";
-    let zipValue = "";
+      const addressComponents = place.address_components || [];
+      let cityValue = "";
+      let stateValue = "";
+      let zipValue = "";
 
-    for (const component of addressComponents) {
-      const types = component.types;
-      
-      if (types.includes("locality")) {
-        cityValue = component.long_name;
+      for (const component of addressComponents) {
+        const types = component.types;
+        
+        if (types.includes("locality")) {
+          cityValue = component.long_name;
+        }
+        
+        if (types.includes("administrative_area_level_1")) {
+          stateValue = component.short_name;
+        }
+        
+        if (types.includes("postal_code")) {
+          zipValue = component.long_name;
+        }
       }
-      
-      if (types.includes("administrative_area_level_1")) {
-        stateValue = component.short_name;
-      }
-      
-      if (types.includes("postal_code")) {
-        zipValue = component.long_name;
-      }
-    }
 
-    console.log('[Autocomplete] Parsed:', { city: cityValue, state: stateValue, zip: zipValue });
-    setCity(cityValue);
-    setState(stateValue);
-    setZipCode(zipValue);
+      console.log('[Autocomplete] Parsed:', { city: cityValue, state: stateValue, zip: zipValue });
+      setCity(cityValue);
+      setState(stateValue);
+      setZipCode(zipValue);
+    }, 0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createMutation.mutate({ name, description, address, city, state, zipCode, unitCount });
+    createMutation.mutate({ 
+      name, 
+      description, 
+      address, 
+      city, 
+      state, 
+      zipCode, 
+      unitCount,
+      customerName: customerName.trim() || undefined,
+      customerPhone: customerPhone.trim() || undefined,
+      customerEmail: customerEmail.trim() || undefined,
+    });
   };
 
   return (
@@ -222,6 +245,44 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
               data-testid="input-project-description"
             />
           </div>
+
+          {/* Customer Information Section */}
+          <div className="space-y-4 pt-2 border-t">
+            <h3 className="text-sm font-medium">Customer Information (optional)</h3>
+            <div>
+              <Label htmlFor="customerName">Customer Name</Label>
+              <Input
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Enter customer name"
+                data-testid="input-customer-name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customerPhone">Customer Phone</Label>
+              <Input
+                id="customerPhone"
+                type="tel"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                placeholder="(555) 123-4567"
+                data-testid="input-customer-phone"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customerEmail">Customer Email</Label>
+              <Input
+                id="customerEmail"
+                type="email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                placeholder="customer@example.com"
+                data-testid="input-customer-email"
+              />
+            </div>
+          </div>
+
           <Button 
             type="submit" 
             className="w-full" 
