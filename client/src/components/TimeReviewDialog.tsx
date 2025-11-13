@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MobileDialog } from "@/components/ui/mobile-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -130,16 +130,35 @@ export function TimeReviewDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col" data-testid="dialog-time-review">
-        <DialogHeader>
-          <DialogTitle>Review Your Day</DialogTitle>
-          <DialogDescription>
-            Review your clock entries for today before ending your day. Total time worked: {formatHours(totalHoursToday)}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto space-y-3 py-4" data-testid="time-review-entries">
+    <>
+      <MobileDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title="Review Your Day"
+        description={`Review your clock entries for today before ending your day. Total time worked: ${formatHours(totalHoursToday)}`}
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isClockingOut}
+              data-testid="button-cancel-review"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={onConfirmClockOut}
+              disabled={isClockingOut}
+              data-testid="button-confirm-clock-out"
+              className="flex-1"
+            >
+              {isClockingOut ? "Clocking Out..." : "Confirm & Clock Out"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3" data-testid="time-review-entries">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -194,66 +213,22 @@ export function TimeReviewDialog({
             ))
           )}
         </div>
-
-        <DialogFooter className="flex-row justify-between gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isClockingOut}
-            data-testid="button-cancel-review"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={onConfirmClockOut}
-            disabled={isClockingOut}
-            data-testid="button-confirm-clock-out"
-          >
-            {isClockingOut ? "Clocking Out..." : "Confirm & Clock Out"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+      </MobileDialog>
 
       {/* Edit Entry Dialog */}
-      <Dialog open={!!editingEntry} onOpenChange={(open) => !open && setEditingEntry(null)}>
-        <DialogContent data-testid="dialog-edit-entry">
-          <DialogHeader>
-            <DialogTitle>Edit Clock Entry</DialogTitle>
-            <DialogDescription>
-              Modify the timestamp for this entry. A reason is required for audit purposes.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-timestamp">Timestamp</Label>
-              <Input
-                id="edit-timestamp"
-                type="datetime-local"
-                value={editTimestamp}
-                onChange={(e) => setEditTimestamp(e.target.value)}
-                data-testid="input-edit-timestamp"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="edit-reason">Reason for Edit *</Label>
-              <Textarea
-                id="edit-reason"
-                placeholder="Explain why this entry needs to be updated..."
-                value={editReason}
-                onChange={(e) => setEditReason(e.target.value)}
-                data-testid="textarea-edit-reason"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
+      <MobileDialog 
+        open={!!editingEntry} 
+        onOpenChange={(open) => !open && setEditingEntry(null)}
+        title="Edit Clock Entry"
+        description="Modify the timestamp for this entry. A reason is required for audit purposes."
+        footer={
+          <div className="flex gap-3 w-full">
             <Button
               variant="outline"
               onClick={() => setEditingEntry(null)}
               disabled={editMutation.isPending}
               data-testid="button-cancel-edit"
+              className="flex-1"
             >
               Cancel
             </Button>
@@ -261,12 +236,37 @@ export function TimeReviewDialog({
               onClick={handleSaveEdit}
               disabled={editMutation.isPending || !editReason.trim()}
               data-testid="button-save-edit"
+              className="flex-1"
             >
               {editMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </Dialog>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="edit-timestamp">Timestamp</Label>
+            <Input
+              id="edit-timestamp"
+              type="datetime-local"
+              value={editTimestamp}
+              onChange={(e) => setEditTimestamp(e.target.value)}
+              data-testid="input-edit-timestamp"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-reason">Reason for Edit *</Label>
+            <Textarea
+              id="edit-reason"
+              placeholder="Explain why this entry needs to be updated..."
+              value={editReason}
+              onChange={(e) => setEditReason(e.target.value)}
+              data-testid="textarea-edit-reason"
+            />
+          </div>
+        </div>
+      </MobileDialog>
+    </>
   );
 }

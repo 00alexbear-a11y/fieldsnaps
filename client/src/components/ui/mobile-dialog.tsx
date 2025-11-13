@@ -15,6 +15,7 @@ interface MobileDialogProps {
   onCancel?: () => void;
   className?: string;
   contentClassName?: string;
+  dismissible?: boolean; // When false, prevents backdrop clicks and Escape key from closing
 }
 
 /**
@@ -39,6 +40,7 @@ export function MobileDialog({
   onCancel,
   className,
   contentClassName,
+  dismissible = true,
 }: MobileDialogProps) {
   // Only track keyboard when dialog is actually open to avoid multiple listeners
   const { keyboardHeight, visualViewportHeight } = useKeyboardManager(open);
@@ -79,6 +81,16 @@ export function MobileDialog({
         style={{
           maxHeight,
         }}
+        onInteractOutside={(e) => {
+          if (!dismissible) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          if (!dismissible) {
+            e.preventDefault();
+          }
+        }}
       >
         {/* Header - not scrollable */}
         <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
@@ -89,7 +101,7 @@ export function MobileDialog({
         {/* Scrollable content area */}
         <div 
           className={cn(
-            "flex-1 overflow-y-auto px-6",
+            "flex-1 flex min-h-0 overflow-y-auto px-6",
             // iOS smooth scrolling
             "[-webkit-overflow-scrolling:touch]",
             // Add bottom padding when keyboard is open to ensure content is accessible

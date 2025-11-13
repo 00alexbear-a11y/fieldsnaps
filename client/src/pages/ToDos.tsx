@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { MobileDialog } from "@/components/ui/mobile-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -965,21 +965,50 @@ export default function ToDos() {
           </main>
 
         {/* Add/Edit Dialog */}
-        <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
-          if (!open) {
-            setShowAddDialog(false);
-            setShowEditDialog(false);
-            setEditingTodo(null);
-            form.reset();
-            setSelectedPhotoId(null);
-            setSelectedPhotoUrl(null);
+        <MobileDialog 
+          open={showAddDialog || showEditDialog} 
+          onOpenChange={(open) => {
+            if (!open) {
+              setShowAddDialog(false);
+              setShowEditDialog(false);
+              setEditingTodo(null);
+              form.reset();
+              setSelectedPhotoId(null);
+              setSelectedPhotoUrl(null);
+            }
+          }}
+          title={editingTodo ? 'Edit Task' : 'New Task'}
+          footer={
+            <div className="flex gap-3 w-full">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowAddDialog(false);
+                  setShowEditDialog(false);
+                  setEditingTodo(null);
+                  form.reset();
+                  setSelectedPhotoId(null);
+                  setSelectedPhotoUrl(null);
+                }}
+                data-testid="button-cancel-todo"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="todo-form"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                data-testid="button-save-todo"
+                className="flex-1"
+              >
+                {editingTodo ? 'Update' : 'Create'}
+              </Button>
+            </div>
           }
-        }}>
-          <DialogContent data-testid="dialog-todo-form">
-            <DialogHeader>
-              <DialogTitle>{editingTodo ? 'Edit Task' : 'New Task'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        >
+          <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <div>
                 <Label htmlFor="title">Title *</Label>
                 <Input
@@ -1102,34 +1131,8 @@ export default function ToDos() {
                   />
                 </div>
               )}
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowAddDialog(false);
-                    setShowEditDialog(false);
-                    setEditingTodo(null);
-                    form.reset();
-                    setSelectedPhotoId(null);
-                    setSelectedPhotoUrl(null);
-                  }}
-                  data-testid="button-cancel-todo"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  data-testid="button-save-todo"
-                >
-                  {editingTodo ? 'Update' : 'Create'}
-                </Button>
-              </DialogFooter>
             </form>
-          </DialogContent>
-        </Dialog>
+        </MobileDialog>
 
         {/* Details Drawer */}
         <Sheet open={showDetailsDrawer} onOpenChange={setShowDetailsDrawer}>

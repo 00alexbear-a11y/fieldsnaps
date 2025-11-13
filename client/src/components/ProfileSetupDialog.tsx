@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { MobileDialog } from "@/components/ui/mobile-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,14 @@ export function ProfileSetupDialog({ open, onOpenChange, user, isFirstTime = fal
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const { toast } = useToast();
+
+  // Reset state to user prop when dialog opens or user changes
+  useEffect(() => {
+    if (open) {
+      setFirstName(user?.firstName || "");
+      setLastName(user?.lastName || "");
+    }
+  }, [open, user?.firstName, user?.lastName]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { firstName?: string; lastName?: string }) => {
@@ -80,85 +88,77 @@ export function ProfileSetupDialog({ open, onOpenChange, user, isFirstTime = fal
     : user?.email?.[0]?.toUpperCase() || "?";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className="sm:max-w-md" 
-        data-testid="dialog-profile-setup"
-        onInteractOutside={(e) => {
-          // Prevent backdrop clicks from closing during first-time setup
-          if (isFirstTime) {
-            e.preventDefault();
-          }
-        }}
-        onEscapeKeyDown={(e) => {
-          // Prevent Escape key from closing during first-time setup
-          if (isFirstTime) {
-            e.preventDefault();
-          }
-        }}
-      >
-        <DialogHeader>
-          <DialogTitle>{isFirstTime ? "Complete Your Profile" : "Edit Profile"}</DialogTitle>
-          {isFirstTime && (
-            <DialogDescription>
-              Add a photo and your name to personalize your account
-            </DialogDescription>
-          )}
-        </DialogHeader>
-
-        <div className="space-y-6 py-4">
-          <ProfilePhotoUpload
-            currentPhotoUrl={user?.profileImageUrl}
-            userInitials={userInitials}
-            onUploadComplete={(url) => {
-              console.log("Profile photo uploaded:", url);
-            }}
-          />
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Enter your first name"
-                data-testid="input-first-name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Enter your last name"
-                data-testid="input-last-name"
-              />
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="flex gap-2">
-          {isFirstTime && (
+    <MobileDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isFirstTime ? "Complete Your Profile" : "Edit Profile"}
+      description={isFirstTime ? "Add a photo and your name to personalize your account" : undefined}
+      dismissible={!isFirstTime} // Non-dismissible during first-time setup
+      footer={
+        <div className="flex gap-2 w-full">
+          {isFirstTime ? (
             <Button
               variant="ghost"
               onClick={handleSkip}
               data-testid="button-skip-profile"
+              className="flex-1"
             >
               Skip for Now
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              data-testid="button-cancel-profile"
+              className="flex-1"
+            >
+              Cancel
             </Button>
           )}
           <Button
             onClick={handleSave}
             disabled={updateProfileMutation.isPending}
             data-testid="button-save-profile"
+            className="flex-1"
           >
             {updateProfileMutation.isPending ? "Saving..." : "Save Profile"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        <ProfilePhotoUpload
+          currentPhotoUrl={user?.profileImageUrl}
+          userInitials={userInitials}
+          onUploadComplete={(url) => {
+            console.log("Profile photo uploaded:", url);
+          }}
+        />
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter your first name"
+              data-testid="input-first-name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter your last name"
+              data-testid="input-last-name"
+            />
+          </div>
+        </div>
+      </div>
+    </MobileDialog>
   );
 }
