@@ -166,7 +166,6 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         title="Create New Project"
-        description="Enter details for your new construction project."
         onSubmit={handleSubmit}
         submitLabel={createMutation.isPending ? "Creating..." : "Create Project"}
         submitDisabled={createMutation.isPending}
