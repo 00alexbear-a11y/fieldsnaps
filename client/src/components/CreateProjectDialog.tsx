@@ -62,8 +62,12 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
     },
   });
 
-  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
-    if (!place.formatted_address) return;
+  const handlePlaceSelected = (place: any) => {
+    console.log('[Autocomplete] Place selected:', place);
+    if (!place.formatted_address) {
+      console.log('[Autocomplete] No formatted address found');
+      return;
+    }
 
     setAddress(place.formatted_address);
 
@@ -88,6 +92,7 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
       }
     }
 
+    console.log('[Autocomplete] Parsed:', { city: cityValue, state: stateValue, zip: zipValue });
     setCity(cityValue);
     setState(stateValue);
     setZipCode(zipValue);
@@ -136,19 +141,25 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
           </div>
           <div>
             <Label htmlFor="address">Address</Label>
-            <Autocomplete
-              apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              onPlaceSelected={handlePlaceSelected}
-              options={{
-                types: ['address'],
-                fields: ['formatted_address', 'address_components', 'geometry'],
-              }}
-              placeholder="Start typing address..."
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              data-testid="input-project-address"
-            />
+            <div className="relative" style={{ zIndex: 9999 }}>
+              <Autocomplete
+                apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                value={address}
+                onChange={(e: any) => {
+                  console.log('[Autocomplete] Text changed:', e.target.value);
+                  setAddress(e.target.value);
+                }}
+                onPlaceSelected={handlePlaceSelected}
+                options={{
+                  types: ['address'],
+                  fields: ['formatted_address', 'address_components', 'geometry'],
+                }}
+                placeholder="Start typing address..."
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                data-testid="input-project-address"
+                style={{ position: 'relative', zIndex: 1 }}
+              />
+            </div>
             {city && (
               <p className="text-xs text-muted-foreground mt-1">
                 {city}, {state} {zipCode}
