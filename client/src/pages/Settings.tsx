@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock, Info } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock, Info, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { MobileDialog } from '@/components/ui/mobile-dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
@@ -1147,81 +1148,70 @@ export default function Settings() {
       </Dialog>
 
       {/* Tag Edit Dialog */}
-      <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
-        <DialogContent data-testid="dialog-tag-edit">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTag ? 'Edit Tag' : 'Create Tag'}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="tag-name">Name</Label>
-              <Input
-                id="tag-name"
-                value={tagName}
-                onChange={(e) => setTagName(e.target.value)}
-                placeholder="e.g., Electrician, HVAC, Plumber"
-                data-testid="input-tag-name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="tag-color">Color</Label>
-              <Select value={tagColor} onValueChange={setTagColor}>
-                <SelectTrigger id="tag-color" data-testid="select-tag-color">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent 
-                  position="popper"
-                  sideOffset={5}
-                  className="z-[100]"
-                >
-                  {TAG_COLORS.map((color) => (
-                    <SelectItem key={color.value} value={color.value}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: color.value }}
-                        />
-                        {color.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      <MobileDialog
+        open={isTagDialogOpen}
+        onOpenChange={setIsTagDialogOpen}
+        title={editingTag ? 'Edit Tag' : 'Create Tag'}
+        showCancel
+        onCancel={() => setIsTagDialogOpen(false)}
+        footer={
+          <Button
+            onClick={handleSaveTag}
+            disabled={createTagMutation.isPending || updateTagMutation.isPending}
+            data-testid="button-save-tag"
+            className="w-full"
+          >
+            {editingTag ? 'Update' : 'Create'}
+          </Button>
+        }
+      >
+        <div className="space-y-4" data-testid="dialog-tag-edit">
+          <div className="space-y-2">
+            <Input
+              id="tag-name"
+              value={tagName}
+              onChange={(e) => setTagName(e.target.value)}
+              placeholder="Name (e.g., Electrician, HVAC)"
+              data-testid="input-tag-name"
+            />
           </div>
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsTagDialogOpen(false)}
-              data-testid="button-cancel-tag"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSaveTag}
-              disabled={createTagMutation.isPending || updateTagMutation.isPending}
-              data-testid="button-save-tag"
-            >
-              {editingTag ? 'Update' : 'Create'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div className="space-y-2">
+            <Select value={tagColor} onValueChange={setTagColor}>
+              <SelectTrigger id="tag-color" data-testid="select-tag-color">
+                <SelectValue placeholder="Color" />
+              </SelectTrigger>
+              <SelectContent 
+                position="popper"
+                sideOffset={5}
+                className="z-[100]"
+              >
+                {TAG_COLORS.map((color) => (
+                  <SelectItem key={color.value} value={color.value}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: color.value }}
+                      />
+                      {color.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </MobileDialog>
 
       {/* Team Dialog */}
-      <Dialog open={showTeamDialog} onOpenChange={setShowTeamDialog}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Team Members</DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
+      <MobileDialog 
+        open={showTeamDialog} 
+        onOpenChange={setShowTeamDialog} 
+        title="Team Members"
+        showCancel
+        onCancel={() => setShowTeamDialog(false)}
+      >
+        <div className="space-y-4">
               {company?.ownerId === user?.id && (
                 <div className="p-3 rounded-lg bg-muted/50 space-y-2">
                   <div className="flex justify-between items-center">
@@ -1353,19 +1343,30 @@ export default function Settings() {
                 ))}
               </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      </MobileDialog>
 
       {/* PDF Settings Dialog */}
-      <Dialog open={showPdfDialog} onOpenChange={setShowPdfDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>PDF Export Settings</DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-6 py-4">
+      <MobileDialog 
+        open={showPdfDialog} 
+        onOpenChange={setShowPdfDialog}
+        title="PDF Export Settings"
+        showCancel
+        onCancel={() => setShowPdfDialog(false)}
+        footer={
+          <Button
+            onClick={() => {
+              handleSavePdfSettings();
+              setShowPdfDialog(false);
+            }}
+            disabled={savePdfSettingsMutation.isPending}
+            data-testid="button-save-pdf-settings"
+            className="w-full"
+          >
+            {savePdfSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
+          </Button>
+        }
+      >
+        <div className="space-y-6">
               {/* Logo Upload */}
               <div className="space-y-3">
                 <Label className="text-base font-medium">Company Logo</Label>
@@ -1565,28 +1566,7 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowPdfDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                handleSavePdfSettings();
-                setShowPdfDialog(false);
-              }}
-              disabled={savePdfSettingsMutation.isPending}
-              data-testid="button-save-pdf-settings"
-            >
-              {savePdfSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </MobileDialog>
 
       {/* Cleanup Results Dialog */}
       <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
@@ -1677,7 +1657,7 @@ export default function Settings() {
       <ProfileSetupDialog
         open={showProfileDialog}
         onOpenChange={setShowProfileDialog}
-        user={user}
+        user={user || null}
         isFirstTime={false}
       />
     </div>
