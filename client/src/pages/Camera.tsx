@@ -1437,7 +1437,8 @@ export default function Camera() {
       return;
     }
 
-    haptics.light();
+    // Apple-style haptic feedback when shutter is pressed
+    haptics.medium();
     
     // Trigger flash animation
     setShowFlash(true);
