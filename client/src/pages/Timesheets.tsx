@@ -114,6 +114,13 @@ export default function Timesheets() {
   const handleExportPdf = (type: 'basic' | 'detailed') => {
     if (!weekData || !rawEntries || !user) return;
 
+    console.log('[PDF Export] Starting PDF generation:', {
+      type,
+      entryCount: rawEntries.length,
+      locationLogsAvailable: !!locationLogs,
+      locationLogsCount: locationLogs?.length || 0,
+    });
+
     // Build project names map
     const projectNames = new Map<string, string>();
     if (projects) {
@@ -132,6 +139,12 @@ export default function Timesheets() {
       timestamp: new Date(log.timestamp),
     }));
 
+    console.log('[PDF Export] Options:', {
+      employeeName,
+      projectCount: projectNames.size,
+      formattedLogsCount: formattedLocationLogs?.length || 0,
+    });
+
     const options = {
       employeeName,
       companyName: undefined, // TODO: Fetch company name from user.companyId
@@ -144,13 +157,16 @@ export default function Timesheets() {
       locationLogs: formattedLocationLogs,
     };
 
+    console.log('[PDF Export] Generating PDF...');
     const doc = type === 'basic' 
       ? generateBasicTimecardPdf(options)
       : generateDetailedTimecardPdf(options);
 
     // Download PDF
     const filename = `timecard-${type}-${startOfWeek.toISOString().split('T')[0]}.pdf`;
+    console.log('[PDF Export] ✅ PDF generated, triggering download:', filename);
     doc.save(filename);
+    console.log('[PDF Export] ✅ Download complete');
   };
 
   return (
