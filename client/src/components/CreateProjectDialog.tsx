@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import Autocomplete from "react-google-autocomplete";
@@ -25,6 +25,29 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
   const [zipCode, setZipCode] = useState("");
   const [unitCount, setUnitCount] = useState(1);
   const { toast } = useToast();
+
+  // Fix Google Places autocomplete dropdown z-index and pointer events
+  useEffect(() => {
+    if (dialogOpen) {
+      const checkAndFixDropdown = () => {
+        const pacContainers = document.querySelectorAll('.pac-container');
+        pacContainers.forEach((container) => {
+          const htmlContainer = container as HTMLElement;
+          htmlContainer.style.zIndex = '99999';
+          htmlContainer.style.pointerEvents = 'auto';
+          htmlContainer.style.cursor = 'pointer';
+          console.log('[Autocomplete] Fixed pac-container styling - z-index: 99999, pointer-events: auto');
+        });
+      };
+
+      // Check immediately and set up observer for dynamic creation
+      checkAndFixDropdown();
+      const observer = new MutationObserver(checkAndFixDropdown);
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      return () => observer.disconnect();
+    }
+  }, [dialogOpen]);
 
   const createMutation = useMutation({
     mutationFn: async (data: { 
