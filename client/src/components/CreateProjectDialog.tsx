@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import Autocomplete from "react-google-autocomplete";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { MobileDialogForm } from "@/components/ui/mobile-dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -39,7 +38,6 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
           htmlContainer.style.zIndex = '99999';
           htmlContainer.style.pointerEvents = 'auto';
           htmlContainer.style.cursor = 'pointer';
-          console.log('[Autocomplete] Fixed pac-container styling - z-index: 99999, pointer-events: auto');
         });
       };
 
@@ -95,9 +93,7 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
   });
 
   const handlePlaceSelected = (place: any) => {
-    console.log('[Autocomplete] Place selected:', place);
     if (!place.formatted_address) {
-      console.log('[Autocomplete] No formatted address found');
       return;
     }
 
@@ -126,7 +122,6 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
         }
       }
 
-      console.log('[Autocomplete] Parsed:', { city: cityValue, state: stateValue, zip: zipValue });
       setCity(cityValue);
       setState(stateValue);
       setZipCode(zipValue);
@@ -151,7 +146,7 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
   };
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <>
       <Button 
         size="default"
         data-testid="button-create-project"
@@ -166,133 +161,120 @@ export function CreateProjectDialog({ canWrite, onUpgradeRequired }: CreateProje
         <Plus className="w-4 h-4 mr-1" />
         New
       </Button>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
-            Enter details for your new construction project.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Project Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter project name"
-              data-testid="input-project-name"
-              required
+      
+      <MobileDialogForm
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title="Create New Project"
+        description="Enter details for your new construction project."
+        onSubmit={handleSubmit}
+        submitLabel={createMutation.isPending ? "Creating..." : "Create Project"}
+        submitDisabled={createMutation.isPending}
+        submitTestId="button-submit-project"
+      >
+        <div>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Project Name"
+            data-testid="input-project-name"
+            required
+          />
+        </div>
+
+        <div>
+          <div className="relative" style={{ zIndex: 9999 }}>
+            <Autocomplete
+              apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+              value={address}
+              onChange={(e: any) => {
+                setAddress(e.target.value);
+              }}
+              onPlaceSelected={handlePlaceSelected}
+              onKeyDown={(e: any) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
+              options={{
+                types: ['address'],
+                fields: ['formatted_address', 'address_components', 'geometry'],
+              }}
+              placeholder="Address"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              data-testid="input-project-address"
+              style={{ position: 'relative', zIndex: 1 }}
             />
           </div>
-          <div>
-            <Label htmlFor="address">Address</Label>
-            <div className="relative" style={{ zIndex: 9999 }}>
-              <Autocomplete
-                apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                value={address}
-                onChange={(e: any) => {
-                  console.log('[Autocomplete] Text changed:', e.target.value);
-                  setAddress(e.target.value);
-                }}
-                onPlaceSelected={handlePlaceSelected}
-                onKeyDown={(e: any) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    console.log('[Autocomplete] Enter key blocked to prevent form submission');
-                  }
-                }}
-                options={{
-                  types: ['address'],
-                  fields: ['formatted_address', 'address_components', 'geometry'],
-                }}
-                placeholder="Start typing address..."
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                data-testid="input-project-address"
-                style={{ position: 'relative', zIndex: 1 }}
-              />
-            </div>
-            {city && (
-              <p className="text-xs text-muted-foreground mt-1">
-                {city}, {state} {zipCode}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="unitCount">Number of Units</Label>
-            <Input
-              id="unitCount"
-              type="number"
-              min="1"
-              max="999"
-              value={unitCount}
-              onChange={(e) => setUnitCount(parseInt(e.target.value) || 1)}
-              placeholder="1 for single-site projects"
-              data-testid="input-project-unit-count"
-            />
+          {city && (
             <p className="text-xs text-muted-foreground mt-1">
-              Set to 1 for single-site projects. For multi-unit buildings, specify the number of units to enable unit labels in camera.
+              {city}, {state} {zipCode}
             </p>
-          </div>
+          )}
+        </div>
+
+        <div>
+          <Input
+            id="unitCount"
+            type="number"
+            min="1"
+            max="999"
+            value={unitCount}
+            onChange={(e) => setUnitCount(parseInt(e.target.value) || 1)}
+            placeholder="Number of Units"
+            data-testid="input-project-unit-count"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Set to 1 for single-site. Multi-unit buildings enable unit labels in camera.
+          </p>
+        </div>
+
+        <div>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description (optional)"
+            rows={3}
+            data-testid="input-project-description"
+          />
+        </div>
+
+        {/* Customer Information Section */}
+        <div className="space-y-4 pt-2 border-t">
+          <h3 className="text-sm font-medium text-muted-foreground">Customer Info (optional)</h3>
           <div>
-            <Label htmlFor="description">Description (optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter project description"
-              rows={3}
-              data-testid="input-project-description"
+            <Input
+              id="customerName"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Customer Name"
+              data-testid="input-customer-name"
             />
           </div>
-
-          {/* Customer Information Section */}
-          <div className="space-y-4 pt-2 border-t">
-            <h3 className="text-sm font-medium">Customer Information (optional)</h3>
-            <div>
-              <Label htmlFor="customerName">Customer Name</Label>
-              <Input
-                id="customerName"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Enter customer name"
-                data-testid="input-customer-name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="customerPhone">Customer Phone</Label>
-              <Input
-                id="customerPhone"
-                type="tel"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                placeholder="(555) 123-4567"
-                data-testid="input-customer-phone"
-              />
-            </div>
-            <div>
-              <Label htmlFor="customerEmail">Customer Email</Label>
-              <Input
-                id="customerEmail"
-                type="email"
-                value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
-                placeholder="customer@example.com"
-                data-testid="input-customer-email"
-              />
-            </div>
+          <div>
+            <Input
+              id="customerPhone"
+              type="tel"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              placeholder="Customer Phone"
+              data-testid="input-customer-phone"
+            />
           </div>
-
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={createMutation.isPending}
-            data-testid="button-submit-project"
-          >
-            {createMutation.isPending ? "Creating..." : "Create Project"}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <div>
+            <Input
+              id="customerEmail"
+              type="email"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              placeholder="Customer Email"
+              data-testid="input-customer-email"
+            />
+          </div>
+        </div>
+      </MobileDialogForm>
+    </>
   );
 }
