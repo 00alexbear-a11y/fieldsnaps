@@ -124,7 +124,7 @@ export function MobileDialog({
         {/* Scrollable content area */}
         <div 
           className={cn(
-            "flex-1 flex min-h-0 overflow-y-auto px-6",
+            "flex-1 flex min-h-0 overflow-y-auto px-6 pt-6",
             // iOS smooth scrolling
             "[-webkit-overflow-scrolling:touch]",
             // Add bottom padding when keyboard is open to ensure content is accessible
