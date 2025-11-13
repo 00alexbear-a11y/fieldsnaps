@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Type, ArrowUpRight, Minus, Circle, Trash2, Undo, Pen, X, Check, ChevronUp, ChevronDown, Ruler, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MobileDialog } from "@/components/ui/mobile-dialog";
 import {
   Select,
   SelectContent,
@@ -9,13 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -2374,38 +2369,25 @@ export function PhotoAnnotationEditor({
       )}
 
       {/* Text Input Dialog */}
-      <Dialog open={textDialogOpen} onOpenChange={setTextDialogOpen}>
-        <DialogContent className="bg-background/95 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle>Add Text</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Enter text..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && textInput.trim()) {
-                  handleAddTextFromDialog();
-                } else if (e.key === "Escape") {
-                  setTextDialogOpen(false);
-                  setTextInput("");
-                }
-              }}
-              autoFocus
-              data-testid="input-text-dialog"
-              className="text-base"
-              style={{ color: selectedColor }}
-            />
-          </div>
-          <DialogFooter>
+      <MobileDialog
+        open={textDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTextDialogOpen(false);
+            setTextInput("");
+          }
+        }}
+        title="Add Text"
+        footer={
+          <div className="flex gap-3 w-full">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => {
                 setTextDialogOpen(false);
                 setTextInput("");
               }}
               data-testid="button-cancel-text"
+              className="flex-1"
             >
               Cancel
             </Button>
@@ -2413,76 +2395,55 @@ export function PhotoAnnotationEditor({
               onClick={handleAddTextFromDialog}
               disabled={!textInput.trim()}
               data-testid="button-submit-text"
+              className="flex-1"
             >
               Add Text
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        }
+      >
+        <div className="space-y-2">
+          <Label htmlFor="text-input">Text</Label>
+          <Input
+            id="text-input"
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            placeholder="Enter text..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && textInput.trim()) {
+                handleAddTextFromDialog();
+              }
+            }}
+            autoFocus
+            data-testid="input-text-dialog"
+            className="text-base"
+            style={{ color: selectedColor }}
+          />
+        </div>
+      </MobileDialog>
 
       {/* Measurement Input Dialog */}
-      <Dialog open={measurementDialogOpen} onOpenChange={setMeasurementDialogOpen}>
-        <DialogContent className="bg-background/95 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle>Add Measurement</DialogTitle>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-sm text-muted-foreground mb-1 block">Feet</label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={measurementFeet}
-                  onChange={(e) => setMeasurementFeet(e.target.value)}
-                  placeholder="0"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && (measurementFeet || measurementInches)) {
-                      handleAddMeasurementFromDialog();
-                    } else if (e.key === "Escape") {
-                      setMeasurementDialogOpen(false);
-                      setMeasurementFeet("");
-                      setMeasurementInches("");
-                    }
-                  }}
-                  autoFocus
-                  data-testid="input-measurement-feet"
-                  className="text-base"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-sm text-muted-foreground mb-1 block">Inches</label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="11"
-                  value={measurementInches}
-                  onChange={(e) => setMeasurementInches(e.target.value)}
-                  placeholder="0"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && (measurementFeet || measurementInches)) {
-                      handleAddMeasurementFromDialog();
-                    } else if (e.key === "Escape") {
-                      setMeasurementDialogOpen(false);
-                      setMeasurementFeet("");
-                      setMeasurementInches("");
-                    }
-                  }}
-                  data-testid="input-measurement-inches"
-                  className="text-base"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
+      <MobileDialog
+        open={measurementDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setMeasurementDialogOpen(false);
+            setMeasurementFeet("");
+            setMeasurementInches("");
+          }
+        }}
+        title="Add Measurement"
+        footer={
+          <div className="flex gap-3 w-full">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => {
                 setMeasurementDialogOpen(false);
                 setMeasurementFeet("");
                 setMeasurementInches("");
               }}
               data-testid="button-cancel-measurement"
+              className="flex-1"
             >
               Cancel
             </Button>
@@ -2490,12 +2451,56 @@ export function PhotoAnnotationEditor({
               onClick={handleAddMeasurementFromDialog}
               disabled={!measurementFeet && !measurementInches}
               data-testid="button-submit-measurement"
+              className="flex-1"
             >
               Add Measurement
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <Label htmlFor="measurement-feet">Feet</Label>
+              <Input
+                id="measurement-feet"
+                type="number"
+                min="0"
+                value={measurementFeet}
+                onChange={(e) => setMeasurementFeet(e.target.value)}
+                placeholder="0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (measurementFeet || measurementInches)) {
+                    handleAddMeasurementFromDialog();
+                  }
+                }}
+                autoFocus
+                data-testid="input-measurement-feet"
+                className="text-base"
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="measurement-inches">Inches</Label>
+              <Input
+                id="measurement-inches"
+                type="number"
+                min="0"
+                max="11"
+                value={measurementInches}
+                onChange={(e) => setMeasurementInches(e.target.value)}
+                placeholder="0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (measurementFeet || measurementInches)) {
+                    handleAddMeasurementFromDialog();
+                  }
+                }}
+                data-testid="input-measurement-inches"
+                className="text-base"
+              />
+            </div>
+          </div>
+        </div>
+      </MobileDialog>
     </div>
   );
 }
