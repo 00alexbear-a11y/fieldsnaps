@@ -41,7 +41,6 @@ import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
 import { Button } from "./components/ui/button";
-import { NotificationPanel } from "./components/NotificationPanel";
 import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
@@ -292,15 +291,14 @@ function AppContent() {
                   className="h-8 w-auto object-contain"
                   data-testid="img-fieldsnaps-logo"
                 />
-                {/* New Project button - only shown on /projects route */}
-                {pathname === '/projects' && (
-                  <CreateProjectDialog 
-                    canWrite={canWrite} 
-                    onUpgradeRequired={() => setUpgradeModalOpen(true)} 
-                  />
-                )}
               </div>
-              <NotificationPanel />
+              {/* New Project button - only shown on /projects route */}
+              {pathname === '/projects' && (
+                <CreateProjectDialog 
+                  canWrite={canWrite} 
+                  onUpgradeRequired={() => setUpgradeModalOpen(true)} 
+                />
+              )}
             </header>
           )}
           
