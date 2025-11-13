@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { X } from "lucide-react";
 import { useKeyboardManager, useAutoScrollInput } from "@/hooks/useKeyboardManager";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,8 @@ interface MobileDialogProps {
   footer?: React.ReactNode;
   showCancel?: boolean;
   onCancel?: () => void;
+  showCloseButton?: boolean; // Show X button in header
+  closeLabel?: string; // Aria-label for close button
   className?: string;
   contentClassName?: string;
   dismissible?: boolean; // When false, prevents backdrop clicks and Escape key from closing
@@ -38,6 +41,8 @@ export function MobileDialog({
   footer,
   showCancel = false,
   onCancel,
+  showCloseButton = false,
+  closeLabel = "Close",
   className,
   contentClassName,
   dismissible = true,
@@ -52,6 +57,12 @@ export function MobileDialog({
       onCancel();
     } else {
       onOpenChange(false);
+    }
+  };
+  
+  const handleClose = () => {
+    if (dismissible) {
+      handleCancel();
     }
   };
 
@@ -93,9 +104,21 @@ export function MobileDialog({
         }}
       >
         {/* Header - not scrollable */}
-        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0 relative">
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
+          {showCloseButton && dismissible && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="absolute right-4 top-4 w-8 h-8 rounded-full hover-elevate"
+              aria-label={closeLabel}
+              data-testid="button-close-dialog"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </DialogHeader>
 
         {/* Scrollable content area */}
