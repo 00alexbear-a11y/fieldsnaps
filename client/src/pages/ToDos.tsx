@@ -19,7 +19,6 @@ import { z } from "zod";
 import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { haptics } from "@/lib/nativeHaptics";
@@ -49,8 +48,6 @@ export default function ToDos() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
-  
-  useKeyboardManager();
   
   // Read selected list from URL query params (managed by AppSidebar)
   const getSelectedList = (): SmartList => {
