@@ -239,7 +239,7 @@ export default function ShareView() {
       {viewerPhotoIndex !== null && (
         <div className="fixed inset-0 z-50 bg-black flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
+          <div className="flex items-center justify-between px-4 pb-4 safe-area-pt-4 bg-black/50 backdrop-blur-sm">
             <Button
               variant="ghost"
               size="icon"
@@ -270,7 +270,7 @@ export default function ShareView() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
+          <div className="flex items-center justify-between px-4 pt-4 safe-area-pb-4 bg-black/50 backdrop-blur-sm">
             <Button
               variant="ghost"
               onClick={() => setViewerPhotoIndex(Math.max(0, viewerPhotoIndex - 1))}

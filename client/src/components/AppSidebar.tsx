@@ -189,7 +189,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" data-testid="app-sidebar">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-3 px-3 py-4">
+        <div className="flex items-center gap-3 px-3 pb-4 safe-area-pt-4">
           {user && (
             <>
               <Avatar className="h-10 w-10">

@@ -1831,7 +1831,7 @@ export default function Camera() {
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t border-border">
+        <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 safe-area-pb-4 bg-background/95 backdrop-blur-xl border-t border-border">
           <div className="max-w-2xl mx-auto">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
