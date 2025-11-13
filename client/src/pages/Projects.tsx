@@ -111,6 +111,9 @@ export default function Projects() {
   const [editDescription, setEditDescription] = useState("");
   const [editAddress, setEditAddress] = useState("");
   const [editUnitCount, setEditUnitCount] = useState(1);
+  const [editCustomerName, setEditCustomerName] = useState("");
+  const [editCustomerPhone, setEditCustomerPhone] = useState("");
+  const [editCustomerEmail, setEditCustomerEmail] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -232,7 +235,7 @@ export default function Projects() {
 
 
   const editMutation = useMutation({
-    mutationFn: async (data: { id: string; name?: string; description?: string; address?: string; unitCount?: number }) => {
+    mutationFn: async (data: { id: string; name?: string; description?: string; address?: string; unitCount?: number; customerName?: string; customerPhone?: string; customerEmail?: string }) => {
       const { id, ...updateData } = data;
       const res = await apiRequest("PATCH", `/api/projects/${id}`, updateData);
       return await res.json();
@@ -246,6 +249,9 @@ export default function Projects() {
       setEditDescription("");
       setEditAddress("");
       setEditUnitCount(1);
+      setEditCustomerName("");
+      setEditCustomerPhone("");
+      setEditCustomerEmail("");
       toast({ title: "Project updated successfully" });
     },
     onError: (error: any) => {
@@ -405,6 +411,9 @@ export default function Projects() {
     setEditDescription(project.description || "");
     setEditAddress(project.address || "");
     setEditUnitCount(project.unitCount || 1);
+    setEditCustomerName(project.customerName || "");
+    setEditCustomerPhone(project.customerPhone || "");
+    setEditCustomerEmail(project.customerEmail || "");
     setEditDialogOpen(true);
   };
 
@@ -417,6 +426,9 @@ export default function Projects() {
       description: editDescription,
       address: editAddress,
       unitCount: editUnitCount,
+      customerName: editCustomerName.trim() || undefined,
+      customerPhone: editCustomerPhone.trim() || undefined,
+      customerEmail: editCustomerEmail.trim() || undefined,
     });
   };
 
@@ -653,6 +665,44 @@ export default function Projects() {
                 data-testid="input-edit-project-description"
               />
             </div>
+
+            {/* Customer Information Section */}
+            <div className="space-y-4 pt-2 border-t">
+              <h3 className="text-sm font-medium">Customer Information (optional)</h3>
+              <div>
+                <Label htmlFor="edit-customerName">Customer Name</Label>
+                <Input
+                  id="edit-customerName"
+                  value={editCustomerName}
+                  onChange={(e) => setEditCustomerName(e.target.value)}
+                  placeholder="Enter customer name"
+                  data-testid="input-edit-customer-name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-customerPhone">Customer Phone</Label>
+                <Input
+                  id="edit-customerPhone"
+                  type="tel"
+                  value={editCustomerPhone}
+                  onChange={(e) => setEditCustomerPhone(e.target.value)}
+                  placeholder="(555) 123-4567"
+                  data-testid="input-edit-customer-phone"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-customerEmail">Customer Email</Label>
+                <Input
+                  id="edit-customerEmail"
+                  type="email"
+                  value={editCustomerEmail}
+                  onChange={(e) => setEditCustomerEmail(e.target.value)}
+                  placeholder="customer@example.com"
+                  data-testid="input-edit-customer-email"
+                />
+              </div>
+            </div>
+
             <DialogFooter className="gap-2">
               <Button 
                 type="button"
