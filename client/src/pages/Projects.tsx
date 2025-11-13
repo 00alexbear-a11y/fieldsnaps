@@ -8,6 +8,7 @@ import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { MobileDialogForm } from "@/components/ui/mobile-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
@@ -23,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useKeyboardManager } from "@/hooks/useKeyboardManager";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import {
   DropdownMenu,
@@ -52,9 +52,6 @@ export default function Projects() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
-  
-  // Enable keyboard management for form inputs
-  useKeyboardManager();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   
@@ -608,121 +605,98 @@ export default function Projects() {
       </AlertDialog>
 
       {/* Edit Project Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent data-testid="dialog-edit-project">
-          <DialogHeader>
-            <DialogTitle>Edit Project</DialogTitle>
-            <DialogDescription>
-              Update your project details
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Project Name</Label>
-              <Input
-                id="edit-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Enter project name"
-                data-testid="input-edit-project-name"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-address">Address</Label>
-              <Input
-                id="edit-address"
-                value={editAddress}
-                onChange={(e) => setEditAddress(e.target.value)}
-                placeholder="Job site address"
-                data-testid="input-edit-project-address"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-unitCount">Number of Units</Label>
-              <Input
-                id="edit-unitCount"
-                type="number"
-                min="1"
-                max="999"
-                value={editUnitCount}
-                onChange={(e) => setEditUnitCount(parseInt(e.target.value) || 1)}
-                placeholder="1 for single-site projects"
-                data-testid="input-edit-project-unit-count"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Set to 1 for single-site projects. For multi-unit buildings, specify the number of units to enable unit labels in camera.
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="edit-description">Description (optional)</Label>
-              <Textarea
-                id="edit-description"
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                placeholder="Enter project description"
-                rows={3}
-                data-testid="input-edit-project-description"
-              />
-            </div>
+      <MobileDialogForm
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        title="Edit Project"
+        description="Update your project details"
+        onSubmit={handleEditSubmit}
+        submitLabel={editMutation.isPending ? "Saving..." : "Save Changes"}
+        submitDisabled={editMutation.isPending}
+        submitTestId="button-submit-edit"
+      >
+        <div>
+          <Input
+            id="edit-name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Project Name"
+            data-testid="input-edit-project-name"
+            required
+          />
+        </div>
 
-            {/* Customer Information Section */}
-            <div className="space-y-4 pt-2 border-t">
-              <h3 className="text-sm font-medium">Customer Information (optional)</h3>
-              <div>
-                <Label htmlFor="edit-customerName">Customer Name</Label>
-                <Input
-                  id="edit-customerName"
-                  value={editCustomerName}
-                  onChange={(e) => setEditCustomerName(e.target.value)}
-                  placeholder="Enter customer name"
-                  data-testid="input-edit-customer-name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-customerPhone">Customer Phone</Label>
-                <Input
-                  id="edit-customerPhone"
-                  type="tel"
-                  value={editCustomerPhone}
-                  onChange={(e) => setEditCustomerPhone(e.target.value)}
-                  placeholder="(555) 123-4567"
-                  data-testid="input-edit-customer-phone"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-customerEmail">Customer Email</Label>
-                <Input
-                  id="edit-customerEmail"
-                  type="email"
-                  value={editCustomerEmail}
-                  onChange={(e) => setEditCustomerEmail(e.target.value)}
-                  placeholder="customer@example.com"
-                  data-testid="input-edit-customer-email"
-                />
-              </div>
-            </div>
+        <div>
+          <Input
+            id="edit-address"
+            value={editAddress}
+            onChange={(e) => setEditAddress(e.target.value)}
+            placeholder="Address"
+            data-testid="input-edit-project-address"
+          />
+        </div>
 
-            <DialogFooter className="gap-2">
-              <Button 
-                type="button"
-                variant="outline"
-                onClick={() => setEditDialogOpen(false)}
-                data-testid="button-cancel-edit"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={editMutation.isPending}
-                data-testid="button-submit-edit"
-              >
-                {editMutation.isPending ? "Saving..." : "Save Changes"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+        <div>
+          <Input
+            id="edit-unitCount"
+            type="number"
+            min="1"
+            max="999"
+            value={editUnitCount}
+            onChange={(e) => setEditUnitCount(parseInt(e.target.value) || 1)}
+            placeholder="Number of Units"
+            data-testid="input-edit-project-unit-count"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Set to 1 for single-site. Multi-unit buildings enable unit labels in camera.
+          </p>
+        </div>
+
+        <div>
+          <Textarea
+            id="edit-description"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="Description (optional)"
+            rows={3}
+            data-testid="input-edit-project-description"
+          />
+        </div>
+
+        {/* Customer Information Section */}
+        <div className="space-y-4 pt-2 border-t">
+          <h3 className="text-sm font-medium text-muted-foreground">Customer Info (optional)</h3>
+          <div>
+            <Input
+              id="edit-customerName"
+              value={editCustomerName}
+              onChange={(e) => setEditCustomerName(e.target.value)}
+              placeholder="Customer Name"
+              data-testid="input-edit-customer-name"
+            />
+          </div>
+          <div>
+            <Input
+              id="edit-customerPhone"
+              type="tel"
+              value={editCustomerPhone}
+              onChange={(e) => setEditCustomerPhone(e.target.value)}
+              placeholder="Customer Phone"
+              data-testid="input-edit-customer-phone"
+            />
+          </div>
+          <div>
+            <Input
+              id="edit-customerEmail"
+              type="email"
+              value={editCustomerEmail}
+              onChange={(e) => setEditCustomerEmail(e.target.value)}
+              placeholder="Customer Email"
+              data-testid="input-edit-customer-email"
+            />
+          </div>
+        </div>
+      </MobileDialogForm>
 
       {/* Share Project Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
