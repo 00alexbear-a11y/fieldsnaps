@@ -42,18 +42,18 @@ export function ClockStatusCard() {
     mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number; projectId?: string }) => {
       return await apiRequest('POST', '/api/clock', data);
     },
-    onSuccess: async (_data, variables) => {
-      // Wait for cache invalidation to complete before closing dialog
-      await queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
-      
-      haptics.medium();
-      
-      // Close time review dialog if this was a clock out
+    onSuccess: (_data, variables) => {
+      // Close time review dialog immediately if this was a clock out
       if (variables.type === 'clock_out') {
         setShowTimeReview(false);
       }
       
-      // Show success toast only after server confirms
+      // Invalidate cache (don't await - let it run in background)
+      queryClient.invalidateQueries({ queryKey: ['/api/clock/status'] });
+      
+      haptics.medium();
+      
+      // Show success toast
       const toastMessages = {
         clock_in: {
           title: "Clocked In",

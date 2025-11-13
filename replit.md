@@ -43,6 +43,9 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 
 **Unified Mobile Keyboard System**: A comprehensive iOS-optimized keyboard management solution using `MobileDialog` component and `useKeyboardManager` hook. The system uses visualViewport API (primary) with Capacitor keyboard events (fallback) to detect keyboard height and auto-scroll inputs into view. MobileDialog provides top-aligned dialogs with scrollable bodies, sticky footers, and dynamic max-height adjustment. All 8 major form dialogs (CreateProject, EditProject, Tag Edit, Team, PDF Settings, TimeReview main/edit, ToDos, ProfileSetup) plus at-risk components (VoiceCaptureSheet, PhotoAnnotationEditor text/measurement dialogs) use this pattern. Race condition handling uses `isProgrammaticClose` ref to distinguish user-initiated closes (backdrop/escape) from programmatic closes (Done/Cancel buttons), ensuring callbacks invoke exactly once. The system includes optional close button support (`showCloseButton` and `closeLabel` props) and proper state cleanup on cancel.
 
+**Critical Bug Fixes**:
+- **TimeReviewDialog clock-out hang**: Fixed issue where "Review Your Day" dialog became stuck with disabled buttons after successful clock-out. The bug was caused by awaiting `invalidateQueries` in `ClockStatusCard`'s mutation `onSuccess` callback before closing the dialog. Solution: Close dialog immediately after successful API response, then run cache invalidation asynchronously in background without blocking UI updates. This ensures responsive UI behavior even under network latency.
+
 ## External Dependencies
 
 ### Frontend
