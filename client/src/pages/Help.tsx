@@ -53,7 +53,7 @@ export default function Help() {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <HelpCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-semibold">Help & Support</h1>
+            <h1 className="text-xl font-semibold">Help & Support</h1>
           </div>
           <p className="text-muted-foreground">
             Find answers to common questions and get support

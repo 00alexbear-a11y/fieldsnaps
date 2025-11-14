@@ -58,7 +58,7 @@ export default function Time() {
       />
       {/* Header */}
       <div className="p-4 space-y-2">
-        <h1 className="text-2xl font-semibold" data-testid="text-time-heading">
+        <h1 className="text-xl font-semibold" data-testid="text-time-heading">
           Time Tracking
         </h1>
         <p className="text-sm text-muted-foreground">

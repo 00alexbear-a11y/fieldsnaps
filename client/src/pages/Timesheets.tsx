@@ -176,7 +176,7 @@ export default function Timesheets() {
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <Clock className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-semibold" data-testid="text-page-title">
+            <h1 className="text-xl font-semibold" data-testid="text-page-title">
               Timesheets
             </h1>
           </div>

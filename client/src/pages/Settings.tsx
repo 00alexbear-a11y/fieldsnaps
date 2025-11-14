@@ -571,7 +571,7 @@ export default function Settings() {
       <div className="sticky top-0 z-50 bg-background border-b">
         <div className="px-4 pt-safe-3 pb-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">Settings</h1>
+            <h1 className="text-xl font-semibold">Settings</h1>
             <Button
               variant="ghost"
               size="icon"
@@ -721,26 +721,6 @@ export default function Settings() {
                 data-testid="switch-upload-wifi-only"
               />
             </div>
-            
-            <Separator />
-            <button
-              onClick={() => setLocation('/upload-queue')}
-              className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
-              data-testid="card-upload-queue"
-            >
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-muted-foreground" />
-                <span className="text-sm">Upload Queue</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {syncStatus && syncStatus.pending > 0 && (
-                  <span className="text-sm text-muted-foreground" data-testid="text-pending-count">
-                    {syncStatus.pending}
-                  </span>
-                )}
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </button>
             
             <Separator />
             <button

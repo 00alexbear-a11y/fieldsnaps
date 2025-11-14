@@ -10,7 +10,6 @@ const Toaster = lazy(() => import("@/components/ui/toaster").then(m => ({ defaul
 const ProjectPhotos = lazy(() => import("./pages/ProjectPhotos"));
 const Camera = lazy(() => import("./pages/Camera"));
 const Settings = lazy(() => import("./pages/Settings"));
-const UploadQueue = lazy(() => import("./pages/UploadQueue"));
 const ToDos = lazy(() => import("./pages/ToDos"));
 
 // Eager-load smaller, frequently-used pages
@@ -314,7 +313,6 @@ function AppContent() {
                 <Route path="/timesheets" component={Timesheets} />
                 <Route path="/settings" component={Settings} />
                 <Route path="/help" component={Help} />
-                <Route path="/upload-queue" component={UploadQueue} />
                 <Route path="/sync-status" component={SyncStatus} />
                 <Route path="/trash" component={Trash} />
                 <Route path="/map" component={Map} />
