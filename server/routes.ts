@@ -1915,6 +1915,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Photos
+  app.get("/api/photos", isAuthenticatedAndWhitelisted, cacheMiddleware(30), async (req, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      
+      if (!user?.companyId) {
+        console.error('[GET /api/photos] User not associated with a company:', req.user.claims.sub);
+        return res.status(403).json({ error: "User not associated with a company" });
+      }
+      
+      const companyId = user.companyId;
+      
+      // Parse pagination params
+      const limit = req.query.limit ? Math.min(parseInt(req.query.limit as string, 10), 100) : 50;
+      const cursor = req.query.cursor as string | undefined;
+      
+      console.log('[GET /api/photos] Fetching photos for company:', companyId, 'limit:', limit, 'cursor:', cursor);
+      const result = await storage.getAllPhotos(companyId, { limit, cursor });
+      console.log('[GET /api/photos] Success - returned', result.photos.length, 'photos, total:', result.total);
+      res.json(result);
+    } catch (error: any) {
+      console.error('[GET /api/photos] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/projects/:projectId/photos", isAuthenticatedAndWhitelisted, validateUuidParam('projectId'), fieldFilterMiddleware, cacheMiddleware(30), async (req, res) => {
     try {
       if (!await verifyProjectCompanyAccess(req, res, req.params.projectId)) return;

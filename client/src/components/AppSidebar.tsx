@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo, MapPin, Radio, FileText } from 'lucide-react';
+import { Moon, Sun, Activity as ActivityIcon, Settings as SettingsIcon, HelpCircle, LogOut, User, Clock, Star, FolderOpen, ArrowUpAZ, ArrowDownAZ, Camera, Calendar, CheckCircle2, Flag, ListTodo, MapPin, Radio, FileText, Images } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
@@ -163,6 +163,11 @@ export function AppSidebar() {
 
   // Menu items (always visible)
   const menuItems = [
+    {
+      title: 'All Photos',
+      icon: Images,
+      href: '/all-photos',
+    },
     ...adminMenuItems,
     {
       title: 'Activity',

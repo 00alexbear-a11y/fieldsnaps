@@ -61,6 +61,7 @@ export interface IStorage {
   
   // Photos
   getProjectPhotos(projectId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string }>;
+  getAllPhotos(companyId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string; total?: number }>;
   getPhoto(id: string): Promise<Photo | undefined>;
   createPhoto(data: InsertPhoto): Promise<Photo>;
   updatePhoto(id: string, data: Partial<InsertPhoto>): Promise<Photo | undefined>;
@@ -612,6 +613,107 @@ export class DbStorage implements IStorage {
     const nextCursor = hasMore ? photosToReturn[photosToReturn.length - 1].createdAt.toISOString() : undefined;
     
     return { photos: photosWithTags, nextCursor };
+  }
+
+  async getAllPhotos(companyId: string, options?: { limit?: number; cursor?: string }): Promise<{ photos: Photo[]; nextCursor?: string; total?: number }> {
+    const limit = options?.limit ?? 50;
+    const cursor = options?.cursor;
+    
+    // Parse composite cursor (format: "timestamp|id")
+    let cursorTimestamp: string | undefined;
+    let cursorId: string | undefined;
+    if (cursor) {
+      const parts = cursor.split('|');
+      cursorTimestamp = parts[0];
+      cursorId = parts[1];
+    }
+    
+    // Build query conditions - join with projects to filter by company
+    const conditions = [
+      eq(projects.companyId, companyId),
+      isNull(photos.deletedAt),
+      isNull(projects.deletedAt)
+    ];
+    
+    // Add cursor condition using both timestamp and id as tie-breaker
+    // Cast cursor values to proper types for tuple comparison
+    if (cursorTimestamp && cursorId) {
+      conditions.push(sql`(${photos.createdAt}, ${photos.id}) < (${cursorTimestamp}::timestamptz, ${cursorId}::uuid)`);
+    }
+    
+    // Get total count for UI
+    const totalResult = await db.select({ count: count() })
+      .from(photos)
+      .innerJoin(projects, eq(photos.projectId, projects.id))
+      .where(and(
+        eq(projects.companyId, companyId),
+        isNull(photos.deletedAt),
+        isNull(projects.deletedAt)
+      ));
+    // Convert BigInt to number safely (Drizzle returns bigint for count())
+    const total = totalResult[0]?.count ? Number.parseInt(String(totalResult[0].count), 10) : 0;
+    
+    // Build query with DESC order (most recent first) with id as tie-breaker
+    const query = db.select({
+      id: photos.id,
+      projectId: photos.projectId,
+      url: photos.url,
+      thumbnailUrl: photos.thumbnailUrl,
+      caption: photos.caption,
+      createdAt: photos.createdAt,
+      deletedAt: photos.deletedAt,
+      photographerId: photos.photographerId,
+      sessionId: photos.sessionId,
+    })
+      .from(photos)
+      .innerJoin(projects, eq(photos.projectId, projects.id))
+      .where(and(...conditions))
+      .orderBy(desc(photos.createdAt), desc(photos.id))
+      .limit(limit + 1); // Fetch limit + 1 to check if there's a next page
+    
+    const photoList = await query;
+    
+    // Check if there are more photos
+    const hasMore = photoList.length > limit;
+    const photosToReturn = hasMore ? photoList.slice(0, limit) : photoList;
+    
+    // If there are no photos, return empty result
+    if (photosToReturn.length === 0) {
+      return { photos: [], nextCursor: undefined, total: Number(total) };
+    }
+    
+    // Get all tags for these photos in one query
+    const photoIds = photosToReturn.map(p => p.id);
+    const photoTagsWithTags = await db.select({
+      photoId: photoTags.photoId,
+      tag: tags,
+    })
+      .from(photoTags)
+      .innerJoin(tags, eq(photoTags.tagId, tags.id))
+      .where(inArray(photoTags.photoId, photoIds))
+      .orderBy(tags.name);
+    
+    // Group tags by photoId
+    const tagsByPhotoId = new Map<string, Tag[]>();
+    for (const pt of photoTagsWithTags) {
+      if (!tagsByPhotoId.has(pt.photoId)) {
+        tagsByPhotoId.set(pt.photoId, []);
+      }
+      tagsByPhotoId.get(pt.photoId)!.push(pt.tag);
+    }
+    
+    // Attach tags to photos
+    const photosWithTags = photosToReturn.map(photo => ({
+      ...photo,
+      tags: tagsByPhotoId.get(photo.id) || [],
+    })) as any;
+    
+    // Generate composite cursor from last photo (format: "timestamp|id")
+    const nextCursor = hasMore 
+      ? `${photosToReturn[photosToReturn.length - 1].createdAt.toISOString()}|${photosToReturn[photosToReturn.length - 1].id}`
+      : undefined;
+    
+    return { photos: photosWithTags, nextCursor, total };
   }
 
   async getPhoto(id: string): Promise<Photo | undefined> {

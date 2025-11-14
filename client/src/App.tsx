@@ -14,6 +14,7 @@ const ToDos = lazy(() => import("./pages/ToDos"));
 
 // Eager-load smaller, frequently-used pages
 import Projects from "./pages/Projects";
+import AllPhotos from "./pages/AllPhotos";
 import Activity from "./pages/Activity";
 import PhotoEdit from "./pages/PhotoEdit";
 import PhotoView from "./pages/PhotoView";
@@ -306,6 +307,7 @@ function AppContent() {
                 <Route path="/camera" component={Camera} />
                 <Route path="/projects" component={Projects} />
                 <Route path="/projects/:id" component={ProjectPhotos} />
+                <Route path="/all-photos" component={AllPhotos} />
                 <Route path="/activity" component={Activity} />
                 <Route path="/photo/:id/edit" component={PhotoEdit} />
                 <Route path="/photo/:id/view" component={PhotoView} />
