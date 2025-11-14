@@ -150,11 +150,6 @@ export function AppSidebar() {
   // Admin-only menu items
   const adminMenuItems = user?.role === 'owner' ? [
     {
-      title: 'Geofences',
-      icon: MapPin,
-      href: '/admin/geofences',
-    },
-    {
       title: 'Live Tracking',
       icon: Radio,
       href: '/admin/locations',

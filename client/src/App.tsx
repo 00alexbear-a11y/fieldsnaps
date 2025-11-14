@@ -33,7 +33,6 @@ import CompanySetup from "./pages/CompanySetup";
 import MyTasks from "./pages/MyTasks";
 import Timesheets from "./pages/Timesheets";
 import Time from "./pages/Time";
-import AdminGeofences from "./pages/AdminGeofences";
 import AdminLocations from "./pages/AdminLocations";
 import AdminTimesheets from "./pages/AdminTimesheets";
 import NotFound from "./pages/not-found";
@@ -321,7 +320,6 @@ function AppContent() {
                 <Route path="/map" component={Map} />
                 <Route path="/todos" component={ToDos} />
                 <Route path="/time" component={Time} />
-                <Route path="/admin/geofences" component={AdminGeofences} />
                 <Route path="/admin/locations" component={AdminLocations} />
                 <Route path="/admin/timesheets" component={AdminTimesheets} />
                 <Route path="/billing/success" component={BillingSuccess} />
