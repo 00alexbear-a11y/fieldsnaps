@@ -612,6 +612,45 @@
     }
   }
 
+  /* iOS Safe Area Insets - Prevent UI from overlapping notch/status bar */
+  /* Use constant() for iOS 11.0-11.1 compatibility, then env() for iOS 11.2+ */
+  @supports (padding: max(0px)) {
+    .safe-area-inset-top {
+      padding-top: constant(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    .safe-area-inset-bottom {
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .safe-area-inset-left {
+      padding-left: constant(safe-area-inset-left);
+      padding-left: env(safe-area-inset-left);
+    }
+    
+    .safe-area-inset-right {
+      padding-right: constant(safe-area-inset-right);
+      padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Combined insets for elements that need multiple sides */
+    .safe-area-inset-y {
+      padding-top: constant(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .safe-area-inset-x {
+      padding-left: constant(safe-area-inset-left);
+      padding-left: env(safe-area-inset-left);
+      padding-right: constant(safe-area-inset-right);
+      padding-right: env(safe-area-inset-right);
+    }
+  }
+
   /* Hide Replit dev banner */
   [data-replit-dev-banner],
   #replit-dev-banner {
