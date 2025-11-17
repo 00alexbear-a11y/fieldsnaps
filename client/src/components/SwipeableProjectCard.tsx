@@ -287,34 +287,40 @@ export default function SwipeableProjectCard({
             </div>
           )}
           
-          {/* Navigation Overlay - Right-angle arrow with "Go" */}
+          {/* Navigation Overlay - Apple Maps style location pin */}
           {project.address && (
             <button
-              className="absolute inset-0 rounded-xl bg-black/20 backdrop-blur-[1px] flex items-center justify-center hover:bg-black/30 active:bg-black/40 transition-colors border-0 p-0"
+              className="absolute inset-0 rounded-xl flex items-center justify-center border-0 p-0 group"
               onClick={handleNavigationClick}
               data-testid={`button-navigate-${project.id}`}
-              aria-label={`Navigate to ${project.name}`}
+              aria-label={`Get directions to ${project.name}`}
               type="button"
             >
-              {/* Right-angle arrow: horizontal with "Go" → turns up with arrow */}
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 48 48"
-                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg pointer-events-none"
-              >
-                {/* Horizontal line with "Go" */}
-                <line x1="8" y1="32" x2="28" y2="32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+              {/* Frosted circular background - Apple style */}
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/30 backdrop-blur-md flex flex-col items-center justify-center gap-0.5 group-hover:bg-black/40 group-active:bg-black/50 transition-colors shadow-lg">
+                {/* Location Pin Icon - SF Symbols inspired */}
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  className="pointer-events-none"
+                  fill="none"
+                >
+                  {/* Pin shape: teardrop with circular center */}
+                  <path
+                    d="M10 2C7.24 2 5 4.24 5 7c0 3.5 5 9 5 9s5-5.5 5-9c0-2.76-2.24-5-5-5z"
+                    fill="white"
+                    fillOpacity="0.9"
+                  />
+                  {/* Center dot */}
+                  <circle cx="10" cy="7" r="2" fill="black" fillOpacity="0.3" />
+                </svg>
                 
-                {/* "Go" text */}
-                <text x="14" y="31" fill="white" fontSize="9" fontWeight="600" textAnchor="middle">Go</text>
-                
-                {/* Vertical line turning up */}
-                <line x1="28" y1="32" x2="28" y2="12" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                
-                {/* Arrow head pointing up */}
-                <polyline points="24,16 28,12 32,16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+                {/* "Route" label */}
+                <span className="text-[10px] font-semibold text-white/90 tracking-tight pointer-events-none">
+                  Route
+                </span>
+              </div>
             </button>
           )}
         </div>
