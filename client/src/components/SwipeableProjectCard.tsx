@@ -289,18 +289,19 @@ export default function SwipeableProjectCard({
           
           {/* Navigation Overlay - Right-angle arrow with "Go" */}
           {project.address && (
-            <div
-              className="absolute inset-0 rounded-xl bg-black/20 backdrop-blur-[1px] flex items-center justify-center cursor-pointer hover:bg-black/30 transition-colors"
+            <button
+              className="absolute inset-0 rounded-xl bg-black/20 backdrop-blur-[1px] flex items-center justify-center hover:bg-black/30 active:bg-black/40 transition-colors border-0 p-0"
               onClick={handleNavigationClick}
               data-testid={`button-navigate-${project.id}`}
               aria-label={`Navigate to ${project.name}`}
+              type="button"
             >
               {/* Right-angle arrow: horizontal with "Go" → turns up with arrow */}
               <svg
                 width="48"
                 height="48"
                 viewBox="0 0 48 48"
-                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg"
+                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg pointer-events-none"
               >
                 {/* Horizontal line with "Go" */}
                 <line x1="8" y1="32" x2="28" y2="32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
@@ -314,7 +315,7 @@ export default function SwipeableProjectCard({
                 {/* Arrow head pointing up */}
                 <polyline points="24,16 28,12 32,16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </div>
+            </button>
           )}
         </div>
 
