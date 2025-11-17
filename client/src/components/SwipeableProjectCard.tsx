@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { actionSheet } from "@/lib/nativeActionSheet";
+import { Browser } from "@capacitor/browser";
 import type { Project, Photo } from "../../../shared/schema";
 
 interface SwipeableProjectCardProps {
@@ -164,6 +165,21 @@ export default function SwipeableProjectCard({
     onDelete();
   };
 
+  const handleNavigationClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!project.address) return;
+    
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`;
+    
+    // Try native browser first (Capacitor), fallback to window.open
+    try {
+      await Browser.open({ url: mapsUrl });
+    } catch {
+      window.open(mapsUrl, '_blank');
+    }
+  };
+
   const handleMenuClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -187,7 +203,7 @@ export default function SwipeableProjectCard({
         buttons.push({
           title: 'Go to Map',
           handler: () => {
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address!)}`, '_blank');
+            handleNavigationClick({ stopPropagation: () => {} } as React.MouseEvent);
           },
         });
       }
@@ -256,8 +272,8 @@ export default function SwipeableProjectCard({
         }}
         data-testid={`card-project-${project.id}`}
       >
-        {/* Cover Photo */}
-        <div className="flex-shrink-0">
+        {/* Cover Photo with Navigation Overlay */}
+        <div className="flex-shrink-0 relative">
           {coverPhoto ? (
             <img
               src={coverPhoto.url}
@@ -268,6 +284,36 @@ export default function SwipeableProjectCard({
           ) : (
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-muted/50 backdrop-blur-sm flex items-center justify-center border border-border/30">
               <Home className="w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground/70" />
+            </div>
+          )}
+          
+          {/* Navigation Overlay - Right-angle arrow with "Go" */}
+          {project.address && (
+            <div
+              className="absolute inset-0 rounded-xl bg-black/20 backdrop-blur-[1px] flex items-center justify-center cursor-pointer hover:bg-black/30 transition-colors"
+              onClick={handleNavigationClick}
+              data-testid={`button-navigate-${project.id}`}
+              aria-label={`Navigate to ${project.name}`}
+            >
+              {/* Right-angle arrow: horizontal with "Go" → turns up with arrow */}
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                className="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-lg"
+              >
+                {/* Horizontal line with "Go" */}
+                <line x1="8" y1="32" x2="28" y2="32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                
+                {/* "Go" text */}
+                <text x="14" y="31" fill="white" fontSize="9" fontWeight="600" textAnchor="middle">Go</text>
+                
+                {/* Vertical line turning up */}
+                <line x1="28" y1="32" x2="28" y2="12" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                
+                {/* Arrow head pointing up */}
+                <polyline points="24,16 28,12 32,16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
           )}
         </div>
