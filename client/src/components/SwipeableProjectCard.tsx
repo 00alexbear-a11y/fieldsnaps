@@ -287,7 +287,7 @@ export default function SwipeableProjectCard({
             </div>
           )}
           
-          {/* Navigation Overlay - Apple Maps style location pin */}
+          {/* Navigation Overlay - Apple Maps red location pin */}
           {project.address && (
             <button
               className="absolute inset-0 rounded-xl flex items-center justify-center border-0 p-0 group"
@@ -296,28 +296,28 @@ export default function SwipeableProjectCard({
               aria-label={`Get directions to ${project.name}`}
               type="button"
             >
-              {/* Frosted circular background - Apple style */}
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/30 backdrop-blur-md flex flex-col items-center justify-center gap-0.5 group-hover:bg-black/40 group-active:bg-black/50 transition-colors shadow-lg">
-                {/* Location Pin Icon - SF Symbols inspired */}
+              <div className="flex flex-col items-center justify-center gap-0.5">
+                {/* Location Pin Icon - Apple Maps red */}
                 <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  className="pointer-events-none"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 28 28"
+                  className="pointer-events-none drop-shadow-lg group-hover:scale-110 group-active:scale-105 transition-transform"
                   fill="none"
                 >
                   {/* Pin shape: teardrop with circular center */}
                   <path
-                    d="M10 2C7.24 2 5 4.24 5 7c0 3.5 5 9 5 9s5-5.5 5-9c0-2.76-2.24-5-5-5z"
-                    fill="white"
-                    fillOpacity="0.9"
+                    d="M14 3C10.14 3 7 6.14 7 10c0 5 7 13 7 13s7-8 7-13c0-3.86-3.14-7-7-7z"
+                    fill="#FF3B30"
+                    stroke="white"
+                    strokeWidth="1.5"
                   />
                   {/* Center dot */}
-                  <circle cx="10" cy="7" r="2" fill="black" fillOpacity="0.3" />
+                  <circle cx="14" cy="10" r="2.5" fill="white" />
                 </svg>
                 
-                {/* "Route" label */}
-                <span className="text-[10px] font-semibold text-white/90 tracking-tight pointer-events-none">
+                {/* "Route" label with background for visibility */}
+                <span className="text-[11px] font-bold text-white tracking-tight pointer-events-none px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm">
                   Route
                 </span>
               </div>
