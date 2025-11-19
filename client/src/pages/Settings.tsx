@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock, Info, UserCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Wifi, WifiOff, User, LogIn, LogOut, Fingerprint, HardDrive, ChevronRight, Trash2, Tag as TagIcon, Plus, Pencil, X, CreditCard, Sparkles, Camera, Users, Link as LinkIcon, Copy, Check, UserMinus, Crown, FileText, Upload, Image as ImageIcon, Clock, Info, UserCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -710,6 +710,20 @@ export default function Settings() {
 
           {/* Data & Storage */}
           <Card className="p-0 overflow-hidden">
+            <div 
+              className="flex items-center justify-between px-4 h-12 cursor-pointer hover-elevate active-elevate-2"
+              onClick={() => setLocation('/location-privacy')}
+              data-testid="link-location-privacy"
+            >
+              <div className="flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm">Location & Privacy</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
+            
+            <Separator />
+            
             <div className="flex items-center justify-between px-4 h-12">
               <div className="flex items-center gap-3">
                 <Wifi className="w-5 h-5 text-muted-foreground" />

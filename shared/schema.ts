@@ -93,6 +93,7 @@ export const userSettings = pgTable("user_settings", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   uploadOnWifiOnly: boolean("upload_on_wifi_only").default(true).notNull(), // Save cellular data by default
+  autoTrackingEnabled: boolean("auto_tracking_enabled").default(true).notNull(), // Automatic time tracking via geofencing
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => [
