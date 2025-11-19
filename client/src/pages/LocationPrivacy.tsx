@@ -24,10 +24,6 @@ export default function LocationPrivacy() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
-  const { data: user } = useQuery<any>({
-    queryKey: ['/api/user'],
-  });
-
   const { data: preferences } = useQuery<any>({
     queryKey: ['/api/settings'],
   });
@@ -60,7 +56,7 @@ export default function LocationPrivacy() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation('/profile')}
+            onClick={() => setLocation('/settings')}
             data-testid="button-back"
           >
             <ChevronLeft className="w-5 h-5" />
