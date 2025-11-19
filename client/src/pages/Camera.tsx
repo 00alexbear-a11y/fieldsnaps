@@ -313,7 +313,7 @@ export default function Camera() {
     }
     
     // Detect Photo Attachment Mode
-    if (mode === 'attachToTodo') {
+    if (mode === 'attachToTodo' || mode === 'task-photo') {
       console.log('[Camera] Photo Attachment Mode activated');
       setIsAttachMode(true);
     } else {
@@ -2339,8 +2339,8 @@ export default function Camera() {
                     </div>
                   )}
                   
-                  {/* To-Do Button */}
-                  {selectedProject && !isRecording && (
+                  {/* To-Do Button - Hidden in task photo attach mode */}
+                  {selectedProject && !isRecording && !isAttachMode && (
                     <Button
                       onClick={() => captureAndEdit('todo')}
                       disabled={isCapturing}
@@ -2362,19 +2362,21 @@ export default function Camera() {
 
         {/* Mode Carousel - Apple Style Pill (Above Capture Button) */}
         <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-xl rounded-full px-3 py-2 border border-white/10">
-          <button
-            onClick={() => switchCameraMode('video')}
-            disabled={isTransitioning || isRecording}
-            aria-pressed={cameraMode === 'video'}
-            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
-              cameraMode === 'video'
-                ? 'bg-white text-black'
-                : 'text-white/70 hover:text-white/90 active:text-white/95'
-            } disabled:opacity-50`}
-            data-testid="button-mode-video"
-          >
-            VIDEO
-          </button>
+          {!isAttachMode && (
+            <button
+              onClick={() => switchCameraMode('video')}
+              disabled={isTransitioning || isRecording}
+              aria-pressed={cameraMode === 'video'}
+              className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+                cameraMode === 'video'
+                  ? 'bg-white text-black'
+                  : 'text-white/70 hover:text-white/90 active:text-white/95'
+              } disabled:opacity-50`}
+              data-testid="button-mode-video"
+            >
+              VIDEO
+            </button>
+          )}
           <button
             onClick={() => switchCameraMode('photo')}
             disabled={isTransitioning || isRecording}
@@ -2401,19 +2403,21 @@ export default function Camera() {
           >
             EDIT
           </button>
-          <button
-            onClick={() => switchCameraMode('todo')}
-            disabled={isTransitioning || isRecording}
-            aria-pressed={cameraMode === 'todo'}
-            className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
-              cameraMode === 'todo'
-                ? 'bg-white text-black'
-                : 'text-white/70 hover:text-white/90 active:text-white/95'
-            } disabled:opacity-50`}
-            data-testid="button-mode-todo"
-          >
-            TODO
-          </button>
+          {!isAttachMode && (
+            <button
+              onClick={() => switchCameraMode('todo')}
+              disabled={isTransitioning || isRecording}
+              aria-pressed={cameraMode === 'todo'}
+              className={`px-5 py-1.5 rounded-full text-[15px] font-medium tracking-tight transition-all duration-250 ${
+                cameraMode === 'todo'
+                  ? 'bg-white text-black'
+                  : 'text-white/70 hover:text-white/90 active:text-white/95'
+              } disabled:opacity-50`}
+              data-testid="button-mode-todo"
+            >
+              TODO
+            </button>
+          )}
         </div>
       </div>
 

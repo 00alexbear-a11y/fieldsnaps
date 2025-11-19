@@ -82,6 +82,7 @@ export default function ToDos() {
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
+  const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -530,7 +531,7 @@ export default function ToDos() {
     localStorage.setItem('todo-form-draft', JSON.stringify(formData));
     
     const projectId = form.watch('projectId');
-    setLocation(`/camera?projectId=${projectId || ''}&mode=attachToTodo`);
+    setLocation(`/camera?projectId=${projectId || ''}&mode=task-photo`);
   };
 
   const handleEditTodo = (todo: TodoWithDetails) => {
@@ -1010,11 +1011,12 @@ export default function ToDos() {
         >
           <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <div>
-                <Label htmlFor="title">Title *</Label>
                 <Input
                   id="title"
                   {...form.register("title")}
                   placeholder="What needs to be done?"
+                  aria-label="Task title (required)"
+                  required
                   data-testid="input-todo-title"
                 />
                 {form.formState.errors.title && (
@@ -1023,18 +1025,16 @@ export default function ToDos() {
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
                   {...form.register("description")}
-                  placeholder="Add details..."
+                  placeholder="Description (optional)"
                   rows={3}
                   data-testid="input-todo-description"
                 />
               </div>
 
               <div>
-                <Label htmlFor="projectId">Project</Label>
                 <Select value={form.watch('projectId') || ''} onValueChange={(value) => form.setValue('projectId', value)}>
                   <SelectTrigger id="projectId" data-testid="select-todo-project">
                     <SelectValue placeholder="Select project (optional)" />
@@ -1051,7 +1051,6 @@ export default function ToDos() {
               </div>
 
               <div>
-                <Label htmlFor="assignedTo">Assign to</Label>
                 <Select value={form.watch('assignedTo') || ''} onValueChange={(value) => form.setValue('assignedTo', value)}>
                   <SelectTrigger id="assignedTo" data-testid="select-todo-assignee">
                     <SelectValue placeholder="Assign to someone (optional)" />
@@ -1068,19 +1067,23 @@ export default function ToDos() {
               </div>
 
               <div>
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  {...form.register("dueDate")}
-                  data-testid="input-todo-due-date"
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowTodoDueDatePicker(true)}
+                  className="w-full justify-start text-left font-normal"
+                  data-testid="button-select-due-date"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {form.watch('dueDate') 
+                    ? format(new Date(form.watch('dueDate')!), 'MMM d, yyyy')
+                    : 'Due date (optional)'}
+                </Button>
               </div>
 
               {selectedPhotoUrl && (
                 <div className="relative">
-                  <Label>Attached Photo</Label>
-                  <div className="mt-2 relative">
+                  <div className="relative">
                     <img src={selectedPhotoUrl} alt="Attached" className="w-full h-40 object-cover rounded-lg" />
                     <Button
                       type="button"
@@ -1337,13 +1340,27 @@ export default function ToDos() {
           </SheetContent>
         </Sheet>
 
-      {/* Full-Screen Calendar */}
+      {/* Full-Screen Calendar for filtering */}
       <FullScreenCalendar
         open={showFullScreenCalendar}
         onOpenChange={setShowFullScreenCalendar}
         selectedDate={dateFilter}
         taskCountByDate={taskCountByDate}
         onSelectDay={(date) => setDateFilter(date)}
+      />
+
+      {/* Todo Due Date Picker */}
+      <FullScreenCalendar
+        open={showTodoDueDatePicker}
+        onOpenChange={setShowTodoDueDatePicker}
+        selectedDate={form.watch('dueDate') ? new Date(form.watch('dueDate')!) : undefined}
+        taskCountByDate={new Map()}
+        onSelectDay={(date) => {
+          if (date) {
+            form.setValue('dueDate', format(date, 'yyyy-MM-dd'));
+            setShowTodoDueDatePicker(false);
+          }
+        }}
       />
     </div>
   );
