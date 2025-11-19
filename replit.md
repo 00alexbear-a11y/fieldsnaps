@@ -20,6 +20,11 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) for construction profe
 ### UI/UX Decisions
 The design adopts an Apple-inspired aesthetic with minimalism, clear typography, and an 8px grid, featuring fluid animations, haptic feedback, and natural gesture navigation. Components include rounded buttons, subtle shadows, and a tab bar with SF Symbols-inspired icons. The camera interface is optimized for one-handed use with frosted glass effects and haptic feedback. A CSS-first, mobile-first responsive design ensures adaptability, including split-screen comparison and a redesigned landing page. Unified navigation and iOS safe area support are implemented globally using `env(safe-area-inset-*)` CSS variables. An Apple-style red notification badge on the To-Do tab icon indicates unread task assignments.
 
+Apple-style polish enhancements include:
+- Clean form design: Task creation dialog uses descriptive placeholders instead of boxed labels while maintaining accessibility through aria-labels and required attributes
+- Auto-applying date picker: FullScreenCalendar closes immediately upon date selection, eliminating extra confirmation taps
+- Context-aware camera: Camera UI adapts based on entry point—when accessed from task creation (mode=task-photo), hides irrelevant modes (VIDEO, TO-DO) to streamline photo attachment workflow
+
 ### Technical Implementations
 FieldSnaps is an offline-first PWA utilizing Service Workers, IndexedDB, and the Background Sync API. Performance is optimized with lazy loading and Web Workers for image compression. Media is stored in Replit Object Storage. The camera supports instant capture, video, and real-time annotation, with session-based photo management, intelligent quota management, and WiFi-only upload controls. Authentication uses Replit Auth with OpenID Connect and biometric login via SimpleWebAuthn. Capacitor provides a native-like iOS experience, with Capgo for OTA updates. A multi-platform subscription system supports Stripe, Apple In-App Purchase, and Google Play Billing.
 
