@@ -67,13 +67,17 @@
         <key>NSPhotoLibraryUsageDescription</key>
         <string>FieldSnaps needs photo library access to let you upload existing photos to projects.</string>
         
+        <!-- Photo Library Add (for saving captured photos) - REQUIRED by iOS -->
+        <key>NSPhotoLibraryAddUsageDescription</key>
+        <string>FieldSnaps needs permission to save construction photos to your photo library for backup and sharing.</string>
+        
         <!-- Location: When In Use (initial permission request) -->
         <key>NSLocationWhenInUseUsageDescription</key>
         <string>FieldSnaps uses your location to show nearby job sites and verify you're at the correct location when clocking in.</string>
         
         <!-- Location: Always Allow (for automatic time tracking) -->
         <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>FieldSnaps needs Always Allow location access to automatically clock you in when you arrive at job sites and clock you out when you leave. This saves you time and ensures accurate timesheets for payroll.</string>
+        <string>FieldSnaps uses your location to automatically clock you in and out at job sites, eliminating manual time entry and ensuring accurate pay. You can view your location history anytime and pause tracking whenever needed. Your location data is never shared without your permission.</string>
         
         <!-- Background Modes (for automatic time tracking) -->
         <key>UIBackgroundModes</key>
