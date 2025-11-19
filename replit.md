@@ -89,3 +89,32 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **Google Geocoding API**: Address to coordinates conversion
 - **Google Maps API**: Map views and location display (for admin dashboard)
 - **Stripe**: Web subscription management and payment processing
+
+## Recent Changes
+
+### iOS App Store Deployment Preparation (November 19, 2025)
+
+**Phase 1-3: Privacy, Geofencing, and License Validation - COMPLETED**
+- Enhanced Info.plist privacy descriptions with plain language emphasizing worker benefits
+- Created Location Privacy transparency screen accessible from Settings
+- Added user controls to pause/resume automatic time tracking
+- Implemented iOS 20-geofence limit with proximity-based rotation (25-mile radius)
+- Safe wrapper for getGeofences() prevents runtime crashes when native layer fails
+- License validation with numeric error codes and user-friendly error messages
+- Graceful degradation on plugin failures with consistent array handling
+
+**Phase 4-7: Documentation and Testing Checklists - COMPLETED**
+Created comprehensive documentation:
+- `docs/ios-app-store-review-strategy.md` - App Store submission strategy with worker-benefit narrative
+- `docs/demo-video-script.md` - Demo video script for App Store preview
+- `docs/transistorsoft-license-setup.md` - TransistorSoft license purchase and setup guide
+- `docs/ios-native-testing-checklist.md` - Native device testing requirements (gestures, safe areas, haptics, geofencing)
+- `docs/app-store-submission-checklist.md` - Final pre-submission validation covering code, assets, compliance, testing
+
+**Production-Ready Status**: All code and documentation for iOS deployment is architect-approved and ready for native device testing on physical iPhones. Next step requires physical iOS device for runtime validation.
+
+**Key Implementation Details:**
+- `client/src/lib/geofencing.ts` - Safe geofence management with 20-limit enforcement
+- `client/src/pages/LocationPrivacy.tsx` - Worker-benefit transparency messaging
+- `shared/schema.ts` - Added autoTrackingEnabled boolean field to users table
+- `ios/App/App/Info.plist` - Comprehensive privacy descriptions for App Store compliance
