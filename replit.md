@@ -38,6 +38,7 @@ Key features include:
 - "Snap & Speak" camera mode for rapid task creation via photo and voice recognition.
 - Profile photo upload and editing with public ACL storage in Replit Object Storage, integrated into the first-login onboarding flow.
 - Automatic time tracking with geofencing using TransistorSoft Capacitor Background Geolocation for clock-in/out notifications based on job site arrival/departure. Geofences are automatically created and managed with a fixed 500ft radius.
+- **Location Privacy Transparency**: Dedicated screen accessible from Settings explaining what location data is tracked and why it benefits workers (accurate pay, personal time records, mileage tracking). Workers can pause/resume automatic time tracking via toggle control. This addresses Apple App Store requirements by framing location tracking as a worker benefit, not just employer monitoring.
 - Google Places Autocomplete streamlines address entry for project creation and editing, automatically parsing city, state, and zip code.
 - Real-time geofence visualization on the admin Locations page displays project geofences as blue circles with project markers on Google Maps.
 - PDF Timecard Export System offers weekly timesheets in three formats: CSV, Basic PDF Timecard (Apple-style design), and Detailed PDF Report (including GPS coordinates, entry method, travel time breakdown, and edit audit trail). Travel time is auto-calculated based on movement telemetry between different projects.
