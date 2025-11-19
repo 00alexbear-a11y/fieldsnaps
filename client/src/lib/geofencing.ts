@@ -181,21 +181,48 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
   } catch (error: any) {
     console.error("[Geofencing] Initialization failed:", error);
     
-    // Check for license-related errors
-    if (error?.message && typeof error.message === 'string') {
-      const errorMsg = error.message.toLowerCase();
-      
-      if (errorMsg.includes('license') || errorMsg.includes('expired') || errorMsg.includes('invalid')) {
-        console.error("[Geofencing] LICENSE ERROR:", error.message);
-        
-        // Re-throw with user-friendly message
-        throw new Error(
-          'Location services are unavailable. Please contact support to activate automatic time tracking features.'
-        );
-      }
+    // Log full error details for debugging
+    if (error?.code !== undefined) {
+      console.error("[Geofencing] Error code:", error.code);
+    }
+    if (error?.message) {
+      console.error("[Geofencing] Error message:", error.message);
     }
     
-    // Other initialization errors
+    // Check for license-related errors by numeric code, string code, or message
+    // TransistorSoft plugin may emit numeric error constants or string codes
+    const errorCode = error?.code;
+    const errorMsg = (error?.message || '').toLowerCase();
+    
+    // Check numeric constants (if exposed by plugin)
+    const ERROR_LICENSE = 1; // Common numeric constant for license errors
+    
+    const isLicenseError = 
+      errorCode === ERROR_LICENSE ||
+      errorCode === 'LICENSE_ERROR' ||
+      errorCode === 'LICENSE_INVALID' ||
+      errorCode === 'LICENSE_EXPIRED' ||
+      errorMsg.includes('license') ||
+      errorMsg.includes('expired') ||
+      errorMsg.includes('invalid');
+    
+    if (isLicenseError) {
+      console.error("[Geofencing] LICENSE ERROR - Full details:", {
+        code: error.code,
+        message: error.message,
+        stack: error.stack,
+      });
+      
+      // Re-throw with user-friendly message
+      const friendlyError = new Error(
+        'Location services are unavailable. Please contact support to activate automatic time tracking features.'
+      );
+      // Preserve original error for debugging
+      (friendlyError as any).originalError = error;
+      throw friendlyError;
+    }
+    
+    // Other initialization errors - preserve original
     throw error;
   }
 }
@@ -815,10 +842,28 @@ export async function removeAllGeofences(): Promise<void> {
 }
 
 /**
- * Get all active geofences
+ * Get all active geofences (safe wrapper with fallback)
+ * 
+ * Handles edge cases where native layer returns undefined/null
+ * Always returns a valid array to prevent runtime crashes
+ * 
+ * @returns Array of active geofences (empty array if query fails)
  */
 export async function getGeofences(): Promise<TSGeofence[]> {
-  return await BackgroundGeolocation.getGeofences();
+  try {
+    const result = await BackgroundGeolocation.getGeofences();
+    
+    // Handle undefined/null/malformed responses from native layer
+    if (!result || !Array.isArray(result)) {
+      console.warn("[Geofencing] BackgroundGeolocation.getGeofences returned non-array:", result);
+      return [];
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("[Geofencing] Failed to get geofences:", error);
+    return []; // Safe fallback
+  }
 }
 
 /**
@@ -957,6 +1002,13 @@ export async function updateGeofencesByProximity(
   currentLocation?: { latitude: number; longitude: number }
 ): Promise<number> {
   try {
+    // Validate input
+    if (!projects || projects.length === 0) {
+      console.log("[Geofencing] No projects provided - clearing all geofences");
+      await removeAllGeofences();
+      return 0;
+    }
+
     // Get current location if not provided
     let userLocation = currentLocation;
     if (!userLocation) {
@@ -966,6 +1018,10 @@ export async function updateGeofencesByProximity(
         longitude: location.coords.longitude,
       };
     }
+
+    // Get existing geofences to compare (getGeofences is now safe and always returns array)
+    const existingGeofences = await getGeofences();
+    const existingIds = new Set(existingGeofences.map(g => g.identifier));
 
     // Calculate distance to each project
     const projectsWithDistance = projects.map((project) => ({
@@ -986,22 +1042,51 @@ export async function updateGeofencesByProximity(
 
     console.log(`[Geofencing] Found ${nearbyProjects.length} projects within ${PROXIMITY_RADIUS_MILES} miles`);
 
-    // Remove all existing geofences
-    await removeAllGeofences();
+    // Determine which geofences to add/remove
+    const targetIds = new Set(nearbyProjects.map(p => p.id));
+    const toRemove = existingGeofences.filter(g => !targetIds.has(g.identifier));
+    const toAdd = nearbyProjects.filter(p => !existingIds.has(p.id));
 
-    // Add geofences for nearby projects
-    for (const project of nearbyProjects) {
-      await addGeofence({
-        identifier: project.id,
-        latitude: project.latitude,
-        longitude: project.longitude,
-        radius: GEOFENCE_RADIUS_FEET * 0.3048, // Convert feet to meters
-        notifyOnEntry: true,
-        notifyOnExit: true,
-      });
+    console.log(`[Geofencing] Changes: remove ${toRemove.length}, add ${toAdd.length}, keep ${existingGeofences.length - toRemove.length}`);
+
+    // Remove old geofences first (frees up slots)
+    for (const geofence of toRemove) {
+      try {
+        await removeGeofence(geofence.identifier);
+      } catch (error) {
+        console.warn(`[Geofencing] Failed to remove geofence ${geofence.identifier}:`, error);
+        // Continue removing others
+      }
     }
 
-    console.log(`[Geofencing] Updated ${nearbyProjects.length} geofences`);
+    // Add new geofences
+    let addedCount = 0;
+    for (const project of toAdd) {
+      try {
+        // Check if we're at limit before adding
+        const currentCount = await getGeofenceCount();
+        if (currentCount >= MAX_GEOFENCES) {
+          console.warn(`[Geofencing] Reached MAX_GEOFENCES limit (${MAX_GEOFENCES}) - cannot add ${project.name}`);
+          break; // Stop adding more
+        }
+
+        await addGeofence({
+          identifier: project.id,
+          latitude: project.latitude,
+          longitude: project.longitude,
+          radius: GEOFENCE_RADIUS_FEET * 0.3048, // Convert feet to meters
+          notifyOnEntry: true,
+          notifyOnExit: true,
+        });
+        addedCount++;
+      } catch (error) {
+        console.error(`[Geofencing] Failed to add geofence for ${project.name}:`, error);
+        // Continue adding others
+      }
+    }
+
+    const finalCount = await getGeofenceCount();
+    console.log(`[Geofencing] Updated geofences: ${finalCount} active (added ${addedCount}, removed ${toRemove.length})`);
     
     // Warn if there are many projects outside the radius
     const distantProjects = projectsWithDistance.length - nearbyProjects.length;
@@ -1009,7 +1094,7 @@ export async function updateGeofencesByProximity(
       console.log(`[Geofencing] ${distantProjects} projects are >${PROXIMITY_RADIUS_MILES} miles away and not monitored`);
     }
 
-    return nearbyProjects.length;
+    return finalCount;
   } catch (error) {
     console.error("[Geofencing] Error updating geofences by proximity:", error);
     throw error;
@@ -1017,17 +1102,17 @@ export async function updateGeofencesByProximity(
 }
 
 /**
- * Get count of active geofences
+ * Get count of active geofences (safe - getGeofences always returns array)
  * 
  * @returns Number of active geofences
  */
 export async function getGeofenceCount(): Promise<number> {
-  const geofences = await getGeofences();
+  const geofences = await getGeofences(); // Safe wrapper - always returns array
   return geofences.length;
 }
 
 /**
- * Check if geofence limit is reached
+ * Check if geofence limit is reached (safe)
  * 
  * @returns True if at or above iOS 20-geofence limit
  */
