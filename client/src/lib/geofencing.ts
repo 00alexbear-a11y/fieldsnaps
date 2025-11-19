@@ -20,11 +20,17 @@ import { LocalNotifications } from "@capacitor/local-notifications";
  * - 5-minute location logging when clocked in
  * - Motion detection (stops GPS when stationary >5 min)
  * - Battery drain target: 5-10% over 8-hour shift
+ * - iOS 20-geofence limit with proximity-based management
  * 
- * Testing Strategy:
- * - iOS: 100% FREE (even production builds)
- * - Android: FREE in debug builds (works perfectly via USB/Firebase)
- * - Android production builds require $389 license (purchase only if testing successful)
+ * License Requirements:
+ * - iOS Production: $399 TransistorSoft license (see docs/transistorsoft-license-setup.md)
+ * - Android Production: $399 TransistorSoft license (separate purchase)
+ * - Development: FREE (no license needed)
+ * 
+ * iOS Geofence Limit:
+ * - Maximum 20 simultaneous geofences (Apple system restriction)
+ * - Proximity-based rotation: monitors nearest 20 sites within 25 miles
+ * - Auto-updates when user moves to new area
  */
 
 export interface GeofencingConfig {
@@ -34,6 +40,32 @@ export interface GeofencingConfig {
   onLocationUpdate?: (location: Location) => void;
   onMotionChange?: (event: MotionChangeEvent) => void;
 }
+
+export interface Project {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+}
+
+/**
+ * iOS enforces a hard limit of 20 geofences per app
+ * Cannot be exceeded - system automatically removes oldest geofences
+ */
+export const MAX_GEOFENCES = 20;
+
+/**
+ * Only monitor geofences within this radius (miles)
+ * Prevents wasting slots on distant sites
+ */
+export const PROXIMITY_RADIUS_MILES = 25;
+
+/**
+ * Standard geofence radius for all job sites (feet)
+ * 500ft = ~152 meters (catches parking lot arrivals)
+ */
+export const GEOFENCE_RADIUS_FEET = 500;
 
 let isInitialized = false;
 let currentConfig: GeofencingConfig | null = null;
@@ -105,8 +137,10 @@ export const GEOFENCING_CONFIG = {
 /**
  * Initialize the geofencing service
  * 
- * IMPORTANT: This works 100% in debug builds on both iOS and Android
- * Android production builds require license key (add only when ready to publish)
+ * License Handling:
+ * - Development builds: Works without license (watermark shown periodically)
+ * - Production iOS: Requires $399 TransistorSoft license in Info.plist
+ * - License validation happens automatically on first `.ready()` call
  */
 export async function initializeGeofencing(config: GeofencingConfig = {}): Promise<void> {
   // Only initialize on native platforms
@@ -123,7 +157,7 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
   currentConfig = config;
 
   try {
-    // Configure Background Geolocation
+    // Configure Background Geolocation (license validation happens here)
     const state = await BackgroundGeolocation.ready(GEOFENCING_CONFIG);
     
     console.log("[Geofencing] Initialized successfully", {
@@ -144,8 +178,24 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
     await requestNotificationPermissions();
 
     isInitialized = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Geofencing] Initialization failed:", error);
+    
+    // Check for license-related errors
+    if (error?.message && typeof error.message === 'string') {
+      const errorMsg = error.message.toLowerCase();
+      
+      if (errorMsg.includes('license') || errorMsg.includes('expired') || errorMsg.includes('invalid')) {
+        console.error("[Geofencing] LICENSE ERROR:", error.message);
+        
+        // Re-throw with user-friendly message
+        throw new Error(
+          'Location services are unavailable. Please contact support to activate automatic time tracking features.'
+        );
+      }
+    }
+    
+    // Other initialization errors
     throw error;
   }
 }
@@ -852,4 +902,136 @@ export async function destroyGeofencing(): Promise<void> {
   cachedClockStatus = null; // Clear cached status
   
   console.log("[Geofencing] Destroyed");
+}
+
+/**
+ * Calculate distance between two coordinates (Haversine formula)
+ * 
+ * @param lat1 Latitude of point 1 (degrees)
+ * @param lon1 Longitude of point 1 (degrees)
+ * @param lat2 Latitude of point 2 (degrees)
+ * @param lon2 Longitude of point 2 (degrees)
+ * @returns Distance in miles
+ */
+export function calculateDistanceMiles(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 3958.8; // Earth radius in miles
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+  
+  return distance;
+}
+
+function toRadians(degrees: number): number {
+  return degrees * (Math.PI / 180);
+}
+
+/**
+ * Update geofences based on user's current location (proximity-based)
+ * 
+ * iOS Limit Strategy:
+ * - Only monitors the nearest 20 projects within 25 miles
+ * - Automatically rotates geofences when user moves to new area
+ * - Prevents wasting slots on distant sites
+ * 
+ * @param projects All available projects
+ * @param currentLocation User's current location (optional, will fetch if not provided)
+ * @returns Number of geofences updated
+ */
+export async function updateGeofencesByProximity(
+  projects: Project[],
+  currentLocation?: { latitude: number; longitude: number }
+): Promise<number> {
+  try {
+    // Get current location if not provided
+    let userLocation = currentLocation;
+    if (!userLocation) {
+      const location = await getCurrentLocation();
+      userLocation = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+    }
+
+    // Calculate distance to each project
+    const projectsWithDistance = projects.map((project) => ({
+      ...project,
+      distance: calculateDistanceMiles(
+        userLocation.latitude,
+        userLocation.longitude,
+        project.latitude,
+        project.longitude
+      ),
+    }));
+
+    // Filter to projects within proximity radius
+    const nearbyProjects = projectsWithDistance
+      .filter((p) => p.distance <= PROXIMITY_RADIUS_MILES)
+      .sort((a, b) => a.distance - b.distance) // Sort by distance (nearest first)
+      .slice(0, MAX_GEOFENCES); // Limit to 20
+
+    console.log(`[Geofencing] Found ${nearbyProjects.length} projects within ${PROXIMITY_RADIUS_MILES} miles`);
+
+    // Remove all existing geofences
+    await removeAllGeofences();
+
+    // Add geofences for nearby projects
+    for (const project of nearbyProjects) {
+      await addGeofence({
+        identifier: project.id,
+        latitude: project.latitude,
+        longitude: project.longitude,
+        radius: GEOFENCE_RADIUS_FEET * 0.3048, // Convert feet to meters
+        notifyOnEntry: true,
+        notifyOnExit: true,
+      });
+    }
+
+    console.log(`[Geofencing] Updated ${nearbyProjects.length} geofences`);
+    
+    // Warn if there are many projects outside the radius
+    const distantProjects = projectsWithDistance.length - nearbyProjects.length;
+    if (distantProjects > 0) {
+      console.log(`[Geofencing] ${distantProjects} projects are >${PROXIMITY_RADIUS_MILES} miles away and not monitored`);
+    }
+
+    return nearbyProjects.length;
+  } catch (error) {
+    console.error("[Geofencing] Error updating geofences by proximity:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get count of active geofences
+ * 
+ * @returns Number of active geofences
+ */
+export async function getGeofenceCount(): Promise<number> {
+  const geofences = await getGeofences();
+  return geofences.length;
+}
+
+/**
+ * Check if geofence limit is reached
+ * 
+ * @returns True if at or above iOS 20-geofence limit
+ */
+export async function isGeofenceLimitReached(): Promise<boolean> {
+  const count = await getGeofenceCount();
+  return count >= MAX_GEOFENCES;
 }
