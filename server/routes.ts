@@ -748,6 +748,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Time Tracking Settings Routes
+  const timeTrackingSettingsSchema = z.object({
+    autoTrackingEnabledByDefault: z.boolean(),
+  });
+
+  app.put("/api/companies/time-tracking-settings", isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only the owner can update time tracking settings
+      const company = await storage.getCompany(user.companyId);
+      if (!company || company.ownerId !== userId) {
+        return res.status(403).json({ error: "Only the billing owner can update time tracking settings" });
+      }
+
+      // Validate time tracking settings with Zod
+      const validated = timeTrackingSettingsSchema.parse(req.body);
+
+      await storage.updateCompany(company.id, validated);
+      const updatedCompany = await storage.getCompany(company.id);
+
+      res.json(updatedCompany);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
   app.post("/api/companies/pdf-logo", isAuthenticatedAndWhitelisted, uploadRateLimiter, upload.single('logo'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
