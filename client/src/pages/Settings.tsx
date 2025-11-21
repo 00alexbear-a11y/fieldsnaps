@@ -105,6 +105,7 @@ export default function Settings() {
   const [showTeamDialog, setShowTeamDialog] = useState(false);
   const [showCameraDialog, setShowCameraDialog] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [showTimeTrackingDialog, setShowTimeTrackingDialog] = useState(false);
 
   const [pdfSettings, setPdfSettings] = useState({
     pdfCompanyName: '',
@@ -259,6 +260,30 @@ export default function Settings() {
     onError: (error: any) => {
       toast({
         title: 'Failed to upload logo',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const saveTimeTrackingSettingsMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const res = await apiRequest('PUT', '/api/companies/time-tracking-settings', {
+        autoTrackingEnabledByDefault: enabled,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies/me'] });
+      setShowTimeTrackingDialog(false);
+      toast({
+        title: 'Time tracking settings saved',
+        description: 'Company default has been updated',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to save settings',
         description: error.message,
         variant: 'destructive',
       });
@@ -845,6 +870,24 @@ export default function Settings() {
               
               {company?.ownerId === user.id && (
                 <>
+                  <Separator />
+                  <button
+                    onClick={() => setShowTimeTrackingDialog(true)}
+                    className="w-full flex items-center justify-between px-4 h-12 hover-elevate active-elevate-2"
+                    data-testid="button-time-tracking-settings"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-sm">Automatic Time Tracking</span>
+                        <span className="text-xs text-muted-foreground">
+                          {company?.autoTrackingEnabledByDefault ? 'Enabled' : 'Disabled'} for team by default
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  
                   <Separator />
                   <button
                     onClick={() => setShowPdfDialog(true)}
