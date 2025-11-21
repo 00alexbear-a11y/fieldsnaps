@@ -80,9 +80,9 @@ export default function NativeAppLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col">
+    <div className="h-screen bg-white dark:bg-black flex flex-col overflow-hidden">
       {/* Hero Section - Takes up most of screen */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8 overflow-y-auto">
         {/* Logo and Title */}
         <div className="flex flex-col items-center space-y-6">
           <img 
