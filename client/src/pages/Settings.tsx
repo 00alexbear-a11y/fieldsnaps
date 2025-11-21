@@ -1605,6 +1605,48 @@ export default function Settings() {
             </div>
       </MobileDialog>
 
+      {/* Time Tracking Settings Dialog */}
+      <MobileDialog 
+        open={showTimeTrackingDialog} 
+        onOpenChange={setShowTimeTrackingDialog}
+        title="Automatic Time Tracking"
+      >
+        <div className="space-y-6">
+          {/* Main Toggle */}
+          <div className="flex items-center justify-between p-4 rounded-lg border">
+            <div className="flex-1 mr-4">
+              <div className="font-medium">Enable for team by default</div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Workers receive notifications to clock in when arriving at job sites
+              </div>
+            </div>
+            <Switch
+              checked={company?.autoTrackingEnabledByDefault !== false}
+              onCheckedChange={(checked) => {
+                saveTimeTrackingSettingsMutation.mutate(checked);
+              }}
+              disabled={saveTimeTrackingSettingsMutation.isPending}
+              data-testid="switch-auto-tracking-default"
+            />
+          </div>
+
+          {/* Privacy Notice */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p>
+                  <strong className="text-foreground">Worker Privacy:</strong> Team members can disable automatic time tracking in their Location & Privacy settings.
+                </p>
+                <p>
+                  This setting controls the default for new team members. Existing workers can choose to opt out.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </MobileDialog>
+
       {/* Cleanup Results Dialog */}
       <AlertDialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
         <AlertDialogContent data-testid="dialog-cleanup-results">
