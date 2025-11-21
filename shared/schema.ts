@@ -57,6 +57,9 @@ export const companies = pgTable("companies", {
   pdfIncludeAnnotations: boolean("pdf_include_annotations").default(true),
   pdfIncludeSignatureLine: boolean("pdf_include_signature_line").default(false),
   
+  // Automatic time tracking settings
+  autoTrackingEnabledByDefault: boolean("auto_tracking_enabled_by_default").default(true).notNull(), // Company-wide default for automatic time tracking
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_companies_owner_id").on(table.ownerId),
