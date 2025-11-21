@@ -33,6 +33,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+        
+        <!-- TransistorSoft Background Geolocation License -->
+        <meta-data
+            android:name="com.transistorsoft.locationmanager.license"
+            android:value="bf49c0f499931f7b15eb7618f825ff2af39ee5037e24050168766fc72d3203bd" />
     </application>
 
     <!-- Permissions -->
