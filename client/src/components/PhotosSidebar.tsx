@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
@@ -67,6 +68,14 @@ export function PhotosSidebar({
   selectedSessionId,
   onSessionChange,
 }: PhotosSidebarProps) {
+  const { setOpenMobile } = useSidebar();
+  
+  // Helper to auto-close sidebar on mobile after selection
+  const withAutoClose = <T,>(callback: (value: T) => void, value: T) => () => {
+    callback(value);
+    setOpenMobile(false);
+  };
+  
   const smartViews = [
     { id: 'all', label: 'All Photos', icon: CameraIcon, filter: 'all' as DateFilter },
     { id: 'today', label: 'Today', icon: Clock, filter: 'today' as DateFilter },
@@ -103,7 +112,7 @@ export function PhotosSidebar({
                 {projects.map((project) => (
                   <SidebarMenuItem key={project.id}>
                     <SidebarMenuButton
-                      onClick={() => onProjectChange(project.id)}
+                      onClick={withAutoClose(onProjectChange, project.id)}
                       isActive={currentProjectId === project.id}
                       data-testid={`filter-project-${project.id}`}
                     >
@@ -128,7 +137,7 @@ export function PhotosSidebar({
               {smartViews.map((view) => (
                 <SidebarMenuItem key={view.id}>
                   <SidebarMenuButton
-                    onClick={() => onDateFilterChange(view.filter)}
+                    onClick={withAutoClose(onDateFilterChange, view.filter)}
                     isActive={dateFilter === view.filter}
                     data-testid={`filter-view-${view.id}`}
                   >
@@ -149,7 +158,7 @@ export function PhotosSidebar({
               {sortOptions.map((option) => (
                 <SidebarMenuItem key={option.id}>
                   <SidebarMenuButton
-                    onClick={() => onSortChange(option.id as SortOption)}
+                    onClick={withAutoClose(onSortChange, option.id as SortOption)}
                     isActive={sortOption === option.id}
                     data-testid={`sort-${option.id}`}
                   >
@@ -172,7 +181,7 @@ export function PhotosSidebar({
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => onUploaderChange(null)}
+                    onClick={withAutoClose(onUploaderChange, null)}
                     isActive={selectedUploaderId === null}
                     data-testid="filter-uploader-all"
                   >
@@ -186,7 +195,7 @@ export function PhotosSidebar({
                 {uploaders.map((uploader) => (
                   <SidebarMenuItem key={uploader.id}>
                     <SidebarMenuButton
-                      onClick={() => onUploaderChange(uploader.id)}
+                      onClick={withAutoClose(onUploaderChange, uploader.id)}
                       isActive={selectedUploaderId === uploader.id}
                       data-testid={`filter-uploader-${uploader.id}`}
                     >
@@ -211,7 +220,7 @@ export function PhotosSidebar({
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => onSessionChange(null)}
+                    onClick={withAutoClose(onSessionChange, null)}
                     isActive={selectedSessionId === null}
                     data-testid="filter-session-all"
                   >
@@ -225,7 +234,7 @@ export function PhotosSidebar({
                 {sessions.map((session) => (
                   <SidebarMenuItem key={session.id}>
                     <SidebarMenuButton
-                      onClick={() => onSessionChange(session.id)}
+                      onClick={withAutoClose(onSessionChange, session.id)}
                       isActive={selectedSessionId === session.id}
                       data-testid={`filter-session-${session.id}`}
                     >
