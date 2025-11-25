@@ -181,16 +181,21 @@ function Sidebar({
   }
 
   if (isMobile) {
+    // Calculate header height: safe area top + 56px (12px top padding + 32px content + 12px bottom padding)
+    const headerHeight = "calc(env(safe-area-inset-top, 0px) + 56px)";
+    
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden"
+          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden !rounded-tr-2xl !rounded-br-2xl !rounded-tl-none"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              top: headerHeight,
+              height: `calc(100% - ${headerHeight})`,
             } as React.CSSProperties
           }
           side={side}
