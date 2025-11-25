@@ -108,7 +108,7 @@ export function AppSidebar() {
     setOpenMobile(false);
   };
 
-  // Update URL query params
+  // Update URL query params and auto-close sidebar
   const updateQueryParam = (key: string, value: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set(key, value);
@@ -116,6 +116,8 @@ export function AppSidebar() {
     window.history.pushState({}, '', newUrl);
     // Trigger a custom event so the page can react to filter changes
     window.dispatchEvent(new CustomEvent('filterChange'));
+    // Auto-close sidebar on mobile after selection
+    setOpenMobile(false);
   };
 
   const toggleQueryParam = (key: string, currentValue: boolean) => {
@@ -128,6 +130,8 @@ export function AppSidebar() {
     const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
     window.history.pushState({}, '', newUrl);
     window.dispatchEvent(new CustomEvent('filterChange'));
+    // Auto-close sidebar on mobile after selection
+    setOpenMobile(false);
   };
 
   // Get user initials for avatar fallback
