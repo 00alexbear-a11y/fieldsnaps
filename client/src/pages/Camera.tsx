@@ -1689,8 +1689,23 @@ export default function Camera() {
 
       // Navigate based on mode
       if (isAttachMode) {
-        // Photo Attachment Mode: return to todos with photoId
-        setLocation(`/todos?photoId=${savedPhoto.id}`);
+        // Photo Attachment Mode: upload and wait for server ID before returning to todos
+        console.log('[Camera] Attach mode - uploading and waiting for server ID');
+        const serverPhotoId = await syncManager.uploadPhotoAndWait(savedPhoto.id, selectedProject);
+        
+        if (serverPhotoId) {
+          console.log('[Camera] Photo uploaded, navigating to todos with server photoId:', serverPhotoId);
+          setLocation(`/todos?photoId=${serverPhotoId}`);
+        } else {
+          // Upload failed or offline - navigate without photoId
+          console.log('[Camera] Photo upload failed, navigating to todos without photoId');
+          toast({
+            title: 'Photo saved locally',
+            description: 'You can attach it later from your gallery',
+          });
+          setLocation('/todos');
+        }
+        return;
       } else if (mode === 'todo') {
         // Camera Tab To-Do mode: navigate to edit page with createTodo flag
         shouldPreserveSessionRef.current = true; // Preserve session when going to edit
