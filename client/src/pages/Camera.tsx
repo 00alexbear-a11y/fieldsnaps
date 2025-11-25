@@ -505,6 +505,14 @@ export default function Camera() {
     }
   }, [projects, selectedProject]);
 
+  // Auto-select if there's only one project
+  useEffect(() => {
+    if (projects.length === 1 && !selectedProject && showProjectSelection) {
+      setSelectedProject(projects[0].id);
+      setShowProjectSelection(false);
+    }
+  }, [projects, selectedProject, showProjectSelection]);
+
   useEffect(() => {
     if (selectedProject && !showProjectSelection && !isActive && !permissionDenied && !isCameraLoading) {
       startCamera();
@@ -1833,12 +1841,9 @@ export default function Camera() {
                     <h3 className="text-lg font-semibold truncate text-left" data-testid={`text-project-name-${project.id}`}>
                       {project.name}
                     </h3>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground text-left">
-                      <CameraIcon className="w-3.5 h-3.5" />
-                      <span data-testid={`text-photo-count-${project.id}`}>
-                        {project.photoCount || 0} {project.photoCount === 1 ? 'photo' : 'photos'}
-                      </span>
-                    </div>
+                    <p className="text-sm text-muted-foreground text-left" data-testid={`text-photo-count-${project.id}`}>
+                      {project.photoCount || 0} {project.photoCount === 1 ? 'photo' : 'photos'}
+                    </p>
                   </div>
                 </div>
               </button>

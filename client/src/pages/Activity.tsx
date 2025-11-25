@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Camera, FolderPlus, CheckSquare, Share2, User, Activity as ActivityIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { formatDistanceToNow, startOfToday, startOfWeek, startOfMonth } from "date-fns";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { ActivitySidebar, ActivityFilter, DateRangeFilter } from "@/components/ActivitySidebar";
+import { ActivitySidebar, ActivityFilter, DateRangeFilter, TeamMemberOption, ProjectOption } from "@/components/ActivitySidebar";
 
 interface ActivityLog {
   id: string;
@@ -150,6 +150,8 @@ function EmptyState() {
 export default function Activity() {
   const [filter, setFilter] = useState<ActivityFilter>('all');
   const [dateRange, setDateRange] = useState<DateRangeFilter>('all');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const { data: allActivities = [], isLoading, error } = useQuery<ActivityLog[]>({
     queryKey: ['/api/activity-logs', filter],
@@ -165,23 +167,64 @@ export default function Activity() {
     },
   });
 
-  // Client-side date filtering
+  // Extract unique team members from activity data
+  const teamMembers = useMemo<TeamMemberOption[]>(() => {
+    const memberMap = new Map<string, TeamMemberOption>();
+    allActivities.forEach((activity) => {
+      if (!memberMap.has(activity.userId)) {
+        const name = activity.user.firstName && activity.user.lastName
+          ? `${activity.user.firstName} ${activity.user.lastName}`
+          : activity.user.email || 'Unknown';
+        memberMap.set(activity.userId, { id: activity.userId, name });
+      }
+    });
+    return Array.from(memberMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [allActivities]);
+
+  // Extract unique projects from activity metadata
+  const projectsList = useMemo<ProjectOption[]>(() => {
+    const projectMap = new Map<string, ProjectOption>();
+    allActivities.forEach((activity) => {
+      const projectId = activity.metadata?.projectId;
+      const projectName = activity.metadata?.projectName;
+      if (projectId && projectName && !projectMap.has(projectId)) {
+        projectMap.set(projectId, { id: projectId, name: projectName });
+      }
+    });
+    return Array.from(projectMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [allActivities]);
+
+  // Client-side filtering: date, user, and project
   const activities = allActivities.filter((activity) => {
-    if (dateRange === 'all') return true;
-    
-    const activityDate = new Date(activity.createdAt);
-    const now = new Date();
-    
-    switch (dateRange) {
-      case 'today':
-        return activityDate >= startOfToday();
-      case 'this-week':
-        return activityDate >= startOfWeek(now, { weekStartsOn: 1 });
-      case 'this-month':
-        return activityDate >= startOfMonth(now);
-      default:
-        return true;
+    // Date filter
+    if (dateRange !== 'all') {
+      const activityDate = new Date(activity.createdAt);
+      const now = new Date();
+      
+      switch (dateRange) {
+        case 'today':
+          if (activityDate < startOfToday()) return false;
+          break;
+        case 'this-week':
+          if (activityDate < startOfWeek(now, { weekStartsOn: 1 })) return false;
+          break;
+        case 'this-month':
+          if (activityDate < startOfMonth(now)) return false;
+          break;
+      }
     }
+
+    // User filter
+    if (selectedUserId && activity.userId !== selectedUserId) {
+      return false;
+    }
+
+    // Project filter
+    if (selectedProjectId && activity.metadata?.projectId !== selectedProjectId) {
+      return false;
+    }
+
+    return true;
   });
 
   return (
@@ -193,6 +236,12 @@ export default function Activity() {
           dateRange={dateRange}
           onDateRangeChange={setDateRange}
           activityCount={activities.length}
+          teamMembers={teamMembers}
+          selectedUserId={selectedUserId}
+          onUserFilterChange={setSelectedUserId}
+          projects={projectsList}
+          selectedProjectId={selectedProjectId}
+          onProjectFilterChange={setSelectedProjectId}
         />
         <SidebarInset className="flex flex-col">
           <div className="sticky top-0 z-10 bg-background border-b border-border pt-safe-3 pb-3">

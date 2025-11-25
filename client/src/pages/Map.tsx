@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, Navigation, MapPin, Search, Star, ArrowUpDown } from 'lucide-react';
+import { Loader2, Navigation, MapPin, Search, Star, ArrowUpDown, Crosshair, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useLocation } from 'wouter';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import type { Project } from '@shared/schema';
@@ -46,6 +48,7 @@ export default function Map() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'distance'>('name');
   const [showProjectList, setShowProjectList] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
@@ -59,7 +62,7 @@ export default function Map() {
   // Filter projects with valid coordinates and calculate distances
   const projectsWithCoords = useMemo(() => {
     const filtered = projects.filter(
-      p => p.latitude && p.longitude && !p.deletedAt
+      p => p.latitude && p.longitude && !p.deletedAt && (showCompleted || !p.completed)
     );
     
     // Add distance calculation if user location is available
@@ -76,7 +79,7 @@ export default function Map() {
     }
     
     return filtered as ProjectWithDistance[];
-  }, [projects, userLocation]);
+  }, [projects, userLocation, showCompleted]);
   
   // Filter and sort projects based on search and sort options
   const filteredSortedProjects = useMemo(() => {
@@ -118,6 +121,14 @@ export default function Map() {
       );
     }
   }, []);
+
+  // Zoom to user's current location
+  const handleZoomToMe = () => {
+    if (!userLocation || !googleMapRef.current) return;
+    
+    googleMapRef.current.setCenter(userLocation);
+    googleMapRef.current.setZoom(14);
+  };
 
   // Load Google Maps script and MarkerClusterer
   useEffect(() => {
@@ -417,25 +428,44 @@ export default function Map() {
             />
           </div>
           <Select value={sortBy} onValueChange={(value: 'name' | 'distance') => setSortBy(value)}>
-            <SelectTrigger className="w-[140px]" data-testid="select-sort-by">
+            <SelectTrigger className="w-[150px]" data-testid="select-sort-by">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="name">By Name</SelectItem>
+              <SelectItem value="name">Sort: A-Z</SelectItem>
               <SelectItem value="distance" disabled={!userLocation}>
-                By Distance {!userLocation && '(GPS off)'}
+                Sort: Nearest {!userLocation && '(need GPS)'}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        {/* User location status */}
-        {userLocation && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Navigation className="w-3 h-3" />
-            <span>Your location detected • Showing distances</span>
+        {/* Filter and location controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="show-completed"
+              checked={showCompleted}
+              onCheckedChange={setShowCompleted}
+              data-testid="switch-show-completed"
+            />
+            <Label htmlFor="show-completed" className="text-sm text-muted-foreground cursor-pointer">
+              Show completed
+            </Label>
           </div>
-        )}
+          {userLocation && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleZoomToMe}
+              className="gap-1.5"
+              data-testid="button-zoom-to-me"
+            >
+              <Crosshair className="w-4 h-4" />
+              <span>My Location</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Map Container */}
