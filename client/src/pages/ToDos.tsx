@@ -1074,7 +1074,7 @@ export default function ToDos() {
             </div>
           }
         >
-          <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
               <div>
                 <Input
                   id="title"
@@ -1093,16 +1093,17 @@ export default function ToDos() {
                 <Textarea
                   id="description"
                   {...form.register("description")}
-                  placeholder="Description (optional)"
-                  rows={3}
+                  placeholder="Notes (optional)"
+                  rows={2}
+                  className="min-h-[56px] resize-none"
                   data-testid="input-todo-description"
                 />
               </div>
 
-              <div>
+              <div className="flex gap-2">
                 <Select value={form.watch('projectId') || ''} onValueChange={(value) => form.setValue('projectId', value)}>
-                  <SelectTrigger id="projectId" data-testid="select-todo-project">
-                    <SelectValue placeholder="Select project (optional)" />
+                  <SelectTrigger id="projectId" data-testid="select-todo-project" className="flex-1">
+                    <SelectValue placeholder="Project" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No project</SelectItem>
@@ -1113,12 +1114,10 @@ export default function ToDos() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
 
-              <div>
                 <Select value={form.watch('assignedTo') || ''} onValueChange={(value) => form.setValue('assignedTo', value)}>
-                  <SelectTrigger id="assignedTo" data-testid="select-todo-assignee">
-                    <SelectValue placeholder="Assign to someone (optional)" />
+                  <SelectTrigger id="assignedTo" data-testid="select-todo-assignee" className="flex-1">
+                    <SelectValue placeholder="Assignee" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="unassigned">Unassigned</SelectItem>
@@ -1131,72 +1130,67 @@ export default function ToDos() {
                 </Select>
               </div>
 
-              <div>
+              <div className="flex gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setShowTodoDueDatePicker(true)}
-                  className="w-full justify-start text-left font-normal"
+                  className="flex-1 justify-start text-left font-normal"
                   data-testid="button-select-due-date"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {form.watch('dueDate') 
-                    ? format(new Date(form.watch('dueDate')!), 'MMM d, yyyy')
-                    : 'Due date (optional)'}
+                    ? format(new Date(form.watch('dueDate')!), 'MMM d')
+                    : 'Due date'}
                 </Button>
+                {!selectedPhotoUrl && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCameraClick}
+                      data-testid="button-attach-camera"
+                    >
+                      <Camera className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadPhotoMutation.isPending}
+                      data-testid="button-attach-upload"
+                    >
+                      <Upload className="w-4 h-4" />
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </>
+                )}
               </div>
 
               {selectedPhotoUrl && (
                 <div className="relative">
-                  <div className="relative">
-                    <img src={selectedPhotoUrl} alt="Attached" className="w-full h-40 object-cover rounded-lg" />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={() => {
-                        setSelectedPhotoId(null);
-                        setSelectedPhotoUrl(null);
-                      }}
-                      data-testid="button-remove-photo"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {!selectedPhotoUrl && (
-                <div className="flex gap-2">
+                  <img src={selectedPhotoUrl} alt="Attached" className="w-full h-32 object-cover rounded-lg" />
                   <Button
                     type="button"
-                    variant="outline"
-                    onClick={handleCameraClick}
-                    className="flex-1"
-                    data-testid="button-attach-camera"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={() => {
+                      setSelectedPhotoId(null);
+                      setSelectedPhotoUrl(null);
+                    }}
+                    data-testid="button-remove-photo"
                   >
-                    <Camera className="w-4 h-4 mr-2" />
-                    Camera
+                    <X className="w-3 h-3" />
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadPhotoMutation.isPending}
-                    className="flex-1"
-                    data-testid="button-attach-upload"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    {uploadPhotoMutation.isPending ? 'Uploading...' : 'Upload'}
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
                 </div>
               )}
             </form>

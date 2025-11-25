@@ -1364,13 +1364,8 @@ export default function ProjectPhotos() {
 
       queryClient.invalidateQueries({ queryKey: ['/api/projects', projectId, 'photos'] });
       
-      toast({ 
-        title: '✓ Saved',
-        description: annotations.length > 0 
-          ? `Annotations saved and will sync when online`
-          : 'Photo saved',
-        duration: 1500,
-      });
+      // Skip success toast for expected behavior - user sees visual feedback via UI update
+      // Only show notifications for errors or important status changes
       
       setSelectedPhoto(null);
     } catch (error: any) {

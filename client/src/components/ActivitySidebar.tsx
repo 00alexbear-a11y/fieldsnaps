@@ -1,4 +1,4 @@
-import { Activity, Camera, FolderPlus, CheckSquare, Share2, Calendar, User } from "lucide-react";
+import { Activity, Camera, FolderPlus, CheckSquare, Share2, Calendar, User, Building2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,12 +15,28 @@ import { Badge } from "@/components/ui/badge";
 export type ActivityFilter = 'all' | 'photo_uploaded' | 'project_created' | 'todo_created' | 'share_created';
 export type DateRangeFilter = 'all' | 'today' | 'this-week' | 'this-month';
 
+export interface TeamMemberOption {
+  id: string;
+  name: string;
+}
+
+export interface ProjectOption {
+  id: string;
+  name: string;
+}
+
 interface ActivitySidebarProps {
   currentFilter: ActivityFilter;
   onFilterChange: (filter: ActivityFilter) => void;
   dateRange: DateRangeFilter;
   onDateRangeChange: (range: DateRangeFilter) => void;
   activityCount: number;
+  teamMembers?: TeamMemberOption[];
+  selectedUserId?: string | null;
+  onUserFilterChange?: (userId: string | null) => void;
+  projects?: ProjectOption[];
+  selectedProjectId?: string | null;
+  onProjectFilterChange?: (projectId: string | null) => void;
 }
 
 const activityTypes = [
@@ -44,6 +60,12 @@ export function ActivitySidebar({
   dateRange,
   onDateRangeChange,
   activityCount,
+  teamMembers = [],
+  selectedUserId,
+  onUserFilterChange,
+  projects = [],
+  selectedProjectId,
+  onProjectFilterChange,
 }: ActivitySidebarProps) {
   return (
     <Sidebar collapsible="icon" data-testid="activity-sidebar">
@@ -78,6 +100,72 @@ export function ActivitySidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Team Member Filter */}
+        {teamMembers.length > 0 && onUserFilterChange && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Team Member</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => onUserFilterChange(null)}
+                    isActive={!selectedUserId}
+                    data-testid="filter-user-all"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>All Members</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {teamMembers.map((member) => (
+                  <SidebarMenuItem key={member.id}>
+                    <SidebarMenuButton
+                      onClick={() => onUserFilterChange(member.id)}
+                      isActive={selectedUserId === member.id}
+                      data-testid={`filter-user-${member.id}`}
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="truncate">{member.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Project Filter */}
+        {projects.length > 0 && onProjectFilterChange && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Project</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={() => onProjectFilterChange(null)}
+                    isActive={!selectedProjectId}
+                    data-testid="filter-project-all"
+                  >
+                    <Building2 className="w-4 h-4" />
+                    <span>All Projects</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {projects.map((project) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton
+                      onClick={() => onProjectFilterChange(project.id)}
+                      isActive={selectedProjectId === project.id}
+                      data-testid={`filter-project-${project.id}`}
+                    >
+                      <Building2 className="w-4 h-4" />
+                      <span className="truncate">{project.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Date Range */}
         <SidebarGroup>

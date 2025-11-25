@@ -615,9 +615,9 @@ export default function AdminLocations() {
                             </p>
                           )}
                           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1" title="Time since last location update">
                               <Clock className="w-3 h-3" />
-                              {minutesAgo === 0 ? 'Just now' : `${minutesAgo}m ago`}
+                              {minutesAgo === 0 ? 'Just now' : `Seen ${minutesAgo}m ago`}
                             </span>
                             {log.batteryLevel !== null && (
                               <span className="flex items-center gap-1">

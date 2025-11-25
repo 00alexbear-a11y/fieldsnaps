@@ -297,14 +297,8 @@ export default function PhotoEdit() {
         // Continue anyway - photo is saved locally
       }
 
-      // Always show success toast
-      toast({
-        title: '✓ Saved Successfully',
-        description: annotations.length > 0 
-          ? `Annotations saved${navigator.onLine ? ' and will sync when online' : ' locally'}`
-          : 'Photo saved successfully',
-        duration: 2000,
-      });
+      // Skip success toast for expected behavior - user sees visual feedback via haptics
+      // Only show notifications for errors or important status changes
 
       // If we should create a todo, we need to ensure the photo is synced first
       // Otherwise the TO-DO will fail with a foreign key constraint error
