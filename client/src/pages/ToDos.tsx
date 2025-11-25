@@ -83,6 +83,7 @@ export default function ToDos() {
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
+  const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -153,6 +154,8 @@ export default function ToDos() {
   });
 
   // Filter todos based on selected smart list
+  // IMPORTANT: Keep todos that are animating (in animatingTasks) so the slide-out animation
+  // can play before they're removed from the DOM
   const filteredTodos = useMemo(() => {
     const now = startOfDay(new Date());
     const tomorrow = new Date(now);
@@ -163,19 +166,21 @@ export default function ToDos() {
     switch (selectedList) {
       case 'today':
         todos = allTodos.filter(todo => {
+          // Keep animating todos in the list so animation can play
+          if (animatingTasks.has(todo.id)) return true;
           if (todo.completed || !todo.dueDate) return false;
           const dueDate = new Date(todo.dueDate);
           return dueDate >= now && dueDate < tomorrow;
         });
         break;
       case 'flagged':
-        todos = allTodos.filter(todo => todo.flag);
+        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || todo.flag);
         break;
       case 'assigned-to-me':
-        todos = allTodos.filter(todo => todo.assignedTo === user?.id && !todo.completed);
+        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || (todo.assignedTo === user?.id && !todo.completed));
         break;
       case 'all':
-        todos = allTodos.filter(todo => !todo.completed);
+        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || !todo.completed);
         break;
       case 'completed':
         todos = allTodos.filter(todo => todo.completed);
@@ -188,6 +193,8 @@ export default function ToDos() {
     if (dateFilter) {
       const filterDate = startOfDay(dateFilter);
       todos = todos.filter(todo => {
+        // Keep animating todos even if they don't match date filter
+        if (animatingTasks.has(todo.id)) return true;
         if (!todo.dueDate) return false;
         const dueDate = startOfDay(new Date(todo.dueDate));
         return isSameDay(dueDate, filterDate);
@@ -195,7 +202,7 @@ export default function ToDos() {
     }
     
     return todos;
-  }, [allTodos, selectedList, user?.id, dateFilter]);
+  }, [allTodos, selectedList, user?.id, dateFilter, animatingTasks]);
 
   // Calculate badge counts for all smart lists (from full dataset)
   const smartListCounts = useMemo(() => {
@@ -284,12 +291,15 @@ export default function ToDos() {
     queryKey: ['/api/companies/members'],
   });
 
-  // Complete todo mutation
+  // Complete todo mutation with slide-out animation
   const completeMutation = useMutation({
     mutationFn: async (todoId: string) => {
       return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
     },
     onMutate: async (todoId: string) => {
+      // Start slide-out animation
+      setAnimatingTasks(prev => new Set(prev).add(todoId));
+      
       await queryClient.cancelQueries({ queryKey: ['/api/todos'] });
       
       const previousQueries: Array<{ queryKey: any; data: TodoWithDetails[] }> = [];
@@ -314,15 +324,27 @@ export default function ToDos() {
       
       return { previousQueries };
     },
-    onSuccess: () => {
+    onSuccess: (_, todoId) => {
       haptics.success();
       toast({ title: "Task completed!" });
+      // Wait for animation to complete before refreshing
       setTimeout(() => {
+        setAnimatingTasks(prev => {
+          const next = new Set(prev);
+          next.delete(todoId);
+          return next;
+        });
         queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
-      }, 800);
+      }, 500);
     },
-    onError: (error, variables, context) => {
+    onError: (error, todoId, context) => {
       haptics.error();
+      // Clear animation state on error
+      setAnimatingTasks(prev => {
+        const next = new Set(prev);
+        next.delete(todoId);
+        return next;
+      });
       if (context?.previousQueries) {
         context.previousQueries.forEach(({ queryKey, data }) => {
           queryClient.setQueryData(queryKey, data);
@@ -377,19 +399,56 @@ export default function ToDos() {
     },
   });
 
-  // Delete todo mutation
+  // Delete todo mutation with slide-out animation
   const deleteMutation = useMutation({
     mutationFn: async (todoId: string) => {
       return apiRequest('DELETE', `/api/todos/${todoId}`, {});
     },
-    onSuccess: () => {
+    onMutate: async (todoId: string) => {
+      // Cancel any in-flight queries
+      await queryClient.cancelQueries({ queryKey: ['/api/todos'] });
+      
+      // Save previous state for rollback
+      const previousTodos = queryClient.getQueryData<TodoWithDetails[]>(['/api/todos']);
+      
+      // Start slide-out animation
+      setAnimatingTasks(prev => new Set(prev).add(todoId));
+      
+      return { previousTodos };
+    },
+    onSuccess: (_, todoId) => {
       haptics.warning();
-      queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
       toast({ title: "Task deleted" });
       setShowDetailsDrawer(false);
+      // Wait for animation to complete before updating cache
+      setTimeout(() => {
+        // Optimistically remove from cache BEFORE clearing animation flag
+        queryClient.setQueriesData<TodoWithDetails[]>(
+          { queryKey: ['/api/todos'] },
+          (old) => old ? old.filter(todo => todo.id !== todoId) : old
+        );
+        // Then clear animation flag
+        setAnimatingTasks(prev => {
+          const next = new Set(prev);
+          next.delete(todoId);
+          return next;
+        });
+        // Finally invalidate to sync with server
+        queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+      }, 500);
     },
-    onError: () => {
+    onError: (_, todoId, context) => {
       haptics.error();
+      // Clear animation state on error
+      setAnimatingTasks(prev => {
+        const next = new Set(prev);
+        next.delete(todoId);
+        return next;
+      });
+      // Restore previous state if we have it
+      if (context?.previousTodos) {
+        queryClient.setQueryData(['/api/todos'], context.previousTodos);
+      }
       toast({ title: "Failed to delete task", variant: "destructive" });
     },
   });
@@ -662,9 +721,14 @@ export default function ToDos() {
   const renderTaskCard = (todo: TodoWithDetails) => {
     const isThisTodoSwiped = swipedTodo === todo.id;
     const currentOffset = isThisTodoSwiped ? swipeOffset : 0;
+    const isAnimating = animatingTasks.has(todo.id);
 
     return (
-      <div className="relative overflow-hidden rounded-lg" key={todo.id}>
+      <div 
+        className={`transition-all duration-500 ease-out ${isAnimating ? 'max-h-0 opacity-0 mb-0 overflow-hidden' : 'max-h-96 opacity-100 mb-2'}`}
+        key={todo.id}
+      >
+      <div className="relative overflow-hidden rounded-lg">
         {/* Swipe action backgrounds with dynamic visual feedback */}
         {/* Right swipe - complete action (green) */}
         <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-lg overflow-hidden">
@@ -715,8 +779,8 @@ export default function ToDos() {
         </div>
 
         <Card
-          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-transform duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''}`}
-          style={{ transform: `translateX(${currentOffset}px)` }}
+          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-all duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''} ${animatingTasks.has(todo.id) ? 'translate-x-full opacity-0 scale-95' : ''}`}
+          style={{ transform: animatingTasks.has(todo.id) ? undefined : `translateX(${currentOffset}px)` }}
           onClick={() => { 
             if (!isSwiping.current) {
               setSelectedTodoForDetails(todo); 
@@ -867,6 +931,7 @@ export default function ToDos() {
           </div>
         </div>
       </Card>
+      </div>
       </div>
     );
   };
