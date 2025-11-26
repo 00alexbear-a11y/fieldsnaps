@@ -779,7 +779,7 @@ export default function ToDos() {
         </div>
 
         <Card
-          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} p-3 ${!isSwiping.current ? 'transition-all duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''} ${animatingTasks.has(todo.id) ? 'translate-x-full opacity-0 scale-95' : ''}`}
+          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} px-3 py-2 ${!isSwiping.current ? 'transition-all duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''} ${animatingTasks.has(todo.id) ? 'translate-x-full opacity-0 scale-95' : ''}`}
           style={{ transform: animatingTasks.has(todo.id) ? undefined : `translateX(${currentOffset}px)` }}
           onClick={() => { 
             if (!isSwiping.current) {
@@ -792,7 +792,7 @@ export default function ToDos() {
           onTouchEnd={() => handleTouchEnd(todo)}
           data-testid={`card-todo-${todo.id}`}
         >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Checkbox */}
           <Checkbox
             checked={todo.completed}
@@ -804,14 +804,14 @@ export default function ToDos() {
               }
             }}
             onClick={(e) => e.stopPropagation()}
-            className="h-5 w-5 flex-shrink-0"
+            className="h-4 w-4 flex-shrink-0"
             data-testid={`checkbox-todo-complete-${todo.id}`}
           />
 
           {/* Photo thumbnail - small indicator */}
           {todo.photo && (
             <div
-              className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden bg-muted"
+              className="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-muted"
               onClick={(e) => {
                 e.stopPropagation();
                 setLocation(`/photo/${todo.photoId}/view`);
@@ -827,68 +827,65 @@ export default function ToDos() {
           )}
 
           {/* Title and metadata - main content */}
-          <div className="flex-1 min-w-0 space-y-1">
-            <h3
-              className={`font-medium text-base leading-snug truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
-              data-testid={`text-todo-title-${todo.id}`}
-            >
-              {todo.title}
-            </h3>
-            
-            {/* Metadata row - project, assignee, description */}
-            <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
-              {/* Project label */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3
+                className={`font-medium text-sm leading-tight truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
+                data-testid={`text-todo-title-${todo.id}`}
+              >
+                {todo.title}
+              </h3>
+              
+              {/* Inline indicators */}
               {todo.project && (
-                <Badge variant="secondary" className="text-xs font-normal" data-testid={`badge-project-${todo.id}`}>
-                  <FolderOpen className="w-3 h-3 mr-1" />
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal" data-testid={`badge-project-${todo.id}`}>
                   {todo.project.name}
                 </Badge>
               )}
-              
-              {/* Assignee */}
-              {todo.assignee && (
-                <span className="flex items-center gap-1" data-testid={`text-assignee-${todo.id}`}>
-                  <User className="w-3 h-3" />
-                  {getDisplayName(todo.assignee)}
-                </span>
-              )}
-              
-              {/* Description preview (first 50 chars) */}
-              {todo.description && (
-                <span className="truncate max-w-[200px]" data-testid={`text-description-preview-${todo.id}`}>
-                  {todo.description.substring(0, 50)}{todo.description.length > 50 ? '...' : ''}
-                </span>
-              )}
             </div>
+            
+            {/* Secondary info row - only show if has content */}
+            {(todo.assignee || todo.description) && (
+              <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                {todo.assignee && (
+                  <span className="flex items-center gap-0.5" data-testid={`text-assignee-${todo.id}`}>
+                    <User className="w-2.5 h-2.5" />
+                    {getDisplayName(todo.assignee)}
+                  </span>
+                )}
+                {todo.description && (
+                  <span className="truncate max-w-[150px]" data-testid={`text-description-preview-${todo.id}`}>
+                    {todo.description.substring(0, 40)}{todo.description.length > 40 ? '...' : ''}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right indicators - flag and due date */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             {/* Due date indicator (icon with color coding for all tasks) */}
             {todo.dueDate && (() => {
               const date = new Date(todo.dueDate);
               const now = startOfDay(new Date());
               const due = startOfDay(date);
               
-              // For completed tasks, always show muted clock (deadline awareness)
               if (todo.completed) {
-                return <Clock className="w-4 h-4 text-muted-foreground" data-testid={`icon-due-completed-${todo.id}`} />;
+                return <Clock className="w-3.5 h-3.5 text-muted-foreground" data-testid={`icon-due-completed-${todo.id}`} />;
               }
               
-              // For incomplete tasks, use color coding
               if (isPast(due) && !isSameDay(due, now)) {
-                return <Clock className="w-4 h-4 text-destructive" data-testid={`icon-overdue-${todo.id}`} />;
+                return <Clock className="w-3.5 h-3.5 text-destructive" data-testid={`icon-overdue-${todo.id}`} />;
               } else if (isToday(due)) {
-                return <Clock className="w-4 h-4 text-orange-500" data-testid={`icon-due-today-${todo.id}`} />;
+                return <Clock className="w-3.5 h-3.5 text-orange-500" data-testid={`icon-due-today-${todo.id}`} />;
               } else {
-                // Future tasks - show muted clock to indicate upcoming deadline
-                return <Clock className="w-4 h-4 text-muted-foreground" data-testid={`icon-due-future-${todo.id}`} />;
+                return <Clock className="w-3.5 h-3.5 text-muted-foreground" data-testid={`icon-due-future-${todo.id}`} />;
               }
             })()}
 
             {/* Flag indicator */}
             {todo.flag && (
-              <Flag className="w-4 h-4 text-orange-500 fill-orange-500" data-testid={`icon-flag-${todo.id}`} />
+              <Flag className="w-3.5 h-3.5 text-orange-500 fill-orange-500" data-testid={`icon-flag-${todo.id}`} />
             )}
 
             {/* Actions menu */}
@@ -897,10 +894,10 @@ export default function ToDos() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-6 w-6"
                   data-testid={`button-todo-menu-${todo.id}`}
                 >
-                  <MoreVertical className="w-4 h-4" />
+                  <MoreVertical className="w-3.5 h-3.5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -941,11 +938,11 @@ export default function ToDos() {
     if (todos.length === 0) return null;
     
     return (
-      <div className="space-y-3" data-testid={testId}>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">
+      <div className="space-y-2" data-testid={testId}>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">
           {title} ({todos.length})
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {todos.map(renderTaskCard)}
         </div>
       </div>
@@ -1074,7 +1071,7 @@ export default function ToDos() {
             </div>
           }
         >
-          <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
+          <form id="todo-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3" autoComplete="off">
               <div>
                 <Input
                   id="title"
@@ -1082,6 +1079,10 @@ export default function ToDos() {
                   placeholder="What needs to be done?"
                   aria-label="Task title (required)"
                   required
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="sentences"
+                  spellCheck="false"
                   data-testid="input-todo-title"
                 />
                 {form.formState.errors.title && (
@@ -1096,6 +1097,9 @@ export default function ToDos() {
                   placeholder="Notes (optional)"
                   rows={2}
                   className="min-h-[56px] resize-none"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck="false"
                   data-testid="input-todo-description"
                 />
               </div>
