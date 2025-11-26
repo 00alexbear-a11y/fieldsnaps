@@ -9,6 +9,7 @@ import BackgroundGeolocation, {
 } from "@transistorsoft/capacitor-background-geolocation";
 import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { debugLog } from './geofenceDebugLog';
 
 /**
  * FieldSnaps Geofencing Service
@@ -72,6 +73,146 @@ let currentConfig: GeofencingConfig | null = null;
 let locationLoggingInterval: ReturnType<typeof setInterval> | null = null;
 let cachedClockStatus: { isClockedIn: boolean; lastChecked: number } | null = null;
 let notificationActionListener: any = null;
+
+/**
+ * Retry configuration for failed operations
+ */
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 1000, // 1 second
+  maxDelayMs: 10000, // 10 seconds
+};
+
+/**
+ * Queue for failed clock operations (retry when network returns)
+ */
+interface FailedOperation {
+  id: string;
+  type: 'clock_in' | 'clock_out';
+  geofenceId: string;
+  projectId?: string;
+  projectName?: string;
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: string;
+  retryCount: number;
+}
+
+let failedOperationsQueue: FailedOperation[] = [];
+
+/**
+ * Retry a function with exponential backoff
+ */
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  operationName: string,
+  maxRetries: number = RETRY_CONFIG.maxRetries
+): Promise<T> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = Math.min(
+          RETRY_CONFIG.baseDelayMs * Math.pow(2, attempt - 1),
+          RETRY_CONFIG.maxDelayMs
+        );
+        await debugLog.info('network', `Retry attempt ${attempt}/${maxRetries} for ${operationName} (delay: ${delay}ms)`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+      
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      await debugLog.warn('network', `${operationName} failed (attempt ${attempt + 1}/${maxRetries + 1})`, {
+        error: error.message,
+        attempt: attempt + 1,
+      });
+      
+      // Don't retry if it's not a network error
+      if (!isNetworkError(error)) {
+        throw error;
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+/**
+ * Check if an error is a network-related error
+ */
+function isNetworkError(error: any): boolean {
+  if (!error) return false;
+  
+  const message = (error.message || '').toLowerCase();
+  return (
+    message.includes('network') ||
+    message.includes('fetch') ||
+    message.includes('timeout') ||
+    message.includes('connection') ||
+    message.includes('offline') ||
+    error.name === 'TypeError' // fetch throws TypeError for network issues
+  );
+}
+
+/**
+ * Add a failed operation to the retry queue
+ */
+async function queueFailedOperation(op: Omit<FailedOperation, 'id' | 'retryCount'>): Promise<void> {
+  const operation: FailedOperation = {
+    ...op,
+    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    retryCount: 0,
+  };
+  
+  failedOperationsQueue.push(operation);
+  await debugLog.info('network', `Queued failed ${op.type} for retry`, { geofenceId: op.geofenceId });
+  
+  // Limit queue size
+  if (failedOperationsQueue.length > 10) {
+    failedOperationsQueue = failedOperationsQueue.slice(-10);
+  }
+}
+
+/**
+ * Process the failed operations queue (call when network returns)
+ */
+export async function processFailedOperationsQueue(): Promise<void> {
+  if (failedOperationsQueue.length === 0) return;
+  
+  await debugLog.info('network', `Processing ${failedOperationsQueue.length} queued operations`);
+  
+  const queue = [...failedOperationsQueue];
+  failedOperationsQueue = [];
+  
+  for (const op of queue) {
+    try {
+      if (op.type === 'clock_in') {
+        await performClockInWithData(op.projectId!, op.projectName!, op.latitude, op.longitude, op.accuracy);
+      } else {
+        await performClockOutWithData(op.latitude, op.longitude, op.accuracy);
+      }
+      await debugLog.info('network', `Successfully processed queued ${op.type}`);
+    } catch (error: any) {
+      op.retryCount++;
+      if (op.retryCount < 5) {
+        failedOperationsQueue.push(op);
+        await debugLog.warn('network', `Re-queued ${op.type} after failure (attempt ${op.retryCount})`, { error: error.message });
+      } else {
+        await debugLog.error('network', `Dropped ${op.type} after 5 failed attempts`, { geofenceId: op.geofenceId }, error);
+      }
+    }
+  }
+}
+
+/**
+ * Get the current failed operations queue
+ */
+export function getFailedOperationsQueue(): FailedOperation[] {
+  return [...failedOperationsQueue];
+}
 
 /**
  * Battery-optimized configuration for construction sites
@@ -150,17 +291,18 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
   }
 
   if (isInitialized) {
-    console.log("[Geofencing] Already initialized");
+    await debugLog.debug('geofence', 'Already initialized, skipping');
     return;
   }
 
   currentConfig = config;
+  await debugLog.info('geofence', 'Initializing geofencing service...');
 
   try {
     // Configure Background Geolocation (license validation happens here)
     const state = await BackgroundGeolocation.ready(GEOFENCING_CONFIG);
     
-    console.log("[Geofencing] Initialized successfully", {
+    await debugLog.info('geofence', 'Initialized successfully', {
       enabled: state.enabled,
       trackingMode: state.trackingMode,
       isMoving: state.isMoving,
@@ -178,16 +320,12 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
     await requestNotificationPermissions();
 
     isInitialized = true;
+    await debugLog.info('geofence', 'Geofencing service ready');
   } catch (error: any) {
-    console.error("[Geofencing] Initialization failed:", error);
-    
-    // Log full error details for debugging
-    if (error?.code !== undefined) {
-      console.error("[Geofencing] Error code:", error.code);
-    }
-    if (error?.message) {
-      console.error("[Geofencing] Error message:", error.message);
-    }
+    await debugLog.error('geofence', 'Initialization failed', {
+      code: error?.code,
+      message: error?.message,
+    }, error);
     
     // Check for license-related errors by numeric code, string code, or message
     // TransistorSoft plugin may emit numeric error constants or string codes
@@ -207,11 +345,10 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
       errorMsg.includes('invalid');
     
     if (isLicenseError) {
-      console.error("[Geofencing] LICENSE ERROR - Full details:", {
+      await debugLog.error('license', 'TransistorSoft license error', {
         code: error.code,
         message: error.message,
-        stack: error.stack,
-      });
+      }, error);
       
       // Re-throw with user-friendly message
       const friendlyError = new Error(
@@ -234,12 +371,12 @@ async function requestNotificationPermissions(): Promise<void> {
   try {
     const result = await LocalNotifications.requestPermissions();
     if (result.display === 'granted') {
-      console.log("[Geofencing] Notification permissions granted");
+      await debugLog.info('notification', 'Notification permissions granted');
     } else {
-      console.warn("[Geofencing] Notification permissions denied - user will need to enable in Settings");
+      await debugLog.warn('permission', 'Notification permissions denied - user will need to enable in Settings', { status: result.display });
     }
-  } catch (error) {
-    console.error("[Geofencing] Failed to request notification permissions:", error);
+  } catch (error: any) {
+    await debugLog.error('notification', 'Failed to request notification permissions', { error: error.message }, error);
   }
 }
 
@@ -474,100 +611,196 @@ async function showClockOutNotification(geofenceId: string, projectName: string)
 }
 
 /**
- * Perform clock-in with GPS location
+ * Perform clock-in with GPS location (called from notification tap)
  */
 async function performClockIn(geofenceId: string): Promise<void> {
+  await debugLog.info('clock', `Starting clock-in for geofence: ${geofenceId}`);
+  
   try {
     // Get current location
     const location = await getCurrentLocation();
+    await debugLog.debug('location', 'Got current location', {
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
+      accuracy: location.coords.accuracy,
+    });
     
     // Get geofence details to extract projectId
     const geofence = await fetchGeofenceDetails(geofenceId);
     
     if (!geofence || !geofence.projectId) {
-      console.error("[Geofence] Missing projectId for clock-in");
+      await debugLog.error('clock', 'Missing projectId for clock-in', { geofenceId });
       await showErrorNotification("Clock In Failed", "Unable to determine project. Please clock in manually.");
       return;
     }
 
-    // Clock in via API
-    const response = await fetch('/api/clock', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        type: 'clock_in',
-        projectId: geofence.projectId,
-        gpsLatitude: location.coords.latitude,
-        gpsLongitude: location.coords.longitude,
-        gpsAccuracy: location.coords.accuracy,
-      }),
-    });
+    await debugLog.info('clock', `Clock-in for project: ${geofence.projectName}`, { projectId: geofence.projectId });
 
-    if (!response.ok) {
-      throw new Error('Failed to clock in');
+    // Try to clock in with retry logic
+    try {
+      await withRetry(
+        () => performClockInWithData(
+          geofence.projectId,
+          geofence.projectName,
+          location.coords.latitude,
+          location.coords.longitude,
+          location.coords.accuracy
+        ),
+        'clock-in'
+      );
+      
+      await debugLog.info('clock', `Successfully clocked in at ${geofence.projectName}`);
+      
+      // Update cached clock status
+      cachedClockStatus = {
+        isClockedIn: true,
+        lastChecked: Date.now(),
+      };
+      
+      // Start 5-minute location logging
+      startLocationLogging();
+      
+      // Show success notification
+      await showSuccessNotification("Clocked In", `Successfully clocked in at ${geofence.projectName}`);
+    } catch (retryError: any) {
+      // All retries failed - queue for later
+      if (isNetworkError(retryError)) {
+        await queueFailedOperation({
+          type: 'clock_in',
+          geofenceId,
+          projectId: geofence.projectId,
+          projectName: geofence.projectName,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          accuracy: location.coords.accuracy,
+          timestamp: new Date().toISOString(),
+        });
+        await showErrorNotification("Clock In Queued", "No network. Will sync when connected.");
+      } else {
+        throw retryError;
+      }
     }
-
-    console.log("[Geofence] Successfully clocked in via geofence");
-    
-    // Update cached clock status
-    cachedClockStatus = {
-      isClockedIn: true,
-      lastChecked: Date.now(),
-    };
-    
-    // Start 5-minute location logging
-    startLocationLogging();
-    
-    // Show success notification
-    await showSuccessNotification("Clocked In", `Successfully clocked in at ${geofence.projectName}`);
-  } catch (error) {
-    console.error("[Geofence] Error performing clock-in:", error);
+  } catch (error: any) {
+    await debugLog.error('clock', 'Clock-in failed', { geofenceId, error: error.message }, error);
     await showErrorNotification("Clock In Failed", "Please try clocking in manually.");
   }
 }
 
 /**
- * Perform clock-out with GPS location
+ * Perform clock-in API call with data (used by both direct call and queue processor)
+ */
+async function performClockInWithData(
+  projectId: string,
+  projectName: string,
+  latitude: number,
+  longitude: number,
+  accuracy: number
+): Promise<void> {
+  const response = await fetch('/api/clock', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      type: 'clock_in',
+      projectId,
+      gpsLatitude: latitude,
+      gpsLongitude: longitude,
+      gpsAccuracy: accuracy,
+      entryMethod: 'geofence',
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error');
+    throw new Error(`Failed to clock in: ${response.status} ${errorText}`);
+  }
+}
+
+/**
+ * Perform clock-out with GPS location (called from notification tap)
  */
 async function performClockOut(geofenceId: string): Promise<void> {
+  await debugLog.info('clock', `Starting clock-out for geofence: ${geofenceId}`);
+  
   try {
     // Get current location
     const location = await getCurrentLocation();
-    
-    // Clock out via API
-    const response = await fetch('/api/clock', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        type: 'clock_out',
-        gpsLatitude: location.coords.latitude,
-        gpsLongitude: location.coords.longitude,
-        gpsAccuracy: location.coords.accuracy,
-      }),
+    await debugLog.debug('location', 'Got current location for clock-out', {
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
+      accuracy: location.coords.accuracy,
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to clock out');
+    // Try to clock out with retry logic
+    try {
+      await withRetry(
+        () => performClockOutWithData(
+          location.coords.latitude,
+          location.coords.longitude,
+          location.coords.accuracy
+        ),
+        'clock-out'
+      );
+      
+      await debugLog.info('clock', 'Successfully clocked out');
+      
+      // Update cached clock status
+      cachedClockStatus = {
+        isClockedIn: false,
+        lastChecked: Date.now(),
+      };
+      
+      // Stop location logging
+      stopLocationLogging();
+      
+      // Show success notification
+      await showSuccessNotification("Clocked Out", "Successfully clocked out");
+    } catch (retryError: any) {
+      // All retries failed - queue for later
+      if (isNetworkError(retryError)) {
+        await queueFailedOperation({
+          type: 'clock_out',
+          geofenceId,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          accuracy: location.coords.accuracy,
+          timestamp: new Date().toISOString(),
+        });
+        await showErrorNotification("Clock Out Queued", "No network. Will sync when connected.");
+      } else {
+        throw retryError;
+      }
     }
-
-    console.log("[Geofence] Successfully clocked out via geofence");
-    
-    // Update cached clock status
-    cachedClockStatus = {
-      isClockedIn: false,
-      lastChecked: Date.now(),
-    };
-    
-    // Stop location logging
-    stopLocationLogging();
-    
-    // Show success notification
-    await showSuccessNotification("Clocked Out", "Successfully clocked out");
-  } catch (error) {
-    console.error("[Geofence] Error performing clock-out:", error);
+  } catch (error: any) {
+    await debugLog.error('clock', 'Clock-out failed', { geofenceId, error: error.message }, error);
     await showErrorNotification("Clock Out Failed", "Please try clocking out manually.");
+  }
+}
+
+/**
+ * Perform clock-out API call with data (used by both direct call and queue processor)
+ */
+async function performClockOutWithData(
+  latitude: number,
+  longitude: number,
+  accuracy: number
+): Promise<void> {
+  const response = await fetch('/api/clock', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      type: 'clock_out',
+      gpsLatitude: latitude,
+      gpsLongitude: longitude,
+      gpsAccuracy: accuracy,
+      entryMethod: 'geofence',
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error');
+    throw new Error(`Failed to clock out: ${response.status} ${errorText}`);
   }
 }
 
