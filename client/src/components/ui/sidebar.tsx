@@ -190,7 +190,8 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden !rounded-tr-2xl !rounded-br-2xl !rounded-tl-none"
+          hideOverlay={true}
+          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden !rounded-tr-2xl !rounded-br-2xl !rounded-tl-none border-r border-border shadow-lg"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
