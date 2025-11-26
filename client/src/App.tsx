@@ -61,7 +61,6 @@ import { Capacitor } from '@capacitor/core';
 import { isNativePlatform } from './lib/nativeNavigation';
 import { nativeStatusBar } from './lib/nativeStatusBar';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
-import { Menu } from 'lucide-react';
 
 function AppContent() {
   // CRITICAL: All hooks must be called at the top, before any conditional logic
@@ -277,21 +276,18 @@ function AppContent() {
           {/* Header with menu button and logo - only shown when sidebar is visible */}
           {shouldShowSidebar && (
             <header className="flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger 
-                  data-testid="button-sidebar-trigger"
-                  className="hover-elevate active-elevate-2"
-                  aria-label="Toggle sidebar"
-                >
-                  <Menu className="h-5 w-5" />
-                </SidebarTrigger>
+              <SidebarTrigger 
+                data-testid="button-sidebar-trigger"
+                className="hover-elevate active-elevate-2 !h-auto !w-auto flex items-center gap-2 px-1"
+                aria-label="Toggle sidebar"
+              >
                 <img 
                   src={logoPath} 
                   alt="FieldSnaps" 
                   className="h-8 w-auto object-contain"
                   data-testid="img-fieldsnaps-logo"
                 />
-              </div>
+              </SidebarTrigger>
               {/* New Project button - only shown on /projects route */}
               {pathname === '/projects' && (
                 <CreateProjectDialog 
