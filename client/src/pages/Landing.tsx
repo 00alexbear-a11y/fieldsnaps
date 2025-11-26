@@ -15,11 +15,9 @@ import {
   LogIn,
   Users,
   Clock,
-  Timer,
   FileText,
   Navigation,
-  Bell,
-  CheckSquare
+  Bell
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -140,8 +138,8 @@ export default function Landing() {
               <a href="#features" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-features">
                 Features
               </a>
-              <a href="#how-it-works" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-how-it-works">
-                How It Works
+              <a href="#time-tracking" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-time-tracking">
+                Time Tracking
               </a>
               <a href="#pricing" className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline" data-testid="link-pricing">
                 Pricing
@@ -528,7 +526,7 @@ export default function Landing() {
       </section>
 
       {/* Automatic Time Tracking Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section id="time-tracking" className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <span className="inline-block px-4 py-1.5 bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-full text-sm font-medium tracking-wide uppercase">
