@@ -122,6 +122,10 @@ export const debugLog = {
     
   debug: (category: LogCategory, message: string, details?: any) =>
     addDebugLog('debug', category, message, details),
+    
+  getLogs: () => getDebugLogs(),
+  
+  clear: () => clearDebugLogs(),
 };
 
 /**

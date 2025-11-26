@@ -36,6 +36,8 @@ import Time from "./pages/Time";
 import AdminLocations from "./pages/AdminLocations";
 import AdminTimesheets from "./pages/AdminTimesheets";
 import LocationPrivacy from "./pages/LocationPrivacy";
+import LocationPermissionEducation from "./pages/LocationPermissionEducation";
+import GeofenceDebugConsole from "./pages/GeofenceDebugConsole";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
@@ -312,6 +314,8 @@ function AppContent() {
                 <Route path="/timesheets" component={Timesheets} />
                 <Route path="/settings" component={Settings} />
                 <Route path="/location-privacy" component={LocationPrivacy} />
+                <Route path="/location-permission" component={LocationPermissionEducation} />
+                <Route path="/debug-console" component={GeofenceDebugConsole} />
                 <Route path="/help" component={Help} />
                 <Route path="/sync-status" component={SyncStatus} />
                 <Route path="/trash" component={Trash} />
