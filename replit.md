@@ -127,9 +127,26 @@ Created comprehensive documentation:
 - `ios/App/App/Info.plist` - Comprehensive privacy descriptions for App Store compliance
 - `android/app/src/main/AndroidManifest.xml` - TransistorSoft license key configuration
 
-### Bug Fixes and UX Improvements (November 25, 2025)
+### Bug Fixes and UX Improvements (November 25-26, 2025)
 
 **Photo Attachment Bug Fix - COMPLETED**
 - Fixed critical bug in task photo attachment flow: Camera's `captureAndEdit` function was returning local IndexedDB photo ID instead of waiting for server sync
 - Both quick capture and captureAndEdit now use `uploadPhotoAndWait` in attach mode to ensure server photo ID is available before navigating to ToDos
 - Graceful fallback: If upload fails (offline), user sees toast message and can attach photo later from gallery
+
+**Sidebar UX Overhaul - COMPLETED (November 26, 2025)**
+- Removed gray overlay from mobile sidebar for cleaner, less intrusive navigation
+- Added subtle right border (`border-r border-border shadow-lg`) for visual definition
+- Replaced hamburger menu icon with directional arrows (ChevronRight when closed, ChevronLeft when open)
+- Made FieldSnaps logo clickable as part of sidebar toggle for larger tap target
+
+**To-Do List Density Improvements - COMPLETED (November 26, 2025)**
+- Reduced task card padding (`px-3 py-2` instead of `p-3`) for more compact display
+- Smaller text sizes (`text-sm`) and icons (`w-3.5 h-3.5`) for better density
+- Tighter section spacing (`space-y-1.5`) to fit more tasks on screen
+- Smaller section headers (`text-xs`) with reduced gaps
+
+**Safari Form Improvements - COMPLETED (November 26, 2025)**
+- Added `autocomplete="off"`, `autoCorrect="off"`, `spellCheck="false"` to New Task form inputs
+- Suppresses Safari's autofill accessory bar for cleaner keyboard experience
+- MobileDialog already handles keyboard-safe scrolling via visualViewport management
