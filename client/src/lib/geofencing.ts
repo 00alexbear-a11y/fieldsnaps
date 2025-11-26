@@ -9,6 +9,8 @@ import BackgroundGeolocation, {
 } from "@transistorsoft/capacitor-background-geolocation";
 import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
+import { Preferences } from '@capacitor/preferences';
+import { Network } from '@capacitor/network';
 import { debugLog } from './geofenceDebugLog';
 
 /**
@@ -100,6 +102,59 @@ interface FailedOperation {
 }
 
 let failedOperationsQueue: FailedOperation[] = [];
+let networkListenerRegistered = false;
+
+const FAILED_OPS_STORAGE_KEY = 'fieldsnaps_failed_clock_ops';
+
+/**
+ * Load failed operations from persistent storage
+ */
+async function loadFailedOperationsQueue(): Promise<void> {
+  try {
+    const { value } = await Preferences.get({ key: FAILED_OPS_STORAGE_KEY });
+    if (value) {
+      failedOperationsQueue = JSON.parse(value);
+      await debugLog.debug('network', `Loaded ${failedOperationsQueue.length} queued operations from storage`);
+    }
+  } catch (error) {
+    console.error('[Geofencing] Failed to load failed operations queue:', error);
+    failedOperationsQueue = [];
+  }
+}
+
+/**
+ * Save failed operations to persistent storage
+ */
+async function saveFailedOperationsQueue(): Promise<void> {
+  try {
+    await Preferences.set({
+      key: FAILED_OPS_STORAGE_KEY,
+      value: JSON.stringify(failedOperationsQueue),
+    });
+  } catch (error) {
+    console.error('[Geofencing] Failed to save failed operations queue:', error);
+  }
+}
+
+/**
+ * Register network listener for auto-retry on reconnection
+ */
+async function registerNetworkListener(): Promise<void> {
+  if (networkListenerRegistered || !Capacitor.isNativePlatform()) return;
+  
+  try {
+    await Network.addListener('networkStatusChange', async (status) => {
+      if (status.connected && failedOperationsQueue.length > 0) {
+        await debugLog.info('network', 'Network reconnected, processing queued operations');
+        await processFailedOperationsQueue();
+      }
+    });
+    networkListenerRegistered = true;
+    await debugLog.debug('network', 'Network listener registered');
+  } catch (error) {
+    console.error('[Geofencing] Failed to register network listener:', error);
+  }
+}
 
 /**
  * Retry a function with exponential backoff
@@ -158,7 +213,7 @@ function isNetworkError(error: any): boolean {
 }
 
 /**
- * Add a failed operation to the retry queue
+ * Add a failed operation to the retry queue (persisted to storage)
  */
 async function queueFailedOperation(op: Omit<FailedOperation, 'id' | 'retryCount'>): Promise<void> {
   const operation: FailedOperation = {
@@ -168,16 +223,20 @@ async function queueFailedOperation(op: Omit<FailedOperation, 'id' | 'retryCount
   };
   
   failedOperationsQueue.push(operation);
-  await debugLog.info('network', `Queued failed ${op.type} for retry`, { geofenceId: op.geofenceId });
   
   // Limit queue size
   if (failedOperationsQueue.length > 10) {
     failedOperationsQueue = failedOperationsQueue.slice(-10);
   }
+  
+  // Persist to storage
+  await saveFailedOperationsQueue();
+  await debugLog.info('network', `Queued failed ${op.type} for retry`, { geofenceId: op.geofenceId, queueLength: failedOperationsQueue.length });
 }
 
 /**
  * Process the failed operations queue (call when network returns)
+ * Persists changes after each operation
  */
 export async function processFailedOperationsQueue(): Promise<void> {
   if (failedOperationsQueue.length === 0) return;
@@ -186,6 +245,7 @@ export async function processFailedOperationsQueue(): Promise<void> {
   
   const queue = [...failedOperationsQueue];
   failedOperationsQueue = [];
+  await saveFailedOperationsQueue(); // Clear persisted queue before processing
   
   for (const op of queue) {
     try {
@@ -205,6 +265,11 @@ export async function processFailedOperationsQueue(): Promise<void> {
       }
     }
   }
+  
+  // Persist any remaining failed operations
+  if (failedOperationsQueue.length > 0) {
+    await saveFailedOperationsQueue();
+  }
 }
 
 /**
@@ -212,6 +277,23 @@ export async function processFailedOperationsQueue(): Promise<void> {
  */
 export function getFailedOperationsQueue(): FailedOperation[] {
   return [...failedOperationsQueue];
+}
+
+/**
+ * Initialize the failed operations queue (load from storage)
+ */
+export async function initializeFailedOperationsQueue(): Promise<void> {
+  await loadFailedOperationsQueue();
+  await registerNetworkListener();
+  
+  // Process any queued operations immediately if we have connectivity
+  if (failedOperationsQueue.length > 0) {
+    const status = await Network.getStatus();
+    if (status.connected) {
+      await debugLog.info('network', 'Found queued operations on startup, processing now');
+      await processFailedOperationsQueue();
+    }
+  }
 }
 
 /**
@@ -318,6 +400,9 @@ export async function initializeGeofencing(config: GeofencingConfig = {}): Promi
 
     // Request notification permissions for clock-in/out prompts
     await requestNotificationPermissions();
+
+    // Initialize failed operations queue (load from storage, register network listener)
+    await initializeFailedOperationsQueue();
 
     isInitialized = true;
     await debugLog.info('geofence', 'Geofencing service ready');
