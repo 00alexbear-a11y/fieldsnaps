@@ -13,7 +13,13 @@ import {
   CheckCircle2, 
   X, 
   LogIn,
-  Users
+  Users,
+  Clock,
+  Timer,
+  FileText,
+  Navigation,
+  Bell,
+  CheckSquare
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -78,6 +84,22 @@ export default function Landing() {
       a: "iOS (iPhone), Android, and web. Take photos on your phone, organize from anywhere."
     },
     {
+      q: "How does automatic time tracking work?",
+      a: "When you add a job site address, FieldSnaps creates a 500ft geofence around it. When your phone enters that zone, you're clocked in. When you leave, you're clocked out. No buttons to press."
+    },
+    {
+      q: "What about privacy with location tracking?",
+      a: "You're in control. You can pause automatic tracking anytime, and we only track when you're near job sites—not everywhere you go. Your location data is private and never shared."
+    },
+    {
+      q: "Can I export timecards for payroll?",
+      a: "Yes. Export weekly timesheets as PDF or CSV with GPS coordinates, entry method, and travel time breakdown. Perfect for payroll or client billing."
+    },
+    {
+      q: "Does travel time between jobs get tracked?",
+      a: "Automatically. FieldSnaps calculates drive time between job sites so you can bill clients accurately for travel."
+    },
+    {
       q: "What happens to my photos if I cancel?",
       a: "You can export all photos anytime. Your photos, your data—we never lock you in."
     },
@@ -95,11 +117,11 @@ export default function Landing() {
     },
     {
       q: "How is this different from Google Photos?",
-      a: "FieldSnaps is built specifically for job documentation—auto-organize by project, timestamp proof, team sharing, and no personal photos mixed in."
+      a: "FieldSnaps is built specifically for job documentation—auto-organize by project, timestamp proof, automatic time tracking, and no personal photos mixed in."
     },
     {
       q: "What if I have bad cell service on site?",
-      a: "Works offline. Take photos on site, they automatically sync when you're back on WiFi."
+      a: "Works offline. Take photos on site, they automatically sync when you're back on WiFi. Time tracking works offline too."
     }
   ];
 
@@ -167,10 +189,10 @@ export default function Landing() {
           <div className="text-center space-y-6 mb-12">
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1]">
               Organize job photos.<br />
-              Separate work from home.
+              Track time automatically.
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Keep construction documentation out of your camera roll—where it belongs.
+              Photo documentation + automatic time tracking in one app. Never forget to clock in again.
             </p>
             <p className="text-lg text-muted-foreground">
               Launching January 2026
@@ -468,12 +490,120 @@ export default function Landing() {
                 Share projects with crew or subcontractors. Everyone stays on the same page.
               </p>
             </div>
+
+            {/* Feature 7 - Auto Clock-In */}
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
+              <div className="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Auto Clock-In</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Arrive at a job site? You're clocked in. Leave? Clocked out. Zero effort required.
+              </p>
+            </div>
+
+            {/* Feature 8 - Travel Time */}
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
+              <div className="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center">
+                <Navigation className="w-6 h-6 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Travel Time Tracking</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Automatically calculates drive time between jobs. Bill clients accurately for travel.
+              </p>
+            </div>
+
+            {/* Feature 9 - Timecard Export */}
+            <div className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
+              <div className="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center">
+                <FileText className="w-6 h-6 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Timecard Export</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Weekly PDF or CSV timesheets with GPS proof. Ready for payroll or client billing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Automatic Time Tracking Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 space-y-4">
+            <span className="inline-block px-4 py-1.5 bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-full text-sm font-medium tracking-wide uppercase">
+              New Feature
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-semibold">
+              Never forget to clock in again
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Automatic time tracking that works in the background. Just drive to the job and start working.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+            {/* Auto Clock-In Card */}
+            <Card className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto">
+                <MapPin className="w-8 h-8 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Geofence Each Job</h3>
+              <p className="text-muted-foreground">
+                Set a 500ft radius around each job site. When you arrive, your phone knows.
+              </p>
+            </Card>
+
+            {/* Notification Card */}
+            <Card className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto">
+                <Bell className="w-8 h-8 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">Smart Notifications</h3>
+              <p className="text-muted-foreground">
+                Get a tap to confirm clock-in when you arrive. Or set it to fully automatic.
+              </p>
+            </Card>
+
+            {/* GPS Proof Card */}
+            <Card className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-8 h-8 text-sky-500" />
+              </div>
+              <h3 className="text-xl font-bold">GPS-Verified Records</h3>
+              <p className="text-muted-foreground">
+                Every clock-in/out is timestamped with GPS coordinates. Proof that stands up.
+              </p>
+            </Card>
+          </div>
+
+          {/* How It Works Steps */}
+          <div className="bg-muted/30 rounded-2xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-center mb-8">How automatic time tracking works</h3>
+            <div className="grid sm:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="w-10 h-10 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center mx-auto mb-3">1</div>
+                <p className="text-sm text-muted-foreground">Add your job sites with addresses</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center mx-auto mb-3">2</div>
+                <p className="text-sm text-muted-foreground">FieldSnaps creates a 500ft geofence automatically</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center mx-auto mb-3">3</div>
+                <p className="text-sm text-muted-foreground">Drive to the job—you're clocked in</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center mx-auto mb-3">4</div>
+                <p className="text-sm text-muted-foreground">Leave the job—you're clocked out</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Founder Story Section */}
-      <section id="founder-story" className="py-24 px-4 sm:px-6 lg:px-8">
+      <section id="founder-story" className="py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl font-semibold mb-6">
@@ -607,10 +737,12 @@ export default function Landing() {
                   <h3 className="font-semibold text-lg mb-4">What's Included</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>• Unlimited photos & projects</li>
+                    <li>• Automatic time tracking with geofencing</li>
+                    <li>• GPS-verified timecards (PDF/CSV export)</li>
+                    <li>• Travel time tracking between jobs</li>
                     <li>• Cloud backup & sync</li>
-                    <li>• Advanced search</li>
-                    <li>• Team sharing</li>
-                    <li>• Priority support</li>
+                    <li>• Task management with photo attachments</li>
+                    <li>• Team sharing & priority support</li>
                   </ul>
                 </div>
 
