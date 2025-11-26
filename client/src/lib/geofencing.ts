@@ -11,6 +11,7 @@ import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
+import { App } from '@capacitor/app';
 import { debugLog } from './geofenceDebugLog';
 
 /**
@@ -99,10 +100,13 @@ interface FailedOperation {
   accuracy: number;
   timestamp: string;
   retryCount: number;
+  lastError?: string;
+  lastAttempt?: string;
 }
 
 let failedOperationsQueue: FailedOperation[] = [];
 let networkListenerRegistered = false;
+let isProcessingQueue = false;
 
 const FAILED_OPS_STORAGE_KEY = 'fieldsnaps_failed_clock_ops';
 
@@ -137,22 +141,35 @@ async function saveFailedOperationsQueue(): Promise<void> {
 }
 
 /**
- * Register network listener for auto-retry on reconnection
+ * Register network and app resume listeners for auto-retry on connectivity/resume
  */
 async function registerNetworkListener(): Promise<void> {
   if (networkListenerRegistered || !Capacitor.isNativePlatform()) return;
   
   try {
+    // Network listener - process queue when connectivity returns
     await Network.addListener('networkStatusChange', async (status) => {
       if (status.connected && failedOperationsQueue.length > 0) {
         await debugLog.info('network', 'Network reconnected, processing queued operations');
         await processFailedOperationsQueue();
       }
     });
+    
+    // App resume listener - process queue when app comes to foreground
+    await App.addListener('appStateChange', async ({ isActive }) => {
+      if (isActive && failedOperationsQueue.length > 0) {
+        const status = await Network.getStatus();
+        if (status.connected) {
+          await debugLog.info('network', 'App resumed with connectivity, processing queued operations');
+          await processFailedOperationsQueue();
+        }
+      }
+    });
+    
     networkListenerRegistered = true;
-    await debugLog.debug('network', 'Network listener registered');
+    await debugLog.debug('network', 'Network and app resume listeners registered');
   } catch (error) {
-    console.error('[Geofencing] Failed to register network listener:', error);
+    console.error('[Geofencing] Failed to register network/app listeners:', error);
   }
 }
 
@@ -236,39 +253,71 @@ async function queueFailedOperation(op: Omit<FailedOperation, 'id' | 'retryCount
 
 /**
  * Process the failed operations queue (call when network returns)
- * Persists changes after each operation
+ * Crash-safe: persists immediately after each operation to prevent data loss
+ * Concurrency-safe: prevents multiple simultaneous executions
  */
 export async function processFailedOperationsQueue(): Promise<void> {
   if (failedOperationsQueue.length === 0) return;
   
-  await debugLog.info('network', `Processing ${failedOperationsQueue.length} queued operations`);
-  
-  const queue = [...failedOperationsQueue];
-  failedOperationsQueue = [];
-  await saveFailedOperationsQueue(); // Clear persisted queue before processing
-  
-  for (const op of queue) {
-    try {
-      if (op.type === 'clock_in') {
-        await performClockInWithData(op.projectId!, op.projectName!, op.latitude, op.longitude, op.accuracy);
-      } else {
-        await performClockOutWithData(op.latitude, op.longitude, op.accuracy);
-      }
-      await debugLog.info('network', `Successfully processed queued ${op.type}`);
-    } catch (error: any) {
-      op.retryCount++;
-      if (op.retryCount < 5) {
-        failedOperationsQueue.push(op);
-        await debugLog.warn('network', `Re-queued ${op.type} after failure (attempt ${op.retryCount})`, { error: error.message });
-      } else {
-        await debugLog.error('network', `Dropped ${op.type} after 5 failed attempts`, { geofenceId: op.geofenceId }, error);
-      }
-    }
+  // Prevent concurrent processing (e.g., network + app resume triggers at same time)
+  if (isProcessingQueue) {
+    await debugLog.debug('network', 'Queue processing already in progress, skipping');
+    return;
   }
   
-  // Persist any remaining failed operations
-  if (failedOperationsQueue.length > 0) {
-    await saveFailedOperationsQueue();
+  isProcessingQueue = true;
+  
+  try {
+    await debugLog.info('network', `Processing ${failedOperationsQueue.length} queued operations`);
+  
+    // Process one item at a time, persisting after each to ensure crash-safety
+    while (failedOperationsQueue.length > 0) {
+      // Take the first item (don't remove yet - in case we crash)
+      const op = failedOperationsQueue[0];
+      
+      try {
+        if (op.type === 'clock_in') {
+          await performClockInWithData(op.projectId!, op.projectName!, op.latitude, op.longitude, op.accuracy);
+        } else {
+          await performClockOutWithData(op.latitude, op.longitude, op.accuracy);
+        }
+        
+        // Success - remove from queue and persist immediately
+        failedOperationsQueue.shift();
+        await saveFailedOperationsQueue();
+        await debugLog.info('network', `Successfully processed queued ${op.type}`, { remaining: failedOperationsQueue.length });
+        
+      } catch (error: any) {
+        // Failure - increment retry count
+        op.retryCount = (op.retryCount || 0) + 1;
+        op.lastError = error.message || 'Unknown error';
+        op.lastAttempt = new Date().toISOString();
+        
+        if (op.retryCount >= 5) {
+          // Max retries reached - remove and log
+          failedOperationsQueue.shift();
+          await saveFailedOperationsQueue();
+          await debugLog.error('network', `Dropped ${op.type} after 5 failed attempts`, { 
+            geofenceId: op.geofenceId, 
+            lastError: op.lastError 
+          }, error);
+        } else {
+          // Move to end of queue for later retry, persist immediately
+          failedOperationsQueue.shift();
+          failedOperationsQueue.push(op);
+          await saveFailedOperationsQueue();
+          await debugLog.warn('network', `Re-queued ${op.type} after failure (attempt ${op.retryCount})`, { 
+            error: op.lastError,
+            remaining: failedOperationsQueue.length 
+          });
+          
+          // Stop processing this batch - wait for next network recovery or app resume
+          break;
+        }
+      }
+    }
+  } finally {
+    isProcessingQueue = false;
   }
 }
 
