@@ -9,6 +9,10 @@ const config: CapacitorConfig = {
     iosScheme: 'https',
   },
   plugins: {
+    CapacitorHttp: {
+      // Enable native HTTP to bypass CORS issues in iOS WebView
+      enabled: true
+    },
     App: {
       // Deep linking URL scheme for OAuth callbacks
       appUrlScheme: 'com.fieldsnaps.app'
