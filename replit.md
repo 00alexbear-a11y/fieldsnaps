@@ -50,8 +50,29 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **Background Sync API**: Deferring network operations
 
 ### Authentication
-- **Replit Auth**: User authentication
+- **Supabase Auth**: Primary authentication provider with Google OAuth, Apple Sign-In, and email/password
+  - PKCE flow for secure mobile OAuth
+  - SecureStorage for native iOS token persistence
+  - Auto-refresh and offline session caching
+  - Deep link handling for OAuth callbacks (com.fieldsnaps.app://auth/callback)
+- **Replit Auth**: Legacy authentication (dual auth support during transition)
 - **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication
+
+### Supabase Auth Migration Notes
+- **Dual auth support**: Backend validates both Supabase JWT and Replit tokens simultaneously
+- **User linking**: Existing Replit users automatically linked to Supabase accounts via email match
+- **Database**: `supabase_user_id` column added to users table for linking
+- **OAuth providers configured in Supabase**:
+  - Google OAuth (contractors/general users)
+  - Apple Sign-In (required for App Store)
+  - Email/Password (fallback option)
+- **Key files**:
+  - `client/src/lib/supabase.ts` - Supabase client with SecureStorage for native
+  - `client/src/lib/supabaseAuth.ts` - Auth functions (signIn, signOut, session management)
+  - `client/src/hooks/useAuth.ts` - React hook with Supabase session state
+  - `client/src/pages/AuthCallback.tsx` - OAuth callback handler
+  - `server/supabaseAuth.ts` - Backend JWT validation with JWKS
+- **Universal Links**: AASA endpoint at `/.well-known/apple-app-site-association` (needs Team ID + production domain configuration)
 
 ### Native Platform & OTA Updates
 - **Capacitor 6**: Native wrapper for iOS/Android
