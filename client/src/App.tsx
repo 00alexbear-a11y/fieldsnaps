@@ -38,6 +38,7 @@ import AdminTimesheets from "./pages/AdminTimesheets";
 import LocationPrivacy from "./pages/LocationPrivacy";
 import LocationPermissionEducation from "./pages/LocationPermissionEducation";
 import GeofenceDebugConsole from "./pages/GeofenceDebugConsole";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/not-found";
 import BottomNav from "./components/BottomNav";
 import { AppSidebar } from "./components/AppSidebar";
@@ -137,7 +138,7 @@ function AppContent() {
   const disableSwipeBack = isMainPage;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/share/', '/impact', '/login', '/waitlist'];
+  const publicRoutes = ['/share/', '/impact', '/login', '/waitlist', '/auth/callback'];
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
   
   // Onboarding routes are authenticated but before full setup
@@ -207,6 +208,7 @@ function AppContent() {
           <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
           <Route path="/impact" component={Impact} />
           <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
+          <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/waitlist" component={Waitlist} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />

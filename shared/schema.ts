@@ -80,6 +80,9 @@ export const users = pgTable("users", {
   removedAt: timestamp("removed_at"), // Timestamp when removed from company (for grace period)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Supabase Auth integration
+  supabaseUserId: varchar("supabase_user_id").unique(), // Links to Supabase auth.users.id
+  authProvider: varchar("auth_provider").default("replit"), // replit, supabase, google, apple
   // Legacy subscription fields (kept for backwards compatibility during migration)
   subscriptionStatus: varchar("subscription_status").default("trial"), // trial, active, past_due, canceled, none
   stripeCustomerId: varchar("stripe_customer_id"),
@@ -89,6 +92,7 @@ export const users = pgTable("users", {
 }, (table) => [
   index("idx_users_company_id").on(table.companyId),
   index("idx_users_invited_by").on(table.invitedBy),
+  index("idx_users_supabase_id").on(table.supabaseUserId),
 ]);
 
 // User settings table
