@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { isDevModeEnabled } from '@/config/devMode';
-import { signInWithGoogle, initializeAuth, onAuthStateChange } from '@/lib/supabaseAuth';
+import { signInWithGoogle, signInWithApple, initializeAuth, onAuthStateChange } from '@/lib/supabaseAuth';
+import { Capacitor } from '@capacitor/core';
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -61,6 +62,26 @@ export default function Login() {
       setIsAuthenticating(false);
     }
   };
+
+  const handleSignInWithApple = async () => {
+    try {
+      setIsAuthenticating(true);
+      setAuthError(null);
+      console.log('[Login] Starting Apple OAuth authentication via Supabase');
+      
+      // This will redirect to Apple OAuth page
+      await signInWithApple();
+      
+      // Note: The page will redirect, so we won't reach here normally
+    } catch (error) {
+      console.error('[Login] Apple authentication failed:', error);
+      setAuthError('Authentication failed. Please try again.');
+      setIsAuthenticating(false);
+    }
+  };
+
+  // Show Apple Sign-In on iOS or when running in native app
+  const showAppleSignIn = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
 
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
@@ -163,6 +184,23 @@ export default function Login() {
               </svg>
               {isAuthenticating ? 'Signing in...' : 'Continue with Google'}
             </Button>
+
+            {/* Apple Sign-In Button - shown on iOS devices */}
+            {showAppleSignIn && (
+              <Button
+                variant="outline"
+                size="default"
+                className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                onClick={handleSignInWithApple}
+                disabled={isAuthenticating}
+                data-testid="button-login-apple"
+              >
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+                {isAuthenticating ? 'Signing in...' : 'Continue with Apple'}
+              </Button>
+            )}
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
@@ -170,6 +208,8 @@ export default function Login() {
               ? 'Use Dev Login to bypass authentication for testing in simulator'
               : biometricSupported 
               ? 'Use Touch ID, Face ID, Windows Hello, or sign in with Google'
+              : showAppleSignIn
+              ? 'Sign in with your Google or Apple account to access your projects'
               : 'Sign in with your Google account to access your projects'}
           </p>
         </Card>
