@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <Capacitor/Capacitor.h>
-#import "App-Swift.h"
+
+@class ASWebAuthPlugin;
 
 CAP_PLUGIN(ASWebAuthPlugin, "ASWebAuthPlugin",
     CAP_PLUGIN_METHOD(authenticate, CAPPluginReturnPromise);
