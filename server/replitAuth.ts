@@ -9,6 +9,7 @@ import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { emailService } from "./email";
 import { generateTokenPair, verifyAccessToken, refreshAccessToken as refreshJwtAccessToken, revokeRefreshToken } from "./jwtService";
+import { verifySupabaseToken, getOrCreateUserFromSupabase, extractTokenFromHeader } from "./supabaseAuth";
 import { generateCodeVerifier, generateCodeChallenge } from "./pkce";
 import { randomBytes } from "crypto";
 
@@ -795,10 +796,12 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    
+    // First try our internal JWT tokens
     const payload = verifyAccessToken(token);
     
     if (payload) {
-      // Valid JWT token - create a req.user object compatible with session-based auth
+      // Valid internal JWT token - create a req.user object compatible with session-based auth
       (req as any).user = {
         claims: {
           sub: payload.sub,
@@ -808,9 +811,37 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
         profilePicture: payload.profilePicture,
       };
       return next();
-    } else {
-      return res.status(401).json({ message: "Invalid or expired token" });
     }
+    
+    // Try Supabase JWT token verification
+    try {
+      const supabasePayload = await verifySupabaseToken(token);
+      
+      if (supabasePayload) {
+        // Valid Supabase token - get or create user in our database
+        const user = await getOrCreateUserFromSupabase(supabasePayload);
+        
+        if (user) {
+          // Create req.user object compatible with session-based auth
+          (req as any).user = {
+            claims: {
+              sub: user.id, // Use our internal user ID
+              email: user.email,
+            },
+            displayName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : undefined,
+            profilePicture: user.profileImageUrl,
+            supabaseUserId: supabasePayload.sub, // Also include Supabase ID
+            isNewUser: user.isNewUser,
+          };
+          return next();
+        }
+      }
+    } catch (error) {
+      console.error('[Auth] Supabase token verification error:', error);
+    }
+    
+    // Both JWT types failed
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 
   // Fall back to session-based authentication (for web)
