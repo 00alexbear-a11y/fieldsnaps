@@ -194,7 +194,7 @@ export async function getOrCreateUserFromSupabase(payload: SupabaseTokenPayload)
   const profileImageUrl = payload.user_metadata?.avatar_url || payload.user_metadata?.picture || null;
   const provider = payload.app_metadata?.provider || 'supabase';
 
-  const [newUser] = await db.insert(users).values({
+  const result = await db.insert(users).values({
     email: email || null,
     firstName,
     lastName,
@@ -204,6 +204,8 @@ export async function getOrCreateUserFromSupabase(payload: SupabaseTokenPayload)
     role: 'member',
     subscriptionStatus: 'trial',
   }).returning();
+  
+  const newUser = Array.isArray(result) ? result[0] : (result as any).rows?.[0];
 
   console.log(`[SupabaseAuth] Created new user ${newUser.id} from Supabase ID ${supabaseUserId}`);
 
