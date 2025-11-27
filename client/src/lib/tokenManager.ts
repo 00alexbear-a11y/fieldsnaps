@@ -1,8 +1,11 @@
 import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { jwtDecode } from 'jwt-decode';
+import { supabase } from './supabase';
+import { Capacitor } from '@capacitor/core';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const SUPABASE_SESSION_KEY = 'supabase_session';
 
 interface JWTPayload {
   sub: string; // user ID
@@ -12,6 +15,15 @@ interface JWTPayload {
   type: 'access' | 'refresh';
   exp: number; // expiration timestamp
   iat: number; // issued at timestamp
+}
+
+interface SupabaseJWTPayload {
+  sub: string; // Supabase user ID
+  email?: string;
+  exp: number;
+  iat: number;
+  aud: string;
+  role?: string;
 }
 
 class TokenManager {
@@ -196,11 +208,60 @@ class TokenManager {
   }
 
   /**
+   * Get Supabase session access token
+   * This is the primary auth method now
+   */
+  async getSupabaseAccessToken(): Promise<string | null> {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('[TokenManager] Error getting Supabase session:', error);
+        return null;
+      }
+      
+      if (!session?.access_token) {
+        console.log('[TokenManager] No Supabase session found');
+        return null;
+      }
+      
+      // Check if token is about to expire (within 60 seconds)
+      const now = Math.floor(Date.now() / 1000);
+      const expiresAt = session.expires_at || 0;
+      
+      if (expiresAt - now < 60) {
+        console.log('[TokenManager] Supabase token expiring soon, refreshing...');
+        const { data: { session: newSession }, error: refreshError } = await supabase.auth.refreshSession();
+        
+        if (refreshError || !newSession) {
+          console.error('[TokenManager] Failed to refresh Supabase session:', refreshError);
+          return null;
+        }
+        
+        console.log('[TokenManager] ✅ Supabase session refreshed');
+        return newSession.access_token;
+      }
+      
+      return session.access_token;
+    } catch (error) {
+      console.error('[TokenManager] Error getting Supabase access token:', error);
+      return null;
+    }
+  }
+
+  /**
    * Get valid access token, refreshing if necessary
    * This is the main method to use when making API calls
+   * Priority: Supabase session > Legacy JWT tokens
    */
   async getValidAccessToken(): Promise<string | null> {
-    // Check if current token is valid
+    // First try Supabase session (primary auth method)
+    const supabaseToken = await this.getSupabaseAccessToken();
+    if (supabaseToken) {
+      return supabaseToken;
+    }
+    
+    // Fall back to legacy JWT tokens (for backward compatibility during migration)
     const isValid = await this.isAccessTokenValid();
     if (isValid) {
       return this.getAccessToken();
@@ -268,19 +329,31 @@ class TokenManager {
   }
 
   /**
-   * Logout user: Revoke refresh token on server and clear all local tokens
+   * Logout user: Sign out from Supabase and clear all local tokens
    */
   async logout(): Promise<void> {
     try {
       console.log('[TokenManager] Logging out user...');
 
-      // Get refresh token before clearing
+      // Sign out from Supabase first
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('[TokenManager] Supabase sign out error:', error);
+        } else {
+          console.log('[TokenManager] ✅ Signed out from Supabase');
+        }
+      } catch (error) {
+        console.error('[TokenManager] Error signing out from Supabase:', error);
+      }
+
+      // Get legacy refresh token before clearing
       const refreshToken = await this.getRefreshToken();
 
-      // Clear tokens from iOS Keychain first
+      // Clear legacy tokens from iOS Keychain
       await this.clearTokens();
 
-      // Try to revoke refresh token on server (best effort - don't fail if it fails)
+      // Try to revoke legacy refresh token on server (best effort - don't fail if it fails)
       if (refreshToken) {
         try {
           await fetch('/api/auth/logout', {
@@ -292,10 +365,10 @@ class TokenManager {
               refresh_token: refreshToken,
             }),
           });
-          console.log('[TokenManager] ✅ Refresh token revoked on server');
+          console.log('[TokenManager] ✅ Legacy refresh token revoked on server');
         } catch (error) {
           // Server revocation failed, but local tokens are already cleared
-          console.error('[TokenManager] Failed to revoke token on server:', error);
+          console.error('[TokenManager] Failed to revoke legacy token on server:', error);
         }
       }
 
