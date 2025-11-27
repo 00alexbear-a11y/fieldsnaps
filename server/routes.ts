@@ -375,6 +375,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Apple App Site Association (AASA) file for Universal Links
+  // Required for iOS to recognize this domain as associated with the app
+  // NOTE: Update APPLE_TEAM_ID environment variable with your Apple Developer Team ID
+  const aasaContent = {
+    applinks: {
+      apps: [],
+      details: [
+        {
+          appIDs: [
+            `${process.env.APPLE_TEAM_ID || 'XXXXXXXXXX'}.com.fieldsnaps.app`
+          ],
+          paths: [
+            '/auth/callback',
+            '/auth/callback/*',
+            '/api/callback',
+            '/invite/*'
+          ],
+          components: [
+            {
+              '/': '/auth/callback',
+              comment: 'Supabase OAuth callback'
+            },
+            {
+              '/': '/auth/callback/*',
+              comment: 'Supabase OAuth callback with params'
+            }
+          ]
+        }
+      ]
+    },
+    webcredentials: {
+      apps: [
+        `${process.env.APPLE_TEAM_ID || 'XXXXXXXXXX'}.com.fieldsnaps.app`
+      ]
+    }
+  };
+
+  app.get('/.well-known/apple-app-site-association', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json(aasaContent);
+  });
+
+  app.get('/apple-app-site-association', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json(aasaContent);
+  });
+
   // Setup authentication with rate limiting
   await setupAuth(app, authRateLimiter);
   
