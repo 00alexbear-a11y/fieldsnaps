@@ -80,8 +80,9 @@ export default function Login() {
     }
   };
 
-  // Show Apple Sign-In on iOS or when running in native app
-  const showAppleSignIn = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+  // Show Apple Sign-In on all platforms for testing (iOS native + web)
+  // Apple requires Apple Sign-In for iOS apps, but web testing helps verify the flow
+  const showAppleSignIn = true;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
