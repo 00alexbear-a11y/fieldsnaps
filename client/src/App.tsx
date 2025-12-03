@@ -79,7 +79,7 @@ function AppContent() {
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   
   // Email whitelist - only these emails can access the app
-  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local', 'snapspeak@test.com'];
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local', 'snapspeak@test.com', 'hello@fieldsnaps.com'];
   const isWhitelisted = user && user.email && WHITELIST_EMAILS.includes(user.email);
   
   // Initialize theme (handles localStorage and DOM automatically)
