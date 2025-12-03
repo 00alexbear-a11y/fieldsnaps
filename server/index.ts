@@ -96,7 +96,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind + Google Fonts
     "img-src 'self' data: blob: https: https://*.googleapis.com https://*.gstatic.com", // Google Maps tiles
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com https://maps.googleapis.com",
+    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com https://maps.googleapis.com https://*.supabase.co",
     "media-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
