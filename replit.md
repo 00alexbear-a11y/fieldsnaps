@@ -58,21 +58,58 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **Replit Auth**: Legacy authentication (dual auth support during transition)
 - **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication
 
-### Supabase Auth Migration Notes
-- **Dual auth support**: Backend validates both Supabase JWT and Replit tokens simultaneously
-- **User linking**: Existing Replit users automatically linked to Supabase accounts via email match
-- **Database**: `supabase_user_id` column added to users table for linking
-- **OAuth providers configured in Supabase**:
-  - Google OAuth (contractors/general users)
-  - Apple Sign-In (required for App Store)
-  - Email/Password (fallback option)
-- **Key files**:
-  - `client/src/lib/supabase.ts` - Supabase client with SecureStorage for native
-  - `client/src/lib/supabaseAuth.ts` - Auth functions (signIn, signOut, session management)
-  - `client/src/hooks/useAuth.ts` - React hook with Supabase session state
-  - `client/src/pages/AuthCallback.tsx` - OAuth callback handler
-  - `server/supabaseAuth.ts` - Backend JWT validation with JWKS
-- **Universal Links**: AASA endpoint at `/.well-known/apple-app-site-association` (needs Team ID + production domain configuration)
+### Supabase Auth Configuration
+
+#### Current Status (December 2024)
+- **Google OAuth**: Fully configured and tested
+- **Apple Sign-In**: Fully configured and tested (web + iOS native)
+- **Session Persistence**: Working - tokens survive page refresh
+
+#### Provider Configuration
+**Google OAuth** (Supabase → Authentication → Providers → Google):
+- Client ID and Secret from Google Cloud Console
+- Callback: `https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback`
+
+**Apple Sign-In** (Supabase → Authentication → Providers → Apple):
+- Service ID: `com.fieldsnaps.signin`
+- Team ID: `9739WWYHQ6`
+- Key ID: `7AB24X9GC4`
+- Private Key: Stored in Supabase (from .p8 file)
+- Callback: `https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback`
+
+**Apple Developer Configuration**:
+- App ID: `com.fieldsnaps.app`
+- Service ID: `com.fieldsnaps.signin` (for web authentication)
+- Domain: `pbfuwfzccdmpkmhncyjg.supabase.co`
+- Return URL: `https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback`
+
+#### URL Configuration (Supabase → Authentication → URL Configuration)
+- Site URL: Production domain when available
+- Redirect URLs:
+  - `com.fieldsnaps.app://auth/callback` (native iOS deep link)
+  - Production domain callback URL when available
+
+#### Important Notes
+- **Apple Name Handling**: Apple only sends user's name on FIRST login. Backend captures and stores it in database.
+- **Secret Key Rotation**: Apple OAuth web secrets must be rotated every 6 months. Set calendar reminder.
+- **GoTrue Version**: Requires v2.139.2+ for Apple auth (check Project Settings → Infrastructure)
+
+#### Dual Auth Support
+- Backend validates both Supabase JWT and Replit tokens simultaneously
+- Existing Replit users automatically linked to Supabase accounts via email match
+- Database: `supabase_user_id` column added to users table for linking
+
+#### Key Files
+- `client/src/lib/supabase.ts` - Supabase client with SecureStorage for native
+- `client/src/lib/supabaseAuth.ts` - Auth functions (signIn, signOut, session management)
+- `client/src/hooks/useAuth.ts` - React hook with Supabase session state
+- `client/src/pages/AuthCallback.tsx` - OAuth callback handler
+- `client/src/pages/Login.tsx` - Login page with Google and Apple buttons
+- `server/supabaseAuth.ts` - Backend JWT validation with JWKS
+
+#### Universal Links
+- AASA endpoint at `/.well-known/apple-app-site-association`
+- Needs Team ID + production domain configuration for native app deep links
 
 ### Native Platform & OTA Updates
 - **Capacitor 6**: Native wrapper for iOS/Android
