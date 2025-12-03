@@ -1,0 +1,102 @@
+Based on my research and your troubleshooting history, here's a comprehensive diagnostic plan to solve this 403 error:
+
+🔍 Root Cause Analysis
+The Error 403: access_denied from Google OAuth typically occurs due to one of these issues:
+
+Redirect URI mismatch (even subtle differences)
+Client ID/Secret mismatch between Google and Supabase
+OAuth consent screen misconfiguration
+Cache/session issues
+Domain verification issues
+🎯 Systematic Debugging Plan
+Phase 1: Verify Exact Redirect URIs (Most Common Issue)
+Let me check what's actually being sent during the OAuth flow:
+
+Action Steps:
+
+Open your Replit app in a new incognito/private window
+Open Browser DevTools (F12 → Network tab)
+Click "Continue with Google"
+Look at the failed request in the Network tab
+Find the redirect_uri parameter in the request URL
+What to verify:
+
+Does the redirect_uri in the request exactly match what's in Google Cloud Console?
+Check for:
+http vs https
+Trailing slashes (/auth/callback vs /auth/callback/)
+Port numbers
+Subdomain differences
+Phase 2: Double-Check Google Cloud Console Setup
+Go back to Google Cloud Console → Credentials → Your OAuth Client:
+
+Verify these exact URIs are added:
+
+https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback
+Also check if you need:
+
+https://[your-replit-url].repl.co/auth/callback
+⚠️ Common mistake: Google Cloud shows the Supabase URI, but your code might be redirecting to your Replit domain.
+
+Phase 3: Verify Supabase Configuration
+In Supabase Dashboard → Authentication → URL Configuration:
+
+Check these settings:
+
+Site URL: Should be your Replit app URL (e.g., https://your-app.repl.co)
+Redirect URLs: Add BOTH:
+https://your-replit-app.repl.co/*
+https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback
+Phase 4: Verify Client Credentials Match
+In Google Cloud Console:
+
+Go to Credentials
+Click on your OAuth client
+Copy the Client ID shown
+In Supabase:
+
+Go to Authentication → Providers → Google
+Verify the Client ID matches exactly
+Do the same for Client Secret.
+
+Phase 5: Check Your Code's OAuth Implementation
+In your Replit code, verify how you're calling Supabase auth:
+
+Copy// The redirectTo parameter MUST match what's in Google Console
+await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: 'https://your-actual-replit-url.repl.co/auth/callback'
+    // NOT localhost:3000
+  }
+})
+Phase 6: Clear Everything and Start Fresh
+If none of the above works:
+
+In Google Cloud Console:
+
+Delete the existing OAuth client
+Create a NEW OAuth client
+Add redirect URI: https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback
+Copy new Client ID and Secret
+In Supabase:
+
+Disable Google provider
+Enable it again with the NEW credentials
+Save
+Clear browser cache or use incognito
+
+Restart your Replit server
+
+🎬 Immediate Action Plan
+Do this RIGHT NOW:
+
+Open Network Tab (F12) in your browser
+Try the Google login
+Find the failed request
+Take a screenshot of:
+The request URL (showing the redirect_uri parameter)
+The response error
+This will tell us exactly what redirect URI your app is sending vs. what Google expects.
+
+Can you do this and share what you see in the Network tab? This is the fastest way to identify the exact mismatch.
