@@ -223,6 +223,7 @@ function AppContent() {
       <main className="min-h-screen bg-white dark:bg-black text-foreground">
         <Switch>
           <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/waitlist" component={Waitlist} />
           <Route path="/share/:token" component={ShareView} />
           <Route component={NotFound} />
@@ -305,6 +306,7 @@ function AppContent() {
           <main className="flex-1 bg-white dark:bg-black overflow-y-auto">
             <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
               <Switch>
+                <Route path="/auth/callback" component={AuthCallback} />
                 <Route path="/camera" component={Camera} />
                 <Route path="/projects" component={Projects} />
                 <Route path="/projects/:id" component={ProjectPhotos} />
