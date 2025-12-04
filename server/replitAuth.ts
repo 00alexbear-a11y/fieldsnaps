@@ -887,7 +887,7 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 // Email whitelist middleware - only allows specific emails to access the app
 // All other authenticated users get a 403 Forbidden response
 export const isWhitelisted: RequestHandler = async (req, res, next) => {
-  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'hello@fieldsnaps.com'];
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'hello@fieldsnaps.com', 'alexmbear@yahoo.com'];
   const userEmail = req.user?.claims?.email;
   const isDevelopment = process.env.NODE_ENV !== 'production';
   const isDevUser = req.user?.claims?.sub === 'dev-user-local';
