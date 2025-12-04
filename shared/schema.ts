@@ -60,6 +60,11 @@ export const companies = pgTable("companies", {
   
   // Automatic time tracking settings
   autoTrackingEnabledByDefault: boolean("auto_tracking_enabled_by_default").default(true).notNull(), // Company-wide default for automatic time tracking
+  clockOutReminderTime: varchar("clock_out_reminder_time", { length: 5 }).default("17:00"), // HH:MM format, when to send daily reminder (default 5pm)
+  maxShiftHours: integer("max_shift_hours").default(12), // Auto clock-out after this many hours (default 12)
+  geofenceExitDelayMinutes: integer("geofence_exit_delay_minutes").default(5), // Wait this long after exit before prompting clock-out (default 5 min)
+  autoClockOutOnExit: boolean("auto_clock_out_on_exit").default(false), // Automatically clock out on geofence exit (vs prompt)
+  staleSessionTimeoutMinutes: integer("stale_session_timeout_minutes").default(30), // Auto-close sessions with no heartbeat after this (default 30 min)
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
@@ -472,6 +477,9 @@ export const clockEntries = pgTable("clock_entries", {
   editedBy: varchar("edited_by").references(() => users.id, { onDelete: "set null" }), // Supervisor who edited (if applicable)
   editReason: text("edit_reason"), // Why the time was adjusted
   originalTimestamp: timestamp("original_timestamp"), // Original time before edit (for audit trail)
+  lastHeartbeat: timestamp("last_heartbeat"), // Last location update/heartbeat (for stale session detection)
+  autoClosedAt: timestamp("auto_closed_at"), // If session was auto-closed due to stale heartbeat
+  autoCloseReason: varchar("auto_close_reason", { length: 50 }), // stale_heartbeat, max_shift, admin_override
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("idx_clock_entries_user_id").on(table.userId),

@@ -48,7 +48,7 @@ import { PaymentNotification } from "./components/PaymentNotification";
 import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
 import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
 import { OfflineIndicator } from "./components/OfflineIndicator";
-import Onboarding from "./components/Onboarding";
+import OnboardingPage from "./pages/Onboarding";
 import { CreateProjectDialog } from "./components/CreateProjectDialog";
 import { ProfileSetupDialog } from "./components/ProfileSetupDialog";
 import { UpgradeModal } from "./components/UpgradeModal";
@@ -85,26 +85,6 @@ function AppContent() {
   // Initialize theme (handles localStorage and DOM automatically)
   useTheme();
   
-  // Onboarding state for authenticated, whitelisted users (must be at top before any returns)
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  
-  useEffect(() => {
-    if (isAuthenticated && isWhitelisted && user?.id) {
-      const onboardingKey = `onboarding_complete_${user.id}`;
-      const hasCompletedOnboarding = localStorage.getItem(onboardingKey);
-      if (!hasCompletedOnboarding) {
-        setShowOnboarding(true);
-      }
-    }
-  }, [isAuthenticated, isWhitelisted, user]);
-
-  const handleOnboardingComplete = () => {
-    if (user?.id) {
-      const onboardingKey = `onboarding_complete_${user.id}`;
-      localStorage.setItem(onboardingKey, 'true');
-      setShowOnboarding(false);
-    }
-  };
 
   // Profile setup state - show before onboarding if user is missing name
   const [showProfileSetup, setShowProfileSetup] = useState(false);
@@ -142,16 +122,30 @@ function AppContent() {
   const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
   
   // Onboarding routes are authenticated but before full setup
-  const onboardingRoutes = ['/onboarding/company-setup'];
+  const onboardingRoutes = ['/onboarding/company-setup', '/onboarding'];
   const isOnboardingRoute = onboardingRoutes.some(route => location.startsWith(route));
+  
+  // Check if user needs onboarding (no company or onboardingComplete is false)
+  const needsOnboarding = isAuthenticated && isWhitelisted && user && (!user.companyId || user.onboardingComplete === false);
 
-  // Redirect authenticated whitelisted users from landing to dashboard
+  // Redirect authenticated whitelisted users from landing to dashboard or onboarding
   // Non-whitelisted users can stay on landing page
   useEffect(() => {
     if (!isLoading && isAuthenticated && isWhitelisted && location === '/') {
-      setLocation('/projects');
+      if (needsOnboarding) {
+        setLocation('/onboarding');
+      } else {
+        setLocation('/projects');
+      }
     }
-  }, [isAuthenticated, isWhitelisted, isLoading, location, setLocation]);
+  }, [isAuthenticated, isWhitelisted, isLoading, location, needsOnboarding, setLocation]);
+  
+  // Redirect users who need onboarding to /onboarding page
+  useEffect(() => {
+    if (!isLoading && needsOnboarding && !isOnboardingRoute && !isPublicRoute) {
+      setLocation('/onboarding');
+    }
+  }, [isLoading, needsOnboarding, isOnboardingRoute, isPublicRoute, setLocation]);
 
   // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
@@ -192,6 +186,7 @@ function AppContent() {
     return (
       <main className="min-h-screen bg-white dark:bg-black text-foreground">
         <Switch>
+          <Route path="/onboarding" component={OnboardingPage} />
           <Route path="/onboarding/company-setup" component={CompanySetup} />
           <Route component={NotFound} />
         </Switch>
@@ -272,8 +267,6 @@ function AppContent() {
           />
         )}
         
-        {/* Onboarding for authenticated, whitelisted users only (gated by profile setup) */}
-        {!showProfileSetup && showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
         
         {/* Sidebar - only shown on non-camera pages */}
         {shouldShowSidebar && <AppSidebar />}

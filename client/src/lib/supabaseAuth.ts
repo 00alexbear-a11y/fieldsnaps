@@ -241,3 +241,33 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
   
   return { session, user };
 }
+
+export async function resetPassword(email: string): Promise<void> {
+  console.log('[SupabaseAuth] Sending password reset email to:', email);
+  
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+  });
+  
+  if (error) {
+    console.error('[SupabaseAuth] Password reset error:', error);
+    throw error;
+  }
+  
+  console.log('[SupabaseAuth] Password reset email sent');
+}
+
+export async function updatePassword(newPassword: string): Promise<void> {
+  console.log('[SupabaseAuth] Updating password');
+  
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+  
+  if (error) {
+    console.error('[SupabaseAuth] Update password error:', error);
+    throw error;
+  }
+  
+  console.log('[SupabaseAuth] Password updated successfully');
+}

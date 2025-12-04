@@ -382,6 +382,7 @@ export const GEOFENCING_CONFIG = {
   foregroundService: true, // Required for Android 8+
   startOnBoot: true, // Restart tracking after device reboot
   enableHeadless: true, // Allow background operation when app is closed
+  stopOnTerminate: false, // CRITICAL: Continue tracking when app is force-closed
   
   // Android Foreground Service Notification (required for Android 8+)
   notification: {
