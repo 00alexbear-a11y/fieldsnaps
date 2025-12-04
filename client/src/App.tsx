@@ -223,6 +223,7 @@ function AppContent() {
       <main className="min-h-screen bg-white dark:bg-black text-foreground">
         <Switch>
           <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
           <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/waitlist" component={Waitlist} />
           <Route path="/share/:token" component={ShareView} />
