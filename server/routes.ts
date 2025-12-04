@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema, insertGeofenceSchema, insertLocationLogSchema, insertUserPermissionSchema, insertTimeEntryEditSchema } from "../shared/schema";
 import { z } from "zod";
-import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./replitAuth";
+import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./auth";
 import { setupWebAuthn } from "./webauthn";
 import { handleError, errors } from "./errorHandler";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
