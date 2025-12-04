@@ -20,9 +20,13 @@ export async function signInWithGoogle(): Promise<void> {
   const redirectTo = getRedirectUrl();
   console.log('[SupabaseAuth] Redirect URL:', redirectTo);
   
+  // Check platform using the same reliable method
+  const isNative = isNativePlatform();
+  console.log('[SupabaseAuth] Platform check for OAuth, isNative:', isNative);
+  
   // For native platforms, we need to manually open the browser
   // and handle the callback ourselves for reliable deep link handling
-  if (isNativePlatform()) {
+  if (isNative) {
     console.log('[SupabaseAuth] Using native OAuth flow with Browser plugin');
     
     // Generate the OAuth URL without opening it
@@ -311,7 +315,12 @@ export function setupDeepLinkListener(): void {
     return;
   }
   
-  if (!isNativePlatform()) {
+  // Use a more reliable native check - getPlatform() instead of isNativePlatform()
+  // isNativePlatform() can return false on iOS in some edge cases
+  const isNative = isNativePlatform();
+  console.log('[SupabaseAuth] Platform check for deep link listener, isNative:', isNative);
+  
+  if (!isNative) {
     console.log('[SupabaseAuth] Not native platform, skipping deep link listener');
     return;
   }
@@ -320,6 +329,7 @@ export function setupDeepLinkListener(): void {
   
   // Check if app was launched with a URL (cold start from deep link)
   App.getLaunchUrl().then((launchUrl) => {
+    console.log('[SupabaseAuth] getLaunchUrl result:', launchUrl);
     if (launchUrl?.url) {
       console.log('[SupabaseAuth] App launched with URL:', launchUrl.url);
       handleOAuthCallback(launchUrl.url);
@@ -330,12 +340,14 @@ export function setupDeepLinkListener(): void {
   
   // Listen for deep links when app is already running
   App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
+    console.log('[SupabaseAuth] *** appUrlOpen event received ***');
     console.log('[SupabaseAuth] App opened with URL:', event.url);
-    await handleOAuthCallback(event.url);
+    const result = await handleOAuthCallback(event.url);
+    console.log('[SupabaseAuth] OAuth callback handled, result:', result);
   });
   
   deepLinkListenerRegistered = true;
-  console.log('[SupabaseAuth] Deep link listener registered');
+  console.log('[SupabaseAuth] Deep link listener registered successfully');
 }
 
 export function onAuthStateChange(callback: (session: Session | null, user: User | null) => void): () => void {
