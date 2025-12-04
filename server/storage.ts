@@ -18,7 +18,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { ObjectStorageService } from "./objectStorage";
 
 export interface IStorage {
-  // User operations (required for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(userId: string, data: Partial<User>): Promise<User | undefined>;
@@ -207,7 +207,7 @@ export class DbStorage implements IStorage {
   // In-memory storage for PKCE verifiers (temporary, expires after 10 minutes)
   private pkceStore = new Map<string, { verifier: string; expiresAt: number }>();
 
-  // User operations (required for Replit Auth)
+  // User operations
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
     return result[0];
