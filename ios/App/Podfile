@@ -12,6 +12,7 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
   pod 'AparajitaCapacitorSecureStorage', :path => '../../node_modules/@aparajita/capacitor-secure-storage'
+  pod 'CapacitorCommunityGenericOauth2', :path => '../../node_modules/@capacitor-community/generic-oauth2'
   pod 'CapacitorCommunitySpeechRecognition', :path => '../../node_modules/@capacitor-community/speech-recognition'
   pod 'CapacitorActionSheet', :path => '../../node_modules/@capacitor/action-sheet'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'

@@ -311,9 +311,9 @@ export default function Login() {
       <div className="flex justify-between text-sm">
         <Button
           type="button"
-          variant="link"
+          variant="ghost"
           size="sm"
-          className="px-0 h-auto"
+          className="px-0 h-auto text-primary underline-offset-4 hover:underline"
           onClick={() => {
             setAuthError(null);
             setAuthSuccess(null);
@@ -325,9 +325,9 @@ export default function Login() {
         </Button>
         <Button
           type="button"
-          variant="link"
+          variant="ghost"
           size="sm"
-          className="px-0 h-auto"
+          className="px-0 h-auto text-primary underline-offset-4 hover:underline"
           onClick={() => {
             setAuthError(null);
             setAuthSuccess(null);
