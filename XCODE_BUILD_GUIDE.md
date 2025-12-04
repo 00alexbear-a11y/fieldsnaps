@@ -7,10 +7,44 @@ Before starting, ensure you have:
 - Apple Developer account (Team ID: 9739WWYHQ6)
 - CocoaPods installed (`sudo gem install cocoapods`)
 - Git repository cloned locally
+- Node.js 18+ installed
 
 ---
 
-## Step 1: Clone and Setup
+## Step 1: Environment Variables (CRITICAL)
+
+Before building on your Mac, you MUST set the required environment variables. Create a `.env` file in the project root or export them:
+
+```bash
+# Required for Supabase Auth
+export VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co"
+export VITE_SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Required for API calls (production backend URL)
+export VITE_API_URL="https://fieldsnaps.com"
+
+# Optional: Google Maps (for admin map features)
+export VITE_GOOGLE_MAPS_API_KEY="your-google-maps-key"
+```
+
+**Where to get these values:**
+- Supabase values: Go to Supabase Dashboard > Settings > API
+- API URL: Your production backend URL (or development URL for testing)
+- If building from Replit, these are already configured as secrets
+
+**Alternative: Use a .env file:**
+```bash
+# Create .env file in project root
+cat > .env << EOF
+VITE_SUPABASE_URL=https://pbfuwfzccdmpkmhncyjg.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_API_URL=https://fieldsnaps.com
+EOF
+```
+
+---
+
+## Step 2: Clone and Setup
 
 ```bash
 # Clone the repository
@@ -20,7 +54,7 @@ cd fieldsnaps
 # Install Node dependencies
 npm install
 
-# Build the production bundle (already done, but run again if you make changes)
+# Build the production bundle (uses environment variables from Step 1)
 npm run build
 
 # Sync with iOS
@@ -29,7 +63,7 @@ npx cap sync ios
 
 ---
 
-## Step 2: Install CocoaPods Dependencies
+## Step 3: Install CocoaPods Dependencies
 
 ```bash
 cd ios/App
@@ -45,7 +79,7 @@ This installs all 24 Capacitor plugins including:
 
 ---
 
-## Step 3: Open in Xcode
+## Step 4: Open in Xcode
 
 ```bash
 npx cap open ios
@@ -55,9 +89,9 @@ Or manually open: `ios/App/App.xcworkspace` (NOT `.xcodeproj`)
 
 ---
 
-## Step 4: Xcode Configuration
+## Step 5: Xcode Configuration
 
-### 4.1 Signing & Capabilities
+### 5.1 Signing & Capabilities
 
 1. Select **App** target in the project navigator
 2. Go to **Signing & Capabilities** tab
@@ -65,7 +99,7 @@ Or manually open: `ios/App/App.xcworkspace` (NOT `.xcodeproj`)
 4. Ensure **Bundle Identifier**: `com.fieldsnaps.app`
 5. Xcode should auto-create provisioning profiles
 
-### 4.2 Required Capabilities
+### 5.2 Required Capabilities
 
 Add these if not already present:
 - **Associated Domains** (for Universal Links - future use)
@@ -74,7 +108,7 @@ Add these if not already present:
   - Background fetch
 - **Push Notifications** (if enabling in future)
 
-### 4.3 Privacy Descriptions (Already Configured)
+### 5.3 Privacy Descriptions (Already Configured)
 
 Info.plist already includes all required privacy descriptions:
 - `NSCameraUsageDescription`
@@ -86,7 +120,7 @@ Info.plist already includes all required privacy descriptions:
 
 ---
 
-## Step 5: TransistorSoft License (Background Geolocation)
+## Step 6: TransistorSoft License (Background Geolocation)
 
 The TransistorSoft Background Geolocation plugin requires a license for production:
 
@@ -97,7 +131,7 @@ For testing, the plugin works without a license but shows a debug banner.
 
 ---
 
-## Step 6: Build and Run
+## Step 7: Build and Run
 
 ### Simulator Testing
 1. Select an iOS simulator (iPhone 14 Pro recommended)
@@ -112,7 +146,7 @@ For testing, the plugin works without a license but shows a debug banner.
 
 ---
 
-## Step 7: OAuth Testing
+## Step 8: OAuth Testing
 
 ### Google Sign-In
 - Should work immediately with Supabase configuration
