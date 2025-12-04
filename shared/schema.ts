@@ -38,6 +38,7 @@ export const companies = pgTable("companies", {
   inviteLinkUses: integer("invite_link_uses").default(0).notNull(), // How many joined via current link
   inviteLinkMaxUses: integer("invite_link_max_uses").default(5).notNull(), // Max uses before expiry
   inviteLinkExpiresAt: timestamp("invite_link_expires_at"), // 7 days from generation
+  inviteLinkRole: varchar("invite_link_role").default("worker"), // Role assigned to users who join via this link: admin, manager, worker
   
   // PDF export settings
   pdfLogoUrl: text("pdf_logo_url"), // Logo URL in Object Storage
@@ -75,8 +76,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   companyId: varchar("company_id").references(() => companies.id, { onDelete: "set null" }),
-  role: varchar("role").default("member"), // owner or member
+  role: varchar("role").default("worker"), // admin, manager, or worker
   invitedBy: varchar("invited_by").references(() => users.id, { onDelete: "set null" }), // Who invited this user
+  onboardingComplete: boolean("onboarding_complete").default(false), // Has user completed onboarding wizard
   removedAt: timestamp("removed_at"), // Timestamp when removed from company (for grace period)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

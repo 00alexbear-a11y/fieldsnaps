@@ -33,7 +33,7 @@ export interface IStorage {
   getCompanyByInviteToken(token: string): Promise<Company | undefined>;
   createCompany(data: InsertCompany): Promise<Company>;
   updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined>;
-  generateInviteLink(companyId: string): Promise<Company>;
+  generateInviteLink(companyId: string, role?: string): Promise<Company>;
   revokeInviteLink(companyId: string): Promise<Company>;
   getCompanyMembers(companyId: string): Promise<User[]>;
   removeUserFromCompany(userId: string): Promise<User | undefined>;
@@ -295,7 +295,7 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async generateInviteLink(companyId: string): Promise<Company> {
+  async generateInviteLink(companyId: string, role: string = 'worker'): Promise<Company> {
     // Generate a random 32-character token
     const token = crypto.randomUUID().replace(/-/g, '');
     
@@ -309,6 +309,7 @@ export class DbStorage implements IStorage {
         inviteLinkUses: 0,
         inviteLinkMaxUses: 5,
         inviteLinkExpiresAt: expiresAt,
+        inviteLinkRole: role,
       })
       .where(eq(companies.id, companyId))
       .returning();

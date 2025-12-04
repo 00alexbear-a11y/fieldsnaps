@@ -495,6 +495,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate invite link (owner only)
+  const inviteLinkSchema = z.object({
+    role: z.enum(['admin', 'manager', 'worker']).optional().default('worker'),
+  });
+
   app.post("/api/companies/invite-link", isAuthenticatedAndWhitelisted, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -504,18 +508,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User does not belong to a company" });
       }
 
+      // Only admins can generate invite links
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Only admins can generate invite links" });
+      }
+
       const company = await storage.getCompany(user.companyId);
       if (!company) {
         return res.status(404).json({ error: "Company not found" });
       }
 
-      // Only billing owner can generate invite links
-      if (company.ownerId !== userId) {
-        return res.status(403).json({ error: "Only the company owner can generate invite links" });
-      }
+      // Parse role from request body
+      const validatedData = inviteLinkSchema.safeParse(req.body);
+      const role = validatedData.success ? validatedData.data.role : 'worker';
 
-      // Generate new invite link
-      const inviteLink = await storage.generateInviteLink(user.companyId);
+      // Generate new invite link with role
+      const inviteLink = await storage.generateInviteLink(user.companyId, role);
       
       res.json(inviteLink);
     } catch (error: any) {
@@ -612,11 +620,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(410).json({ error: "Invite link has reached maximum uses" });
       }
 
-      // Add user to company
+      // Add user to company with the role specified in invite link
       await storage.updateUser(userId, {
         companyId: company.id,
-        role: 'member',
+        role: company.inviteLinkRole || 'worker',
         invitedBy: company.ownerId,
+        onboardingComplete: true,
       });
 
       // Increment invite uses
@@ -740,10 +749,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Transfer ownership
       await storage.updateCompany(company.id, { ownerId: targetUserId });
-      await storage.updateUser(targetUserId, { role: 'owner' });
-      await storage.updateUser(currentUserId, { role: 'member' });
+      await storage.updateUser(targetUserId, { role: 'admin' });
+      await storage.updateUser(currentUserId, { role: 'admin' }); // Demote to admin, not member
 
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Change user role (admin only)
+  const changeRoleSchema = z.object({
+    role: z.enum(['admin', 'manager', 'worker']),
+  });
+
+  app.put("/api/companies/members/:userId/role", isAuthenticatedAndWhitelisted, validateUuidParam('userId'), async (req: any, res) => {
+    try {
+      const currentUserId = req.user.claims.sub;
+      const currentUser = await storage.getUser(currentUserId);
+      const targetUserId = req.params.userId;
+
+      if (!currentUser || !currentUser.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      // Only admins can change roles
+      if (currentUser.role !== 'admin') {
+        return res.status(403).json({ error: "Only admins can change user roles" });
+      }
+
+      const validatedData = changeRoleSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        return res.status(400).json({ error: "Invalid role. Must be admin, manager, or worker" });
+      }
+
+      const { role: newRole } = validatedData.data;
+
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser || targetUser.companyId !== currentUser.companyId) {
+        return res.status(404).json({ error: "User not found in your company" });
+      }
+
+      // If demoting an admin, check there's at least one admin remaining
+      if (targetUser.role === 'admin' && newRole !== 'admin') {
+        const members = await storage.getCompanyMembers(currentUser.companyId);
+        const adminCount = members.filter(m => m.role === 'admin').length;
+        if (adminCount <= 1) {
+          return res.status(400).json({ error: "Cannot demote. At least one admin must remain in the company" });
+        }
+      }
+
+      // Can't demote yourself if you're the billing owner
+      const company = await storage.getCompany(currentUser.companyId);
+      if (company?.ownerId === targetUserId && newRole !== 'admin') {
+        return res.status(400).json({ error: "The billing owner must remain an admin" });
+      }
+
+      await storage.updateUser(targetUserId, { role: newRole });
+
+      res.json({ success: true, role: newRole });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
