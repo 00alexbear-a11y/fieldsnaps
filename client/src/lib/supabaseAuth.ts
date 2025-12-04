@@ -1,5 +1,6 @@
 import { supabase, getRedirectUrl, isNativePlatform } from './supabase';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 
 export interface SupabaseAuthState {
@@ -10,6 +11,8 @@ export interface SupabaseAuthState {
 }
 
 let deepLinkListenerRegistered = false;
+let pendingOAuthResolve: (() => void) | null = null;
+let pendingOAuthReject: ((error: Error) => void) | null = null;
 
 export async function signInWithGoogle(): Promise<void> {
   console.log('[SupabaseAuth] Starting Google OAuth sign-in');
@@ -17,6 +20,48 @@ export async function signInWithGoogle(): Promise<void> {
   const redirectTo = getRedirectUrl();
   console.log('[SupabaseAuth] Redirect URL:', redirectTo);
   
+  // For native platforms, we need to manually open the browser
+  // and handle the callback ourselves for reliable deep link handling
+  if (isNativePlatform()) {
+    console.log('[SupabaseAuth] Using native OAuth flow with Browser plugin');
+    
+    // Generate the OAuth URL without opening it
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true, // Don't auto-open, we'll use Browser plugin
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    
+    if (error) {
+      console.error('[SupabaseAuth] Google OAuth error:', error);
+      throw error;
+    }
+    
+    if (!data.url) {
+      throw new Error('No OAuth URL returned');
+    }
+    
+    console.log('[SupabaseAuth] Opening OAuth URL in in-app browser:', data.url);
+    
+    // Open in Capacitor Browser (SFSafariViewController on iOS)
+    // This provides better deep link callback handling
+    await Browser.open({ 
+      url: data.url,
+      presentationStyle: 'popover',
+      windowName: '_blank'
+    });
+    
+    console.log('[SupabaseAuth] Browser opened, waiting for callback...');
+    return;
+  }
+  
+  // Web flow - use default Supabase behavior
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -41,6 +86,39 @@ export async function signInWithApple(): Promise<void> {
   
   const redirectTo = getRedirectUrl();
   
+  // For native platforms, use Browser plugin for reliable deep link handling
+  if (isNativePlatform()) {
+    console.log('[SupabaseAuth] Using native Apple OAuth flow with Browser plugin');
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+    
+    if (error) {
+      console.error('[SupabaseAuth] Apple OAuth error:', error);
+      throw error;
+    }
+    
+    if (!data.url) {
+      throw new Error('No OAuth URL returned');
+    }
+    
+    console.log('[SupabaseAuth] Opening Apple OAuth URL in in-app browser');
+    
+    await Browser.open({ 
+      url: data.url,
+      presentationStyle: 'popover',
+      windowName: '_blank'
+    });
+    
+    return;
+  }
+  
+  // Web flow
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
     options: {
@@ -148,6 +226,16 @@ async function handleOAuthCallback(url: string): Promise<boolean> {
   }
   
   console.log('[SupabaseAuth] Processing OAuth callback');
+  
+  // Close the in-app browser on iOS (it doesn't auto-close)
+  if (isNativePlatform()) {
+    try {
+      console.log('[SupabaseAuth] Closing in-app browser');
+      await Browser.close();
+    } catch (e) {
+      console.log('[SupabaseAuth] Browser close failed (may already be closed):', e);
+    }
+  }
   
   try {
     // Handle custom scheme URLs (com.fieldsnaps.app://...)
