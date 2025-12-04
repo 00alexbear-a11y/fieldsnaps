@@ -15,7 +15,6 @@ let deepLinkListenerRegistered = false;
 
 // Supabase project configuration
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-const SUPABASE_PROJECT_REF = SUPABASE_URL.replace('https://', '').replace('.supabase.co', '');
 
 export async function signInWithGoogle(): Promise<void> {
   console.log('[SupabaseAuth] Starting Google OAuth sign-in');
@@ -24,44 +23,30 @@ export async function signInWithGoogle(): Promise<void> {
   console.log('[SupabaseAuth] Platform check for OAuth, isNative:', isNative);
   
   // For native iOS/Android, use GenericOAuth2 with ASWebAuthenticationSession
-  // This is the proper iOS OAuth solution that handles URL scheme callbacks correctly
+  // This uses the proper iOS OAuth solution that handles URL scheme callbacks correctly
   if (isNative) {
     console.log('[SupabaseAuth] Using GenericOAuth2 with ASWebAuthenticationSession for native');
     
     try {
-      // Generate the Supabase OAuth URL first to get PKCE code verifier stored
-      const { data: oauthData, error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'com.fieldsnaps.app://auth/callback',
-          skipBrowserRedirect: true,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-      
-      if (oauthError || !oauthData.url) {
-        console.error('[SupabaseAuth] Error generating OAuth URL:', oauthError);
-        throw oauthError || new Error('No OAuth URL returned');
-      }
-      
-      console.log('[SupabaseAuth] Supabase OAuth URL generated');
-      console.log('[SupabaseAuth] Opening with GenericOAuth2 (ASWebAuthenticationSession)...');
-      
-      // Use GenericOAuth2 which uses ASWebAuthenticationSession on iOS
-      // This properly handles the custom URL scheme callback
+      // Use the generic-oauth2 plugin with Supabase's authorization endpoint
+      // The plugin will handle ASWebAuthenticationSession on iOS
       const result = await GenericOAuth2.authenticate({
-        authorizationBaseUrl: oauthData.url,
-        accessTokenEndpoint: '', // Not needed, we just want the redirect
         appId: 'com.fieldsnaps.app',
+        authorizationBaseUrl: `${SUPABASE_URL}/auth/v1/authorize`,
+        accessTokenEndpoint: `${SUPABASE_URL}/auth/v1/token`,
         responseType: 'code',
         scope: 'openid email profile',
-        pkceEnabled: false, // Supabase handles PKCE internally
+        pkceEnabled: true, // Plugin handles PKCE
+        logsEnabled: true,
+        additionalParameters: {
+          provider: 'google',
+          access_type: 'offline',
+          prompt: 'consent',
+        },
         web: {
+          appId: 'com.fieldsnaps.app',
           redirectUrl: `${window.location.origin}/auth/callback`,
-          windowOptions: 'height=600,left=0,top=0'
+          windowOptions: 'height=600,left=0,top=0',
         },
         ios: {
           appId: 'com.fieldsnaps.app',
@@ -75,15 +60,38 @@ export async function signInWithGoogle(): Promise<void> {
       
       console.log('[SupabaseAuth] GenericOAuth2 returned:', JSON.stringify(result));
       
-      // The result contains the authorization response URL
-      // Extract the code and exchange it for a session
+      // If we got tokens directly from the plugin
+      if (result.access_token && result.refresh_token) {
+        console.log('[SupabaseAuth] Setting session from OAuth2 tokens');
+        const { data, error } = await supabase.auth.setSession({
+          access_token: result.access_token,
+          refresh_token: result.refresh_token,
+        });
+        
+        if (error) {
+          console.error('[SupabaseAuth] Error setting session:', error);
+          throw error;
+        }
+        
+        console.log('[SupabaseAuth] Successfully authenticated user:', data.user?.id);
+        return;
+      }
+      
+      // If we got an authorization response URL with a code
       if (result.authorization_response) {
         const responseUrl = result.authorization_response;
         console.log('[SupabaseAuth] Authorization response URL:', responseUrl);
         
         // Parse the URL to extract the code
-        const urlParams = new URL(responseUrl.replace('com.fieldsnaps.app://', 'https://app/'));
-        const code = urlParams.searchParams.get('code');
+        let code: string | null = null;
+        try {
+          const urlParams = new URL(responseUrl.replace('com.fieldsnaps.app://', 'https://app/'));
+          code = urlParams.searchParams.get('code');
+        } catch (e) {
+          // Try parsing hash fragment
+          const hashParams = new URLSearchParams(responseUrl.split('#')[1] || '');
+          code = hashParams.get('code');
+        }
         
         if (code) {
           console.log('[SupabaseAuth] Found authorization code, exchanging for session...');
@@ -99,20 +107,13 @@ export async function signInWithGoogle(): Promise<void> {
         }
       }
       
-      // Also check for access_token directly in result
-      if (result.access_token) {
-        console.log('[SupabaseAuth] Found access token in result');
-        // Handle direct token response if present
-        return;
-      }
-      
-      console.log('[SupabaseAuth] No authorization code found in response');
+      console.log('[SupabaseAuth] No tokens or authorization code found in response');
       
     } catch (error: any) {
       console.error('[SupabaseAuth] GenericOAuth2 error:', error);
       
       // User cancelled the auth flow
-      if (error.message?.includes('cancelled') || error.message?.includes('canceled')) {
+      if (error.message?.includes('cancelled') || error.message?.includes('canceled') || error.message?.includes('USER_CANCELLED')) {
         console.log('[SupabaseAuth] User cancelled authentication');
         return;
       }
@@ -154,34 +155,22 @@ export async function signInWithApple(): Promise<void> {
     console.log('[SupabaseAuth] Using GenericOAuth2 with ASWebAuthenticationSession for Apple');
     
     try {
-      // Generate the Supabase Apple OAuth URL first
-      const { data: oauthData, error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: 'com.fieldsnaps.app://auth/callback',
-          skipBrowserRedirect: true,
-        },
-      });
-      
-      if (oauthError || !oauthData.url) {
-        console.error('[SupabaseAuth] Error generating Apple OAuth URL:', oauthError);
-        throw oauthError || new Error('No OAuth URL returned');
-      }
-      
-      console.log('[SupabaseAuth] Supabase Apple OAuth URL generated');
-      console.log('[SupabaseAuth] Opening with GenericOAuth2 (ASWebAuthenticationSession)...');
-      
-      // Use GenericOAuth2 which uses ASWebAuthenticationSession on iOS
+      // Use the generic-oauth2 plugin with Supabase's authorization endpoint for Apple
       const result = await GenericOAuth2.authenticate({
-        authorizationBaseUrl: oauthData.url,
-        accessTokenEndpoint: '',
         appId: 'com.fieldsnaps.app',
+        authorizationBaseUrl: `${SUPABASE_URL}/auth/v1/authorize`,
+        accessTokenEndpoint: `${SUPABASE_URL}/auth/v1/token`,
         responseType: 'code',
         scope: 'openid email name',
-        pkceEnabled: false,
+        pkceEnabled: true,
+        logsEnabled: true,
+        additionalParameters: {
+          provider: 'apple',
+        },
         web: {
+          appId: 'com.fieldsnaps.app',
           redirectUrl: `${window.location.origin}/auth/callback`,
-          windowOptions: 'height=600,left=0,top=0'
+          windowOptions: 'height=600,left=0,top=0',
         },
         ios: {
           appId: 'com.fieldsnaps.app',
@@ -195,13 +184,36 @@ export async function signInWithApple(): Promise<void> {
       
       console.log('[SupabaseAuth] GenericOAuth2 Apple returned:', JSON.stringify(result));
       
-      // Extract the code and exchange it for a session
+      // If we got tokens directly from the plugin
+      if (result.access_token && result.refresh_token) {
+        console.log('[SupabaseAuth] Setting Apple session from OAuth2 tokens');
+        const { data, error } = await supabase.auth.setSession({
+          access_token: result.access_token,
+          refresh_token: result.refresh_token,
+        });
+        
+        if (error) {
+          console.error('[SupabaseAuth] Error setting Apple session:', error);
+          throw error;
+        }
+        
+        console.log('[SupabaseAuth] Successfully authenticated Apple user:', data.user?.id);
+        return;
+      }
+      
+      // If we got an authorization response URL with a code
       if (result.authorization_response) {
         const responseUrl = result.authorization_response;
         console.log('[SupabaseAuth] Apple authorization response URL:', responseUrl);
         
-        const urlParams = new URL(responseUrl.replace('com.fieldsnaps.app://', 'https://app/'));
-        const code = urlParams.searchParams.get('code');
+        let code: string | null = null;
+        try {
+          const urlParams = new URL(responseUrl.replace('com.fieldsnaps.app://', 'https://app/'));
+          code = urlParams.searchParams.get('code');
+        } catch (e) {
+          const hashParams = new URLSearchParams(responseUrl.split('#')[1] || '');
+          code = hashParams.get('code');
+        }
         
         if (code) {
           console.log('[SupabaseAuth] Found Apple authorization code, exchanging for session...');
@@ -217,12 +229,12 @@ export async function signInWithApple(): Promise<void> {
         }
       }
       
-      console.log('[SupabaseAuth] No authorization code found in Apple response');
+      console.log('[SupabaseAuth] No tokens or authorization code found in Apple response');
       
     } catch (error: any) {
       console.error('[SupabaseAuth] Apple GenericOAuth2 error:', error);
       
-      if (error.message?.includes('cancelled') || error.message?.includes('canceled')) {
+      if (error.message?.includes('cancelled') || error.message?.includes('canceled') || error.message?.includes('USER_CANCELLED')) {
         console.log('[SupabaseAuth] User cancelled Apple authentication');
         return;
       }
