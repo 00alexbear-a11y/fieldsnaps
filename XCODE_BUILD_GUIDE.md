@@ -157,38 +157,17 @@ The app uses native SDKs for Google and Apple Sign-In on iOS, then passes ID tok
 
 ### 8.1 Google Sign-In Setup (REQUIRED)
 
-1. **Get Google OAuth Client IDs** from Google Cloud Console:
-   - Go to: https://console.cloud.google.com/apis/credentials
-   - You need TWO OAuth 2.0 Client IDs:
-     - **Web application** - Already configured: `757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com`
-     - **iOS** - Create new one with Bundle ID: `com.fieldsnaps.app`
-   
-2. **Create iOS OAuth Client ID** (if not already done):
-   - In Google Cloud Console, click "+ CREATE CREDENTIALS" > "OAuth client ID"
-   - Application type: "iOS"
+1. **Google OAuth Client IDs** (already configured):
+   - **Web Client ID**: `757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com`
+   - **iOS Client ID**: `757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac.apps.googleusercontent.com`
    - Bundle ID: `com.fieldsnaps.app`
-   - App Store ID: (leave empty for now)
    - Team ID: `9739WWYHQ6`
-   - Click "Create"
-   - Note the iOS Client ID (format: `XXXX.apps.googleusercontent.com`)
 
-3. **Add iOS URL Scheme** to `ios/App/App/Info.plist`:
-   - In Google Cloud Console, click on your iOS OAuth client
-   - Copy the "iOS URL scheme" (format: `com.googleusercontent.apps.YOUR_IOS_CLIENT_ID`)
-   - Add to Info.plist inside `CFBundleURLTypes` array (after the existing `com.fieldsnaps.app` scheme):
-   
-   ```xml
-   <dict>
-       <key>CFBundleURLName</key>
-       <string>google-signin</string>
-       <key>CFBundleURLSchemes</key>
-       <array>
-           <string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID</string>
-       </array>
-   </dict>
-   ```
+2. **iOS URL Scheme** (already configured in Info.plist):
+   - Reversed Client ID: `com.googleusercontent.apps.757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac`
+   - This is already added to `ios/App/App/Info.plist` - no action needed
 
-4. **Web Client ID** is already configured:
+3. **Web Client ID** is already configured:
    - Environment variable `VITE_GOOGLE_WEB_CLIENT_ID` is set in Replit
    - When building locally, export it: `export VITE_GOOGLE_WEB_CLIENT_ID="757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com"`
 
