@@ -11,7 +11,7 @@ import { Capacitor } from '@capacitor/core';
 
 // Enable dev login in native builds (iOS/Android) for local testing
 // Set to false before production deployment
-const ENABLE_DEV_LOGIN_IN_NATIVE = true;
+const ENABLE_DEV_LOGIN_IN_NATIVE = false;
 
 // Check if we're in development mode OR in a native app with dev login enabled
 export const isDevModeEnabled = (): boolean => {
