@@ -159,18 +159,23 @@ The app uses native SDKs for Google and Apple Sign-In on iOS, then passes ID tok
 
 1. **Get Google OAuth Client IDs** from Google Cloud Console:
    - Go to: https://console.cloud.google.com/apis/credentials
-   - Create OAuth 2.0 Client ID for "Web application" (this is your Web Client ID)
-   - Create OAuth 2.0 Client ID for "iOS" (set Bundle ID: `com.fieldsnaps.app`)
+   - You need TWO OAuth 2.0 Client IDs:
+     - **Web application** - Already configured: `757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com`
+     - **iOS** - Create new one with Bundle ID: `com.fieldsnaps.app`
    
-2. **Add Web Client ID to environment variables** (in Step 1):
-   ```bash
-   export VITE_GOOGLE_WEB_CLIENT_ID="your-web-client-id.apps.googleusercontent.com"
-   ```
+2. **Create iOS OAuth Client ID** (if not already done):
+   - In Google Cloud Console, click "+ CREATE CREDENTIALS" > "OAuth client ID"
+   - Application type: "iOS"
+   - Bundle ID: `com.fieldsnaps.app`
+   - App Store ID: (leave empty for now)
+   - Team ID: `9739WWYHQ6`
+   - Click "Create"
+   - Note the iOS Client ID (format: `XXXX.apps.googleusercontent.com`)
 
 3. **Add iOS URL Scheme** to `ios/App/App/Info.plist`:
    - In Google Cloud Console, click on your iOS OAuth client
-   - Copy the "iOS URL scheme" (format: `com.googleusercontent.apps.YOUR_CLIENT_ID`)
-   - Add to Info.plist inside `CFBundleURLTypes`:
+   - Copy the "iOS URL scheme" (format: `com.googleusercontent.apps.YOUR_IOS_CLIENT_ID`)
+   - Add to Info.plist inside `CFBundleURLTypes` array (after the existing `com.fieldsnaps.app` scheme):
    
    ```xml
    <dict>
@@ -183,10 +188,14 @@ The app uses native SDKs for Google and Apple Sign-In on iOS, then passes ID tok
    </dict>
    ```
 
-4. **Verify Supabase Configuration**:
+4. **Web Client ID** is already configured:
+   - Environment variable `VITE_GOOGLE_WEB_CLIENT_ID` is set in Replit
+   - When building locally, export it: `export VITE_GOOGLE_WEB_CLIENT_ID="757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com"`
+
+5. **Verify Supabase Configuration**:
    - Go to Supabase Dashboard > Authentication > Providers > Google
    - Ensure the Web Client ID and Secret are configured
-   - Enable "Use native sign-in on iOS" option if available
+   - The same Web Client ID should be used in both Supabase and the app
 
 ### 8.2 Apple Sign-In Setup (REQUIRED)
 
