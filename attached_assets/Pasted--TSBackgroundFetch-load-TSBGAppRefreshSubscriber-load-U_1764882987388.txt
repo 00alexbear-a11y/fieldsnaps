@@ -1,0 +1,282 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/3B1B6C2E-D284-44ED-B6D9-337675364E5F/App.app'
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11ccdc690 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4631e9a6-c93d-4deb-a3ee-4b03c008f993
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+WebContent[82443] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  [log] - [App] Platform: ios
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 49998429
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  WebView loaded
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","status":"success","version":"builtin","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 49998430
+⚡️  To Native ->  CapacitorUpdater addListener 49998431
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 49998432
+⚡️  To Native ->  CapacitorUpdater current 49998433
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"version":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","status":"success","id":"builtin"},"native":"1.0"}
+⚡️  [log] - [Capgo] Current bundle: {"version":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","status":"success","id":"builtin"}
+⚡️  To Native ->  App addListener 49998434
+⚡️  To Native ->  App addListener 49998435
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  StatusBar setOverlaysWebView 49998436
+⚡️  To Native ->  StatusBar setStyle ⚡️  TO JS 49998437
+undefined
+⚡️  TO JS {}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  To Native ->  SecureStorage internalGetItem 49998438
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 49998439
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  To Native ->  SecureStorage internalRemoveItem 49998440
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 49998441
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 49998442
+⚡️  TO JS undefined
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  TO JS {"isActive":false}
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x12251c690 V:|-(7)-[TUIKeyboardContentView:0x12244ebc0]   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c6e0 V:[TUIKeyboardContentView:0x12244ebc0]-(12)-|   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c190 V:|-(0)-[TUIKeyplaneView:0x11ccf7400]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c230 V:[TUIKeyplaneView:0x11ccf7400]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c2d0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x12251c370 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x1225b09b0 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x11ccf5c00.height == 241   (active)>",
+    "<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 8A1397F0-D6F4-4B5A-A6C9-FA0457AF72DA
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  Can only perform input operation for an active session. sessionID = 8A1397F0-D6F4-4B5A-A6C9-FA0457AF72DA
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  TO JS {"isActive":true}
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  Can only perform input operation for an active session. sessionID = 8A1397F0-D6F4-4B5A-A6C9-FA0457AF72DA
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 8A1397F0-D6F4-4B5A-A6C9-FA0457AF72DA
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto update is disabled
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 10000 ms, then check for notifyAppReady
+⚡️  [log] - [App] State changed. Active: true
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x12251c690 V:|-(7)-[TUIKeyboardContentView:0x12244ebc0]   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c6e0 V:[TUIKeyboardContentView:0x12244ebc0]-(12)-|   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c190 V:|-(0)-[TUIKeyplaneView:0x11ccf7400]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c230 V:[TUIKeyplaneView:0x11ccf7400]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c2d0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x12251c370 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x12251d310 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x11ccf5c00.height == 241   (active)>",
+    "<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x12251c690 V:|-(7)-[TUIKeyboardContentView:0x12244ebc0]   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c6e0 V:[TUIKeyboardContentView:0x12244ebc0]-(12)-|   (active, names: '|':TUIKeyplaneView:0x11ccf7400 )>",
+    "<NSLayoutConstraint:0x12251c190 V:|-(0)-[TUIKeyplaneView:0x11ccf7400]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c230 V:[TUIKeyplaneView:0x11ccf7400]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardLayoutStar Prev...:0x10e3cea00 )>",
+    "<NSLayoutConstraint:0x12251c2d0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x12251c370 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3cea00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x122447110 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x11ccf5c00.height == 241   (active)>",
+    "<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x12251c870 'TUIKeyplane.height' TUIKeyboardContentView:0x12244ebc0.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  TO JS {"isActive":false}
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  TO JS {"isActive":true}
+UITextInputSessionActionAnalytics is nil
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto update is disabled
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 10000 ms, then check for notifyAppReady
+⚡️  [log] - [App] State changed. Active: true
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+Result accumulator timeout: 3.000000, exceeded.
+⚡️  TO JS {"isActive":false}
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+WebContent[82443] 0x600000162004100 - [sessionID=1] WebProcess::markAllLayersVolatile: Failed to mark layers as volatile for webPageID=8
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x1226d2a30 V:|-(7)-[TUIKeyboardContentView:0x12267b9c0]   (active, names: '|':TUIKeyplaneView:0x11ccf6c00 )>",
+    "<NSLayoutConstraint:0x1226d2a80 V:[TUIKeyboardContentView:0x12267b9c0]-(12)-|   (active, names: '|':TUIKeyplaneView:0x11ccf6c00 )>",
+    "<NSLayoutConstraint:0x1226d23a0 V:|-(0)-[TUIKeyplaneView:0x11ccf6c00]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardLayoutStar Prev...:0x10e3ccc00 )>",
+    "<NSLayoutConstraint:0x1226d1450 V:[TUIKeyplaneView:0x11ccf6c00]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardLayoutStar Prev...:0x10e3ccc00 )>",
+    "<NSLayoutConstraint:0x1226d12c0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x1226d14f0 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x10e3c9fe0 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x11ccf5c00.height == 241   (active)>",
+    "<NSLayoutConstraint:0x1226d2c10 'TUIKeyplane.height' TUIKeyboardContentView:0x12267b9c0.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x1226d2c10 'TUIKeyplane.height' TUIKeyboardContentView:0x12267b9c0.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 8F4EED24-73E5-484A-B180-5E039C985A18
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  TO JS {"isActive":true}
+Unable to simultaneously satisfy constraints.
+	Probably at least one of the constraints in the following list is one you don't want. 
+	Try this: 
+		(1) look at each constraint and try to figure out which you don't expect; 
+		(2) find the code that added the unwanted constraint or constraints and fix it. 
+(
+    "<NSLayoutConstraint:0x1226d2a30 V:|-(7)-[TUIKeyboardContentView:0x12267b9c0]   (active, names: '|':TUIKeyplaneView:0x11ccf6c00 )>",
+    "<NSLayoutConstraint:0x1226d2a80 V:[TUIKeyboardContentView:0x12267b9c0]-(12)-|   (active, names: '|':TUIKeyplaneView:0x11ccf6c00 )>",
+    "<NSLayoutConstraint:0x1226d23a0 V:|-(0)-[TUIKeyplaneView:0x11ccf6c00]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardLayoutStar Prev...:0x10e3ccc00 )>",
+    "<NSLayoutConstraint:0x1226d1450 V:[TUIKeyplaneView:0x11ccf6c00]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardLayoutStar Prev...:0x10e3ccc00 )>",
+    "<NSLayoutConstraint:0x1226d12c0 V:|-(0)-[UIKeyboardLayoutStar Prev...]   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x1226d14f0 V:[UIKeyboardLayoutStar Prev...]-(0)-|   (active, names: UIKeyboardLayoutStar Prev...:0x10e3ccc00, '|':UIKeyboardImpl:0x11ccf5c00 )>",
+    "<NSLayoutConstraint:0x1226d18b0 '_UITemporaryLayoutHeight' UIKeyboardImpl:0x11ccf5c00.height == 241   (active)>",
+    "<NSLayoutConstraint:0x1226d2c10 'TUIKeyplane.height' TUIKeyboardContentView:0x12267b9c0.height == 224   (active)>"
+)
+
+Will attempt to recover by breaking constraint 
+<NSLayoutConstraint:0x1226d2c10 'TUIKeyplane.height' TUIKeyboardContentView:0x12267b9c0.height == 224   (active)>
+
+Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger.
+The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful.
+unable to decode "ShellSceneKit.ProfileActivation" because this class does not exist
+-[BSSettings initWithXPCDictionary:]_block_invoke Could not decode object for setting 17456962218540468756
+No value decoded for key "profileActivation" (17456962218540468756). Ignoring.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto update is disabled
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 10000 ms, then check for notifyAppReady
+⚡️  [log] - [App] State changed. Active: true
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 10000ms
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 10000ms
+⚡️  [log] - [Login] 🚀 Starting OAuth authentication
+⚡️  [log] - [Native OAuth] 🚀 Starting PKCE OAuth flow
+⚡️  [log] - [Native OAuth] 📞 Calling /api/native/oauth/start
+⚡️  To Native ->  CapacitorHttp request 49998443
+⚡️  TO JS {"data":"<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" \/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover\" \/>\n    <meta name=\"theme-color\" content=\"#FFFFF
+⚡️  [error] - [Login] ❌ Authentication failed: {"line":573,"column":8856,"sourceURL":"capacitor://localhost/assets/index-Dx9LQ7oJ.js"}
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
