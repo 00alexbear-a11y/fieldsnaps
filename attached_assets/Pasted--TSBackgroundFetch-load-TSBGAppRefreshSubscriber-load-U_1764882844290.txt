@@ -1,0 +1,85 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/DB1D1202-5868-4AD4-BAC4-8A24A0E81097/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4631e9a6-c93d-4deb-a3ee-4b03c008f993
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11a16c030 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+KeyboardPlugin: resize mode - native
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[82424] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 5805137
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","version":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 5805138
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 5805139
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 5805140
+⚡️  To Native ->  CapacitorUpdater current 5805141
+⚡️  TO JS {"native":"1.0","bundle":{"status":"success","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin"}}
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin"}
+⚡️  To Native ->  App addListener 5805142
+⚡️  To Native ->  App addListener 5805143
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  StatusBar setOverlaysWebView 5805144
+⚡️  To Native ->  StatusBar setStyle 5805145
+⚡️  To Native ->  SecureStorage internalGetItem 5805146
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  SecureStorage internalGetItem 5805147
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  To Native ->  SecureStorage internalRemoveItem 5805148
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 5805149
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 5805150
+⚡️  TO JS undefined
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+⚡️  [log] - [Login] 🚀 Starting OAuth authentication
+⚡️  [log] - [Native OAuth] 🚀 Starting PKCE OAuth flow
+⚡️  [log] - [Native OAuth] 📞 Calling /api/native/oauth/start
+⚡️  To Native ->  CapacitorHttp request 5805151
+⚡️  TO JS {"url":"https:\/\/fieldsnaps.replit.app\/api\/native\/oauth\/start","data":"<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" \/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1, viewpo
+⚡️  [error] - [Login] ❌ Authentication failed: {"line":573,"column":8856,"sourceURL":"capacitor://localhost/assets/index-Dx9LQ7oJ.js"}
