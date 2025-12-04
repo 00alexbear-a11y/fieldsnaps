@@ -66,8 +66,8 @@ export default function AuthCallback() {
           console.log('[AuthCallback] Found existing session');
         }
         
-        console.log('[AuthCallback] Redirecting to home');
-        setLocation('/');
+        console.log('[AuthCallback] Redirecting to projects');
+        setLocation('/projects');
       } catch (err) {
         console.error('[AuthCallback] Unexpected error:', err);
         setError('An unexpected error occurred. Please try again.');
