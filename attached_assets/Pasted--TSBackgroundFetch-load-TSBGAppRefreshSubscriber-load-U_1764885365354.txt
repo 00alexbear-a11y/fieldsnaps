@@ -1,0 +1,179 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/87FA5B7F-13D6-4124-BA6B-F50B730ACE96/App.app'
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4631e9a6-c93d-4deb-a3ee-4b03c008f993
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x12acd5170 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[82735] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 49092057
+⚡️  [log] - [App] Is Native: true
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"version":"builtin","status":"success","id":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  WebView loaded
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 49092058
+⚡️  To Native ->  CapacitorUpdater addListener 49092059
+⚡️  To Native ->  CapacitorUpdater addListener 49092060
+⚡️  To Native ->  CapacitorUpdater current 49092061
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"native":"1.0","bundle":{"id":"builtin","version":"builtin","status":"success","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  To Native ->  App addListener 49092062
+⚡️  To Native ->  App addListener 49092063
+⚡️  [log] - [Capgo] Current bundle: {"id":"builtin","version":"builtin","status":"success","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 49092064
+⚡️  To Native ->  App addListener 49092065
+⚡️  To Native ->  StatusBar setOverlaysWebView 49092066
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setStyle 49092067
+⚡️  To Native ->  SecureStorage internalGetItem 49092068
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  TO JS {"data":"\"\\\"df818526063fdb726e7ceab01d6aefbb5d1b6e08636b2e565796d54fce15490d0735a734df15027d254668e07adfa5b7e83cf5c4ebf77df8\\\"\""}
+⚡️  To Native ->  SecureStorage internalGetItem 49092069
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 49092070
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 49092071
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  To Native ->  SecureStorage internalGetItem 49092072
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  To Native ->  SecureStorage internalGetItem 49092073
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 49092074
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 49092075
+⚡️  To Native ->  SecureStorage internalGetItem 49092076
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  SecureStorage internalGetItem 49092077
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  To Native ->  SecureStorage internalRemoveItem 49092078
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 49092079
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 49092080
+⚡️  TO JS undefined
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Redirect URL: com.fieldsnaps.app://auth/callback
+⚡️  To Native ->  SecureStorage internalSetItem 49092081
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] OAuth initiated, URL: https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/authorize?provider=google&redirect_to=com.fieldsnaps.app%3A%2F%2Fauth%2Fcallback&code_challenge=-t3YPsJkh7I3dpus0figayUieXnX4GNtw6mIluxhl7E&code_challenge_method=s256&access_type=offline&prompt=consent
+unable to make sandbox extension: [2: No such file or directory]
+1   0x1a5454584 0   WebKit                              0x00000001a5454584 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 11171204
+2   0x1a50d437c 1   WebKit                              0x00000001a50d437c F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 7500668
+3   0x104395ed4 $sSo24WKNavigationActionPolicyVIeyBy_ABIegy_TR
+4   0x1043959f4 $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctF
+5   0x104395e6c $s9Capacitor24WebViewDelegationHandlerC03webC0_15decidePolicyFor08decisionE0ySo05WKWebC0C_So18WKNavigationActionCySo0lmH0VctFTo
+6   0x1a50bad7c 5   WebKit                              0x00000001a50bad7c F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 7396732
+7   0x1a548a51c 6   WebKit                              0x00000001a548a51c F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 11392284
+8   0x1a5488790 7   WebKit                              0x00000001a5488790 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 11384720
+9   0x1a4f2ab8c 8   WebKit                              0x00000001a4f2ab8c F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 5757836
+10  0x1a5b21f90 9   WebKit                              0x00000001a5b21f90 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 18304912
+11  0x1a5507334 10  WebKit                              0x00000001a5507334 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 11903796
+12  0x1a4a420c8 11  WebKit                              0x00000001a4a420c8 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 610504
+13  0x1a4a2fc48 12  WebKit                              0x00000001a4a2fc48 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 535624
+14  0x1a4a3fb40 13  WebKit                              0x00000001a4a3fb40 F2321104-8C05-34EF-BB9E-5F9FCEAB779B + 600896
+15  0x19f56f16c 14  JavaScriptCore                      0x000000019f56f16c 9E1FE0BC-E8D2-3653-A93C-B2ADCC9EF055 + 1663340
+16  0x19f56ef24 15  JavaScriptCore                      0x000000019f56ef24 9E1FE0BC-E8D2-3653-A93C-B2ADCC9EF055 + 1662756
+17  0x18a5cef24 16  CoreFoundation                      0x000000018a5cef24 B4A0233B-F37D-3EF6-A977-E4F36199C5A4 + 429860
+18  0x18a5cee98 17  CoreFoundation                      0x000000018a5cee98 B4A0233B-F37D-3EF6-A977-E4F36199C5A4 + 429720
+19  0x18a5acacc 18  CoreFoundation                      0x000000018a5acacc B4A0233B-F37D-3EF6-A977-E4F36199C5A4 + 289484
+20  0x18a5836d8 19  CoreFoundation                      0x000000018a5836d8 B4A0233B-F37D-3EF6-A977-E4F36199C5A4 + 120536
+21  0x18a582a6c 20  CoreFoundation                      0x000000018a582a6c B4A0233B-F37D-3EF6-A977-E4F36199C5A4 + 117356
+22  0x22b1ac498 GSEventRunModal
+23  0x18ff46ba4 22  UIKitCore                           0x000000018ff46ba4 A0E1CEFB-FD01-36F9-B823-51B092E4DBC6 + 646052
+24  0x18feefa78 UIApplicationMain
+25  0x103aad20c __debug_main_executable_dylib_entry_point
+26  0x18759ae28 25  dyld                                0x000000018759ae28 EF27E386-3CFF-3752-B152-D96A0AA9EFFD + 20008
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  TO JS {"iosOpenInPlace":"","url":"com.fieldsnaps.app:\/\/auth\/callback?code=c7982006-c3ba-47a3-a08f-89bee10ab0d4","iosSourceApplication":""}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto update is disabled
+⚡️  To Native ->  SecureStorage internalGetItem 49092082
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 10000 ms, then check for notifyAppReady
+⚡️  [log] - [SupabaseAuth] App opened with URL: com.fieldsnaps.app://auth/callback?code=c7982006-c3ba-47a3-a08f-89bee10ab0d4
+⚡️  [log] - [SupabaseAuth] Processing potential OAuth callback: com.fieldsnaps.app://auth/callback?code=c7982006-c3ba-47a3-a08f-89bee10ab0d4
+⚡️  [log] - [SupabaseAuth] Processing OAuth callback
+⚡️  [log] - [SupabaseAuth] Found authorization code, exchanging for session
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 49092083
+⚡️  TO JS {"data":"\"\\\"ad3a3dc9d2a4399c84468e5f069fa4c74f34d877abb575d369434a8f677f01229b3a2b70cb619911cedbde6fbadaf8a21bdaa95f46bc72cb\\\"\""}
+⚡️  To Native ->  CapacitorHttp request 49092084
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  TO JS {"data":{"hint":"Double check your Supabase `anon` or `service_role` API key.","message":"Invalid API key"},"headers":{"content-type":"application\/json;charset=UTF-8","x-content-type-options":"nosniff","access-control-allow-methods":"GET,HEAD,PUT,PATCH,PO
+⚡️  [error] - [SupabaseAuth] Error exchanging code: {"__isAuthError":true,"name":"AuthApiError","status":401}
+⚡️  [error] - [SupabaseAuth] Error processing OAuth callback: {"__isAuthError":true,"name":"AuthApiError","status":401}
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 10000ms
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
