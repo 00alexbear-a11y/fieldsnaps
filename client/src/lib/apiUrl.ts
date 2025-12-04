@@ -4,12 +4,14 @@ import { Capacitor } from '@capacitor/core';
  * Get the base API URL based on the platform
  * - Web: Uses relative URLs (same server)
  * - Native: Uses production server URL
+ * 
+ * IMPORTANT: Update PRODUCTION_URL before deploying to production
  */
+const PRODUCTION_URL = import.meta.env.VITE_API_URL || 'https://fieldsnaps.com';
+
 export function getApiBaseUrl(): string {
-  // Check if running in native app
   if (Capacitor.isNativePlatform()) {
-    // Use production server for native apps
-    return 'https://fieldsnaps.replit.app';
+    return PRODUCTION_URL;
   }
   
   // Web uses relative URLs (same server)

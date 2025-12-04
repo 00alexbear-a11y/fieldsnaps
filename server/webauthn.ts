@@ -8,7 +8,7 @@ import {
   type VerifiedAuthenticationResponse,
 } from "@simplewebauthn/server";
 import { storage } from "./storage";
-import { isAuthenticated } from "./replitAuth";
+import { isAuthenticated } from "./auth";
 
 declare module 'express-session' {
   interface SessionData {
@@ -17,8 +17,8 @@ declare module 'express-session' {
   }
 }
 
-const rpName = "Construction Photo PWA";
-const rpID = process.env.REPLIT_DOMAINS?.split(",")[0] || "localhost";
+const rpName = "FieldSnaps";
+const rpID = process.env.APP_DOMAIN || "fieldsnaps.com";
 const origin = process.env.NODE_ENV === 'production' 
   ? `https://${rpID}` 
   : `http://localhost:5000`;

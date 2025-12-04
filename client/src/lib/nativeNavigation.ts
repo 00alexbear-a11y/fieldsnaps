@@ -10,13 +10,13 @@ import { Capacitor } from '@capacitor/core';
 /**
  * Server URL for native builds
  * 
- * IMPORTANT: Update this before building for production!
- * - Development: Your Replit dev server URL
- * - Production: Your production server URL (e.g., https://fieldsnaps.com)
+ * IMPORTANT: Update VITE_API_URL environment variable for different environments
+ * - Development: Set to your dev server URL
+ * - Production: Set to https://fieldsnaps.com
  * 
  * This MUST match the server.url in your capacitor.config files.
  */
-const SERVER_URL = 'https://b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1nc5d7i5pn8nb.picard.replit.dev';
+const SERVER_URL = import.meta.env.VITE_API_URL || 'https://fieldsnaps.com';
 
 /**
  * Get the base server URL
