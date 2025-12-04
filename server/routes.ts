@@ -4421,9 +4421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const teamSize = members.length;
 
       // Build success and cancel URLs
-      const baseUrl = process.env.REPLIT_DEPLOYMENT ? 
-        `https://${process.env.REPLIT_DEPLOYMENT}` : 
-        `http://localhost:5000`;
+      const baseUrl = process.env.APP_URL || 'http://localhost:5000';
       const successUrl = `${baseUrl}/billing/success`;
       const cancelUrl = `${baseUrl}/settings`;
 
@@ -4459,9 +4457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Build return URL
-      const baseUrl = process.env.REPLIT_DEPLOYMENT ? 
-        `https://${process.env.REPLIT_DEPLOYMENT}` : 
-        `http://localhost:5000`;
+      const baseUrl = process.env.APP_URL || 'http://localhost:5000';
       const returnUrl = `${baseUrl}/settings`;
 
       // Create portal session

@@ -32,19 +32,17 @@ export const corsConfig = cors({
       }
       
       // Allow production domains
-      // In production, allow any .replit.app domain and .repl.co domains
       if (process.env.NODE_ENV === 'production') {
-        if (url.hostname.endsWith('.replit.app') || 
-            url.hostname.endsWith('.repl.co') ||
-            url.hostname === 'fieldsnaps.replit.app') {
+        if (url.hostname === 'fieldsnaps.com' || 
+            url.hostname.endsWith('.fieldsnaps.com')) {
           return callback(null, true);
         }
       }
       
-      // Also check specific allowed origins for backwards compatibility
+      // Also check specific allowed origins from environment
       const allowedOrigins = [
-        'https://fieldsnaps.replit.app',
-        process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null,
+        'https://fieldsnaps.com',
+        process.env.APP_URL,
       ].filter(Boolean);
       
       if (allowedOrigins.includes(origin)) {
@@ -96,7 +94,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind + Google Fonts
     "img-src 'self' data: blob: https: https://*.googleapis.com https://*.gstatic.com", // Google Maps tiles
     "font-src 'self' data: https://fonts.gstatic.com",
-    "connect-src 'self' https://*.replit.app https://*.repl.co https://api.stripe.com https://maps.googleapis.com https://*.supabase.co",
+    "connect-src 'self' https://*.fieldsnaps.com https://api.stripe.com https://maps.googleapis.com https://*.supabase.co https://*.googleapis.com",
     "media-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
