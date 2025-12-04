@@ -12,6 +12,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const SUPABASE_AUTH_KEY = 'supabase.auth.token';
 let cachedSession: string | null = null;
 
+// Use getPlatform() which is more reliable than isNativePlatform()
+// isNativePlatform() can return false on iOS in some edge cases
+function checkIsNative(): boolean {
+  try {
+    const platform = Capacitor.getPlatform();
+    const isNative = platform !== 'web';
+    console.log(`[Supabase] Platform check: ${platform}, isNative: ${isNative}`);
+    return isNative;
+  } catch (e) {
+    console.log('[Supabase] Platform check failed, assuming web');
+    return false;
+  }
+}
+
 async function getFromSecureStorage(key: string): Promise<string | null> {
   try {
     const result = await SecureStorage.get(key);
@@ -65,7 +79,8 @@ async function removeFromSecureStorage(key: string): Promise<void> {
   }
 }
 
-const isNative = Capacitor.isNativePlatform();
+// Call checkIsNative() at module load time for storage selection
+const isNative = checkIsNative();
 
 export const supabase = createClient(
   supabaseUrl || '',
@@ -122,12 +137,24 @@ export const supabase = createClient(
 );
 
 export function getRedirectUrl(): string {
-  if (Capacitor.isNativePlatform()) {
-    return 'com.fieldsnaps.app://auth/callback';
+  // Use getPlatform() which is more reliable than isNativePlatform()
+  try {
+    const platform = Capacitor.getPlatform();
+    if (platform !== 'web') {
+      return 'com.fieldsnaps.app://auth/callback';
+    }
+  } catch (e) {
+    // Fall through to web redirect
   }
   return `${window.location.origin}/auth/callback`;
 }
 
 export function isNativePlatform(): boolean {
-  return Capacitor.isNativePlatform();
+  // Use getPlatform() which is more reliable than isNativePlatform()
+  try {
+    const platform = Capacitor.getPlatform();
+    return platform !== 'web';
+  } catch (e) {
+    return false;
+  }
 }
