@@ -26,6 +26,16 @@ FieldSnaps is an offline-first PWA utilizing Service Workers, IndexedDB, and the
 ### System Design Choices
 The architecture prioritizes simplicity and an invisible interface. A Service Worker handles hourly updates and offline caching. Storage uses IndexedDB for Blobs, intelligent quota management, and automatic thumbnail cleanup. Performance is optimized through database indexing, query optimization, code-splitting, and virtualization. The offline sync system includes queue limits, exponential backoff, atomic deduplication, and persistent failed sync items. Global error notifications are managed via TanStack Query. Production readiness includes React Error Boundaries, consistent empty states, haptic feedback, and robust security headers. Backend optimizations focus on compression, field filtering, upload resilience, per-user rate limiting, and a 3-tier upload system. Critical edge cases like phone dying while clocked in, overlapping geofences, and low GPS accuracy are handled. An iOS-optimized keyboard management solution auto-scrolls inputs into view.
 
+### Time Tracking Safety Features (December 2024)
+- **Server-side auto-close**: Scheduled job runs every 5 minutes to detect stale sessions
+  - Respects per-company `staleSessionTimeoutMinutes` (default 30 min)
+  - Respects per-company `maxShiftHours` (default 12 hours)
+  - Creates auto clock-out entries with reason (max_shift or stale_heartbeat)
+  - Marks original clock-in with `autoClosedAt` and `autoCloseReason`
+- **Heartbeat tracking**: `lastHeartbeat` field on clock entries tracks device connectivity
+- **Admin visibility**: Admin timesheets show "Last seen" for active workers and "Auto-closed" badge for auto-closed entries
+- **Background tracking**: stopOnTerminate=false ensures tracking continues when app is closed
+
 ## External Dependencies
 
 ### Frontend
