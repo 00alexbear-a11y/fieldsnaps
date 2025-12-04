@@ -61,19 +61,21 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 
 ### Authentication
 - **Supabase Auth**: Primary authentication provider with Google OAuth, Apple Sign-In, and email/password
-  - PKCE flow for secure mobile OAuth
+  - **Native SDK Authentication (iOS)**: Uses @capgo/capacitor-social-login for native Google/Apple SDKs
+  - ID tokens from native SDKs passed to Supabase via `signInWithIdToken()`
   - SecureStorage for native iOS token persistence
   - Auto-refresh and offline session caching
-  - Deep link handling for OAuth callbacks (com.fieldsnaps.app://auth/callback)
+  - Web flow uses standard Supabase OAuth redirect
 - **Replit Auth**: Legacy authentication (dual auth support during transition)
 - **SimpleWebAuthn**: WebAuthn/FIDO2 biometric authentication
 
 ### Supabase Auth Configuration
 
 #### Current Status (December 2024)
-- **Google OAuth**: Fully configured and tested
-- **Apple Sign-In**: Fully configured and tested (web + iOS native)
+- **Google OAuth**: Native SDK on iOS + web OAuth fallback
+- **Apple Sign-In**: Native SDK on iOS + web OAuth fallback  
 - **Session Persistence**: Working - tokens survive page refresh
+- **Auth Flow**: Native iOS uses signInWithIdToken(), web uses OAuth redirect
 
 #### Provider Configuration
 **Google OAuth** (Supabase → Authentication → Providers → Google):
@@ -132,6 +134,7 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **@transistorsoft/capacitor-background-geolocation**: Battery-optimized background location tracking and geofencing
 - **@transistorsoft/capacitor-background-fetch**: Background task scheduling for location sync
 - **@capacitor-community/speech-recognition**: Native speech recognition
+- **@capgo/capacitor-social-login**: Native Google/Apple Sign-In SDKs for iOS authentication
 
 ### Third-Party APIs & Payment Processing
 - **Google Geocoding API**: Address to coordinates conversion

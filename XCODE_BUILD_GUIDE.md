@@ -23,6 +23,9 @@ export VITE_SUPABASE_ANON_KEY="your-supabase-anon-key"
 # Required for API calls (production backend URL)
 export VITE_API_URL="https://fieldsnaps.com"
 
+# Required for Native Google Sign-In (see Step 8)
+export VITE_GOOGLE_WEB_CLIENT_ID="your-google-web-client-id.apps.googleusercontent.com"
+
 # Optional: Google Maps (for admin map features)
 export VITE_GOOGLE_MAPS_API_KEY="your-google-maps-key"
 ```
@@ -30,6 +33,7 @@ export VITE_GOOGLE_MAPS_API_KEY="your-google-maps-key"
 **Where to get these values:**
 - Supabase values: Go to Supabase Dashboard > Settings > API
 - API URL: Your production backend URL (or development URL for testing)
+- Google Web Client ID: Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client IDs > Web application
 - If building from Replit, these are already configured as secrets
 
 **Alternative: Use a .env file:**
@@ -39,6 +43,7 @@ cat > .env << EOF
 VITE_SUPABASE_URL=https://pbfuwfzccdmpkmhncyjg.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_API_URL=https://fieldsnaps.com
+VITE_GOOGLE_WEB_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
 EOF
 ```
 
@@ -146,21 +151,98 @@ For testing, the plugin works without a license but shows a debug banner.
 
 ---
 
-## Step 8: OAuth Testing
+## Step 8: Native Authentication Setup
 
-### Google Sign-In
-- Should work immediately with Supabase configuration
-- Uses `com.fieldsnaps.app://auth/callback` redirect
+The app uses native SDKs for Google and Apple Sign-In on iOS, then passes ID tokens to Supabase for authentication. This approach bypasses browser-based OAuth issues on iOS.
 
-### Apple Sign-In
-- Requires app to be signed with your Apple Developer Team
-- Service ID: `com.fieldsnaps.signin`
-- Already configured in Supabase
+### 8.1 Google Sign-In Setup (REQUIRED)
 
-### Supabase Redirect URLs (Already Configured)
-Ensure these are in Supabase Dashboard > Authentication > URL Configuration:
-- `com.fieldsnaps.app://auth/callback` (native iOS deep link)
-- `https://your-production-domain.com/auth/callback` (web)
+1. **Get Google OAuth Client IDs** from Google Cloud Console:
+   - Go to: https://console.cloud.google.com/apis/credentials
+   - Create OAuth 2.0 Client ID for "Web application" (this is your Web Client ID)
+   - Create OAuth 2.0 Client ID for "iOS" (set Bundle ID: `com.fieldsnaps.app`)
+   
+2. **Add Web Client ID to environment variables** (in Step 1):
+   ```bash
+   export VITE_GOOGLE_WEB_CLIENT_ID="your-web-client-id.apps.googleusercontent.com"
+   ```
+
+3. **Add iOS URL Scheme** to `ios/App/App/Info.plist`:
+   - In Google Cloud Console, click on your iOS OAuth client
+   - Copy the "iOS URL scheme" (format: `com.googleusercontent.apps.YOUR_CLIENT_ID`)
+   - Add to Info.plist inside `CFBundleURLTypes`:
+   
+   ```xml
+   <dict>
+       <key>CFBundleURLName</key>
+       <string>google-signin</string>
+       <key>CFBundleURLSchemes</key>
+       <array>
+           <string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID</string>
+       </array>
+   </dict>
+   ```
+
+4. **Verify Supabase Configuration**:
+   - Go to Supabase Dashboard > Authentication > Providers > Google
+   - Ensure the Web Client ID and Secret are configured
+   - Enable "Use native sign-in on iOS" option if available
+
+### 8.2 Apple Sign-In Setup (REQUIRED)
+
+1. **Enable Sign in with Apple capability** in Xcode:
+   - Select App target > Signing & Capabilities
+   - Click "+ Capability"
+   - Add "Sign in with Apple"
+
+2. **Verify Apple Developer Configuration**:
+   - App ID: `com.fieldsnaps.app` must have "Sign in with Apple" enabled
+   - Service ID: `com.fieldsnaps.signin` (for web authentication)
+   
+3. **Supabase Apple Configuration** (Already done):
+   - Service ID: `com.fieldsnaps.signin`
+   - Team ID: `9739WWYHQ6`
+   - Key ID: `7AB24X9GC4`
+
+### 8.3 How It Works
+
+The native authentication flow:
+1. User taps "Sign in with Google/Apple"
+2. Native SDK presents sign-in UI (not a browser)
+3. User authenticates with their account
+4. SDK returns an ID token
+5. App passes ID token to Supabase via `signInWithIdToken()`
+6. Supabase verifies the token and creates/links user account
+
+### 8.4 Testing OAuth
+
+**Google Sign-In:**
+- Tap "Sign in with Google" button
+- Native Google Sign-In sheet should appear
+- Select your Google account
+- App should authenticate and redirect to home
+
+**Apple Sign-In:**
+- Tap "Sign in with Apple" button
+- Face ID / Touch ID prompt appears
+- Approve with biometrics
+- App should authenticate and redirect to home
+
+### 8.5 Troubleshooting
+
+**"No ID token returned":**
+- Check that Web Client ID is set correctly in environment
+- Verify iOS URL scheme is added to Info.plist
+- Ensure you rebuilt after adding env vars: `npm run build && npx cap sync ios`
+
+**Google Sign-In sheet doesn't appear:**
+- Verify `com.googleusercontent.apps.XXX` URL scheme in Info.plist
+- Check Xcode console for initialization errors
+
+**Apple Sign-In fails:**
+- Ensure "Sign in with Apple" capability is added
+- Verify provisioning profile includes Sign in with Apple
+- Check that app is signed with correct team
 
 ---
 
@@ -221,9 +303,12 @@ Ensure these are in Supabase Dashboard > Authentication > URL Configuration:
 | Team ID | `9739WWYHQ6` |
 | Apple Service ID | `com.fieldsnaps.signin` |
 | Deep Link Scheme | `com.fieldsnaps.app://` |
-| Auth Callback | `com.fieldsnaps.app://auth/callback` |
+| Auth Callback (Legacy) | `com.fieldsnaps.app://auth/callback` |
+| Auth Method | Native SDK + signInWithIdToken |
 | Min iOS Version | 14.0 |
 | Supabase Callback | `https://pbfuwfzccdmpkmhncyjg.supabase.co/auth/v1/callback` |
+| Google Web Client ID | Set via `VITE_GOOGLE_WEB_CLIENT_ID` env var |
+| Required Capabilities | Sign in with Apple, Background Modes (location, fetch) |
 
 ---
 
