@@ -139,6 +139,84 @@ export async function refreshSession(): Promise<Session | null> {
   return session;
 }
 
+async function handleOAuthCallback(url: string): Promise<boolean> {
+  console.log('[SupabaseAuth] Processing potential OAuth callback:', url);
+  
+  if (!url.includes('auth/callback') && !url.includes('#access_token')) {
+    console.log('[SupabaseAuth] URL is not an OAuth callback');
+    return false;
+  }
+  
+  console.log('[SupabaseAuth] Processing OAuth callback');
+  
+  try {
+    // Handle custom scheme URLs (com.fieldsnaps.app://...)
+    // Convert to a proper URL format for parsing
+    let urlToParse = url;
+    if (url.startsWith('com.fieldsnaps.app://')) {
+      urlToParse = url.replace('com.fieldsnaps.app://', 'https://fieldsnaps.app/');
+    }
+    
+    const parsedUrl = new URL(urlToParse);
+    
+    let accessToken: string | null = null;
+    let refreshToken: string | null = null;
+    
+    // Check hash fragment first (implicit flow)
+    const fragment = parsedUrl.hash.substring(1);
+    if (fragment) {
+      const params = new URLSearchParams(fragment);
+      accessToken = params.get('access_token');
+      refreshToken = params.get('refresh_token');
+    }
+    
+    // Check query params if not in fragment
+    if (!accessToken) {
+      accessToken = parsedUrl.searchParams.get('access_token');
+      refreshToken = parsedUrl.searchParams.get('refresh_token');
+    }
+    
+    if (accessToken && refreshToken) {
+      console.log('[SupabaseAuth] Found tokens in callback, setting session');
+      
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      
+      if (error) {
+        console.error('[SupabaseAuth] Error setting session:', error);
+        throw error;
+      }
+      
+      await supabase.auth.refreshSession();
+      
+      console.log('[SupabaseAuth] Session set successfully, user:', data.user?.id);
+      return true;
+    } else {
+      // Check for authorization code (PKCE flow)
+      const code = parsedUrl.searchParams.get('code');
+      if (code) {
+        console.log('[SupabaseAuth] Found authorization code, exchanging for session');
+        
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (error) {
+          console.error('[SupabaseAuth] Error exchanging code:', error);
+          throw error;
+        }
+        
+        console.log('[SupabaseAuth] Code exchanged successfully, user:', data.user?.id);
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('[SupabaseAuth] Error processing OAuth callback:', error);
+  }
+  
+  return false;
+}
+
 export function setupDeepLinkListener(): void {
   if (deepLinkListenerRegistered) {
     console.log('[SupabaseAuth] Deep link listener already registered');
@@ -152,66 +230,20 @@ export function setupDeepLinkListener(): void {
   
   console.log('[SupabaseAuth] Setting up deep link listener for OAuth callbacks');
   
+  // Check if app was launched with a URL (cold start from deep link)
+  App.getLaunchUrl().then((launchUrl) => {
+    if (launchUrl?.url) {
+      console.log('[SupabaseAuth] App launched with URL:', launchUrl.url);
+      handleOAuthCallback(launchUrl.url);
+    }
+  }).catch((error) => {
+    console.error('[SupabaseAuth] Error getting launch URL:', error);
+  });
+  
+  // Listen for deep links when app is already running
   App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
     console.log('[SupabaseAuth] App opened with URL:', event.url);
-    
-    if (event.url.includes('auth/callback') || event.url.includes('#access_token')) {
-      console.log('[SupabaseAuth] Processing OAuth callback');
-      
-      try {
-        const url = new URL(event.url);
-        
-        let accessToken: string | null = null;
-        let refreshToken: string | null = null;
-        
-        const fragment = url.hash.substring(1);
-        if (fragment) {
-          const params = new URLSearchParams(fragment);
-          accessToken = params.get('access_token');
-          refreshToken = params.get('refresh_token');
-        }
-        
-        if (!accessToken) {
-          const params = url.searchParams;
-          accessToken = params.get('access_token');
-          refreshToken = params.get('refresh_token');
-        }
-        
-        if (accessToken && refreshToken) {
-          console.log('[SupabaseAuth] Found tokens in callback, setting session');
-          
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-          
-          if (error) {
-            console.error('[SupabaseAuth] Error setting session:', error);
-            throw error;
-          }
-          
-          await supabase.auth.refreshSession();
-          
-          console.log('[SupabaseAuth] Session set successfully, user:', data.user?.id);
-        } else {
-          const code = url.searchParams.get('code');
-          if (code) {
-            console.log('[SupabaseAuth] Found authorization code, exchanging for session');
-            
-            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-            
-            if (error) {
-              console.error('[SupabaseAuth] Error exchanging code:', error);
-              throw error;
-            }
-            
-            console.log('[SupabaseAuth] Code exchanged successfully, user:', data.user?.id);
-          }
-        }
-      } catch (error) {
-        console.error('[SupabaseAuth] Error processing OAuth callback:', error);
-      }
-    }
+    await handleOAuthCallback(event.url);
   });
   
   deepLinkListenerRegistered = true;
