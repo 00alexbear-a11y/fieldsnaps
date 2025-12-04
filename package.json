@@ -35,6 +35,7 @@
     "@capacitor/splash-screen": "^7.0.3",
     "@capacitor/status-bar": "^7.0.3",
     "@capacitor/toast": "^7.0.2",
+    "@capgo/capacitor-social-login": "^7.20.0",
     "@capgo/capacitor-updater": "^7.22.0",
     "@capgo/cli": "^7.17.6",
     "@google-cloud/storage": "^7.17.2",
