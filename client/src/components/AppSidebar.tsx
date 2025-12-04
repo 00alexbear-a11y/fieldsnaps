@@ -27,7 +27,7 @@ import { haptics } from '@/lib/nativeHaptics';
 import { useQuery } from '@tanstack/react-query';
 
 export function AppSidebar() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
@@ -82,8 +82,8 @@ export function AppSidebar() {
   const handleLogout = async () => {
     try {
       await haptics.light();
-      await apiRequest('POST', '/api/auth/logout');
-      setLocation('/');
+      await signOut();
+      setLocation('/login');
       toast({
         title: 'Logged out',
         description: 'You have been logged out successfully',
