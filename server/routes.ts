@@ -461,10 +461,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ownerId: userId,
       });
 
-      // Update user to join company as owner
+      // Update user to join company as admin (owner) and mark onboarding complete
       await storage.updateUser(userId, {
         companyId: company.id,
-        role: 'owner',
+        role: 'admin',
+        onboardingComplete: true,
       });
 
       res.json(company);
@@ -861,7 +862,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Time Tracking Settings Routes
   const timeTrackingSettingsSchema = z.object({
-    autoTrackingEnabledByDefault: z.boolean(),
+    autoTrackingEnabledByDefault: z.boolean().optional(),
+    clockOutReminderTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/).optional(), // HH:MM format
+    maxShiftHours: z.number().min(1).max(24).optional(),
+    geofenceExitDelayMinutes: z.number().min(0).max(60).optional(),
+    autoClockOutOnExit: z.boolean().optional(),
+    staleSessionTimeoutMinutes: z.number().min(5).max(120).optional(),
   });
 
   app.put("/api/companies/time-tracking-settings", isAuthenticatedAndWhitelisted, async (req: any, res) => {
@@ -873,10 +879,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "User must belong to a company" });
       }
 
-      // Only the owner can update time tracking settings
+      // Only admins can update time tracking settings
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Only admins can update time tracking settings" });
+      }
+
       const company = await storage.getCompany(user.companyId);
-      if (!company || company.ownerId !== userId) {
-        return res.status(403).json({ error: "Only the billing owner can update time tracking settings" });
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
       }
 
       // Validate time tracking settings with Zod
@@ -1248,6 +1258,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching authenticated user:", error);
       return res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Update user profile (name, etc)
+  const profileUpdateSchema = z.object({
+    firstName: z.string().min(1).max(50).optional(),
+    lastName: z.string().max(50).optional(),
+  });
+
+  app.put('/api/auth/user/profile', isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const validation = profileUpdateSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ error: "Invalid profile data", details: validation.error.errors });
+      }
+
+      const updatedUser = await storage.updateUser(userId, validation.data);
+      return res.json(updatedUser);
+    } catch (error: any) {
+      console.error("Error updating user profile:", error);
+      return res.status(500).json({ error: error.message || "Failed to update profile" });
     }
   });
 
@@ -4680,6 +4713,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
       handleError(res, error);
     }
   });
+
+  // Auto-close stale clock entries (runs every 5 minutes)
+  // Checks for clock entries without heartbeat updates within the configured timeout
+  async function autoCloseStaleSessions() {
+    try {
+      // Get all companies with their settings
+      const companiesResult = await db.select().from(companies);
+      
+      for (const company of companiesResult) {
+        const timeoutMinutes = company.staleSessionTimeoutMinutes || 30;
+        const maxShiftHours = company.maxShiftHours || 12;
+        const cutoffTime = new Date(Date.now() - timeoutMinutes * 60 * 1000);
+        const maxShiftCutoff = new Date(Date.now() - maxShiftHours * 60 * 60 * 1000);
+        
+        // Find active clock entries (clock_in without matching clock_out)
+        // that either have stale heartbeats or exceeded max shift
+        const staleEntries = await db.select()
+          .from(clockEntries)
+          .where(
+            and(
+              eq(clockEntries.companyId, company.id),
+              eq(clockEntries.type, 'clock_in'),
+              isNull(clockEntries.autoClosedAt)
+            )
+          );
+        
+        for (const entry of staleEntries) {
+          // Check if there's a matching clock_out
+          const clockOutExists = await db.select()
+            .from(clockEntries)
+            .where(
+              and(
+                eq(clockEntries.userId, entry.userId),
+                eq(clockEntries.type, 'clock_out'),
+                sql`${clockEntries.timestamp} > ${entry.timestamp}`
+              )
+            )
+            .limit(1);
+          
+          if (clockOutExists.length > 0) continue; // Already clocked out
+          
+          // Check for stale heartbeat or max shift exceeded
+          const lastHeartbeat = entry.lastHeartbeat || entry.timestamp;
+          const shouldAutoClose = lastHeartbeat < cutoffTime || entry.timestamp < maxShiftCutoff;
+          
+          if (shouldAutoClose) {
+            const reason = entry.timestamp < maxShiftCutoff ? 'max_shift' : 'stale_heartbeat';
+            
+            // Create auto clock-out entry
+            await db.insert(clockEntries).values({
+              userId: entry.userId,
+              companyId: entry.companyId,
+              projectId: entry.projectId,
+              type: 'clock_out',
+              timestamp: new Date(),
+              entryMethod: 'auto_close',
+              notes: `Auto-closed: ${reason === 'max_shift' ? 'exceeded max shift hours' : 'no heartbeat received'}`,
+            });
+            
+            // Mark original entry as auto-closed
+            await db.update(clockEntries)
+              .set({
+                autoClosedAt: new Date(),
+                autoCloseReason: reason,
+              })
+              .where(eq(clockEntries.id, entry.id));
+            
+            console.log(`[AutoClose] Closed stale session for user ${entry.userId}: ${reason}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[AutoClose] Error processing stale sessions:', error);
+    }
+  }
+  
+  // Run stale session check every 5 minutes
+  setInterval(autoCloseStaleSessions, 5 * 60 * 1000);
+  // Also run once on startup after a short delay
+  setTimeout(autoCloseStaleSessions, 30000);
 
   const httpServer = createServer(app);
   

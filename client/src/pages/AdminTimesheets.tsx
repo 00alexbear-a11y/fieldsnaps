@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, MapPin, Clock, User as UserIcon, Calendar, Download, Shield, Hand } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, subWeeks } from 'date-fns';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Loader2, MapPin, Clock, User as UserIcon, Calendar, Download, Shield, Hand, Radio, AlertTriangle } from 'lucide-react';
+import { format, startOfWeek, endOfWeek, subWeeks, formatDistanceToNow } from 'date-fns';
 
 interface ClockEntry {
   id: string;
@@ -25,6 +26,9 @@ interface ClockEntry {
   clockOutLatitude: string | null;
   clockOutLongitude: string | null;
   clockOutAccuracy: number | null;
+  lastHeartbeat: Date | null;
+  autoClosedAt: Date | null;
+  autoCloseReason: string | null;
   user?: {
     id: string;
     firstName: string | null;
@@ -131,7 +135,7 @@ export default function AdminTimesheets() {
 
   const handleExport = () => {
     // CSV export
-    const csvHeaders = ['Date', 'Time', 'Worker', 'Type', 'Method', 'Project', 'Location', 'GPS Accuracy', 'Notes'];
+    const csvHeaders = ['Date', 'Time', 'Worker', 'Type', 'Method', 'Project', 'Location', 'GPS Accuracy', 'Last Heartbeat', 'Auto Closed', 'Notes'];
     const csvRows = entries.map(entry => [
       format(new Date(entry.timestamp), 'yyyy-MM-dd'),
       format(new Date(entry.timestamp), 'HH:mm:ss'),
@@ -141,6 +145,8 @@ export default function AdminTimesheets() {
       entry.project?.name || '-',
       entry.location || '-',
       entry.clockInAccuracy !== null ? `±${entry.clockInAccuracy}m` : '-',
+      entry.lastHeartbeat ? format(new Date(entry.lastHeartbeat), 'yyyy-MM-dd HH:mm:ss') : '-',
+      entry.autoClosedAt ? `${entry.autoCloseReason} (${format(new Date(entry.autoClosedAt), 'HH:mm')})` : '-',
       entry.notes || '-',
     ]);
 
@@ -299,6 +305,40 @@ export default function AdminTimesheets() {
                               <span className="flex items-center gap-1">
                                 GPS: ±{entry.clockInAccuracy}m
                               </span>
+                            )}
+                            
+                            {entry.type === 'clock_in' && entry.lastHeartbeat && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="flex items-center gap-1 cursor-help">
+                                    <Radio className="w-3 h-3 text-green-500" />
+                                    Last seen: {formatDistanceToNow(new Date(entry.lastHeartbeat), { addSuffix: true })}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Last heartbeat received from worker's device</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {format(new Date(entry.lastHeartbeat), 'MMM d, h:mm a')}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            
+                            {entry.autoClosedAt && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="outline" className="text-xs text-amber-600 border-amber-400 cursor-help">
+                                    <AlertTriangle className="w-3 h-3 mr-1" />
+                                    Auto-closed
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Session was auto-closed at {format(new Date(entry.autoClosedAt), 'h:mm a')}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Reason: {entry.autoCloseReason === 'max_shift' ? 'Exceeded max shift hours' : 'No heartbeat received'}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
                             )}
                           </div>
 
