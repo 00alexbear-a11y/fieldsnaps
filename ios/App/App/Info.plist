@@ -46,6 +46,10 @@
         <key>UIViewControllerBasedStatusBarAppearance</key>
         <true/>
         
+        <!-- Google Sign-In Client ID (iOS Client ID from Google Cloud Console) -->
+        <key>GIDClientID</key>
+        <string>757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac.apps.googleusercontent.com</string>
+        
         <!-- Deep Link URL Scheme for OAuth Callback -->
         <key>CFBundleURLTypes</key>
         <array>
