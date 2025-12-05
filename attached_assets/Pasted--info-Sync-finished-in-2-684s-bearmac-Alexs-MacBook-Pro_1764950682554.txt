@@ -1,0 +1,62 @@
+[info] Sync finished in 2.684s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % cd ~/Documents/Projects/FieldSnaps
+grep -o "pbfuwfzccdmpkmhncyjg" dist/public/assets/index*.js | head -1
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % cd ~/Documents/Projects/FieldSnaps && VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co" VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA4MjcyMTYsImV4cCI6MjA0NjQwMzIxNn0.2UR9ck1G0T2PeHO6Nb1zowJKVXSo4sMXlb6fPST8EeY" VITE_GOOGLE_WEB_CLIENT_ID="757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com" npm run build
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (8) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3257 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-CB7Vi40g.css                                129.35 kB │ gzip:  20.05 kB
+../dist/public/assets/web-BpgkuBlD.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-BsSOUw7m.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-BXiBZM9k.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-CrkASAUB.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-D_h_LhHz.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-CKOS8oH4.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-DXzhFUvS.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-BEnRYuCh.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/isToday-D1Qf0gCk.js                                 0.61 kB │ gzip:   0.33 kB
+../dist/public/assets/native-B7EMfRhM.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-CnsUDb1r.js                                     0.76 kB │ gzip:   0.35 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-B70Y2dMc.js                                     0.80 kB │ gzip:   0.42 kB
+../dist/public/assets/web-BOthW3d0.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-_q-aclaQ.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-CulsGemB.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-DM8WoeNe.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-D_mVw97D.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-DwhVTvUk.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-CmmgZpsx.js                                     3.44 kB │ gzip:   1.09 kB
+../dist/public/assets/web-DHWyBMdG.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-C15deNBr.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web-DHCLfrfM.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/ToDos-B0N0JoJ5.js                                  27.71 kB │ gzip:   7.83 kB
+../dist/public/assets/Settings-BnE0lKFG.js                               43.40 kB │ gzip:   9.61 kB
+../dist/public/assets/Camera-Cld2bswA.js                                 78.69 kB │ gzip:  21.32 kB
+../dist/public/assets/ProjectPhotos-De0x1s0E.js                         125.58 kB │ gzip:  36.80 kB
+../dist/public/assets/index.es-CKcZEZ-z.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-DUnBy7Lf.js                               1,619.28 kB │ gzip: 473.11 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.93s
+
+  dist/index.js  302.0kb
+
+⚡ Done in 14ms
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % grep -o "pbfuwfzccdmpkmhncyjg" dist/public/assets/index*.js | head -1
+dist/public/assets/index-DUnBy7Lf.js:pbfuwfzccdmpkmhncyjg
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
