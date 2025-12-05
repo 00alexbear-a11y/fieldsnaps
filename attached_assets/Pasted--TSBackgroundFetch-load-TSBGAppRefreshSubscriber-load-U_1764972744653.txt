@@ -1,0 +1,187 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/22514FD7-BF1C-4540-AE97-95D7E523084B/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device f1c00943-0531-4f22-a862-e62709dd834d
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+Loading network plugin
+KeyboardPlugin: resize mode - native
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11ccaad90 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+⚡️  Loading app at capacitor://localhost...
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[88018] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 110774088
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 110774089
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","status":"success","version":"builtin"}}
+⚡️  To Native ->  CapacitorUpdater addListener 110774090
+⚡️  To Native ->  CapacitorUpdater addListener 110774091
+⚡️  To Native ->  CapacitorUpdater addListener 110774092
+⚡️  To Native ->  CapacitorUpdater current 110774093
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  SecureStorage internalGetItem 110774094
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","status":"success","version":"builtin"},"native":"1.0"}
+⚡️  To Native ->  App addListener 110774095
+⚡️  To Native ->  App addListener 110774096
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","status":"success","version":"builtin"}
+⚡️  To Native ->  SecureStorage internalGetItem 110774097
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 110774098
+⚡️  To Native ->  App ⚡️  TO JS addListener 110774099
+undefined
+⚡️  To Native ->  StatusBar setOverlaysWebView 110774100
+⚡️  To Native ->  StatusBar setStyle 110774101
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  To Native ->  SecureStorage internalGetItem 110774102
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 110774103
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  To Native ->  SecureStorage internalGetItem 110774104
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalGetItem 110774105
+⚡️  To Native ->  SecureStorage internalGetItem 110774106
+⚡️  TO JS {"data":null}
+⚡️  TO JS ⚡️  To Native ->  SecureStorage internalGetItem 110774107
+{"data":null}
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 110774108
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalRemoveItem 110774109
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  To Native ->  SecureStorage internalRemoveItem 110774110
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 110774111
+⚡️  TO JS undefined
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 110774112
+No saved state found
+⚡️  TO JS undefined
+⚡️  To Native ->  ⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+SocialLogin login 110774113
+⚡️  TO JS {"result":{"profile":{"givenName":"Aleksandr","imageUrl":"https:\/\/lh3.googleusercontent.com\/a\/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","name":"Aleksandr Medvedev","id":"101096107950550804914","familyName":"Medvedev","email":"hello@f
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"result":{"profile":{"givenName":"Aleksandr","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","name":"Aleksandr Medvedev","id":"101096107950550804914","familyName":"Medvedev","email":"hello@fieldsnaps.com"},"responseType":"online","idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ1NDNlMjFhMDI3M2VmYzY2YTQ3NTAwMDI0NDFjYjIxNTFjYjIzNWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiVUkyV1lCSDQyQ1VKR1BSY1BUcUtWZyIsIm5hbWUiOiJBbGVrc2FuZHIgTWVkdmVkZXYiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSzR5VzIzSDBQbGk1SFBVb3lGblpYYzdMR3FhNVVZRFpZa0VlOGJFQW1ZVDhQQlVnPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFsZWtzYW5kciIsImZhbWlseV9uYW1lIjoiTWVkdmVkZXYiLCJpYXQiOjE3NjQ5NzI1NDQsImV4cCI6MTc2NDk3NjE0NH0.d2ViTLP8qm5FwNURv3EJdK2WXsloW_qCpL02PQdsF_jJN_Ynq_7Bv5c5_gSYlvR70eTLlXiJVWRX3MpdVkMUqnm_7OKv38_a3nb9ismvNk7Rgrv385uGIgbXedJ9r-w29IJWw_1qbOBjp-d1B5pQz2XYVxNQ4ZOUlbvg75KBLxWH4AzmEHMmoTYwbRZXJQeRl2WzNcz27SjZvqoiMv7N9bbBottfFADDGoosYRteb1Ph7TnrYHDd5rvop9CyNdkW3X8dnr0GGjB-R5_1nX1HIyyevVMzvdrmRxshK9QfqdkDc6vD9V-wvY_8tpqR80T1F36X-sp_DfGfNebiKQEFCA","accessToken":{"userId":"101096107950550804914","token":"ya29.a0ATi6K2vRH2OqmemjzJ9nvBGyfBLpe0dQ-q5em_7LXcf86xUsBYGHdqO3KUvlxZ5AX_N_NJbx1ESM7sPIfSQ16F6ASa4H6PgDaqXMyjk5mcnPfQUPisHXrWkHiKX25hP-m-EOpKuNRth2Pu-R6zAltLFrMegQ0OGBhtU2sjivqhoGMOrhu8AeTYU4ZVZ_v9eLcnrvTNvSaCgYKAQsSARASFQHGX2MiYhwblcWsRnRA-gdJPVpoOA0207","refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4"}},"provider":"google"}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  To Native ->  CapacitorHttp request 110774114
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","status":200,"data":{"user":{"app_metadata":{"providers":["google"],"provider":"google"},"user_metadata":{"phone_verified":false,"sub":"101096107950550804914","custom_
+⚡️  To Native ->  SecureStorage internalSetItem 110774115
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774116
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  Network getStatus 110774117
+⚡️  To Native ->  Network addListener 110774118
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  SecureStorage internalGetItem 110774119
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774120
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774121
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774122
+⚡️  TO JS ⚡️  To Native ->  SecureStorage internalGetItem 110774123
+{"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774124
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774125
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 110774126
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774127
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774128
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774129
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774130
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774131
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774132
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774133
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  To Native ->  SecureStorage internalGetItem 110774134
+⚡️  TO JS {"data":"\"{\\\"user\\\":{\\\"app_metadata\\\":{\\\"providers\\\":[\\\"google\\\"],\\\"provider\\\":\\\"google\\\"},\\\"user_metadata\\\":{\\\"phone_verified\\\":false,\\\"sub\\\":\\\"101096107950550804914\\\",\\\"custom_claims\\\":{\\\"hd\\\":\\\"fieldsna
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
