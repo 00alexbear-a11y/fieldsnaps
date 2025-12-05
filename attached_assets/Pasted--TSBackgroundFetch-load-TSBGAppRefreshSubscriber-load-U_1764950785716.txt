@@ -1,0 +1,124 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/6F15ADCB-AD9D-4829-BF54-A65E86205B8B/App.app'
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11acc0f60 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device e5ec41cd-f9f0-4abd-9e59-582633d3117f
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[86031] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 50191313
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 50191314
+⚡️  TO JS {"bundle":{"checksum":"","version":"builtin","status":"success","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 50191315
+⚡️  To Native ->  CapacitorUpdater addListener 50191316
+⚡️  To Native ->  CapacitorUpdater addListener 50191317
+⚡️  To Native ->  CapacitorUpdater current 50191318
+⚡️  TO JS {"data":"\"\\\"ecc459088cd88672ac16222945a860683c51e1884e125baa5e3d3e5eed0cd4cdbb16d94d5129edc5c5697bf85b5f1fe5b7eb86032291dc52\\\"\""}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"native":"1.0","bundle":{"checksum":"","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin","version":"builtin","status":"success"}}
+⚡️  To Native ->  SecureStorage internalGetItem 50191319
+⚡️  To Native ->  App addListener 50191320
+⚡️  To Native ->  App addListener 50191321
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] Current bundle: {"checksum":"","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin","version":"builtin","status":"success"}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 50191322
+⚡️  To Native ->  App addListener 50191323
+⚡️  To Native ->  StatusBar setOverlaysWebView 50191324
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setStyle 50191325
+⚡️  To Native ->  SecureStorage internalGetItem 50191326
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  To Native ->  SecureStorage internalGetItem 50191327
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  To Native ->  SecureStorage internalGetItem 50191328
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  To Native ->  SecureStorage internalGetItem 50191329
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 50191330
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 50191331
+⚡️  To Native ->  SecureStorage internalGetItem 50191332
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  SecureStorage internalGetItem 50191333
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  To Native ->  SecureStorage internalRemoveItem 50191334
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 50191335
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  To Native ->  SplashScreen hide 50191336
+⚡️  TO JS undefined
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 50191337
+No saved state found
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+⚡️  To Native ->  SocialLogin login 50191338
+*** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: 'No active configuration. Make sure GIDClientID is set in Info.plist.'
+*** First throw call stack:
+(0x18a62b994 0x187545814 0x18a6b399c 0x1048ca0ac 0x1048c8a38 0x1043062a0 0x10430590c 0x1042fe22c 0x104f6463c 0x104f7e2d0 0x104f9f4c0 0x104f74778 0x104f746b4 0x18a5d02c8 0x18a583b3c 0x18a582a6c 0x22b1ac498 0x18ff46ba4 0x18feefa78 0x1036e9124 0x18759ae28)
+libc++abi: terminating due to uncaught exception of type NSException
+*** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: 'No active configuration. Make sure GIDClientID is set in Info.plist.'
+*** First throw call stack:
+(0x18a62b994 0x187545814 0x18a6b399c 0x1048ca0ac 0x1048c8a38 0x1043062a0 0x10430590c 0x1042fe22c 0x104f6463c 0x104f7e2d0 0x104f9f4c0 0x104f74778 0x104f746b4 0x18a5d02c8 0x18a583b3c 0x18a582a6c 0x22b1ac498 0x18ff46ba4 0x18feefa78 0x1036e9124 0x18759ae28)
+terminating due to uncaught exception of type NSException
