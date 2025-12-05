@@ -18,7 +18,7 @@ import {
   onAuthStateChange 
 } from '@/lib/supabaseAuth';
 
-type AuthView = 'main' | 'email' | 'signup' | 'forgot-password';
+type AuthView = 'main' | 'email-entry' | 'email-signin' | 'email-signup' | 'forgot-password';
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -127,7 +127,7 @@ export default function Login() {
       setAuthError(null);
       await signUpWithEmail(email, password);
       setAuthSuccess('Check your email to confirm your account');
-      setAuthView('email');
+      setAuthView('email-signin');
     } catch (error: any) {
       console.error('[Login] Email sign-up failed:', error);
       setAuthError(error.message || 'Failed to create account');
@@ -148,7 +148,7 @@ export default function Login() {
       setAuthError(null);
       await resetPassword(email);
       setAuthSuccess('Password reset email sent. Check your inbox.');
-      setAuthView('email');
+      setAuthView('email-signin');
     } catch (error: any) {
       console.error('[Login] Password reset failed:', error);
       setAuthError(error.message || 'Failed to send reset email');
@@ -161,7 +161,7 @@ export default function Login() {
 
   const renderMainView = () => (
     <>
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {isDevelopment && (
           <Button
             variant="default"
@@ -222,7 +222,7 @@ export default function Login() {
           </Button>
         )}
 
-        <div className="relative my-4">
+        <div className="relative my-3">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -238,7 +238,7 @@ export default function Login() {
           onClick={() => {
             setAuthError(null);
             setAuthSuccess(null);
-            setAuthView('email');
+            setAuthView('email-entry');
           }}
           data-testid="button-login-email"
         >
@@ -247,13 +247,86 @@ export default function Login() {
         </Button>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
-        Sign in with your preferred method to access your projects
+      <p className="text-xs text-muted-foreground text-center mt-3">
+        Sign in with your preferred method
       </p>
     </>
   );
 
-  const renderEmailView = () => (
+  const renderEmailEntryView = () => (
+    <div className="space-y-4">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="mb-2 -ml-2"
+        onClick={() => {
+          setAuthError(null);
+          setAuthSuccess(null);
+          setEmail('');
+          setAuthView('main');
+        }}
+        data-testid="button-back-to-main"
+      >
+        <ArrowLeft className="w-4 h-4 mr-1" />
+        Back
+      </Button>
+
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-semibold">Continue with Email</h2>
+        <p className="text-sm text-muted-foreground">Enter your email to get started</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email-entry">Email</Label>
+        <Input
+          id="email-entry"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          autoFocus
+          data-testid="input-email-entry"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Button
+          type="button"
+          className="w-full"
+          disabled={!email || !email.includes('@')}
+          onClick={() => {
+            setAuthError(null);
+            setAuthView('email-signin');
+          }}
+          data-testid="button-continue-signin"
+        >
+          Sign In
+        </Button>
+        
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={!email || !email.includes('@')}
+          onClick={() => {
+            setAuthError(null);
+            setAuthView('email-signup');
+          }}
+          data-testid="button-continue-signup"
+        >
+          Create New Account
+        </Button>
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center">
+        Don't have an account? Choose "Create New Account"
+      </p>
+    </div>
+  );
+
+  const renderEmailSignInView = () => (
     <form onSubmit={handleEmailSignIn} className="space-y-4">
       <Button
         type="button"
@@ -263,26 +336,18 @@ export default function Login() {
         onClick={() => {
           setAuthError(null);
           setAuthSuccess(null);
-          setAuthView('main');
+          setPassword('');
+          setAuthView('email-entry');
         }}
-        data-testid="button-back-to-main"
+        data-testid="button-back-to-email-entry"
       >
         <ArrowLeft className="w-4 h-4 mr-1" />
         Back
       </Button>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isAuthenticating}
-          autoComplete="email"
-          data-testid="input-email"
-        />
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-semibold">Sign in to your account</h2>
+        <p className="text-sm text-muted-foreground">{email}</p>
       </div>
 
       <div className="space-y-2">
@@ -295,6 +360,7 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           disabled={isAuthenticating}
           autoComplete="current-password"
+          autoFocus
           data-testid="input-password"
         />
       </div>
@@ -302,7 +368,7 @@ export default function Login() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isAuthenticating || !email || !password}
+        disabled={isAuthenticating || !password}
         data-testid="button-signin-email"
       >
         {isAuthenticating ? 'Signing in...' : 'Sign In'}
@@ -327,21 +393,22 @@ export default function Login() {
           type="button"
           variant="ghost"
           size="sm"
-          className="px-0 h-auto text-primary underline-offset-4 hover:underline"
+          className="px-0 h-auto text-muted-foreground underline-offset-4 hover:underline"
           onClick={() => {
             setAuthError(null);
-            setAuthSuccess(null);
-            setAuthView('signup');
+            setPassword('');
+            setConfirmPassword('');
+            setAuthView('email-signup');
           }}
-          data-testid="button-goto-signup"
+          data-testid="button-switch-to-signup"
         >
-          Create account
+          Create account instead
         </Button>
       </div>
     </form>
   );
 
-  const renderSignUpView = () => (
+  const renderEmailSignUpView = () => (
     <form onSubmit={handleEmailSignUp} className="space-y-4">
       <Button
         type="button"
@@ -351,31 +418,19 @@ export default function Login() {
         onClick={() => {
           setAuthError(null);
           setAuthSuccess(null);
-          setAuthView('email');
+          setPassword('');
+          setConfirmPassword('');
+          setAuthView('email-entry');
         }}
-        data-testid="button-back-to-email"
+        data-testid="button-back-to-email-entry-signup"
       >
         <ArrowLeft className="w-4 h-4 mr-1" />
         Back
       </Button>
 
       <div className="text-center mb-4">
-        <h2 className="text-xl font-semibold">Create your account</h2>
-        <p className="text-sm text-muted-foreground">Enter your details to get started</p>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isAuthenticating}
-          autoComplete="email"
-          data-testid="input-signup-email"
-        />
+        <h2 className="text-lg font-semibold">Create your account</h2>
+        <p className="text-sm text-muted-foreground">{email}</p>
       </div>
 
       <div className="space-y-2">
@@ -388,6 +443,7 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           disabled={isAuthenticating}
           autoComplete="new-password"
+          autoFocus
           data-testid="input-signup-password"
         />
       </div>
@@ -409,15 +465,29 @@ export default function Login() {
       <Button
         type="submit"
         className="w-full"
-        disabled={isAuthenticating || !email || !password || !confirmPassword}
+        disabled={isAuthenticating || !password || !confirmPassword}
         data-testid="button-signup-submit"
       >
         {isAuthenticating ? 'Creating account...' : 'Create Account'}
       </Button>
 
-      <p className="text-xs text-muted-foreground text-center">
-        By signing up, you agree to our Terms of Service
-      </p>
+      <div className="text-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="px-0 h-auto text-muted-foreground underline-offset-4 hover:underline text-sm"
+          onClick={() => {
+            setAuthError(null);
+            setPassword('');
+            setConfirmPassword('');
+            setAuthView('email-signin');
+          }}
+          data-testid="button-switch-to-signin"
+        >
+          Already have an account? Sign in
+        </Button>
+      </div>
     </form>
   );
 
@@ -431,7 +501,7 @@ export default function Login() {
         onClick={() => {
           setAuthError(null);
           setAuthSuccess(null);
-          setAuthView('email');
+          setAuthView('email-signin');
         }}
         data-testid="button-back-to-email-forgot"
       >
@@ -470,73 +540,76 @@ export default function Login() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex justify-start">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation('/')}
-            className="gap-2 text-muted-foreground hover:text-foreground"
-            data-testid="button-back-to-home"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </Button>
-        </div>
-
-        <div className="flex flex-col items-center space-y-4">
-          <img 
-            src={logoPath} 
-            alt="FieldSnaps" 
-            className="h-16 w-auto object-contain"
-            data-testid="img-login-logo"
-          />
-          <div className="text-center">
-            <h1 className="text-3xl font-bold tracking-tight">Welcome to FieldSnaps</h1>
-            <p className="mt-2 text-muted-foreground">
-              Sign in to capture and document job sites
-            </p>
+    <div className="min-h-screen bg-white dark:bg-black flex flex-col overflow-auto pb-safe pt-safe">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-0">
+        <div className="w-full max-w-md space-y-6">
+          <div className="flex justify-start">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/')}
+              className="gap-2 text-muted-foreground hover:text-foreground"
+              data-testid="button-back-to-home"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Home
+            </Button>
           </div>
-        </div>
 
-        <Card className="p-6 space-y-4">
-          {authError && (
-            <div className="text-center text-sm text-destructive bg-destructive/10 p-3 rounded-lg" data-testid="text-auth-error">
-              {authError}
-            </div>
-          )}
-
-          {authSuccess && (
-            <div className="text-center text-sm text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 p-3 rounded-lg" data-testid="text-auth-success">
-              {authSuccess}
-            </div>
-          )}
-
-          {authView === 'main' && renderMainView()}
-          {authView === 'email' && renderEmailView()}
-          {authView === 'signup' && renderSignUpView()}
-          {authView === 'forgot-password' && renderForgotPasswordView()}
-        </Card>
-
-        {authView === 'main' && (
-          <div className="space-y-3 text-sm text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
-              <p>Capture photos offline with instant sync when connected</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
-              <p>Annotate and organize photos by project</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
-              <p>View projects on an interactive map</p>
+          <div className="flex flex-col items-center space-y-3">
+            <img 
+              src={logoPath} 
+              alt="FieldSnaps" 
+              className="h-12 w-auto object-contain"
+              data-testid="img-login-logo"
+            />
+            <div className="text-center">
+              <h1 className="text-2xl font-bold tracking-tight">Welcome to FieldSnaps</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Sign in to capture and document job sites
+              </p>
             </div>
           </div>
-        )}
+
+          <Card className="p-5 space-y-3">
+            {authError && (
+              <div className="text-center text-sm text-destructive bg-destructive/10 p-2.5 rounded-lg" data-testid="text-auth-error">
+                {authError}
+              </div>
+            )}
+
+            {authSuccess && (
+              <div className="text-center text-sm text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 p-2.5 rounded-lg" data-testid="text-auth-success">
+                {authSuccess}
+              </div>
+            )}
+
+            {authView === 'main' && renderMainView()}
+            {authView === 'email-entry' && renderEmailEntryView()}
+            {authView === 'email-signin' && renderEmailSignInView()}
+            {authView === 'email-signup' && renderEmailSignUpView()}
+            {authView === 'forgot-password' && renderForgotPasswordView()}
+          </Card>
+
+          {authView === 'main' && (
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <p>Capture photos offline with instant sync</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <p>Annotate and organize by project</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <p>View projects on interactive map</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
