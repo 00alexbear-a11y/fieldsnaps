@@ -1,0 +1,1223 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/53F66FBC-D3C7-4323-A421-4694F2A07110/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4bca915e-bfcd-47ab-b829-9c5bfd87120c
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x12ecdd530 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+Networking process (0x114060190) took 1.226596 seconds to launch
+WebContent process (0x1140e8100) took 1.005442 seconds to launch
+WebContent[89027] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 37867757
+⚡️  To Native ->  SecureStorage internalGetItem 37867758
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","version":"builtin","status":"success"}}
+⚡️  To Native ->  CapacitorUpdater addListener 37867759
+⚡️  To Native ->  CapacitorUpdater addListener 37867760
+⚡️  To Native ->  CapacitorUpdater addListener 37867761
+⚡️  To Native ->  CapacitorUpdater current 37867762
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 37867763
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","status":"success","id":"builtin"},"native":"1.0"}
+⚡️  To Native ->  App addListener 37867764
+⚡️  To Native ->  App addListener 37867765
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1764979825,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YW
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","status":"success","id":"builtin"}
+⚡️  To Native ->  CapacitorHttp request 37867766
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 37867767
+⚡️  TO JS ⚡️  To Native ->  App undefined
+addListener 37867768
+⚡️  To Native ->  StatusBar setOverlaysWebView 37867769
+⚡️  To Native ->  StatusBar setStyle 37867770
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  To Native ->  SplashScreen hide 37867771
+⚡️  TO JS undefined
+⚡️  TO JS {"headers":{"date":"Sat, 06 Dec 2025 01:05:26 GMT","set-cookie":"__cf_bm=HVBWlL0baYVU.OUJJcfljyP..0QMzZe3geOp0PVNiwo-1764983126-1.0.1.1-FAzZBSXRQDgxKiHh0u_68GpHaBpDCh7elHJADeetLEuBWLbRgZ_MuPDMEwy.QsIzYkKIu3LikNCsgC25LOPtUhp97sqm5imuCkk6YFZi4lQ; path=\/; ex
+⚡️  To Native ->  SecureStorage internalSetItem 37867772
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: TOKEN_REFRESHED
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867773
+⚡️  To Native ->  SecureStorage internalGetItem 37867774
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867775
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867776
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  Network getStatus 37867777
+⚡️  To Native ->  Network addListener 37867778
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  SecureStorage internalGetItem 37867779
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867780
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  To Native ->  SecureStorage internalGetItem 37867781
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867782
+⚡️  To Native ->  SecureStorage internalGetItem 37867783
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867784
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867785
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867786
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867787
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867788
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867789
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867790
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867791
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867792
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867793
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  Haptics impact 37867794
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Signing out
+⚡️  To Native ->  SecureStorage internalGetItem 37867795
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  CapacitorHttp request 37867796
+⚡️  TO JS {"data":"","status":204,"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/logout?scope=global","headers":{"server-timing":"cfExtPri","server":"cloudflare","strict-transport-security":"max-age=31536000; includeSubDomains; preload","sb-project-ref
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867797
+⚡️  TO JS {"success":true}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867798
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867799
+⚡️  TO JS {"success":false}
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867800
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  Network removeListener 37867801
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  To Native ->  SecureStorage internalGetItem 37867802
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867803
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [TokenManager] No Supabase session found
+internalGetItem 37867804
+⚡️  To Native ->  SecureStorage internalGetItem 37867805
+⚡️  TO JS {"data":null}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalGetItem 37867806
+⚡️  To Native ->  SecureStorage internalGetItem 37867807
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867808
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867809
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 37867810
+⚡️  To Native ->  SecureStorage internalGetItem 37867811
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867812
+⚡️  TO JS {"data":null}
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867813
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  ⚡️  [log] - [TokenManager] Refreshing access token...
+SecureStorage internalGetItem 37867814
+⚡️  To Native ->  SecureStorage internalGetItem 37867815
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867816
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867817
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage ⚡️  TO JS internalGetItem {"data":null}
+37867818
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  [log] - [SupabaseAuth] Sign-out successful
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+internalGetItem 37867819
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867820
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867821
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  To Native ->  SecureStorage internalGetItem 37867822
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867823
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867824
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalGetItem 37867825
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867826
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867827
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867828
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867829
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 37867830
+No saved state found
+⚡️  TO JS undefined
+⚡️  To Native ->  ⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+SocialLogin login 37867831
+⚡️  TO JS {"provider":"google","result":{"accessToken":{"refreshToken":"1\/\/065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4","token":"ya29.a0ATi6K2uXCiCrizMkq-mndlHWerLoWh92AnOfj0uijyQzhxASQRiY1uz0_eABx639e2_e5TO
+⚡️  To Native ->  CapacitorHttp request 37867832
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"provider":"google","result":{"accessToken":{"refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4","token":"ya29.a0ATi6K2uXCiCrizMkq-mndlHWerLoWh92AnOfj0uijyQzhxASQRiY1uz0_eABx639e2_e5TOayXpbmEEQzxMLaO1ovdArGz2n6J2ejOPK9ahy63AB9yhb58PU4QumOX0X6no1u43nDFpPURa81lNbPIYb5SA8hxoueqIHnBpFQIGP68hkqDQkSwiTPUm3mUpqeVAFkrnPaCgYKAYASARASFQHGX2MiHH4TdzAeYF4bX_gvuj9jXA0207","userId":"101096107950550804914"},"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ1NDNlMjFhMDI3M2VmYzY2YTQ3NTAwMDI0NDFjYjIxNTFjYjIzNWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoicjdUalpzSVBqQkZmbFYyUURDZU12dyIsImlhdCI6MTc2NDk4MzE0NywiZXhwIjoxNzY0OTg2NzQ3fQ.rPmIJ4l362LobJzXlNSjsgqrIUAdOuPmGNgQu1dUgoS4aYxOBJZZITHjn0AXQ4NiEW8pnh7Ob9tkreTdiFsbnrP1yyyOEOgivMxI5xKon3mQYhPArhkBTcJGKQ2GJWJpsOpxng4Rn9PHXrBuCmQpsseyefRP1IayECyA8M85fuik1GdMWw1wtEbtArTNJp1_tjivb5GqxaD9Jhpew7Ddpg7t7OD6Y2mDMXzUAB44Sl-_tgBZix1ZSGWvQy6M4BpUO-64xL3er6LlkYnhfe8bMLlt48YizJjfX40VW5-PH6dt4Rjo19uw7qzsMuwi-kP-fNvIOAPHqYM_KWn3IVoFaQ","profile":{"name":"Aleksandr Medvedev","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","givenName":"Aleksandr","familyName":"Medvedev","email":"hello@fieldsnaps.com","id":"101096107950550804914"},"responseType":"online"}}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  TO JS {"status":200,"headers":{"content-type":"application\/json","x-envoy-attempt-count":"1","cf-cache-status":"DYNAMIC","content-encoding":"gzip","server":"cloudflare","cf-ray":"9a97e083ff7def4b-PDX","set-cookie":"__cf_bm=HxYzd1bodp5uoGcBZTVKMW.WP6O_DyO2PUKX3A
+⚡️  To Native ->  SecureStorage internalSetItem 37867833
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867834
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  Network getStatus 37867835
+⚡️  To Native ->  Network addListener 37867836
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  SecureStorage internalGetItem 37867837
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867838
+⚡️  To Native ->  SecureStorage internalGetItem 37867839
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867840
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867841
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867842
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867843
+⚡️  To Native ->  SecureStorage internalGetItem 37867844
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867845
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867846
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867847
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867848
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867849
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867850
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867851
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867852
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867853
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867854
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867855
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867856
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867857
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867858
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867859
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867860
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867861
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867862
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867863
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867864
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867865
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867866
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867867
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867868
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867869
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867870
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867871
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867872
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867873
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867874
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867875
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867876
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867877
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867878
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867879
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  CapacitorHttp request 37867880
+⚡️  TO JS {"status":200,"data":"<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" \/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover\" \/>\n    <meta name=\"theme-color\" con
+⚡️  To Native ->  SecureStorage internalGetItem 37867881
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867882
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867883
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867884
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867885
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867886
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867887
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867888
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867889
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867890
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867891
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867892
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [error] - Google Maps API key not found
+⚡️  To Native ->  SecureStorage internalGetItem 37867893
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867894
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867895
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867896
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867897
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867898
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867899
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867900
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867901
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867902
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867903
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867904
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867905
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867906
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867907
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867908
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867909
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867910
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867911
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867912
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867913
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  CapacitorHttp request 37867914
+⚡️  TO JS {"data":"<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" \/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover\" \/>\n    <meta name=\"theme-color\" content=\"#FFFFF
+⚡️  [log] - [Camera] NO EXISTING SESSION - Generated new sessionId: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [Camera] Setting project from URL: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  To Native ->  SpeechRecognition available 37867915
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  To Native ->  SecureStorage internalGetItem 37867916
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  SecureStorage internalGetItem 37867917
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867918
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867919
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  SecureStorage internalGetItem 37867920
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867921
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  To Native ->  StatusBar hide 37867922
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 37867923
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification ⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"eab79173-fd15-4941-83e3-2dae7fd58a71","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","action":"create","online":true}
+37867924
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  To Native ->  Network getStatus 37867925
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {"line":606,"column":67894,"sourceURL":"capacitor://localhost/assets/index-Dll-GUu4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create eab79173-fd15-4941-83e3-2dae7fd58a71
+⚡️  [log] - [Sync] Starting photo upload for: eab79173-fd15-4941-83e3-2dae7fd58a71 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 341351 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 10093 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 37867926
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification 37867927
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"5d574f0f-7224-44c6-8a33-ba00a08b42a8","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","action":"create","online":true}
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Network getStatus ⚡️  [log] - [Sync] Photo added to queue successfully
+37867928
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {"line":606,"column":67894,"sourceURL":"capacitor://localhost/assets/index-Dll-GUu4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create 5d574f0f-7224-44c6-8a33-ba00a08b42a8
+⚡️  [log] - [Sync] Waiting for retry delay: 557ms (retry 1/5)
+⚡️  [log] - [Sync] Starting photo upload for: 5d574f0f-7224-44c6-8a33-ba00a08b42a8 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 375127 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 9817 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 2x via applyConstraints
+⚡️  To Native ->  Haptics impact 37867929
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification 37867930
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"3d7996f2-73d3-40bf-85eb-f92babf83038","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","action":"create","online":true}
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  To Native ->  Network getStatus 37867931
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {"line":606,"column":67894,"sourceURL":"capacitor://localhost/assets/index-Dll-GUu4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create 3d7996f2-73d3-40bf-85eb-f92babf83038
+⚡️  [log] - [Sync] Waiting for retry delay: 1079ms (retry 1/5)
+⚡️  [log] - [Sync] Processing photo create eab79173-fd15-4941-83e3-2dae7fd58a71
+⚡️  [log] - [Sync] Starting photo upload for: 3d7996f2-73d3-40bf-85eb-f92babf83038 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 314080 bytes
+⚡️  [log] - [Sync] Starting photo upload for: eab79173-fd15-4941-83e3-2dae7fd58a71 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 341351 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 10093 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Thumbnail generated: 8372 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 1x via applyConstraints
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 37867932
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 37867933
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Photo saved for edit: a18b430f-17b4-4662-9eb8-c6aea2580715
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"a18b430f-17b4-4662-9eb8-c6aea2580715","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","action":"create","online":true}
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  To Native ->  Network getStatus 37867934
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Preserving camera stream - navigating to photo viewer
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SpeechRecognition removeAllListeners 37867935
+⚡️  To Native ->  SpeechRecognition stop 37867936
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  [error] - [Sync] Error checking network/settings: {}
+⚡️  To Native ->  SecureStorage internalGetItem 37867937
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867938
+⚡️  To Native ->  SecureStorage internalGetItem 37867939
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867940
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867941
+⚡️  [log] - [Sync] Processing photo create a18b430f-17b4-4662-9eb8-c6aea2580715
+⚡️  [log] - [Sync] Processing photo create 3d7996f2-73d3-40bf-85eb-f92babf83038
+⚡️  [log] - [Sync] Processing photo create 5d574f0f-7224-44c6-8a33-ba00a08b42a8
+⚡️  [log] - [Sync] Waiting for retry delay: 2429ms (retry 2/5)
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Sync] Starting photo upload for: a18b430f-17b4-4662-9eb8-c6aea2580715 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 266737 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 3d7996f2-73d3-40bf-85eb-f92babf83038 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 314080 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 5d574f0f-7224-44c6-8a33-ba00a08b42a8 to project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 375127 bytes
+⚡️  To Native ->  SecureStorage internalGetItem 37867942
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Sync] Thumbnail generated: 8372 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Thumbnail generated: 8554 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9817 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/fe017b0e-7b23-49d8-8ba1-688936ceec8f/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [PhotoEdit] ========== SESSION DEBUG START ==========
+⚡️  [log] - [PhotoEdit] Before update - existing photo data: {"id":"a18b430f-17b4-4662-9eb8-c6aea2580715","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true,"sessionId":"3e529fc6-a477-42b6-82b4-e71a89941ce3","syncStatus":"error"}
+⚡️  [log] - [PhotoEdit] Preserving sessionActive: true
+⚡️  [log] - [PhotoEdit] Preserving sessionId: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [PhotoEdit] Full update data: {"hasBlob":true,"blobSize":290015,"hasAnnotations":true,"sessionActive":true,"sessionId":"3e529fc6-a477-42b6-82b4-e71a89941ce3"}
+⚡️  [log] - [IndexedDB] Updating photo: {"id":"a18b430f-17b4-4662-9eb8-c6aea2580715","hasBlob":true,"hasAnnotations":false}
+⚡️  [log] - [PhotoEdit] After update - verified photo: {"id":"a18b430f-17b4-4662-9eb8-c6aea2580715","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true,"sessionId":"3e529fc6-a477-42b6-82b4-e71a89941ce3","syncStatus":"error"}
+⚡️  [log] - [PhotoEdit] ========== SESSION DEBUG END ==========
+⚡️  [log] - [PhotoEdit] Successfully queued photo for sync
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [Camera] Setting project from URL: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Preserving session, loading photos from IndexedDB for sessionId: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  To Native ->  SpeechRecognition available 37867943
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  SecureStorage internalGetItem 37867944
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] SUCCESS: Loaded 4 session photos: [{"id":"a18b430f-17b4-4662-9eb8-c6aea2580715","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true},{"id":"3d7996f2-73d3-40bf-85eb-f92babf83038","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true},{"id":"5d574f0f-7224-44c6-8a33-ba00a08b42a8","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true},{"id":"eab79173-fd15-4941-83e3-2dae7fd58a71","projectId":"fe017b0e-7b23-49d8-8ba1-688936ceec8f","sessionActive":true}]
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  SecureStorage internalGetItem 37867945
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867946
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867947
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867948
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [Camera Tags] Should show selector: false
+internalGetItem 37867949
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  To Native ->  StatusBar hide 37867950
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera Tags] Selected project: fe017b0e-7b23-49d8-8ba1-688936ceec8f
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+WebContent[89027] Unable to find source 14347 for videoFrameAvailable
+⚡️  [log] - [Camera] Cleaning up session photos for session: 3e529fc6-a477-42b6-82b4-e71a89941ce3
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SpeechRecognition removeAllListeners 37867951
+⚡️  TO JS undefined
+⚡️  To Native ->  SpeechRecognition stop 37867952
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 37867953
+⚡️  To Native ->  StatusBar show 37867954
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  SecureStorage internalGetItem 37867955
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867956
+⚡️  To Native ->  SecureStorage internalGetItem 37867957
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867958
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867959
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [IndexedDB] Session cleanup: deleted 0 uploaded photos, cleared 4 pending photos
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [Camera] Session cleanup complete: {"deleted":0,"cleared":4}
+internalGetItem 37867960
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867961
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867962
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867963
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867964
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867965
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867966
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867967
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867968
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867969
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  SecureStorage internalGetItem 37867970
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867971
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867972
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867973
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867974
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867975
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867976
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867977
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867978
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867979
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867980
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [error] - Google Maps API key not found
+⚡️  To Native ->  SecureStorage internalGetItem 37867981
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867982
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867983
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867984
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867985
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867986
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867987
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867988
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867989
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867990
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867991
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867992
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867993
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37867994
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867995
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867996
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867997
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867998
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37867999
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [error] - Google Maps API key not found
+⚡️  To Native ->  SecureStorage internalGetItem 37868000
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868001
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37868002
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868003
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37868004
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37868005
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868006
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868007
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [error] - Google Maps API key not found
+⚡️  To Native ->  SecureStorage internalGetItem 37868008
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868009
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  SecureStorage internalGetItem 37868010
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868011
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37868012
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37868013
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868014
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868015
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [error] - Google Maps API key not found
+⚡️  To Native ->  SecureStorage internalGetItem 37868016
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  To Native ->  SecureStorage internalGetItem 37868017
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh

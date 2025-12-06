@@ -1,0 +1,262 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/53F66FBC-D3C7-4323-A421-4694F2A07110/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4bca915e-bfcd-47ab-b829-9c5bfd87120c
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x12ecdd530 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+Networking process (0x114060190) took 1.226596 seconds to launch
+WebContent process (0x1140e8100) took 1.005442 seconds to launch
+WebContent[89027] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 37867757
+⚡️  To Native ->  SecureStorage internalGetItem 37867758
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","id":"builtin","version":"builtin","status":"success"}}
+⚡️  To Native ->  CapacitorUpdater addListener 37867759
+⚡️  To Native ->  CapacitorUpdater addListener 37867760
+⚡️  To Native ->  CapacitorUpdater addListener 37867761
+⚡️  To Native ->  CapacitorUpdater current 37867762
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 37867763
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","status":"success","id":"builtin"},"native":"1.0"}
+⚡️  To Native ->  App addListener 37867764
+⚡️  To Native ->  App addListener 37867765
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1764979825,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YW
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin","status":"success","id":"builtin"}
+⚡️  To Native ->  CapacitorHttp request 37867766
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 37867767
+⚡️  TO JS ⚡️  To Native ->  App undefined
+addListener 37867768
+⚡️  To Native ->  StatusBar setOverlaysWebView 37867769
+⚡️  To Native ->  StatusBar setStyle 37867770
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  To Native ->  SplashScreen hide 37867771
+⚡️  TO JS undefined
+⚡️  TO JS {"headers":{"date":"Sat, 06 Dec 2025 01:05:26 GMT","set-cookie":"__cf_bm=HVBWlL0baYVU.OUJJcfljyP..0QMzZe3geOp0PVNiwo-1764983126-1.0.1.1-FAzZBSXRQDgxKiHh0u_68GpHaBpDCh7elHJADeetLEuBWLbRgZ_MuPDMEwy.QsIzYkKIu3LikNCsgC25LOPtUhp97sqm5imuCkk6YFZi4lQ; path=\/; ex
+⚡️  To Native ->  SecureStorage internalSetItem 37867772
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: TOKEN_REFRESHED
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867773
+⚡️  To Native ->  SecureStorage internalGetItem 37867774
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867775
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867776
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  To Native ->  Network getStatus 37867777
+⚡️  To Native ->  Network addListener 37867778
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  SecureStorage internalGetItem 37867779
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867780
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  To Native ->  SecureStorage internalGetItem 37867781
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867782
+⚡️  To Native ->  SecureStorage internalGetItem 37867783
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867784
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867785
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 37867786
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867787
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867788
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867789
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867790
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867791
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867792
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  SecureStorage internalGetItem 37867793
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB
+⚡️  To Native ->  Haptics impact 37867794
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Signing out
+⚡️  To Native ->  SecureStorage internalGetItem 37867795
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"q76a6gahznbj\\\",\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzd
+⚡️  To Native ->  CapacitorHttp request 37867796
+⚡️  TO JS {"data":"","status":204,"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/logout?scope=global","headers":{"server-timing":"cfExtPri","server":"cloudflare","strict-transport-security":"max-age=31536000; includeSubDomains; preload","sb-project-ref
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867797
+⚡️  TO JS {"success":true}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867798
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867799
+⚡️  TO JS {"success":false}
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_OUT
+⚡️  [log] - [useAuth] Auth state changed: signed out
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867800
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  Network removeListener 37867801
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  To Native ->  SecureStorage internalGetItem 37867802
+⚡️  [log] - [SupabaseAuth] Deep link listener already registered
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867803
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [TokenManager] No Supabase session found
+internalGetItem 37867804
+⚡️  To Native ->  SecureStorage internalGetItem 37867805
+⚡️  TO JS {"data":null}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalGetItem 37867806
+⚡️  To Native ->  SecureStorage internalGetItem 37867807
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867808
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867809
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalGetItem 37867810
+⚡️  To Native ->  SecureStorage internalGetItem 37867811
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867812
+⚡️  TO JS {"data":null}
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867813
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  To Native ->  ⚡️  [log] - [TokenManager] Refreshing access token...
+SecureStorage internalGetItem 37867814
+⚡️  To Native ->  SecureStorage internalGetItem 37867815
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867816
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867817
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage ⚡️  TO JS internalGetItem {"data":null}
+37867818
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: none
+⚡️  [log] - [SupabaseAuth] Sign-out successful
+⚡️  To Native ->  SecureStorage ⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+internalGetItem 37867819
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867820
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867821
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  To Native ->  SecureStorage internalGetItem 37867822
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867823
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867824
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  TO JS {"success":false}
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalGetItem 37867825
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867826
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] No Supabase session found
+⚡️  TO JS {"data":null}
+⚡️  To Native ->  SecureStorage internalGetItem 37867827
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] Access token expired or expiring soon, refreshing...
+⚡️  [log] - [TokenManager] Refreshing access token...
+⚡️  TO JS {"data":null}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+⚡️  [log] - [TokenManager] No refresh token available
+⚡️  [log] - [TokenManager] ❌ Token refresh failed, user must login
+⚡️  [log] - [TokenManager] Clearing tokens from iOS Keychain
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867828
+⚡️  TO JS {"success":false}
+⚡️  To Native ->  SecureStorage internalRemoveItem 37867829
+⚡️  TO JS {"success":false}
+⚡️  [log] - [TokenManager] ✅ Tokens cleared
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
