@@ -140,3 +140,30 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **Google Geocoding API**: Address to coordinates conversion
 - **Google Maps API**: Map views and location display (for admin dashboard)
 - **Stripe**: Web subscription management and payment processing
+
+## iOS Native App Build
+
+### iOS Build Command
+```bash
+VITE_API_URL="https://YOUR-REPLIT-DOMAIN.replit.dev" \
+VITE_SUPABASE_URL="..." \
+VITE_SUPABASE_ANON_KEY="..." \
+VITE_GOOGLE_WEB_CLIENT_ID="..." \
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+```
+
+**CRITICAL**: The `VITE_API_URL` environment variable MUST be set during build for iOS apps to communicate with the backend. Without it, the app defaults to `https://fieldsnaps.com` which causes "Network Error: string did not match expected pattern" errors.
+
+### iOS Layout Guidelines (December 2024)
+Fixed elements should never scroll. The app uses these CSS utilities:
+- **`app-shell`**: Root container - `position: fixed; inset: 0; overflow: hidden`
+- **`scroll-container`**: Content areas - `overflow-y: auto; overscroll-behavior-y: contain`
+- **`fixed-fullscreen`**: Edge-to-edge views (camera) - `position: fixed; inset: 0; touch-action: none`
+- **`bottom-nav-fixed`**: Bottom navigation - fixed with safe area padding
+- Safe area classes: `pt-safe-3`, `pb-safe-4`, `safe-area-pt-4`, `safe-area-pb-4`
+
+Key principles:
+1. Root uses `app-shell` class for fixed layout
+2. Header has `flex-shrink-0` and `touch-action: none` to prevent scroll
+3. Main content uses `scroll-container` for contained scrolling
+4. Camera and modals use `fixed-fullscreen` for edge-to-edge display

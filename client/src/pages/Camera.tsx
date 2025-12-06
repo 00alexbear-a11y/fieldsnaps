@@ -1881,7 +1881,7 @@ export default function Camera() {
     };
 
     return (
-      <div className="fixed inset-0 w-full h-dvh bg-black overflow-hidden flex items-center justify-center">
+      <div className="fixed-fullscreen w-full bg-black flex items-center justify-center" style={{ minHeight: '100svh' }}>
         <div className="text-center space-y-6 p-8">
           <div className="w-24 h-24 mx-auto bg-red-600/20 rounded-full flex items-center justify-center">
             <CameraIcon className="w-12 h-12 text-red-600" />
@@ -1919,7 +1919,7 @@ export default function Camera() {
   // Show minimal black screen while restoring session to prevent flash
   if (isRestoringSession) {
     return (
-      <div className="fixed inset-0 w-full h-dvh bg-black flex items-center justify-center">
+      <div className="fixed-fullscreen w-full bg-black flex items-center justify-center" style={{ minHeight: '100svh' }}>
         <div className="text-white/60 text-sm">Loading...</div>
       </div>
     );
@@ -1928,7 +1928,8 @@ export default function Camera() {
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-0 w-full h-dvh overflow-hidden flex flex-col"
+      className="fixed-fullscreen w-full flex flex-col"
+      style={{ minHeight: '100svh' }}
       onTouchStart={handleContainerTouchStart}
       onTouchMove={handleContainerTouchMove}
       onTouchEnd={handleContainerTouchEnd}
@@ -2121,7 +2122,10 @@ export default function Camera() {
       </div>
 
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
-      <div className="flex-shrink-0 flex flex-col items-center gap-2 pt-4 pb-safe-4 px-6 mb-0 bg-black">
+      <div 
+        className="flex-shrink-0 flex flex-col items-center gap-2 pt-4 px-6 bg-black"
+        style={{ paddingBottom: 'max(1rem, var(--safe-area-bottom, 0px))' }}
+      >
         {/* Central Control Row - Bottom Position */}
         <div className="flex items-center justify-between w-full">
           {/* Thumbnail - Bottom Left (iOS Style) */}
