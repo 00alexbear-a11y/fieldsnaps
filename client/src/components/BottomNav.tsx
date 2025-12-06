@@ -81,10 +81,14 @@ export default function BottomNav() {
   return (
     <>
       {/* Background fill to prevent content from showing at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 h-28 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none pb-safe" />
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none"
+        style={{ height: 'calc(6rem + var(--safe-area-bottom, 0px))' }}
+      />
       
       <nav
-        className="fixed bottom-4 left-0 right-0 z-[100] bg-transparent pb-safe"
+        className="fixed left-0 right-0 z-[100] bg-transparent"
+        style={{ bottom: 'calc(1rem + var(--safe-area-bottom, 0px))' }}
         data-testid="nav-bottom"
       >
         <div className="flex items-center justify-around gap-1 min-h-[44px] max-w-screen-sm mx-auto px-2">
