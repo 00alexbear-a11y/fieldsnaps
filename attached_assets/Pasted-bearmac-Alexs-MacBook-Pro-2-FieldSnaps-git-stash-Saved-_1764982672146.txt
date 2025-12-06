@@ -1,0 +1,121 @@
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % git stash
+Saved working directory and index state WIP on main: d5d23db Update Google login to use new OAuth flow and plugin
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % git pull origin main
+remote: Enumerating objects: 28, done.
+remote: Counting objects: 100% (28/28), done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 22 (delta 15), reused 22 (delta 15), pack-reused 0 (from 0)
+Unpacking objects: 100% (22/22), 692.40 KiB | 5.17 MiB/s, done.
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+   bec7d33..f414b89  main       -> origin/main
+Updating d5d23db..f414b89
+Fast-forward
+ .replit                                            |    1 +
+ XCODE_BUILD_GUIDE.md                               |   99 +-
+ ...hot_2025-12-04_at_15.20.33@2x_1764890436689.png |  Bin 0 -> 1144220 bytes
+ ...hot_2025-12-04_at_15.24.15@2x_1764890657674.png |  Bin 0 -> 895895 bytes
+ ...hot_2025-12-04_at_15.33.44@2x_1764891228746.png |  Bin 0 -> 6522184 bytes
+ ...hot_2025-12-04_at_15.34.25@2x_1764891268663.png |  Bin 0 -> 894640 bytes
+ ...hot_2025-12-04_at_15.36.31@2x_1764891395080.png |  Bin 0 -> 6091427 bytes
+ ...hot_2025-12-04_at_15.58.31@2x_1764892713709.png |  Bin 0 -> 1727429 bytes
+ ...hot_2025-12-04_at_16.04.52@2x_1764893095342.png |  Bin 0 -> 6392968 bytes
+ ...hot_2025-12-05_at_08.16.50@2x_1764951417237.png |  Bin 0 -> 952657 bytes
+ ...hot_2025-12-05_at_08.26.09@2x_1764951972125.png |  Bin 0 -> 873866 bytes
+ ...hot_2025-12-05_at_08.26.59@2x_1764952023172.png |  Bin 0 -> 854454 bytes
+ attached_assets/IMG_4411_1764972570697.PNG         |  Bin 0 -> 258155 bytes
+ attached_assets/IMG_4412_1764972570696.PNG         |  Bin 0 -> 269097 bytes
+ ...BGAppRefreshSubscriber-load-U_1764888104142.txt |  143 +++
+ ...BGAppRefreshSubscriber-load-U_1764891136960.txt |  123 +++
+ ...BGAppRefreshSubscriber-load-U_1764891653060.txt |  127 +++
+ ...BGAppRefreshSubscriber-load-U_1764891818418.txt |  121 +++
+ ...BGAppRefreshSubscriber-load-U_1764892171530.txt |  123 +++
+ ...BGAppRefreshSubscriber-load-U_1764894193620.txt |   30 +
+ ...BGAppRefreshSubscriber-load-U_1764950095188.txt |   46 +
+ ...BGAppRefreshSubscriber-load-U_1764950318462.txt |   39 +
+ ...BGAppRefreshSubscriber-load-U_1764950489523.txt |   41 +
+ ...BGAppRefreshSubscriber-load-U_1764950785716.txt |  124 +++
+ ...BGAppRefreshSubscriber-load-U_1764951303779.txt |  153 +++
+ ...BGAppRefreshSubscriber-load-U_1764951617864.txt |  127 +++
+ ...BGAppRefreshSubscriber-load-U_1764951774738.txt |  146 +++
+ ...BGAppRefreshSubscriber-load-U_1764952160726.txt |  248 +++++
+ ...BGAppRefreshSubscriber-load-U_1764952219569.txt |  407 ++++++++
+ ...BGAppRefreshSubscriber-load-U_1764972433115.txt |   65 ++
+ ...BGAppRefreshSubscriber-load-U_1764972576103.txt |  159 +++
+ ...BGAppRefreshSubscriber-load-U_1764972744653.txt |  187 ++++
+ ...BGAppRefreshSubscriber-load-U_1764972929568.txt |  260 +++++
+ ...BGAppRefreshSubscriber-load-U_1764973219348.txt |  182 ++++
+ ...BGAppRefreshSubscriber-load-U_1764973293920.txt |  197 ++++
+ ...BGAppRefreshSubscriber-load-U_1764973512530.txt |  106 ++
+ ...84s-bearmac-Alexs-MacBook-Pro_1764950682554.txt |   62 ++
+ ...33s-bearmac-Alexs-MacBook-Pro_1764973411257.txt |  137 +++
+ ...-34-on-ttys000-bearmac-Alexs-_1764887977736.txt |  298 ++++++
+ ...-34-on-ttys000-bearmac-Alexs-_1764891842805.txt |  864 ++++++++++++++++
+ ...-34-on-ttys000-bearmac-Alexs-_1764891908848.txt |  978 ++++++++++++++++++
+ ...-34-on-ttys000-bearmac-Alexs-_1764891954283.txt | 1084 ++++++++++++++++++++
+ ...-47-on-ttys000-bearmac-Alexs-_1764893462196.txt |  108 ++
+ ...-48-on-ttys000-bearmac-Alexs-_1764951138131.txt |  615 +++++++++++
+ ...-MacBook-Pro-2--1764893228991_1764893228991.txt |  102 ++
+ ...2-FieldSnaps-VITE-SUPABASE-UR_1764972849679.txt |  107 ++
+ ...upabase-supabase-js-import-Ca_1764892973556.txt |  160 +++
+ ...shot_2025-12-05_at_2.21.13_PM_1764973283318.png |  Bin 0 -> 295947 bytes
+ client/public/download/supabaseAuth.txt            |  470 +++++++++
+ client/src/lib/supabaseAuth.ts                     |  247 ++---
+ client/src/pages/Login.tsx                         |  283 +++--
+ client/src/pages/NativeAppLogin.tsx                |  653 +++++++++---
+ ios/App/App/Info.plist                             |   13 +
+ ios/App/Podfile                                    |    1 +
+ package-lock.json                                  |   10 +
+ package.json                                       |    1 +
+ replit.md                                          |   11 +-
+ 57 files changed, 9056 insertions(+), 402 deletions(-)
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.20.33@2x_1764890436689.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.24.15@2x_1764890657674.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.33.44@2x_1764891228746.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.34.25@2x_1764891268663.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.36.31@2x_1764891395080.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_15.58.31@2x_1764892713709.png
+ create mode 100644 attached_assets/CleanShot_2025-12-04_at_16.04.52@2x_1764893095342.png
+ create mode 100644 attached_assets/CleanShot_2025-12-05_at_08.16.50@2x_1764951417237.png
+ create mode 100644 attached_assets/CleanShot_2025-12-05_at_08.26.09@2x_1764951972125.png
+ create mode 100644 attached_assets/CleanShot_2025-12-05_at_08.26.59@2x_1764952023172.png
+ create mode 100644 attached_assets/IMG_4411_1764972570697.PNG
+ create mode 100644 attached_assets/IMG_4412_1764972570696.PNG
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764888104142.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891136960.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891653060.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891818418.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764892171530.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764894193620.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950095188.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950318462.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950489523.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950785716.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951303779.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951617864.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951774738.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764952160726.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764952219569.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972433115.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972576103.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972744653.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972929568.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973219348.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973293920.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973512530.txt
+ create mode 100644 attached_assets/Pasted--info-Sync-finished-in-2-684s-bearmac-Alexs-MacBook-Pro_1764950682554.txt
+ create mode 100644 attached_assets/Pasted--info-Sync-finished-in-3-133s-bearmac-Alexs-MacBook-Pro_1764973411257.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764887977736.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891842805.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891908848.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891954283.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-16-05-47-on-ttys000-bearmac-Alexs-_1764893462196.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Thu-Dec-4-16-24-48-on-ttys000-bearmac-Alexs-_1764951138131.txt
+ create mode 100644 attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2--1764893228991_1764893228991.txt
+ create mode 100644 attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2-FieldSnaps-VITE-SUPABASE-UR_1764972849679.txt
+ create mode 100644 attached_assets/Pasted-import-createClient-from-supabase-supabase-js-import-Ca_1764892973556.txt
+ create mode 100644 attached_assets/Screenshot_2025-12-05_at_2.21.13_PM_1764973283318.png
+ create mode 100644 client/public/download/supabaseAuth.txt
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % grep -n "Continue with Apple" client/src/pages/NativeAppLogin.tsx
+251:        {isAuthenticating ? 'Signing in...' : 'Continue with Apple'}
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
