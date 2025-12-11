@@ -1,0 +1,512 @@
+Last login: Wed Dec 10 08:37:21 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Downloads/fieldsnaps-main   # or wherever you unzipped it
+npm install
+cd: too many arguments
+npm error code ENOENT
+npm error syscall open
+npm error path /Users/bearmac/package.json
+npm error errno -2
+npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/bearmac/package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: /Users/bearmac/.npm/_logs/2025-12-11T00_13_06_222Z-debug-0.log
+bearmac@Alexs-MacBook-Pro-2 ~ % ls ~/Downloads
+A3.0 FOUNDATION PLAN.pdf
+AB CERT - NU.pdf
+AB GROUP SIGN 1.png
+ab_group_llc_20804627.pdf
+ABGROUP.png
+ABGROUPLLC20837246.pdf
+Alexs Chrome passwords.csv
+AuthKey_7AB24X9GC4.p8
+Bath Handle 2.000.stl
+BetterDisplay-v4.0.4.dmg
+Bobby Helms - Jingle Bell Rock (Lyrics) Christmas Rock.mp3
+C1-SITE PLAN.pdf
+cityofvancouver.myrelayview.com_Permits_cart_receipt_WIL63IKR.pdf
+client_757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac.apps.googleusercontent.com.plist
+Condo paymetn.pdf
+FieldSnaps
+FieldSnaps.mobileprovision
+FieldSnaps.zip
+fw9.pdf
+HeartGears1-2 (1).stl
+IMG_2431.HEIC
+IMG_4274.WEBP
+IMG_4411.PNG
+IMG_4412.PNG
+IMG_4415.PNG
+IMG_4416.PNG
+IMG_4417.PNG
+IMG_4418.PNG
+IMG_4419.PNG
+IMG_5582.PNG
+Invoice 1056.pdf
+José Feliciano - Feliz Navidad (Official Audio).mp3
+LIGHT PLAN.pdf
+MD&I W9 10.22.25.pdf
+Medvedev Residence - Mcglouphlin Vancouver - AB Group .pdf
+page for background.pdf
+POLICY COPY ENDORSEMENTS.pdf
+replit
+ScreenRecording_11-25-2025 23-30-32_1.MP4
+Screenshot 2025-11-26 at 11.12.54 AM.png
+Screenshot 2025-11-26 at 11.36.42 AM.png
+Screenshot 2025-11-26 at 11.47.28 AM.png
+Screenshot 2025-11-26 at 12.09.24 PM.png
+Screenshot 2025-11-26 at 12.18.04 PM.png
+Screenshot 2025-11-26 at 3.48.17 PM.png
+Screenshot 2025-12-04 at 1.13.25 PM.png
+Screenshot 2025-12-04 at 8.48.38 AM.png
+Screenshot 2025-12-05 at 2.21.13 PM.png
+Screenshot 2025-12-05 at 3.02.34 PM.png
+Screenshot 2025-12-08 at 7.52.32 AM.png
+supabase.ts
+supabaseAuth.ts
+Tighter PNG.png
+W-9.pdf
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Downloads
+bearmac@Alexs-MacBook-Pro-2 Downloads % cd FieldSnaps
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % npm install
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+npm warn deprecated source-map@0.8.0-beta.0: The work that was done in this beta branch won't be included in future versions
+
+added 981 packages, and audited 982 packages in 6s
+
+157 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (3 low, 5 moderate, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % VITE_API_URL="https://fieldsnaps.replit.app" \
+VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co" \
+VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs" \
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (9) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3257 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-BXGG07-I.css                                130.31 kB │ gzip:  20.26 kB
+../dist/public/assets/web-DxU-eLfX.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-Dsg1Vf_M.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-DcrwouQ4.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-CO-Te0op.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-5xo_Zk2K.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-DgjGTpY6.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-8R539Irh.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-BsVrEbeG.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/isToday-DgJnm6jA.js                                 0.61 kB │ gzip:   0.33 kB
+../dist/public/assets/native-DA1o1_ON.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-DCagvg6e.js                                     0.76 kB │ gzip:   0.35 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-Be93UZmL.js                                     0.80 kB │ gzip:   0.41 kB
+../dist/public/assets/web-DslU2lw-.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-RbA12wwa.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-D_gbVzXe.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-B8ZEwKN5.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-DtiCx0po.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-DXPzKpvL.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-CyQoPDCI.js                                     3.44 kB │ gzip:   1.09 kB
+../dist/public/assets/web-CSotZ5co.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-Cd_9BvTJ.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web-8-o8p8_C.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/ToDos-C5iAgQAB.js                                  27.71 kB │ gzip:   7.82 kB
+../dist/public/assets/Settings-DrUfFVKa.js                               43.40 kB │ gzip:   9.61 kB
+../dist/public/assets/Camera-BJuaz3FS.js                                 78.78 kB │ gzip:  21.37 kB
+../dist/public/assets/ProjectPhotos-uZlPML80.js                         125.58 kB │ gzip:  36.79 kB
+../dist/public/assets/index.es-B1sRUy0c.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-Coah699x.js                               1,628.24 kB │ gzip: 473.55 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.45s
+
+  dist/index.js  302.0kb
+
+⚡ Done in 16ms
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 14.80ms
+✔ Creating capacitor.config.json in ios/App/App in 405.38μs
+✔ copy ios in 83.14ms
+✔ Updating iOS plugins in 7.75ms
+✔ Updating iOS native dependencies with pod install in 4.60s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 5.29s
+[info] Sync finished in 7.394s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % npx cap open ios
+✔ Opening the Xcode workspace... in 3.00s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % VITE_API_URL="https://fieldsnaps.replit.app" npm run build && rm -rf ios/App/App/public && npx cap sync ios
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (7) ../vite/preload-helper.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3257 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-BXGG07-I.css                                130.31 kB │ gzip:  20.26 kB
+../dist/public/assets/web-ZRTXlmXz.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-Br2avbDy.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-BkuxGNyg.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-CxJpVXe_.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-CIEqGL3n.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-C0XQjnli.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-BFdk7NhX.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-C6go0Add.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/isToday-aHkqYUf2.js                                 0.61 kB │ gzip:   0.33 kB
+../dist/public/assets/native-CwCUThlj.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-BYG-QlnP.js                                     0.76 kB │ gzip:   0.36 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-C326tYdr.js                                     0.80 kB │ gzip:   0.42 kB
+../dist/public/assets/web-DizKqrDc.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-DD3cswSV.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-BRfP9V0F.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-BqKa58Gs.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-Bqe0-MUn.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-BQNBB_ls.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-BlLnowJ1.js                                     3.44 kB │ gzip:   1.09 kB
+../dist/public/assets/web-DulMia95.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-TkyekaB4.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web-CKBMYrqZ.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/ToDos-BFJQcrzt.js                                  27.71 kB │ gzip:   7.82 kB
+../dist/public/assets/Settings-CVtU8a9j.js                               43.40 kB │ gzip:   9.61 kB
+../dist/public/assets/Camera-FKR3fiwM.js                                 78.78 kB │ gzip:  21.37 kB
+../dist/public/assets/ProjectPhotos-DjQ7g6lU.js                         125.58 kB │ gzip:  36.80 kB
+../dist/public/assets/index.es-BIPeAnHD.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-CMnOhPD8.js                               1,628.06 kB │ gzip: 473.40 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.83s
+
+  dist/index.js  302.0kb
+
+⚡ Done in 12ms
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 6.76ms
+✔ Creating capacitor.config.json in ios/App/App in 418.63μs
+✔ copy ios in 79.70ms
+✔ Updating iOS plugins in 8.34ms
+✔ Updating iOS native dependencies with pod install in 3.47s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 3.53s
+[info] Sync finished in 3.944s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % VITE_API_URL="https://fieldsnaps.replit.app" npm run build && rm -rf ios/App/App/public && npx cap sync ios
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (9) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3257 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-BXGG07-I.css                                130.31 kB │ gzip:  20.26 kB
+../dist/public/assets/web-ZRTXlmXz.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-Br2avbDy.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-BkuxGNyg.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-CxJpVXe_.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-CIEqGL3n.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-C0XQjnli.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-BFdk7NhX.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-C6go0Add.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/isToday-aHkqYUf2.js                                 0.61 kB │ gzip:   0.33 kB
+../dist/public/assets/native-CwCUThlj.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-BYG-QlnP.js                                     0.76 kB │ gzip:   0.36 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-C326tYdr.js                                     0.80 kB │ gzip:   0.42 kB
+../dist/public/assets/web-DizKqrDc.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-DD3cswSV.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-BRfP9V0F.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-BqKa58Gs.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-Bqe0-MUn.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-BQNBB_ls.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-BlLnowJ1.js                                     3.44 kB │ gzip:   1.09 kB
+../dist/public/assets/web-DulMia95.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-TkyekaB4.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web-CKBMYrqZ.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/ToDos-BFJQcrzt.js                                  27.71 kB │ gzip:   7.82 kB
+../dist/public/assets/Settings-CVtU8a9j.js                               43.40 kB │ gzip:   9.61 kB
+../dist/public/assets/Camera-FKR3fiwM.js                                 78.78 kB │ gzip:  21.37 kB
+../dist/public/assets/ProjectPhotos-DjQ7g6lU.js                         125.58 kB │ gzip:  36.80 kB
+../dist/public/assets/index.es-BIPeAnHD.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-CMnOhPD8.js                               1,628.06 kB │ gzip: 473.40 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.53s
+
+  dist/index.js  302.0kb
+
+⚡ Done in 13ms
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 9.52ms
+✔ Creating capacitor.config.json in ios/App/App in 451.54μs
+✔ copy ios in 79.65ms
+✔ Updating iOS plugins in 8.37ms
+✔ Updating iOS native dependencies with pod install in 3.00s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 3.06s
+[info] Sync finished in 3.438s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % VITE_API_URL="https://fieldsnaps.replit.app" \
+VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co" \
+VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs" \
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (6) ../vite/preload-helper.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3257 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-BXGG07-I.css                                130.31 kB │ gzip:  20.26 kB
+../dist/public/assets/web-DxU-eLfX.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-Dsg1Vf_M.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-DcrwouQ4.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-CO-Te0op.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-5xo_Zk2K.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-DgjGTpY6.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-8R539Irh.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-BsVrEbeG.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/isToday-DgJnm6jA.js                                 0.61 kB │ gzip:   0.33 kB
+../dist/public/assets/native-DA1o1_ON.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-DCagvg6e.js                                     0.76 kB │ gzip:   0.35 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-Be93UZmL.js                                     0.80 kB │ gzip:   0.41 kB
+../dist/public/assets/web-DslU2lw-.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-RbA12wwa.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-D_gbVzXe.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-B8ZEwKN5.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-DtiCx0po.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-DXPzKpvL.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-CyQoPDCI.js                                     3.44 kB │ gzip:   1.09 kB
+../dist/public/assets/web-CSotZ5co.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-Cd_9BvTJ.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web-8-o8p8_C.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/ToDos-C5iAgQAB.js                                  27.71 kB │ gzip:   7.82 kB
+../dist/public/assets/Settings-DrUfFVKa.js                               43.40 kB │ gzip:   9.61 kB
+../dist/public/assets/Camera-BJuaz3FS.js                                 78.78 kB │ gzip:  21.37 kB
+../dist/public/assets/ProjectPhotos-uZlPML80.js                         125.58 kB │ gzip:  36.79 kB
+../dist/public/assets/index.es-B1sRUy0c.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-Coah699x.js                               1,628.24 kB │ gzip: 473.55 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.37s
+
+  dist/index.js  302.0kb
+
+⚡ Done in 14ms
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 8.63ms
+✔ Creating capacitor.config.json in ios/App/App in 411.62μs
+✔ copy ios in 77.84ms
+✔ Updating iOS plugins in 8.18ms
+✔ Updating iOS native dependencies with pod install in 3.06s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 3.12s
+[info] Sync finished in 3.469s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
