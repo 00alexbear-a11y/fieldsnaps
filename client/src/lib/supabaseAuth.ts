@@ -2,8 +2,46 @@ import { supabase, getRedirectUrl, isNativePlatform } from './supabase';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import { SocialLogin } from '@capgo/capacitor-social-login';
 import type { Session, User, AuthError } from '@supabase/supabase-js';
+
+// First-launch detection key - stored in Preferences (NOT Keychain)
+// Preferences data is cleared on app uninstall, unlike iOS Keychain
+const FIRST_LAUNCH_COMPLETED_KEY = 'fieldsnaps.first.launch.completed';
+
+// Check if user has completed initial login on this app install
+async function hasCompletedFirstLaunch(): Promise<boolean> {
+  try {
+    const { value } = await Preferences.get({ key: FIRST_LAUNCH_COMPLETED_KEY });
+    const completed = value === 'true';
+    console.log('[SupabaseAuth] First launch check:', completed ? 'completed' : 'not completed');
+    return completed;
+  } catch (error) {
+    console.error('[SupabaseAuth] Error checking first launch flag:', error);
+    return false;
+  }
+}
+
+// Mark that user has completed initial login
+export async function setFirstLaunchCompleted(): Promise<void> {
+  try {
+    await Preferences.set({ key: FIRST_LAUNCH_COMPLETED_KEY, value: 'true' });
+    console.log('[SupabaseAuth] First launch marked as completed');
+  } catch (error) {
+    console.error('[SupabaseAuth] Error setting first launch flag:', error);
+  }
+}
+
+// Clear the first launch flag (called on sign out)
+export async function clearFirstLaunchFlag(): Promise<void> {
+  try {
+    await Preferences.remove({ key: FIRST_LAUNCH_COMPLETED_KEY });
+    console.log('[SupabaseAuth] First launch flag cleared');
+  } catch (error) {
+    console.error('[SupabaseAuth] Error clearing first launch flag:', error);
+  }
+}
 
 export interface SupabaseAuthState {
   user: User | null;
@@ -85,6 +123,9 @@ export async function signInWithGoogle(): Promise<void> {
           throw error;
         }
         
+        // Mark first launch as completed after successful login
+        await setFirstLaunchCompleted();
+        
         console.log('[SupabaseAuth] Successfully authenticated with Supabase:', data.user?.id);
         return;
       } else {
@@ -165,6 +206,9 @@ export async function signInWithApple(): Promise<void> {
           throw error;
         }
         
+        // Mark first launch as completed after successful login
+        await setFirstLaunchCompleted();
+        
         console.log('[SupabaseAuth] Successfully authenticated Apple user with Supabase:', data.user?.id);
         return;
       } else {
@@ -216,6 +260,9 @@ export async function signInWithEmail(email: string, password: string): Promise<
     throw error;
   }
   
+  // Mark first launch as completed after successful login
+  await setFirstLaunchCompleted();
+  
   console.log('[SupabaseAuth] Email sign-in successful');
   return { user: data.user, session: data.session };
 }
@@ -233,12 +280,20 @@ export async function signUpWithEmail(email: string, password: string): Promise<
     throw error;
   }
   
+  // Mark first launch as completed after successful sign-up (if session was created)
+  if (data.session) {
+    await setFirstLaunchCompleted();
+  }
+  
   console.log('[SupabaseAuth] Email sign-up successful');
   return { user: data.user, session: data.session };
 }
 
 export async function signOut(): Promise<void> {
   console.log('[SupabaseAuth] Signing out');
+  
+  // Clear the first-launch flag so user sees login screen next time
+  await clearFirstLaunchFlag();
   
   const { error } = await supabase.auth.signOut();
   
@@ -348,6 +403,9 @@ async function handleOAuthCallback(url: string): Promise<boolean> {
       
       await supabase.auth.refreshSession();
       
+      // Mark first launch as completed after successful OAuth
+      await setFirstLaunchCompleted();
+      
       console.log('[SupabaseAuth] Session set successfully, user:', data.user?.id);
       return true;
     } else {
@@ -362,6 +420,9 @@ async function handleOAuthCallback(url: string): Promise<boolean> {
           console.error('[SupabaseAuth] Error exchanging code:', error);
           throw error;
         }
+        
+        // Mark first launch as completed after successful OAuth
+        await setFirstLaunchCompleted();
         
         console.log('[SupabaseAuth] Code exchanged successfully, user:', data.user?.id);
         return true;
@@ -430,6 +491,29 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
   console.log('[SupabaseAuth] Initializing auth');
   
   setupDeepLinkListener();
+  
+  // On native platforms, check if this is a fresh install
+  // iOS Keychain can persist tokens even after app uninstall, causing auto-login
+  // without the user ever seeing the login screen on a fresh install
+  if (isNativePlatform()) {
+    const hasCompleted = await hasCompletedFirstLaunch();
+    
+    if (!hasCompleted) {
+      console.log('[SupabaseAuth] Fresh install detected - clearing persisted session to show login');
+      
+      // Must actually sign out and clear the persisted tokens from Supabase
+      // Otherwise onAuthStateChange will still emit SIGNED_IN event with cached session
+      try {
+        await supabase.auth.signOut();
+        console.log('[SupabaseAuth] Cleared persisted Supabase session for fresh install');
+      } catch (error) {
+        console.log('[SupabaseAuth] Error clearing session (may not exist):', error);
+      }
+      
+      // Force user to login screen - session is now cleared
+      return { session: null, user: null };
+    }
+  }
   
   const session = await getSession();
   const user = session?.user ?? null;
