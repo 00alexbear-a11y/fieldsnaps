@@ -115,9 +115,17 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - `client/src/lib/supabase.ts` - Supabase client with SecureStorage for native
 - `client/src/lib/supabaseAuth.ts` - Auth functions (signIn, signOut, session management)
 - `client/src/hooks/useAuth.ts` - React hook with Supabase session state
-- `client/src/pages/AuthCallback.tsx` - OAuth callback handler
+- `client/src/pages/AuthCallback.tsx` - OAuth callback handler with password recovery flow
 - `client/src/pages/Login.tsx` - Login page with Google and Apple buttons
+- `client/src/pages/Onboarding.tsx` - New user onboarding with escape hatch
 - `server/supabaseAuth.ts` - Backend JWT validation with JWKS
+
+#### Auth Flow Logic (December 2024)
+- **ProfileSetupDialog**: Only shown if `user.firstName && user.lastName` are missing in database (not localStorage)
+- **needsOnboarding**: Only checks `!user.companyId` - if user has company, skip onboarding entirely
+- **Onboarding escape hatch**: "Sign Out & Return to Login" button always visible at bottom
+- **Password reset flow**: AuthCallback detects `type=recovery` query param, shows password reset form, signs user out after successful update
+- **Sign out handling**: Uses `window.location.href` instead of router navigation to force full page reload and prevent auth state race conditions
 
 #### Universal Links
 - AASA endpoint at `/.well-known/apple-app-site-association`
