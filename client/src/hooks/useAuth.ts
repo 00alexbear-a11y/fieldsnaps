@@ -12,6 +12,7 @@ import {
   signInWithEmail,
   signUpWithEmail,
 } from "@/lib/supabaseAuth";
+import { getApiUrl } from "@/lib/apiUrl";
 
 interface AuthState {
   session: Session | null;
@@ -84,7 +85,8 @@ export function useAuth() {
         throw new Error('No session');
       }
       
-      const response = await fetch('/api/auth/user', {
+      // Use getApiUrl to ensure iOS native app hits the correct backend server
+      const response = await fetch(getApiUrl('/api/auth/user'), {
         headers: {
           'Authorization': `Bearer ${authState.session.access_token}`,
         },
