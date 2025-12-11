@@ -1,0 +1,92 @@
+Last login: Wed Dec 10 08:37:21 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Downloads/fieldsnaps-main   # or wherever you unzipped it
+npm install
+cd: too many arguments
+npm error code ENOENT
+npm error syscall open
+npm error path /Users/bearmac/package.json
+npm error errno -2
+npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/bearmac/package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: /Users/bearmac/.npm/_logs/2025-12-11T00_13_06_222Z-debug-0.log
+bearmac@Alexs-MacBook-Pro-2 ~ % ls ~/Downloads
+A3.0 FOUNDATION PLAN.pdf
+AB CERT - NU.pdf
+AB GROUP SIGN 1.png
+ab_group_llc_20804627.pdf
+ABGROUP.png
+ABGROUPLLC20837246.pdf
+Alexs Chrome passwords.csv
+AuthKey_7AB24X9GC4.p8
+Bath Handle 2.000.stl
+BetterDisplay-v4.0.4.dmg
+Bobby Helms - Jingle Bell Rock (Lyrics) Christmas Rock.mp3
+C1-SITE PLAN.pdf
+cityofvancouver.myrelayview.com_Permits_cart_receipt_WIL63IKR.pdf
+client_757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac.apps.googleusercontent.com.plist
+Condo paymetn.pdf
+FieldSnaps
+FieldSnaps.mobileprovision
+FieldSnaps.zip
+fw9.pdf
+HeartGears1-2 (1).stl
+IMG_2431.HEIC
+IMG_4274.WEBP
+IMG_4411.PNG
+IMG_4412.PNG
+IMG_4415.PNG
+IMG_4416.PNG
+IMG_4417.PNG
+IMG_4418.PNG
+IMG_4419.PNG
+IMG_5582.PNG
+Invoice 1056.pdf
+José Feliciano - Feliz Navidad (Official Audio).mp3
+LIGHT PLAN.pdf
+MD&I W9 10.22.25.pdf
+Medvedev Residence - Mcglouphlin Vancouver - AB Group .pdf
+page for background.pdf
+POLICY COPY ENDORSEMENTS.pdf
+replit
+ScreenRecording_11-25-2025 23-30-32_1.MP4
+Screenshot 2025-11-26 at 11.12.54 AM.png
+Screenshot 2025-11-26 at 11.36.42 AM.png
+Screenshot 2025-11-26 at 11.47.28 AM.png
+Screenshot 2025-11-26 at 12.09.24 PM.png
+Screenshot 2025-11-26 at 12.18.04 PM.png
+Screenshot 2025-11-26 at 3.48.17 PM.png
+Screenshot 2025-12-04 at 1.13.25 PM.png
+Screenshot 2025-12-04 at 8.48.38 AM.png
+Screenshot 2025-12-05 at 2.21.13 PM.png
+Screenshot 2025-12-05 at 3.02.34 PM.png
+Screenshot 2025-12-08 at 7.52.32 AM.png
+supabase.ts
+supabaseAuth.ts
+Tighter PNG.png
+W-9.pdf
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Downloads
+bearmac@Alexs-MacBook-Pro-2 Downloads % cd FieldSnaps
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % npm install
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+npm warn deprecated source-map@0.8.0-beta.0: The work that was done in this beta branch won't be included in future versions
+
+added 981 packages, and audited 982 packages in 6s
+
+157 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (3 low, 5 moderate, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
