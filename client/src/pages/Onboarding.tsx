@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, User, ArrowRight, ArrowLeft, Check, Users, Link2 } from 'lucide-react';
+import { Building2, User, ArrowRight, ArrowLeft, Check, Users, Link2, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
+import { signOut } from '@/lib/supabaseAuth';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, type UserRole } from '@shared/permissions';
 
@@ -173,6 +174,20 @@ export default function Onboarding() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      queryClient.clear();
+      // Use window.location to force full page reload, ensuring auth state is re-evaluated
+      // This prevents race conditions where App.tsx guards redirect back before session clears
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('[Onboarding] Sign out error:', error);
+      // Force redirect even if signOut fails
+      window.location.href = '/login';
     }
   };
 
@@ -389,6 +404,20 @@ export default function Onboarding() {
             )}
           </Card>
         )}
+
+        {/* Escape hatch - always visible sign out option */}
+        <div className="text-center pt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-foreground gap-2"
+            data-testid="button-signout-onboarding"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out & Return to Login
+          </Button>
+        </div>
       </div>
     </div>
   );
