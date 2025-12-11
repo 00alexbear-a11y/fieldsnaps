@@ -40,7 +40,10 @@ export function useAuth() {
         });
         
         if (session) {
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          // Use resetQueries to CLEAR cache (not just invalidate) - this ensures
+          // fresh data is loaded with proper loading state, preventing stale
+          // user data (e.g., missing companyId) from causing wrong routing
+          queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
         }
       } catch (error) {
         console.error('[useAuth] Initialization error:', error);
@@ -58,7 +61,9 @@ export function useAuth() {
         supabaseUser: user,
       }));
       
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Use resetQueries to CLEAR cache - prevents stale user data from
+      // causing incorrect onboarding/routing decisions
+      queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
     });
 
     return () => {
@@ -66,10 +71,14 @@ export function useAuth() {
     };
   }, [queryClient]);
 
-  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
+  const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
     enabled: authState.isInitialized && !!authState.session,
+    // Force refetch on window focus to ensure fresh data
+    refetchOnWindowFocus: true,
+    // Consider data stale immediately to always refetch
+    staleTime: 0,
     queryFn: async () => {
       if (!authState.session?.access_token) {
         throw new Error('No session');
@@ -108,7 +117,12 @@ export function useAuth() {
     return authState.session?.access_token ?? null;
   }, [authState.session]);
 
-  const isLoading = !authState.isInitialized || (authState.session && isLoadingUser);
+  // isLoading is true when:
+  // 1. Auth is not initialized, OR
+  // 2. Session exists AND (user query is loading OR (user doesn't exist AND query is fetching))
+  // The extra check for !user && isFetchingUser handles the case where cache was reset
+  // and we're waiting for fresh user data before making routing decisions
+  const isLoading = !authState.isInitialized || (authState.session && (isLoadingUser || (!user && isFetchingUser)));
 
   return {
     user,
