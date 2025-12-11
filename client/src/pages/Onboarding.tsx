@@ -135,6 +135,17 @@ export default function Onboarding() {
 
       setLocation('/projects');
     } catch (error: any) {
+      // If user already has a company (e.g., from production DB sync), just redirect
+      if (error.message?.includes('already belongs to a company')) {
+        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        toast({
+          title: "Welcome back!",
+          description: "Redirecting to your projects...",
+        });
+        setLocation('/projects');
+        return;
+      }
+      
       toast({
         title: "Failed to create company",
         description: error.message || "Please try again",
@@ -167,6 +178,17 @@ export default function Onboarding() {
 
       setLocation('/projects');
     } catch (error: any) {
+      // If user already has a company, just redirect
+      if (error.message?.includes('already belongs to a company')) {
+        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        toast({
+          title: "Welcome back!",
+          description: "Redirecting to your projects...",
+        });
+        setLocation('/projects');
+        return;
+      }
+      
       toast({
         title: "Failed to join company",
         description: error.message || "The invite may be invalid or expired",
