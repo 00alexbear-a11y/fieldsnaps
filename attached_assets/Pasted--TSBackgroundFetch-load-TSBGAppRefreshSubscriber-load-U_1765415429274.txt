@@ -1,0 +1,53 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/65255CFC-FAD4-44D1-9368-0BF3EE85391D/App.app'
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: init for device e8f3ce37-1a8e-4706-8456-bab996806f12
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11d0b9a40 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+Reachable via WiFi
+Networking process (0x11705c190) took 1.257759 seconds to launch
+GPU process (0x1171101e0) took 1.076140 seconds to launch
+WebContent process (0x1170d8100) took 1.083442 seconds to launch
+WebContent[19432] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+
+⚡️  ------ STARTUP JS ERROR ------
+
+⚡️  Error: supabaseUrl is required.
+⚡️  URL: capacitor://localhost/assets/index-CMnOhPD8.js
+⚡️  index-CMnOhPD8.js:74:41746
+
+⚡️  See above for help with debugging blank-screen issues
+⚡️  [warn] - [Supabase] Missing environment variables. Auth features may not work.
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [error] - {}
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 10000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 10000ms
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
