@@ -126,6 +126,7 @@ The architecture prioritizes simplicity and an invisible interface. A Service Wo
 - **Onboarding escape hatch**: "Sign Out & Return to Login" button always visible at bottom
 - **Password reset flow**: AuthCallback detects `type=recovery` query param, shows password reset form, signs user out after successful update
 - **Sign out handling**: Uses `window.location.href` instead of router navigation to force full page reload and prevent auth state race conditions
+- **Race condition prevention**: Auth state changes use `resetQueries` (not `invalidateQueries`) to CLEAR cached user data, preventing stale companyId from causing incorrect onboarding redirects. The `isLoading` state also checks `isFetching` when user is undefined to ensure fresh data loads before routing decisions.
 
 #### Universal Links
 - AASA endpoint at `/.well-known/apple-app-site-association`
