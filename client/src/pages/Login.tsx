@@ -56,7 +56,7 @@ export default function Login() {
   const handleBiometricLogin = async () => {
     const user = await authenticateWithBiometric();
     if (user) {
-      window.location.href = '/';
+      setLocation('/');
     }
   };
 

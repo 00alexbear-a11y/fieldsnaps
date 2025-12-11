@@ -91,24 +91,26 @@ function AppContent() {
 
   useEffect(() => {
     if (isAuthenticated && isWhitelisted && user?.id) {
-      // Check if user has completed profile setup or has name data
-      const profileKey = `profile_setup_complete_${user.id}`;
-      const hasCompletedProfileSetup = localStorage.getItem(profileKey);
+      // ONLY check database fields - trust the server, not localStorage
+      // If user already has firstName AND lastName in database, they don't need setup
       const hasName = user.firstName && user.lastName;
       
-      // Show profile setup if not completed and missing name
-      if (!hasCompletedProfileSetup && !hasName) {
+      // Only show profile setup if user is missing name data in the database
+      // This prevents the dialog from showing for existing users on fresh iOS installs
+      if (!hasName) {
         setShowProfileSetup(true);
+      } else {
+        // User has name data - ensure dialog stays closed
+        setShowProfileSetup(false);
       }
     }
   }, [isAuthenticated, isWhitelisted, user]);
 
   const handleProfileSetupComplete = () => {
-    // Only called on successful save or explicit skip
+    // Close the dialog and refetch user data
+    setShowProfileSetup(false);
     if (user?.id) {
-      const profileKey = `profile_setup_complete_${user.id}`;
-      localStorage.setItem(profileKey, 'true');
-      // Refetch user data to update UI
+      // Refetch user data to update UI with new profile data
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
     }
   };
@@ -125,8 +127,10 @@ function AppContent() {
   const onboardingRoutes = ['/onboarding/company-setup', '/onboarding'];
   const isOnboardingRoute = onboardingRoutes.some(route => location.startsWith(route));
   
-  // Check if user needs onboarding (no company or onboardingComplete is false)
-  const needsOnboarding = isAuthenticated && isWhitelisted && user && (!user.companyId || user.onboardingComplete === false);
+  // Check if user needs onboarding - ONLY if they don't have a company
+  // If user has companyId, they're already set up (ignore onboardingComplete flag)
+  // This prevents existing users from getting stuck in onboarding loop
+  const needsOnboarding = isAuthenticated && isWhitelisted && user && !user.companyId;
 
   // Redirect authenticated whitelisted users from landing to dashboard or onboarding
   // Non-whitelisted users can stay on landing page
