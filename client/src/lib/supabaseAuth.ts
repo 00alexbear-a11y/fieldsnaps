@@ -489,11 +489,17 @@ export function onAuthStateChange(callback: (session: Session | null, user: User
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     console.log('[SupabaseAuth] Auth state changed:', event);
     
-    // If we just cleared the session for a fresh install, ignore any cached session events
-    // This prevents the Supabase client from immediately re-authenticating with stale Keychain tokens
-    if (freshInstallSessionCleared && session) {
-      console.log('[SupabaseAuth] Ignoring cached session event during fresh-install clear');
+    // If we just cleared the session for a fresh install, ignore INITIAL_SESSION events
+    // that try to restore cached Keychain tokens. But ALLOW SIGNED_IN events from active logins.
+    if (freshInstallSessionCleared && session && event === 'INITIAL_SESSION') {
+      console.log('[SupabaseAuth] Ignoring cached INITIAL_SESSION event during fresh-install clear');
       return;
+    }
+    
+    // If user actively signed in, reset the fresh-install flag so future events work normally
+    if (event === 'SIGNED_IN' && freshInstallSessionCleared) {
+      console.log('[SupabaseAuth] Active sign-in detected, resetting fresh-install flag');
+      freshInstallSessionCleared = false;
     }
     
     callback(session, session?.user ?? null);
