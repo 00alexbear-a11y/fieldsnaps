@@ -25,10 +25,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#FFFFFF',
     },
     CapacitorUpdater: {
-      // Auto-update DISABLED to prevent old dev bundles from overriding production builds
-      // This was causing login loops by downloading old bundles with dev server URLs
-      autoUpdate: false,
-      resetWhenUpdate: false,
+      // Auto-update ENABLED - OTA updates from Capgo
+      // First-launch flag system in supabaseAuth.ts prevents login loops
+      autoUpdate: true,
+      resetWhenUpdate: true,
       appReadyTimeout: 10000,
       responseDelay: 0,
       statsUrl: 'https://api.capgo.app/stats',

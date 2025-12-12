@@ -14,6 +14,9 @@ const FIRST_LAUNCH_COMPLETED_KEY = 'fieldsnaps.first.launch.completed';
 // This prevents onAuthStateChange from immediately restoring the cached session
 let freshInstallSessionCleared = false;
 
+// Track if auth has been initialized to prevent multiple initialization calls
+let authInitializationPromise: Promise<{ session: Session | null; user: User | null }> | null = null;
+
 // Check if user has completed initial login on this app install
 async function hasCompletedFirstLaunch(): Promise<boolean> {
   try {
@@ -502,6 +505,13 @@ export function onAuthStateChange(callback: (session: Session | null, user: User
 }
 
 export async function initializeAuth(): Promise<{ session: Session | null; user: User | null }> {
+  // Prevent multiple simultaneous initialization calls
+  // This fixes the blinking loop caused by React re-renders
+  if (authInitializationPromise) {
+    console.log('[SupabaseAuth] Auth initialization already in progress, returning existing promise');
+    return authInitializationPromise;
+  }
+  
   console.log('[SupabaseAuth] Initializing auth');
   
   setupDeepLinkListener();
@@ -535,6 +545,7 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
       }
       
       // Force user to login screen - session is now cleared
+      authInitializationPromise = Promise.resolve({ session: null, user: null });
       return { session: null, user: null };
     }
   }
@@ -544,7 +555,9 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
   
   console.log('[SupabaseAuth] Auth initialized, user:', user?.id ?? 'none');
   
-  return { session, user };
+  const result = { session, user };
+  authInitializationPromise = Promise.resolve(result);
+  return result;
 }
 
 export async function resetPassword(email: string): Promise<void> {
