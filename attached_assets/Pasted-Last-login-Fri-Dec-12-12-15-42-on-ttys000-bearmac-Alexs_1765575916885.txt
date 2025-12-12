@@ -1,0 +1,45 @@
+Last login: Fri Dec 12 12:15:42 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % # Delete the old folder
+rm -rf ~/Downloads/FieldSnaps
+
+# Unzip the new download (it might be named differently)
+cd ~/Downloads
+unzip fieldsnaps-main.zip
+mv fieldsnaps-main FieldSnaps
+
+# Install dependencies and build
+cd FieldSnaps
+npm install
+
+VITE_API_URL="https://fieldsnaps.replit.app" \
+VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co" \
+VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs" \
+VITE_GOOGLE_WEB_CLIENT_ID="757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com" \
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+
+npx cap open ios
+zsh: command not found: #
+zsh: unknown file attribute: i
+unzip:  cannot find or open fieldsnaps-main.zip, fieldsnaps-main.zip.zip or fieldsnaps-main.zip.ZIP.
+mv: rename fieldsnaps-main to FieldSnaps: No such file or directory
+zsh: command not found: #
+cd: no such file or directory: FieldSnaps
+npm error code ENOENT
+npm error syscall open
+npm error path /Users/bearmac/Downloads/package.json
+npm error errno -2
+npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/bearmac/Downloads/package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: /Users/bearmac/.npm/_logs/2025-12-12T21_45_09_860Z-debug-0.log
+npm error code ENOENT
+npm error syscall open
+npm error path /Users/bearmac/Downloads/package.json
+npm error errno -2
+npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/bearmac/Downloads/package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: /Users/bearmac/.npm/_logs/2025-12-12T21_45_10_158Z-debug-0.log
+npm error could not determine executable to run
+npm error A complete log of this run can be found in: /Users/bearmac/.npm/_logs/2025-12-12T21_45_10_237Z-debug-0.log
+bearmac@Alexs-MacBook-Pro-2 Downloads % 
