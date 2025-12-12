@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { indexedDB as idb } from '@/lib/indexeddb';
 import type { Project, Photo } from '../../../shared/schema';
 
 type ProjectWithCounts = Project & { photoCount: number; coverPhoto?: Photo };
+
+// Create a stable hash of projects to detect actual data changes
+function createProjectsHash(projects: ProjectWithCounts[]): string {
+  return projects.map(p => `${p.id}:${p.name}:${p.photoCount}`).sort().join('|');
+}
 
 /**
  * Offline-first hook for loading projects
@@ -15,6 +20,9 @@ type ProjectWithCounts = Project & { photoCount: number; coverPhoto?: Photo };
 export function useOfflineFirstProjects() {
   const [localProjects, setLocalProjects] = useState<ProjectWithCounts[]>([]);
   const [isLoadingLocal, setIsLoadingLocal] = useState(true);
+  
+  // Track the last saved hash to prevent infinite save loops
+  const lastSavedHashRef = useRef<string>('');
 
   // Load from IndexedDB immediately
   useEffect(() => {
@@ -75,8 +83,17 @@ export function useOfflineFirstProjects() {
   });
 
   // Save server data back to IndexedDB when it arrives
+  // Uses hash comparison to prevent infinite loops from array reference changes
   useEffect(() => {
     if (serverProjects.length > 0) {
+      // Create a hash of the current projects to detect actual data changes
+      const currentHash = createProjectsHash(serverProjects);
+      
+      // Skip if we already saved this exact data
+      if (currentHash === lastSavedHashRef.current) {
+        return;
+      }
+      
       const saveToIndexedDB = async () => {
         try {
           // Save each project to IndexedDB
@@ -107,6 +124,9 @@ export function useOfflineFirstProjects() {
               });
             }
           }
+          
+          // Update the last saved hash to prevent re-saving the same data
+          lastSavedHashRef.current = currentHash;
           console.log('[Offline] Saved', serverProjects.length, 'projects to IndexedDB');
         } catch (error) {
           console.error('[Offline] Failed to save projects to IndexedDB:', error);
