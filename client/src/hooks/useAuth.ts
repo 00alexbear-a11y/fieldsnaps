@@ -30,10 +30,13 @@ export function useAuth() {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let initCompleted = false;
 
     const init = async () => {
       try {
         const { session, user } = await initializeAuth();
+        initCompleted = true;
+        
         setAuthState({
           session,
           supabaseUser: user,
@@ -46,26 +49,30 @@ export function useAuth() {
           // user data (e.g., missing companyId) from causing wrong routing
           queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
         }
+        
+        // Register auth state change listener AFTER initialization completes
+        // This prevents race conditions where cached Keychain sessions override
+        // the fresh-install session clear
+        unsubscribe = onAuthStateChange((session, user) => {
+          console.log('[useAuth] Auth state changed:', user?.id ?? 'signed out');
+          setAuthState(prev => ({
+            ...prev,
+            session,
+            supabaseUser: user,
+          }));
+          
+          // Use resetQueries to CLEAR cache - prevents stale user data from
+          // causing incorrect onboarding/routing decisions
+          queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
+        });
       } catch (error) {
         console.error('[useAuth] Initialization error:', error);
+        initCompleted = true;
         setAuthState(prev => ({ ...prev, isInitialized: true }));
       }
     };
 
     init();
-
-    unsubscribe = onAuthStateChange((session, user) => {
-      console.log('[useAuth] Auth state changed:', user?.id ?? 'signed out');
-      setAuthState(prev => ({
-        ...prev,
-        session,
-        supabaseUser: user,
-      }));
-      
-      // Use resetQueries to CLEAR cache - prevents stale user data from
-      // causing incorrect onboarding/routing decisions
-      queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
-    });
 
     return () => {
       unsubscribe?.();

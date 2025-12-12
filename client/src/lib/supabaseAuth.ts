@@ -10,6 +10,10 @@ import type { Session, User, AuthError } from '@supabase/supabase-js';
 // Preferences data is cleared on app uninstall, unlike iOS Keychain
 const FIRST_LAUNCH_COMPLETED_KEY = 'fieldsnaps.first.launch.completed';
 
+// Track if we're in the middle of a fresh-install session clear
+// This prevents onAuthStateChange from immediately restoring the cached session
+let freshInstallSessionCleared = false;
+
 // Check if user has completed initial login on this app install
 async function hasCompletedFirstLaunch(): Promise<boolean> {
   try {
@@ -27,6 +31,8 @@ async function hasCompletedFirstLaunch(): Promise<boolean> {
 export async function setFirstLaunchCompleted(): Promise<void> {
   try {
     await Preferences.set({ key: FIRST_LAUNCH_COMPLETED_KEY, value: 'true' });
+    // Reset the fresh-install flag so auth state changes work normally
+    freshInstallSessionCleared = false;
     console.log('[SupabaseAuth] First launch marked as completed');
   } catch (error) {
     console.error('[SupabaseAuth] Error setting first launch flag:', error);
@@ -479,6 +485,14 @@ export function setupDeepLinkListener(): void {
 export function onAuthStateChange(callback: (session: Session | null, user: User | null) => void): () => void {
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     console.log('[SupabaseAuth] Auth state changed:', event);
+    
+    // If we just cleared the session for a fresh install, ignore any cached session events
+    // This prevents the Supabase client from immediately re-authenticating with stale Keychain tokens
+    if (freshInstallSessionCleared && session) {
+      console.log('[SupabaseAuth] Ignoring cached session event during fresh-install clear');
+      return;
+    }
+    
     callback(session, session?.user ?? null);
   });
   
@@ -501,13 +515,23 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
     if (!hasCompleted) {
       console.log('[SupabaseAuth] Fresh install detected - clearing persisted session to show login');
       
+      // Set flag BEFORE signing out to prevent race condition
+      // This tells onAuthStateChange to ignore any cached session events
+      freshInstallSessionCleared = true;
+      
       // Must actually sign out and clear the persisted tokens from Supabase
-      // Otherwise onAuthStateChange will still emit SIGNED_IN event with cached session
+      // Use scope: 'local' to only clear local storage, not server session
       try {
-        await supabase.auth.signOut();
+        await supabase.auth.signOut({ scope: 'local' });
         console.log('[SupabaseAuth] Cleared persisted Supabase session for fresh install');
       } catch (error) {
         console.log('[SupabaseAuth] Error clearing session (may not exist):', error);
+      }
+      
+      // Verify session is actually cleared
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        console.log('[SupabaseAuth] Session still exists after signOut, forcing null');
       }
       
       // Force user to login screen - session is now cleared
