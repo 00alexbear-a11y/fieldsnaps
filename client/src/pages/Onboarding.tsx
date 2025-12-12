@@ -43,7 +43,10 @@ export default function Onboarding() {
       if (user.firstName) setFirstName(user.firstName);
       if (user.lastName) setLastName(user.lastName);
       
-      if (user.onboardingComplete && user.companyId) {
+      // If user already has a company, skip onboarding entirely
+      // This handles cases where user lands on /onboarding but already has a company
+      if (user.companyId) {
+        console.log('[Onboarding] User already has company, redirecting to projects');
         setLocation('/projects');
       }
     }
