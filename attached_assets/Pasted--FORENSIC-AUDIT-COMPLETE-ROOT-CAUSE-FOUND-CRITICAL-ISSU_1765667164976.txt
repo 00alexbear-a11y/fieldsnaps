@@ -1,0 +1,122 @@
+🎯 FORENSIC AUDIT COMPLETE - ROOT CAUSE FOUND
+🔴 CRITICAL ISSUE #1: Infinite Re-fetch Loop
+Location: client/src/hooks/useAuth.ts - Line 89
+
+The Bug:
+
+Copyconst { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser } = useQuery<User>({
+  queryKey: ["/api/auth/user"],
+  retry: false,
+  enabled: authState.isInitialized && !!authState.session,
+  refetchOnWindowFocus: true,  // ← Refetch on every window focus
+  staleTime: 0,  // ← DATA IS ALWAYS STALE - THIS IS THE BUG
+  queryFn: async () => { ... }
+});
+Why It Breaks:
+
+staleTime: 0 means data is INSTANTLY stale after fetching
+refetchOnWindowFocus: true triggers refetch on any React re-render
+Multiple components use useAuth() simultaneously (App.tsx, Projects.tsx, etc.)
+Each refetch updates React Query cache → triggers re-render → refetch again → INFINITE LOOP
+The Logs You See:
+
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+This happens because:
+
+initializeAuth() is properly guarded (it's NOT the problem)
+But the USER QUERY keeps refetching rapidly
+React components keep mounting/remounting
+Looks like an infinite loop but it's actually infinite refetching
+✅ THE FIX (One Line Change)
+File: client/src/hooks/useAuth.ts
+
+Change Line 89 from:
+
+CopystaleTime: 0,  // Consider data stale immediately to always refetch
+To:
+
+CopystaleTime: 5 * 60 * 1000,  // Cache user data for 5 minutes
+Why This Works:
+
+User data doesn't change frequently (name, email, companyId are stable)
+5-minute cache prevents unnecessary refetching
+Still allows manual refresh via queryClient.invalidateQueries()
+Breaks the refetch loop
+📋 COMPLETE FIX INSTRUCTIONS FOR REPLIT AI
+CRITICAL FIX: Infinite user query refetch loop causing app spinner
+
+Problem: App keeps spinning and shows repeated "Auth initialization already in progress" logs
+Root Cause: staleTime: 0 in useAuth hook causes React Query to refetch user data on every render
+
+FILE: client/src/hooks/useAuth.ts
+LINE: 89
+
+CHANGE FROM:
+    staleTime: 0, // Consider data stale immediately to always refetch
+
+CHANGE TO:
+    staleTime: 5 * 60 * 1000, // Cache user data for 5 minutes
+
+EXPLANATION:
+- staleTime: 0 made user data instantly stale after fetching
+- Combined with refetchOnWindowFocus: true, this caused continuous refetching
+- Multiple components using useAuth() amplified the problem
+- 5-minute cache is sufficient for user data (name/email/companyId don't change often)
+- Manual refetch still works via queryClient.invalidateQueries()
+
+After making the change:
+1. Run: npm run build
+2. Commit: git add client/src/hooks/useAuth.ts
+3. Commit message: "Fix: Change user query staleTime from 0 to 5 minutes to prevent infinite refetch loop"
+4. Push: git push origin main
+
+EXPECTED RESULT:
+- App opens immediately to Projects page
+- NO more repeated "Auth initialization already in progress" logs
+- User data is cached for 5 minutes (still refetches when needed)
+🔍 ADDITIONAL FINDINGS (Medium Priority)
+Issue #2: Redundant refetchOnWindowFocus
+File: client/src/hooks/useAuth.ts - Line 87
+
+Current:
+
+CopyrefetchOnWindowFocus: true,
+Recommendation: Change to false
+Why: User data doesn't change when switching browser tabs. The query already refetches after login/logout via queryClient.resetQueries().
+
+Issue #3: Global queryClient has conflicting staleTime
+File: client/src/lib/queryClient.ts - Line 141
+
+Current:
+
+CopystaleTime: 0, // Allow queries to refetch after invalidation
+Conflict: This global setting contradicts the 5-minute staleTime we're setting in useAuth.
+Resolution: The query-level staleTime overrides global, so this is OK. But consider documenting why global is 0.
+
+✅ FULL AUDIT SUMMARY
+Issue	Severity	File	Line	Status
+Infinite refetch loop	🔴 CRITICAL	useAuth.ts	89	FIX READY
+Unnecessary refetchOnWindowFocus	🟡 MEDIUM	useAuth.ts	87	Optional
+Conflicting global staleTime	🟢 LOW	queryClient.ts	141	Document only
+🚀 NEXT STEPS
+Give the fix above to Replit AI (Build mode)
+Wait for push to GitHub
+On your Mac:
+Copycd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build
+npx cap sync ios
+npx cap open ios
+Clean build in Xcode (⌘+Shift+K), delete app, run (⌘+R)
+✅ EXPECTED RESULTS:
+Before Fix:
+
+[SupabaseAuth] Auth initialization already in progress (repeats 100x)
+App spins forever
+After Fix:
+
+[SupabaseAuth] Initializing auth
+[SupabaseAuth] Auth initialized, user: 7889aa04-...
+[useAuth] Auth state changed: 7889aa04-...
+App opens to Projects page immediately
+This is the correct diagnosis. The bug was in the React Query configuration, not in the auth initialization logic. Copy the Replit AI instructions above and let's ship this fix! 🎯
