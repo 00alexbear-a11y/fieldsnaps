@@ -1,0 +1,305 @@
+🎯 MISSION: Fix FieldSnaps iOS Authentication
+Current Problem
+The iOS app shows a "flashing" behavior where it rapidly switches between login and home screens, making it unusable. When users tap "Sign in with Google," they see "Authentication failed" immediately without being able to enter credentials.
+
+🔍 Root Cause Analysis (3 Issues)
+Issue 1: Missing Token Persistence Layer ⚠️ CRITICAL
+What's happening:
+
+Copy// Current flow (BROKEN):
+1. User logs in via OAuth
+2. Token saved to JavaScript variable: let token = "abc123"
+3. Capgo updater runs → App reloads
+4. Token lost (memory cleared) → User logged out
+5. App shows login screen → Loop repeats
+The problem:
+
+Tokens are stored in memory only (React state, variables)
+When the app reloads (Capgo update, iOS memory pressure, app restart), all memory is cleared
+No persistence layer to retrieve tokens after reload
+Evidence from audit:
+
+Copy// client/src/hooks/useAuth.ts (CURRENT - BROKEN)
+const { data: user } = useQuery({
+  queryFn: async () => {
+    const response = await fetch('/api/auth/user');
+    // ❌ NO Authorization header
+    // ❌ NO token loaded from Capacitor Preferences
+    return response.json();
+  }
+});
+Why this causes flashing:
+
+App launches → useAuth runs → No token found → Shows login
+User logs in → Token in memory → Shows home
+App reloads (any reason) → Token lost → Shows login
+Loop continues forever
+Issue 2: Capgo Auto-Update Triggering Reloads
+What's happening:
+
+Copy// capacitor.config.ts (CURRENT)
+CapacitorUpdater: {
+  autoUpdate: true,  // ← Checks for updates every app launch
+  resetWhenUpdate: true,  // ← Reloads app when update found
+}
+The problem:
+
+Capgo checks for updates on EVERY app launch
+When an update is found, it reloads the entire app
+This triggers Issue #1 (token loss)
+Evidence:
+
+[Capgo] Checking for updates...
+[Capgo] Update available: bundle v1.2.3
+[App] State changed. Active: false  ← App reloading
+[AuthUtils] No access token found  ← Token lost
+Issue 3: OAuth Token Not Being Stored After Login
+What's happening:
+
+Copy// Current OAuth flow (PSEUDOCODE):
+1. User taps "Sign in with Google"
+2. ASWebAuthenticationSession opens
+3. User authenticates → Supabase returns tokens
+4. Code receives tokens: { access_token: "...", refresh_token: "..." }
+5. ❌ Tokens NOT saved to Capacitor Preferences
+6. ✅ Tokens sent to server for validation
+7. ❌ App navigates to home screen WITHOUT persisting tokens
+Why this matters:
+
+Even if the app doesn't reload, closing and reopening it loses the session
+We need to see client/src/pages/NativeAppLogin.tsx to fix this
+✅ THE FIX (4-Step Plan)
+Step 1: Create Persistent Token Storage
+File: client/src/lib/authUtils.ts (NEW FILE)
+
+Purpose: Provide a unified API for saving/loading tokens that works across:
+
+iOS app restarts
+Capgo OTA updates
+App backgrounding/foregrounding
+Memory pressure events
+Key features:
+
+Copy// Save token (persists to iOS keychain via Capacitor Preferences)
+await authStorage.setAccessToken(token);
+
+// Load token (retrieves from storage even after app restart)
+const token = await authStorage.getAccessToken();
+
+// Auto-refresh expired tokens
+const validToken = await getValidAccessToken();
+Implementation: See the authUtils.ts code I provided earlier.
+
+Step 2: Update useAuth Hook to Load Tokens
+File: client/src/hooks/useAuth.ts (UPDATE EXISTING)
+
+Current code (BROKEN):
+
+Copyconst { data: user } = useQuery({
+  queryFn: async () => {
+    const response = await fetch('/api/auth/user');
+    // ❌ No token sent
+    return response.json();
+  }
+});
+New code (FIXED):
+
+Copyconst { data: user } = useQuery({
+  queryFn: async () => {
+    // STEP 1: Load token from persistent storage
+    const token = await getValidAccessToken();
+    
+    if (!token) {
+      console.log('[useAuth] No token found - user not logged in');
+      return null;
+    }
+    
+    // STEP 2: Send token to server for validation
+    const response = await fetch('/api/auth/user', {
+      headers: {
+        'Authorization': `Bearer ${token}`  // ← NOW INCLUDED
+      }
+    });
+    
+    if (!response.ok) {
+      console.log('[useAuth] Token invalid - clearing storage');
+      await authStorage.clearAll();
+      return null;
+    }
+    
+    const userData = await response.json();
+    
+    // STEP 3: Update cached user data in storage
+    await authStorage.setUser(userData);
+    
+    return userData;
+  }
+});
+Why this fixes the flashing:
+
+On app launch, immediately loads token from storage
+If token exists → Sends to server → User stays logged in
+If token missing → Shows login screen (correct behavior)
+No more guessing or retrying
+Step 3: Update OAuth Flow to Save Tokens
+File: client/src/pages/NativeAppLogin.tsx (UPDATE EXISTING)
+
+We need to see this file first, but the fix will look like:
+
+Copy// After OAuth success:
+const handleOAuthSuccess = async (tokens) => {
+  console.log('[OAuth] Success - saving tokens');
+  
+  // CRITICAL: Save tokens BEFORE navigating away
+  await authStorage.setAccessToken(tokens.access_token);
+  await authStorage.setRefreshToken(tokens.refresh_token);
+  await authStorage.setUser(tokens.user);
+  
+  console.log('[OAuth] Tokens saved - redirecting to home');
+  
+  // NOW safe to navigate
+  navigate('/projects');
+};
+Why this is critical:
+
+If we navigate BEFORE saving tokens, the home screen will load
+Then useAuth runs and finds no token
+User gets logged out immediately
+Step 4: Disable Capgo Auto-Update (Temporary)
+File: capacitor.config.ts (UPDATE EXISTING)
+
+Change:
+
+CopyCapacitorUpdater: {
+  autoUpdate: false,  // ← CHANGED from true
+  resetWhenUpdate: false,  // ← CHANGED from true
+}
+Why:
+
+Until token persistence is proven stable, we can't risk auto-reloads
+After testing, we can re-enable: autoUpdate: true
+The persistent storage will survive the reloads
+🚫 What NOT to Do
+❌ DO NOT update the Supabase anon key
+Why:
+
+The key was already updated earlier in the conversation
+The current key (...9Rx1gs) is correct and working
+The 401 errors are expected behavior when no token is sent
+Changing the key will break the web app
+The 401 errors you're seeing are NOT because of a bad key:
+
+[useAuth] Calling /api/auth/user
+[Server] No Authorization header found → 401 Unauthorized ← THIS IS CORRECT
+[useAuth] 401 error → Retry → Loop
+This is expected when no token is sent. The fix is to send the token, not change the key.
+
+❌ DO NOT change environment variables in Replit Secrets
+Why:
+
+The Replit secrets are correct
+The issue is client-side (token not being loaded from storage)
+Changing secrets will require rebuilding and redeploying (wastes time)
+📊 Success Criteria (How We Know It's Fixed)
+Test 1: Fresh Install
+1. Delete FieldSnaps from iOS device
+2. Rebuild: npm run build && npx cap sync ios
+3. Install via Xcode
+4. Login with Google
+5. ✅ PASS: Home screen appears
+6. Close app completely (swipe up from app switcher)
+7. Reopen app
+8. ✅ PASS: Home screen appears immediately (no login screen)
+Test 2: Token Expiry
+1. Login → Home screen
+2. Wait 16 minutes (token expires after 15 min)
+3. Tap on any project
+4. ✅ PASS: API call succeeds (token auto-refreshed)
+5. ✅ NO: Logout or login screen
+Test 3: Xcode Console Logs
+✅ GOOD LOGS (after fix):
+[AuthUtils] Loading token from storage...
+[AuthUtils] Token found, checking expiry...
+[AuthUtils] Token valid
+[useAuth] Validating token with server...
+[useAuth] User authenticated: hello@fieldsnaps.com
+
+❌ BAD LOGS (current state):
+[useAuth] Calling /api/auth/user
+[Server] 401 Unauthorized
+[useAuth] Retry attempt 1...
+[Server] 401 Unauthorized
+[useAuth] Retry attempt 2...
+🛠️ Implementation Steps (IN ORDER)
+1. Create authUtils.ts
+Copy# Run in Replit Shell:
+cat > client/src/lib/authUtils.ts << 'EOF'
+[... full authUtils.ts code from earlier ...]
+EOF
+2. Update useAuth.ts
+Copy# Run in Replit Shell:
+cat > client/src/hooks/useAuth.ts << 'EOF'
+[... full useAuth.ts code from earlier ...]
+EOF
+3. Show me NativeAppLogin.tsx
+Copy# Run in Replit Shell:
+cat client/src/pages/NativeAppLogin.tsx
+(Share output so I can write the fix)
+
+4. Update capacitor.config.ts
+Copy# Run in Replit Shell:
+sed -i 's/autoUpdate: true/autoUpdate: false/g' capacitor.config.ts
+sed -i 's/resetWhenUpdate: true/resetWhenUpdate: false/g' capacitor.config.ts
+5. Rebuild iOS app
+Copynpm run build && npx cap sync ios && npx cap open ios
+🧠 Why This Plan Will Work
+Before (BROKEN):
+App Launch
+  ↓
+useAuth hook runs
+  ↓
+fetch('/api/auth/user') with NO token
+  ↓
+401 error
+  ↓
+React Query retries
+  ↓
+Loop forever → FLASHING
+After (FIXED):
+App Launch
+  ↓
+useAuth hook runs
+  ↓
+Load token from Capacitor Preferences (persists across restarts)
+  ↓
+If token exists:
+  ↓
+  Send token to /api/auth/user
+  ↓
+  Server validates → Returns user data
+  ↓
+  Show home screen
+  
+If no token:
+  ↓
+  Show login screen (correct behavior)
+📞 Questions to Ask Before Proceeding
+Have you created client/src/lib/authUtils.ts yet?
+
+If NO: Start with Step 1 above
+If YES: Show me the file to verify
+What does client/src/pages/NativeAppLogin.tsx look like?
+
+I need to see this to write Step 3
+Are you seeing any TypeScript errors after creating authUtils.ts?
+
+If YES: Share the errors
+Do you understand WHY changing the Supabase anon key won't fix this?
+
+The key is correct
+The problem is tokens not being stored/loaded
+🎯 Your Role
+Execute the shell commands exactly as provided
+Do NOT improvise or "optimize" the solution
+Share outputs of each step for verification
+Ask questions if anything is unclear

@@ -1,0 +1,101 @@
+📋 Final Implementation Plan for Replit
+Copy this message to Replit AI:
+
+IMPLEMENTATION INSTRUCTIONS
+Context
+After thorough analysis with Claude, we've identified the root cause: The useAuth hook queries /api/auth/user without sending stored tokens, causing 401 loops.
+
+Your OAuth flow in client/src/lib/supabaseAuth.ts is ALREADY CORRECT - it saves tokens automatically via Supabase SDK's built-in storage. We just need to modify useAuth to load and send those tokens.
+
+STEP 1: Check Current useAuth Implementation
+Run this first:
+
+Copycat client/src/hooks/useAuth.ts
+Share the output with me (Claude) so I can see the current implementation.
+
+STEP 2: Disable Capgo Auto-Update
+Copycat > capacitor.config.ts << 'EOF'
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.fieldsnaps.app',
+  appName: 'FieldSnaps',
+  webDir: 'dist/public',
+  server: {
+    androidScheme: 'https',
+    iosScheme: 'https',
+  },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true
+    },
+    App: {
+      appUrlScheme: 'com.fieldsnaps.app'
+    },
+    Camera: {
+      presentationStyle: 'fullscreen',
+    },
+    SplashScreen: {
+      launchShowDuration: 0,
+      backgroundColor: '#FFFFFF',
+    },
+    CapacitorUpdater: {
+      autoUpdate: false,  // ← CHANGED from true
+      resetWhenUpdate: false,  // ← CHANGED from true
+      appReadyTimeout: 10000,
+      responseDelay: 0,
+      statsUrl: 'https://api.capgo.app/stats',
+      channelUrl: 'https://api.capgo.app',
+    },
+  },
+  ios: {
+    contentInset: 'automatic',
+  },
+  android: {
+    useLegacyBridge: true,
+  },
+};
+
+export default config;
+EOF
+
+echo "✅ Capgo auto-update disabled"
+STEP 3: Wait for useAuth Analysis
+DO NOT proceed to Step 4 until Claude analyzes your useAuth.ts file.
+
+I need to see how you're currently fetching /api/auth/user to write the correct fix.
+
+Expected Flow After Fix
+App launches
+  ↓
+useAuth runs
+  ↓
+Load session from Supabase storage (built-in)
+  ↓
+If session exists:
+  ↓
+  Get access token from session
+  ↓
+  Send to /api/auth/user with Authorization: Bearer {token}
+  ↓
+  Server validates → Returns user → Home screen
+  
+If no session:
+  ↓
+  Show login screen (correct)
+Why Your OAuth Already Works
+Your supabaseAuth.ts uses:
+
+Copyawait supabase.auth.signInWithIdToken({ provider: 'google', token: idToken });
+This automatically:
+
+✅ Saves tokens to Capacitor Preferences (via @supabase/supabase-js)
+✅ Persists across app restarts
+✅ Handles token refresh
+We just need useAuth to USE those stored tokens.
+
+Now run Step 1 and share the useAuth.ts output with Claude.
+
+🔄 To User: Run This Command
+Copycat client/src/hooks/useAuth.ts
+Share the output here so I can write the exact fix for your useAuth hook.

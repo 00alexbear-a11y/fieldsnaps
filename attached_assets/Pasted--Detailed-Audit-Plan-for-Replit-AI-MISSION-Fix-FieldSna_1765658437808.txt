@@ -1,0 +1,241 @@
+ Detailed Audit Plan for Replit AI
+MISSION: Fix FieldSnaps iOS Authentication
+Problem Statement
+The iOS app "flashes" between login and home screens. Users tap "Continue with Google/Apple" and see "Authentication failed" immediately without being able to authenticate.
+
+Root Cause Analysis (3 Findings)
+Finding 1: useAuth.ts is ALREADY CORRECT ✅
+Evidence from code audit:
+
+Copy// client/src/hooks/useAuth.ts (lines 85-99)
+const { data: user } = useQuery({
+  queryKey: ['/api/auth/user', authState.session?.user?.id],
+  queryFn: async () => {
+    if (!authState.session) {
+      return null;  // ← Query disabled when no session
+    }
+    
+    const response = await fetch('/api/auth/user', {
+      headers: {
+        'Authorization': `Bearer ${authState.session.access_token}`,  // ← Token IS sent
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return response.json();
+  },
+  enabled: !!authState.session,  // ← Only runs when session exists
+});
+Conclusion: useAuth is NOT the problem. It correctly:
+
+Checks for session before making API calls
+Sends Authorization: Bearer header with token
+Only queries when session exists
+Finding 2: The Real Problem is in initializeAuth() ⚠️
+Location: client/src/lib/supabaseAuth.ts (lines 370-410)
+
+Current behavior:
+
+Copyexport async function initializeAuth() {
+  // ... code ...
+  
+  // On native platforms, check if this is a fresh install
+  if (isNativePlatform()) {
+    const hasCompleted = await hasCompletedFirstLaunch();
+    
+    if (!hasCompleted) {
+      // PROBLEM: On fresh install, this ALWAYS clears session
+      freshInstallSessionCleared = true;
+      await supabase.auth.signOut({ scope: 'local' });
+      return { session: null, user: null };  // ← Forces login screen
+    }
+  }
+  
+  const session = await getSession();  // ← Gets Supabase session from storage
+  return { session, user: session?.user ?? null };
+}
+The bug:
+
+On first app launch after OAuth login:
+
+User logs in successfully via Google/Apple
+OAuth completes, tokens saved to Supabase storage
+setFirstLaunchCompleted() is called
+User sees home screen ✅
+On app restart or Capgo reload:
+
+initializeAuth() runs
+Supabase SDK's getSession() retrieves tokens from storage ✅
+BUT if hasCompletedFirstLaunch() returns false (due to Preferences being cleared), session is wiped ❌
+User forced back to login screen
+The "flashing" happens because:
+
+Capgo autoUpdate: true triggers frequent app reloads
+Each reload runs initializeAuth()
+Race condition between session restoration and first-launch check
+App rapidly toggles between "session exists" and "session cleared"
+Finding 3: Capgo Auto-Update Amplifies the Problem 🔄
+Current config:
+
+Copy// capacitor.config.ts
+CapacitorUpdater: {
+  autoUpdate: true,  // ← Checks for updates on every launch
+  resetWhenUpdate: true,  // ← Reloads app when update found
+  appReadyTimeout: 10000,
+}
+Impact:
+
+Every app launch checks for updates
+Any update triggers full app reload
+Reload runs initializeAuth() → potential session clear
+User gets stuck in login loop
+Fix Strategy (4 Steps)
+Step 1: Remove the "First Launch" Session Clear Logic
+File: client/src/lib/supabaseAuth.ts
+
+Problem code to fix (lines 383-395):
+
+Copy// CURRENT (BROKEN):
+if (isNativePlatform()) {
+  const hasCompleted = await hasCompletedFirstLaunch();
+  
+  if (!hasCompleted) {
+    freshInstallSessionCleared = true;
+    await supabase.auth.signOut({ scope: 'local' });
+    return { session: null, user: null };
+  }
+}
+Why this is wrong:
+
+iOS Keychain/Preferences can be unreliable across app updates
+Supabase SDK already handles session management correctly
+This logic creates more problems than it solves
+Proposed fix:
+
+Copy// NEW (CORRECT):
+export async function initializeAuth() {
+  console.log('[SupabaseAuth] Initializing auth');
+  
+  // Prevent multiple simultaneous initialization calls
+  if (authInitializationPromise) {
+    console.log('[SupabaseAuth] Auth initialization already in progress');
+    return authInitializationPromise;
+  }
+  
+  setupDeepLinkListener();
+  
+  // Simply get the session from Supabase storage
+  // Supabase SDK handles persistence correctly via Capacitor Preferences
+  const session = await getSession();
+  const user = session?.user ?? null;
+  
+  console.log('[SupabaseAuth] Auth initialized, user:', user?.id ?? 'none');
+  
+  const result = { session, user };
+  authInitializationPromise = Promise.resolve(result);
+  return result;
+}
+Why this works:
+
+Trusts Supabase SDK's built-in session management
+No custom "first launch" logic to break
+Session persists across app restarts automatically
+Simpler = fewer bugs
+Step 2: Disable Capgo Auto-Update (Temporary)
+File: capacitor.config.ts
+
+Change:
+
+CopyCapacitorUpdater: {
+  autoUpdate: false,  // ← CHANGED from true
+  resetWhenUpdate: false,  // ← CHANGED from true
+  appReadyTimeout: 10000,
+  responseDelay: 0,
+  statsUrl: 'https://api.capgo.app/stats',
+  channelUrl: 'https://api.capgo.app',
+},
+Why:
+
+Eliminates frequent app reloads during testing
+Can re-enable after session persistence is proven stable
+Reduces noise in debugging
+Step 3: Verify Supabase Client Configuration
+File: client/src/lib/supabase.ts (need to check if this exists)
+
+Required config:
+
+Copyimport { createClient } from '@supabase/supabase-js';
+import { CapacitorPreferences } from '@capacitor/preferences';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: CapacitorPreferences,  // ← Uses Capacitor Preferences for persistence
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,  // Native apps don't use URL-based auth
+  },
+});
+If this is missing or incorrect, tokens won't persist.
+
+Step 4: Rebuild and Test
+Commands:
+
+Copy# Build with correct environment variables
+npm run build && npx cap sync ios && npx cap open ios
+Test sequence:
+
+Delete app from device
+Install via Xcode
+Login with Google/Apple
+✅ PASS: Home screen appears
+Close app completely (swipe from app switcher)
+Reopen app
+✅ PASS: Home screen appears immediately (NO login screen)
+Wait 5 minutes
+Tap on a project
+✅ PASS: API call succeeds (token auto-refreshed if needed)
+What NOT to Change
+❌ DO NOT modify useAuth.ts
+Reason: It's already correct. The session is coming from AuthContext, which gets it from initializeAuth().
+
+❌ DO NOT change Supabase anon key
+Reason: The key is correct. The 401 errors are from missing sessions, not bad keys.
+
+❌ DO NOT modify OAuth login flow
+Reason: signInWithGoogle() and signInWithApple() correctly save tokens via supabase.auth.signInWithIdToken().
+
+❌ DO NOT add new token storage layer
+Reason: Supabase SDK already handles this via Capacitor Preferences.
+
+Audit Checklist for Replit AI
+Before implementing, verify:
+
+ client/src/lib/supabase.ts exists and uses CapacitorPreferences storage
+ client/src/hooks/useAuth.ts uses session from context (already confirmed correct)
+ initializeAuth() doesn't have race conditions with onAuthStateChange
+ No other code is calling supabase.auth.signOut() unexpectedly
+ Environment variables are correctly loaded (already confirmed)
+Expected Console Logs After Fix
+✅ Good (Working):
+[SupabaseAuth] Initializing auth
+[SupabaseAuth] Auth initialized, user: abc-123-def
+[useAuth] Session found, fetching user data
+[useAuth] User authenticated: hello@fieldsnaps.com
+❌ Bad (Current broken state):
+[SupabaseAuth] Fresh install detected - clearing persisted session
+[SupabaseAuth] Cleared persisted Supabase session for fresh install
+[SupabaseAuth] Auth initialized, user: none
+[useAuth] No session found
+[App] Redirecting to login
+Implementation Priority
+HIGHEST: Fix initializeAuth() (removes buggy first-launch logic)
+HIGH: Disable Capgo auto-update (stops reload loops)
+MEDIUM: Verify Supabase client config (ensure persistence works)
+LOW: Rebuild and test
+Questions to Answer Before Proceeding
+Does client/src/lib/supabase.ts exist? If yes, what's its content?
+Is CapacitorPreferences configured as the storage adapter for Supabase?
+Are there any other files calling supabase.auth.signOut() besides the intended logout flow?

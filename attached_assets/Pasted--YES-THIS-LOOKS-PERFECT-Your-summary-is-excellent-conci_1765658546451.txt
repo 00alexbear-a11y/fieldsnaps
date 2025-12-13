@@ -1,0 +1,140 @@
+ YES, THIS LOOKS PERFECT!
+Your summary is excellent - concise, accurate, and actionable. Here's what makes it great:
+
+🎯 What's Perfect About Your Plan
+✅ 1. Correct Root Cause Identification
+You nailed it:
+
+useAuth.ts is already correct
+The bug is in initializeAuth()'s first-launch logic
+Capgo amplifies the problem
+✅ 2. Clear Action Items
+The 4-step fix plan is:
+
+Specific (exact files to modify)
+Ordered correctly (fix root cause first)
+Testable (rebuild and verify)
+✅ 3. Prevents Wrong Fixes
+The "What NOT to Change" section saves time by stopping unnecessary work on:
+
+useAuth.ts (already works)
+Supabase keys (not the issue)
+OAuth flow (already correct)
+📋 Now Execute in This Order
+Step 1: Fix initializeAuth()
+Copycat > /tmp/supabaseAuth_initializeAuth_fix.patch << 'EOF'
+--- a/client/src/lib/supabaseAuth.ts
++++ b/client/src/lib/supabaseAuth.ts
+@@ -370,35 +370,19 @@ export async function initializeAuth(): Promise<{ session: Session | null; user
+   if (authInitializationPromise) {
+     console.log('[SupabaseAuth] Auth initialization already in progress, returning existing promise');
+     return authInitializationPromise;
+   }
+   
+   console.log('[SupabaseAuth] Initializing auth');
+   
+   setupDeepLinkListener();
+   
+-  // On native platforms, check if this is a fresh install
+-  // iOS Keychain can persist tokens even after app uninstall, causing auto-login
+-  // without the user ever seeing the login screen on a fresh install
+-  if (isNativePlatform()) {
+-    const hasCompleted = await hasCompletedFirstLaunch();
+-    
+-    if (!hasCompleted) {
+-      console.log('[SupabaseAuth] Fresh install detected - clearing persisted session to show login');
+-      
+-      // Set flag BEFORE signing out to prevent race condition
+-      // This tells onAuthStateChange to ignore any cached session events
+-      freshInstallSessionCleared = true;
+-      
+-      // Must actually sign out and clear the persisted tokens from Supabase
+-      // Use scope: 'local' to only clear local storage, not server session
+-      try {
+-        await supabase.auth.signOut({ scope: 'local' });
+-        console.log('[SupabaseAuth] Cleared persisted Supabase session for fresh install');
+-      } catch (error) {
+-        console.log('[SupabaseAuth] Error clearing session (may not exist):', error);
+-      }
+-      
+-      // Force user to login screen - session is now cleared
+-      authInitializationPromise = Promise.resolve({ session: null, user: null });
+-      return { session: null, user: null };
+-    }
+-  }
++  // Trust Supabase SDK's built-in session management
++  // It handles persistence via Capacitor Preferences automatically
++  // No need for custom "first launch" logic that can break session restoration
+   
+   const session = await getSession();
+   const user = session?.user ?? null;
+   
+   console.log('[SupabaseAuth] Auth initialized, user:', user?.id ?? 'none');
+   
+   const result = { session, user };
+   authInitializationPromise = Promise.resolve(result);
+   return result;
+ }
+EOF
+
+# Apply the fix
+cd client/src/lib
+patch -p4 < /tmp/supabaseAuth_initializeAuth_fix.patch
+OR manually edit client/src/lib/supabaseAuth.ts:
+
+Find this section (around line 383):
+
+Copy// On native platforms, check if this is a fresh install
+if (isNativePlatform()) {
+  const hasCompleted = await hasCompletedFirstLaunch();
+  
+  if (!hasCompleted) {
+    // ... 20+ lines of code clearing session ...
+  }
+}
+Replace with:
+
+Copy// Trust Supabase SDK's built-in session management
+// It handles persistence via Capacitor Preferences automatically
+Step 2: Disable Capgo Auto-Update
+Copysed -i.bak 's/autoUpdate: true/autoUpdate: false/g' capacitor.config.ts
+sed -i.bak 's/resetWhenUpdate: true/resetWhenUpdate: false/g' capacitor.config.ts
+
+echo "✅ Capgo auto-update disabled"
+Step 3: Verify Supabase Client Config
+Copy# Check if supabase.ts exists and uses Capacitor storage
+echo "=== Checking Supabase Client Config ==="
+find client/src -name "supabase.ts" -o -name "supabaseClient.ts" | head -1 | xargs cat
+
+# If the file exists, verify it has:
+# auth: {
+#   storage: // Should reference Capacitor Preferences
+#   persistSession: true,
+# }
+Share the output so I can verify the storage configuration.
+
+Step 4: Rebuild and Test
+Copynpm run build && npx cap sync ios && npx cap open ios
+Test in Xcode:
+
+Delete app from device
+Install → Login with Google → Home screen ✅
+Close app completely (kill from app switcher)
+Reopen app → Should stay on home screen ✅
+🎬 Expected Results After Fix
+Console Logs (Good):
+[SupabaseAuth] Initializing auth
+[SupabaseAuth] Auth initialized, user: abc-123-def-456
+[useAuth] Session found, fetching user data
+[useAuth] User authenticated: hello@fieldsnaps.com
+Console Logs (If still broken):
+[SupabaseAuth] Auth initialized, user: none
+[useAuth] No session found
+→ If this happens, means Supabase client storage isn't configured correctly (Step 3).
+
+📞 Next Steps
+Execute Step 1 (fix initializeAuth())
+Execute Step 2 (disable Capgo)
+Run Step 3 command and share output with me
+I'll verify your Supabase config
+Execute Step 4 (rebuild and test)
