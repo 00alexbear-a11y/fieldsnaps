@@ -5,11 +5,6 @@ import type { Project, Photo } from '../../../shared/schema';
 
 type ProjectWithCounts = Project & { photoCount: number; coverPhoto?: Photo };
 
-// Create a stable hash of projects to detect actual data changes
-function createProjectsHash(projects: ProjectWithCounts[]): string {
-  return projects.map(p => `${p.id}:${p.name}:${p.photoCount}`).sort().join('|');
-}
-
 /**
  * Offline-first hook for loading projects
  * 1. Loads from IndexedDB immediately (instant display)
@@ -21,8 +16,8 @@ export function useOfflineFirstProjects() {
   const [localProjects, setLocalProjects] = useState<ProjectWithCounts[]>([]);
   const [isLoadingLocal, setIsLoadingLocal] = useState(true);
   
-  // Track the last saved hash to prevent infinite save loops
-  const lastSavedHashRef = useRef<string>('');
+  // Track if we've already saved this session - only save ONCE per component mount
+  const hasSavedRef = useRef<boolean>(false);
 
   // Load from IndexedDB immediately
   useEffect(() => {
@@ -83,58 +78,54 @@ export function useOfflineFirstProjects() {
   });
 
   // Save server data back to IndexedDB when it arrives
-  // Uses hash comparison to prevent infinite loops from array reference changes
+  // Only saves ONCE per component mount to prevent infinite loops
   useEffect(() => {
-    if (serverProjects.length > 0) {
-      // Create a hash of the current projects to detect actual data changes
-      const currentHash = createProjectsHash(serverProjects);
-      
-      // Skip if we already saved this exact data
-      if (currentHash === lastSavedHashRef.current) {
-        return;
-      }
-      
-      const saveToIndexedDB = async () => {
-        try {
-          // Save each project to IndexedDB
-          for (const project of serverProjects) {
-            // Check if project already exists in IndexedDB
-            const existing = await idb.getAllProjects();
-            const existingProject = existing.find(
-              p => p.serverId === project.id || p.id === project.id
-            );
-
-            if (existingProject) {
-              // Update existing project
-              await idb.updateProject(existingProject.id, {
-                name: project.name,
-                description: project.description || undefined,
-                serverId: project.id,
-                syncStatus: 'synced',
-                photoCount: project.photoCount,
-              });
-            } else {
-              // Save new project to IndexedDB
-              await idb.saveProject({
-                name: project.name,
-                description: project.description || undefined,
-                serverId: project.id,
-                syncStatus: 'synced',
-                photoCount: project.photoCount,
-              });
-            }
-          }
-          
-          // Update the last saved hash to prevent re-saving the same data
-          lastSavedHashRef.current = currentHash;
-          console.log('[Offline] Saved', serverProjects.length, 'projects to IndexedDB');
-        } catch (error) {
-          console.error('[Offline] Failed to save projects to IndexedDB:', error);
-        }
-      };
-
-      saveToIndexedDB();
+    // Skip if already saved this session or no projects
+    if (hasSavedRef.current || serverProjects.length === 0) {
+      return;
     }
+    
+    // Mark as saved IMMEDIATELY to prevent any race conditions
+    hasSavedRef.current = true;
+    
+    const saveToIndexedDB = async () => {
+      try {
+        // Save each project to IndexedDB
+        for (const project of serverProjects) {
+          // Check if project already exists in IndexedDB
+          const existing = await idb.getAllProjects();
+          const existingProject = existing.find(
+            p => p.serverId === project.id || p.id === project.id
+          );
+
+          if (existingProject) {
+            // Update existing project
+            await idb.updateProject(existingProject.id, {
+              name: project.name,
+              description: project.description || undefined,
+              serverId: project.id,
+              syncStatus: 'synced',
+              photoCount: project.photoCount,
+            });
+          } else {
+            // Save new project to IndexedDB
+            await idb.saveProject({
+              name: project.name,
+              description: project.description || undefined,
+              serverId: project.id,
+              syncStatus: 'synced',
+              photoCount: project.photoCount,
+            });
+          }
+        }
+        
+        console.log('[Offline] Saved', serverProjects.length, 'projects to IndexedDB (once per session)');
+      } catch (error) {
+        console.error('[Offline] Failed to save projects to IndexedDB:', error);
+      }
+    };
+
+    saveToIndexedDB();
   }, [serverProjects]);
 
   // Merge local and server data (server takes precedence)
