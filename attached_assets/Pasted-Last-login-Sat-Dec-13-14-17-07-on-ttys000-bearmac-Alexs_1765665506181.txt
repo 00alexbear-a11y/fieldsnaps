@@ -1,0 +1,56 @@
+Last login: Sat Dec 13 14:17:07 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Documents/Projects/FieldSnaps && git pull origin main && npm install && VITE_API_URL="https://fieldsnaps.replit.app" VITE_SUPABASE_URL="https://pbfuwfzccdmpkmhncyjg.supabase.co" VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs" VITE_GOOGLE_WEB_CLIENT_ID="757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com" npm run build && rm -rf ios/App/App/public && npx cap sync ios && npx cap open ios
+remote: Enumerating objects: 29, done.
+remote: Counting objects: 100% (29/29), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 21 (delta 16), reused 20 (delta 15), pack-reused 0 (from 0)
+Unpacking objects: 100% (21/21), 12.02 KiB | 439.00 KiB/s, done.
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+   579ea65..6b96d22  main       -> origin/main
+Updating 579ea65..6b96d22
+Fast-forward
+ ...HERE-S-WHY-THE-REAL-PROBLEM-F_1765664502299.txt | 143 ++++++
+ ...BGAppRefreshSubscriber-load-U_1765664375279.txt | 511 +++++++++++++++++++++
+ ...6-28-on-ttys000-bearmac-Alexs_1765664271925.txt | 137 ++++++
+ client/src/hooks/useOfflineFirstProjects.ts        |  23 +-
+ client/src/lib/supabaseAuth.ts                     |  78 +++-
+ 5 files changed, 868 insertions(+), 24 deletions(-)
+ create mode 100644 attached_assets/Pasted--STOP-THE-FIX-DIDN-T-WORK-HERE-S-WHY-THE-REAL-PROBLEM-F_1765664502299.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765664375279.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Sat-Dec-13-14-16-28-on-ttys000-bearmac-Alexs_1765664271925.txt
+
+up to date, audited 982 packages in 2s
+
+157 packages are looking for funding
+  run `npm fund` for details
+
+10 vulnerabilities (3 low, 5 moderate, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (8) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 83 modules transformed.
+x Build failed in 851ms
+error during build:
+[vite:asset] Could not load /Users/bearmac/Documents/Projects/FieldSnaps/attached_assets/Fieldsnap logo v1.2_1760310501545.png (imported by client/src/App.tsx): ENOENT: no such file or directory, open '/Users/bearmac/Documents/Projects/FieldSnaps/attached_assets/Fieldsnap logo v1.2_1760310501545.png'
+    at async open (node:internal/fs/promises:641:25)
+    at async Object.readFile (node:internal/fs/promises:1245:14)
+    at async fileToBuiltUrl (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:20428:19)
+    at async Object.load (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:20328:17)
+    at async PluginDriver.hookFirstAndGetPlugin (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20689:28)
+    at async file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:19809:33
+    at async Queue.work (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20899:32)
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
