@@ -1,0 +1,1206 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/7FBC4ED2-315B-4EA9-A4DE-F54E2CBEA8EB/App.app'
+KeyboardPlugin: resize mode - native
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 4bc1f54d-5d75-43ab-acf2-f56abf86e7b9
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11d49da10 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[6956] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 76227349
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 76227350
+⚡️  TO JS {"bundle":{"checksum":"","downloaded":"1970-01-01T00:00:00.000Z","status":"success","id":"builtin","version":"builtin"}}
+⚡️  To Native ->  CapacitorUpdater addListener 76227351
+⚡️  To Native ->  CapacitorUpdater addListener 76227352
+⚡️  To Native ->  CapacitorUpdater addListener 76227353
+⚡️  To Native ->  CapacitorUpdater current 76227354
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 76227355
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"status":"success","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin"},"native":"1.0"}
+⚡️  To Native ->  App addListener 76227356
+⚡️  To Native ->  App addListener 76227357
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":"","version":"builtin"}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 76227358
+⚡️  To Native ->  App addListener 76227359
+⚡️  To Native ->  StatusBar setOverlaysWebView 76227360
+⚡️  To Native ->  StatusBar setStyle ⚡️  TO JS 76227361
+undefined
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  To Native ->  CapacitorHttp request 76227362
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 76227363
+⚡️  TO JS undefined
+⚡️  TO JS {"status":200,"headers":{"cf-cache-status":"DYNAMIC","sb-auth-user-id":"7889aa04-6fdf-473b-bb80-bcc7d4899d8e","x-envoy-attempt-count":"1","alt-svc":"h3=\":443\"; ma=86400","sb-project-ref":"pbfuwfzccdmpkmhncyjg","server":"cloudflare","x-content-type-option
+⚡️  To Native ->  SecureStorage internalSetItem 76227364
+⚡️  TO JS undefined
+⚡️  To Native ->  SecureStorage internalGetItem 76227365
+⚡️  To Native ->  SecureStorage internalGetItem 76227366
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 76227367
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227368
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227369
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 76227370
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227371
+⚡️  To Native ->  Network addListener 76227372
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227373
+⚡️  To Native ->  SecureStorage internalGetItem 76227374
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227375
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227376
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227377
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227378
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227379
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227380
+⚡️  To Native ->  SecureStorage internalGetItem 76227381
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227382
+⚡️  To Native ->  SecureStorage internalGetItem 76227383
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227384
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227385
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227386
+⚡️  To Native ->  Network removeListener 76227387
+⚡️  To Native ->  SecureStorage internalGetItem 76227388
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227389
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227390
+⚡️  To Native ->  SecureStorage internalGetItem 76227391
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227392
+⚡️  To Native ->  SecureStorage internalGetItem 76227393
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227394
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227395
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227396
+⚡️  To Native ->  Network removeListener 76227397
+⚡️  To Native ->  SecureStorage internalGetItem 76227398
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227399
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227400
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227401
+⚡️  To Native ->  SecureStorage internalGetItem 76227402
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227403
+⚡️  To Native ->  SecureStorage internalGetItem 76227404
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227405
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  Network getStatus 76227406
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227407
+⚡️  To Native ->  Network removeListener 76227408
+⚡️  To Native ->  SecureStorage internalGetItem 76227409
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227410
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227411
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227412
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227413
+⚡️  To Native ->  SecureStorage internalGetItem 76227414
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227415
+⚡️  To Native ->  SecureStorage internalGetItem 76227416
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227417
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227418
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227419
+⚡️  To Native ->  Network removeListener 76227420
+⚡️  To Native ->  SecureStorage internalGetItem 76227421
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227422
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227423
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227424
+⚡️  To Native ->  SecureStorage internalGetItem 76227425
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227426
+⚡️  To Native ->  SecureStorage internalGetItem 76227427
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227428
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227429
+⚡️  To Native ->  Network addListener 76227430
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227431
+⚡️  To Native ->  SecureStorage internalGetItem 76227432
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227433
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227434
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227435
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227436
+⚡️  To Native ->  SecureStorage internalGetItem 76227437
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227438
+⚡️  To Native ->  SecureStorage internalGetItem 76227439
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227440
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227441
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  TO JS ⚡️  To Native ->  {"connected":true,"connectionType":"wifi"}
+Network addListener 76227442
+⚡️  To Native ->  Network removeListener 76227443
+⚡️  To Native ->  SecureStorage internalGetItem 76227444
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227445
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227446
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227447
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227448
+⚡️  To Native ->  SecureStorage internalGetItem 76227449
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227450
+⚡️  To Native ->  SecureStorage internalGetItem 76227451
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227452
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227453
+⚡️  To Native ->  Network addListener 76227454
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227455
+⚡️  To Native ->  SecureStorage internalGetItem 76227456
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227457
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227458
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227459
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227460
+⚡️  To Native ->  SecureStorage internalGetItem 76227461
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227462
+⚡️  To Native ->  SecureStorage internalGetItem 76227463
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227464
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227465
+⚡️  To Native ->  Network ⚡️  TO JS addListener 76227466
+{"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227467
+⚡️  To Native ->  SecureStorage internalGetItem 76227468
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227469
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227470
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227471
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227472
+⚡️  To Native ->  SecureStorage internalGetItem 76227473
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227474
+⚡️  To Native ->  SecureStorage internalGetItem 76227475
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227476
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227477
+⚡️  To Native ->  Network addListener 76227478
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227479
+⚡️  To Native ->  SecureStorage internalGetItem 76227480
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227481
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227482
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227483
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227484
+⚡️  To Native ->  SecureStorage internalGetItem 76227485
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227486
+⚡️  To Native ->  SecureStorage internalGetItem 76227487
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227488
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227489
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227490
+⚡️  To Native ->  Network removeListener 76227491
+⚡️  To Native ->  SecureStorage internalGetItem 76227492
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227493
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227494
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227495
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227496
+⚡️  To Native ->  SecureStorage internalGetItem 76227497
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227498
+⚡️  To Native ->  SecureStorage internalGetItem 76227499
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227500
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227501
+⚡️  To Native ->  Network addListener 76227502
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227503
+⚡️  To Native ->  SecureStorage internalGetItem 76227504
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227505
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227506
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227507
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227508
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227509
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227510
+⚡️  To Native ->  SecureStorage internalGetItem 76227511
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227512
+⚡️  To Native ->  SecureStorage internalGetItem 76227513
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227514
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227515
+⚡️  To Native ->  Network addListener 76227516
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227517
+⚡️  To Native ->  SecureStorage internalGetItem 76227518
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227519
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227520
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227521
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227522
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227523
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227524
+⚡️  To Native ->  SecureStorage internalGetItem 76227525
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227526
+⚡️  To Native ->  SecureStorage internalGetItem 76227527
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227528
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227529
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227530
+⚡️  To Native ->  Network removeListener 76227531
+⚡️  To Native ->  SecureStorage internalGetItem 76227532
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227533
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227534
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227535
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227536
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227537
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227538
+⚡️  To Native ->  SecureStorage internalGetItem 76227539
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227540
+⚡️  To Native ->  SecureStorage internalGetItem 76227541
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227542
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227543
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227544
+⚡️  To Native ->  Network removeListener 76227545
+⚡️  To Native ->  SecureStorage internalGetItem 76227546
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227547
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227548
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227549
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227550
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227551
+⚡️  To Native ->  SecureStorage internalGetItem 76227552
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227553
+⚡️  To Native ->  SecureStorage internalGetItem 76227554
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227555
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227556
+⚡️  To Native ->  Network addListener 76227557
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227558
+⚡️  To Native ->  SecureStorage internalGetItem 76227559
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227560
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227561
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227562
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227563
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227564
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227565
+⚡️  To Native ->  SecureStorage internalGetItem 76227566
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227567
+⚡️  To Native ->  SecureStorage internalGetItem 76227568
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227569
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227570
+⚡️  To Native ->  Network addListener 76227571
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 76227572
+⚡️  To Native ->  SecureStorage internalGetItem 76227573
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227574
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227575
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227576
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227577
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227578
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227579
+⚡️  To Native ->  SecureStorage internalGetItem 76227580
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227581
+⚡️  To Native ->  SecureStorage internalGetItem 76227582
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227583
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227584
+⚡️  To Native ->  Network addListener 76227585
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 76227586
+⚡️  To Native ->  SecureStorage internalGetItem 76227587
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227588
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227589
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227590
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227591
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227592
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227593
+⚡️  To Native ->  SecureStorage internalGetItem 76227594
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227595
+⚡️  To Native ->  SecureStorage internalGetItem 76227596
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227597
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227598
+⚡️  To Native ->  Network addListener 76227599
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 76227600
+⚡️  To Native ->  SecureStorage internalGetItem 76227601
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227602
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227603
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227604
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227605
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227606
+⚡️  To Native ->  SecureStorage internalGetItem 76227607
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227608
+⚡️  To Native ->  SecureStorage internalGetItem 76227609
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227610
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227611
+⚡️  To Native ->  Network addListener 76227612
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227613
+⚡️  To Native ->  SecureStorage internalGetItem 76227614
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227615
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227616
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227617
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227618
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227619
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227620
+⚡️  To Native ->  SecureStorage internalGetItem 76227621
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227622
+⚡️  To Native ->  SecureStorage internalGetItem 76227623
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227624
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227625
+⚡️  To Native ->  Network addListener 76227626
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227627
+⚡️  To Native ->  SecureStorage internalGetItem 76227628
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227629
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227630
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227631
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227632
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227633
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227634
+⚡️  To Native ->  SecureStorage internalGetItem 76227635
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227636
+⚡️  To Native ->  SecureStorage internalGetItem 76227637
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227638
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227639
+⚡️  To Native ->  Network addListener 76227640
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227641
+⚡️  To Native ->  SecureStorage internalGetItem 76227642
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227643
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227644
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227645
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227646
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227647
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227648
+⚡️  To Native ->  SecureStorage internalGetItem 76227649
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227650
+⚡️  To Native ->  SecureStorage internalGetItem 76227651
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227652
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227653
+⚡️  To Native ->  Network addListener 76227654
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227655
+⚡️  To Native ->  SecureStorage internalGetItem 76227656
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227657
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227658
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227659
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227660
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227661
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227662
+⚡️  To Native ->  SecureStorage internalGetItem 76227663
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227664
+⚡️  To Native ->  SecureStorage internalGetItem 76227665
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227666
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227667
+⚡️  To Native ->  Network addListener 76227668
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 76227669
+⚡️  To Native ->  SecureStorage internalGetItem 76227670
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227671
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227672
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227673
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227674
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227675
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227676
+⚡️  To Native ->  SecureStorage internalGetItem 76227677
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227678
+⚡️  To Native ->  SecureStorage internalGetItem 76227679
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227680
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227681
+⚡️  To Native ->  Network addListener 76227682
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227683
+⚡️  To Native ->  SecureStorage internalGetItem 76227684
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227685
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227686
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227687
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227688
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227689
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227690
+⚡️  To Native ->  SecureStorage internalGetItem 76227691
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227692
+⚡️  To Native ->  SecureStorage internalGetItem 76227693
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227694
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227695
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227696
+⚡️  To Native ->  Network removeListener 76227697
+⚡️  To Native ->  SecureStorage internalGetItem 76227698
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227699
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227700
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227701
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227702
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227703
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227704
+⚡️  To Native ->  SecureStorage internalGetItem 76227705
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227706
+⚡️  To Native ->  SecureStorage internalGetItem 76227707
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227708
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227709
+⚡️  To Native ->  Network addListener 76227710
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227711
+⚡️  To Native ->  SecureStorage internalGetItem 76227712
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227713
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227714
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227715
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227716
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227717
+⚡️  To Native ->  SecureStorage internalGetItem 76227718
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227719
+⚡️  To Native ->  SecureStorage internalGetItem 76227720
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227721
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227722
+⚡️  To Native ->  Network addListener 76227723
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227724
+⚡️  To Native ->  SecureStorage internalGetItem 76227725
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227726
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227727
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227728
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227729
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227730
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227731
+⚡️  To Native ->  SecureStorage internalGetItem 76227732
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227733
+⚡️  To Native ->  SecureStorage internalGetItem 76227734
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227735
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227736
+⚡️  To Native ->  Network addListener 76227737
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227738
+⚡️  To Native ->  SecureStorage internalGetItem 76227739
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227740
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227741
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227742
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227743
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227744
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227745
+⚡️  To Native ->  SecureStorage internalGetItem 76227746
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227747
+⚡️  To Native ->  SecureStorage internalGetItem 76227748
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227749
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227750
+⚡️  TO JS ⚡️  To Native ->  Network addListener 76227751
+{"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227752
+⚡️  To Native ->  SecureStorage internalGetItem 76227753
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227754
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227755
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227756
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227757
+⚡️  To Native ->  SecureStorage internalGetItem 76227758
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227759
+⚡️  To Native ->  SecureStorage internalGetItem 76227760
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227761
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227762
+⚡️  To Native ->  Network addListener 76227763
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227764
+⚡️  To Native ->  SecureStorage internalGetItem 76227765
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227766
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227767
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227768
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227769
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227770
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227771
+⚡️  To Native ->  SecureStorage internalGetItem 76227772
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227773
+⚡️  To Native ->  SecureStorage internalGetItem 76227774
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227775
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227776
+⚡️  To Native ->  Network addListener 76227777
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227778
+⚡️  To Native ->  SecureStorage internalGetItem 76227779
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227780
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227781
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227782
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227783
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227784
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227785
+⚡️  To Native ->  SecureStorage internalGetItem 76227786
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227787
+⚡️  To Native ->  SecureStorage internalGetItem 76227788
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227789
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227790
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227791
+⚡️  To Native ->  Network removeListener 76227792
+⚡️  To Native ->  SecureStorage internalGetItem 76227793
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227794
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227795
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227796
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227797
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227798
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227799
+⚡️  To Native ->  SecureStorage internalGetItem 76227800
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227801
+⚡️  To Native ->  SecureStorage internalGetItem 76227802
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227803
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227804
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227805
+⚡️  To Native ->  Network removeListener 76227806
+⚡️  To Native ->  SecureStorage internalGetItem 76227807
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227808
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227809
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227810
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227811
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227812
+⚡️  To Native ->  SecureStorage internalGetItem 76227813
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227814
+⚡️  To Native ->  SecureStorage internalGetItem 76227815
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227816
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227817
+⚡️  To Native ->  Network addListener 76227818
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227819
+⚡️  To Native ->  SecureStorage internalGetItem 76227820
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227821
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227822
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227823
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227824
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227825
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227826
+⚡️  To Native ->  SecureStorage internalGetItem 76227827
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227828
+⚡️  To Native ->  SecureStorage internalGetItem 76227829
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227830
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227831
+⚡️  To Native ->  Network addListener 76227832
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227833
+⚡️  To Native ->  SecureStorage internalGetItem 76227834
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227835
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227836
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227837
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227838
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227839
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227840
+⚡️  To Native ->  SecureStorage internalGetItem 76227841
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227842
+⚡️  To Native ->  SecureStorage internalGetItem 76227843
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227844
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227845
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227846
+⚡️  To Native ->  Network removeListener 76227847
+⚡️  To Native ->  SecureStorage internalGetItem 76227848
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227849
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227850
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227851
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227852
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227853
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227854
+⚡️  To Native ->  SecureStorage internalGetItem 76227855
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227856
+⚡️  To Native ->  SecureStorage internalGetItem 76227857
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227858
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227859
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 76227860
+⚡️  To Native ->  Network removeListener 76227861
+⚡️  To Native ->  SecureStorage internalGetItem 76227862
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227863
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227864
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227865
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227866
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227867
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227868
+⚡️  To Native ->  SecureStorage internalGetItem 76227869
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227870
+⚡️  To Native ->  SecureStorage internalGetItem 76227871
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227872
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 76227873
+⚡️  To Native ->  Network addListener 76227874
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 76227875
+⚡️  To Native ->  SecureStorage internalGetItem 76227876
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 76227877
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227878
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227879
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227880
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227881
+⚡️  To Native ->  SecureStorage internalGetItem 76227882
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227883
+⚡️  To Native ->  SecureStorage internalGetItem 76227884
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  To Native ->  SecureStorage internalGetItem 76227885
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
