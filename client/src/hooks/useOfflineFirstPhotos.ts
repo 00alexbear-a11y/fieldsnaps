@@ -35,7 +35,7 @@ export function useOfflineFirstPhotos(projectId: string) {
     dataUpdatedAt,
   } = useQuery<{ photos: Photo[]; nextCursor?: string }>({
     queryKey: ['/api/projects', projectId, 'photos'],
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes to prevent infinite refetch loops
     retry: false, // Don't retry if offline
     meta: {
       skipErrorToast: true, // Handle errors gracefully
