@@ -100,10 +100,6 @@ export default function Projects() {
     };
   }, [searchQuery]);
   
-  // Sync debounced value on mount to prevent stale searches
-  useEffect(() => {
-    setDebouncedSearchQuery(searchQuery);
-  }, []);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editAddress, setEditAddress] = useState("");
