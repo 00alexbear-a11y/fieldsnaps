@@ -1,0 +1,39 @@
+Last login: Sat Dec 13 14:37:47 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Documents/Projects/FieldSnaps && git pull origin main && ls -la "attached_assets/Fieldsnap logo v1.2_1760310501545.png"
+remote: Enumerating objects: 7, done.
+remote: Counting objects: 100% (7/7), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 5 (delta 3), reused 5 (delta 3), pack-reused 0 (from 0)
+Unpacking objects: 100% (5/5), 2.59 KiB | 294.00 KiB/s, done.
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+   17dfd02..f3fc331  main       -> origin/main
+Updating 17dfd02..f3fc331
+Fast-forward
+ ...7-07-on-ttys000-bearmac-Alexs_1765665627660.txt | 67 +++++++++++++++++
+ ...7-07-on-ttys000-bearmac-Alexs_1765666100262.txt | 86 ++++++++++++++++++++++
+ 2 files changed, 153 insertions(+)
+ create mode 100644 attached_assets/Pasted-Last-login-Sat-Dec-13-14-17-07-on-ttys000-bearmac-Alexs_1765665627660.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Sat-Dec-13-14-17-07-on-ttys000-bearmac-Alexs_1765666100262.txt
+ls: attached_assets/Fieldsnap logo v1.2_1760310501545.png: No such file or directory
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % npm run build && rm -rf ios/App/App/public && npx cap sync ios && npx cap open ios
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (9) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 73 modules transformed.
+x Build failed in 790ms
+error during build:
+[vite:asset] Could not load /Users/bearmac/Documents/Projects/FieldSnaps/attached_assets/Fieldsnap logo v1.2_1760310501545.png (imported by client/src/App.tsx): ENOENT: no such file or directory, open '/Users/bearmac/Documents/Projects/FieldSnaps/attached_assets/Fieldsnap logo v1.2_1760310501545.png'
+    at async open (node:internal/fs/promises:641:25)
+    at async Object.readFile (node:internal/fs/promises:1245:14)
+    at async fileToBuiltUrl (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:20428:19)
+    at async Object.load (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:20328:17)
+    at async PluginDriver.hookFirstAndGetPlugin (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20689:28)
+    at async file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:19809:33
+    at async Queue.work (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20899:32)
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
