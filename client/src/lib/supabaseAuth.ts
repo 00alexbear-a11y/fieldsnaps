@@ -17,6 +17,10 @@ let freshInstallSessionCleared = false;
 // Track if auth has been initialized to prevent multiple initialization calls
 let authInitializationPromise: Promise<{ session: Session | null; user: User | null }> | null = null;
 
+// Cache the auth result so subsequent calls return immediately without triggering effects
+let cachedAuthResult: { session: Session | null; user: User | null } | null = null;
+let isAuthInitialized = false;
+
 // Check if user has completed initial login on this app install
 async function hasCompletedFirstLaunch(): Promise<boolean> {
   try {
@@ -304,6 +308,11 @@ export async function signOut(): Promise<void> {
   // Clear the first-launch flag so user sees login screen next time
   await clearFirstLaunchFlag();
   
+  // Reset auth initialization cache so next login reinitializes properly
+  isAuthInitialized = false;
+  cachedAuthResult = null;
+  authInitializationPromise = null;
+  
   const { error } = await supabase.auth.signOut();
   
   if (error) {
@@ -502,6 +511,17 @@ export function onAuthStateChange(callback: (session: Session | null, user: User
       freshInstallSessionCleared = false;
     }
     
+    // Update the auth cache when auth state changes
+    // This ensures initializeAuth returns fresh data after login/logout
+    if (event === 'SIGNED_IN' && session) {
+      cachedAuthResult = { session, user: session.user };
+      isAuthInitialized = true;
+    } else if (event === 'SIGNED_OUT') {
+      cachedAuthResult = null;
+      isAuthInitialized = false;
+      authInitializationPromise = null;
+    }
+    
     callback(session, session?.user ?? null);
   });
   
@@ -511,29 +531,53 @@ export function onAuthStateChange(callback: (session: Session | null, user: User
 }
 
 export async function initializeAuth(): Promise<{ session: Session | null; user: User | null }> {
-  // Prevent multiple simultaneous initialization calls
-  // This fixes the blinking loop caused by React re-renders
+  // If already fully initialized, return cached result immediately
+  // This prevents multiple components from triggering repeated initialization
+  if (isAuthInitialized && cachedAuthResult) {
+    return cachedAuthResult;
+  }
+  
+  // If initialization is in progress, wait for it
   if (authInitializationPromise) {
     console.log('[SupabaseAuth] Auth initialization already in progress, returning existing promise');
     return authInitializationPromise;
   }
   
-  console.log('[SupabaseAuth] Initializing auth');
+  // Create the initialization promise
+  authInitializationPromise = (async () => {
+    try {
+      console.log('[SupabaseAuth] Initializing auth');
+      
+      setupDeepLinkListener();
+      
+      // Trust Supabase SDK's built-in session management
+      // It handles persistence via SecureStorage/Capacitor Preferences automatically
+      const session = await getSession();
+      const user = session?.user ?? null;
+      
+      console.log('[SupabaseAuth] Auth initialized, user:', user?.id ?? 'none');
+      
+      const result = { session, user };
+      
+      // Cache the result and mark as initialized
+      cachedAuthResult = result;
+      isAuthInitialized = true;
+      
+      // Clear the promise since we're done (result is now in cache)
+      authInitializationPromise = null;
+      
+      return result;
+    } catch (error) {
+      console.error('[SupabaseAuth] Initialization failed:', error);
+      // Reset on failure to allow retry
+      authInitializationPromise = null;
+      cachedAuthResult = null;
+      isAuthInitialized = false;
+      throw error;
+    }
+  })();
   
-  setupDeepLinkListener();
-  
-  // Trust Supabase SDK's built-in session management
-  // It handles persistence via SecureStorage/Capacitor Preferences automatically
-  // The previous "first launch" logic was incorrectly clearing valid sessions on app restart
-  
-  const session = await getSession();
-  const user = session?.user ?? null;
-  
-  console.log('[SupabaseAuth] Auth initialized, user:', user?.id ?? 'none');
-  
-  const result = { session, user };
-  authInitializationPromise = Promise.resolve(result);
-  return result;
+  return authInitializationPromise;
 }
 
 export async function resetPassword(email: string): Promise<void> {
