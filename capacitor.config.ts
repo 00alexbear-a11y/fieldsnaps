@@ -25,13 +25,12 @@ const config: CapacitorConfig = {
       backgroundColor: '#FFFFFF',
     },
     CapacitorUpdater: {
-      // Auto-update DISABLED temporarily - prevents reload loops during auth testing
-      // Re-enable after session persistence is proven stable
+      // Auto-update DISABLED - prevents reload loops and freezing on launch
       autoUpdate: false,
       resetWhenUpdate: false,
       appReadyTimeout: 10000,
       responseDelay: 0,
-      statsUrl: 'https://api.capgo.app/stats',
+      statsUrl: undefined,
       channelUrl: 'https://api.capgo.app',
     },
   },

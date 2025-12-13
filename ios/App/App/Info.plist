@@ -102,5 +102,9 @@
         <!-- Face ID / Touch ID (for biometric login) -->
         <key>NSFaceIDUsageDescription</key>
         <string>FieldSnaps uses Face ID to securely authenticate your account.</string>
+        
+        <!-- Motion and Fitness (for activity tracking) -->
+        <key>NSMotionUsageDescription</key>
+        <string>FieldSnaps uses motion data to improve location accuracy for automatic time tracking.</string>
 </dict>
 </plist>
