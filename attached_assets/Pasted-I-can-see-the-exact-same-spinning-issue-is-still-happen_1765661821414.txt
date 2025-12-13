@@ -1,0 +1,73 @@
+I can see the exact same spinning issue is still happening - those repeated [SupabaseAuth] Auth initialization already in progress logs mean the infinite loop was NOT fixed.
+
+Let me check what's actually in your GitHub repo right now:
+
+Using Tool
+|
+Read
+https://github.com/00alexbear-a11y/fieldsnaps/blob/main/client/src/pages/Projects.tsx
+View
+Let me try the raw GitHub URL:
+
+Using Tool
+|
+Read
+https://raw.githubusercontent.com/00alexbear-a11y/fieldsnaps/main/client/src/pages/Projects.tsx
+View
+The GitHub repo appears to be private. Here's what we need to do immediately:
+
+🚨 EMERGENCY FIX - Run This On Your Mac RIGHT NOW:
+Copycd ~/Documents/Projects/FieldSnaps
+
+# Create the fix file
+cat > fix-infinite-loop.sh << 'EOF'
+#!/bin/bash
+
+echo "🔧 Fixing infinite loop in Projects.tsx..."
+
+# Backup original
+cp client/src/pages/Projects.tsx client/src/pages/Projects.tsx.backup
+
+# Remove the problematic useEffect (lines 105-107)
+sed -i.tmp '/useEffect(() => {/,/}, \[\]);/{ 
+  /setDebouncedSearchQuery(searchQuery);/,/}, \[\]);/d
+}' client/src/pages/Projects.tsx
+
+echo "✅ Fix applied! Rebuilding..."
+
+npm run build
+npx cap sync ios
+
+echo "
+✅ DONE! Now:
+1. Open Xcode: npx cap open ios
+2. Clean Build (⌘+Shift+K)
+3. Delete app from simulator
+4. Run fresh install (⌘+R)
+"
+EOF
+
+chmod +x fix-infinite-loop.sh
+./fix-infinite-loop.sh
+⚠️ IF THAT SCRIPT FAILS, DO THIS MANUAL FIX:
+Option 1: Use VSCode/Cursor to edit client/src/pages/Projects.tsx
+
+Find these lines (around line 105-107):
+
+CopyuseEffect(() => {
+  setDebouncedSearchQuery(searchQuery);
+}, []);
+DELETE THAT ENTIRE BLOCK. It's causing infinite re-renders.
+
+Then run:
+
+Copynpm run build && npx cap sync ios && npx cap open ios
+🎯 What This Fixes:
+The useEffect with empty dependencies [] was calling setDebouncedSearchQuery(searchQuery) on every render, which triggered auth checks repeatedly = infinite spinning.
+
+After the fix:
+
+✅ App opens immediately to Projects page
+✅ NO more "Auth initialization already in progress" spam
+✅ Login persists across restarts
+Run the script and paste the output here. If it works, we'll immediately push to GitHub and then do the full security audit you requested.

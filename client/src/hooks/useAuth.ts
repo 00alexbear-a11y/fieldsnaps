@@ -100,6 +100,22 @@ export function useAuth() {
       });
       
       if (!response.ok) {
+        // Handle 401/403: Backend doesn't recognize the Supabase token
+        // Clear the invalid session to prevent infinite loading state
+        if (response.status === 401 || response.status === 403) {
+          console.log('[useAuth] Backend rejected token (401/403), clearing session');
+          try {
+            await supabaseSignOut();
+          } catch (e) {
+            console.error('[useAuth] Error signing out:', e);
+          }
+          setAuthState({
+            session: null,
+            supabaseUser: null,
+            isInitialized: true,
+          });
+          throw new Error('Session expired - please login again');
+        }
         throw new Error('Failed to fetch user');
       }
       
