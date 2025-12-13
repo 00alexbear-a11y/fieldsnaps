@@ -25,10 +25,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#FFFFFF',
     },
     CapacitorUpdater: {
-      // Auto-update ENABLED - OTA updates from Capgo
-      // First-launch flag system in supabaseAuth.ts prevents login loops
-      autoUpdate: true,
-      resetWhenUpdate: true,
+      // Auto-update DISABLED temporarily - prevents reload loops during auth testing
+      // Re-enable after session persistence is proven stable
+      autoUpdate: false,
+      resetWhenUpdate: false,
       appReadyTimeout: 10000,
       responseDelay: 0,
       statsUrl: 'https://api.capgo.app/stats',

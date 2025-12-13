@@ -522,39 +522,9 @@ export async function initializeAuth(): Promise<{ session: Session | null; user:
   
   setupDeepLinkListener();
   
-  // On native platforms, check if this is a fresh install
-  // iOS Keychain can persist tokens even after app uninstall, causing auto-login
-  // without the user ever seeing the login screen on a fresh install
-  if (isNativePlatform()) {
-    const hasCompleted = await hasCompletedFirstLaunch();
-    
-    if (!hasCompleted) {
-      console.log('[SupabaseAuth] Fresh install detected - clearing persisted session to show login');
-      
-      // Set flag BEFORE signing out to prevent race condition
-      // This tells onAuthStateChange to ignore any cached session events
-      freshInstallSessionCleared = true;
-      
-      // Must actually sign out and clear the persisted tokens from Supabase
-      // Use scope: 'local' to only clear local storage, not server session
-      try {
-        await supabase.auth.signOut({ scope: 'local' });
-        console.log('[SupabaseAuth] Cleared persisted Supabase session for fresh install');
-      } catch (error) {
-        console.log('[SupabaseAuth] Error clearing session (may not exist):', error);
-      }
-      
-      // Verify session is actually cleared
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        console.log('[SupabaseAuth] Session still exists after signOut, forcing null');
-      }
-      
-      // Force user to login screen - session is now cleared
-      authInitializationPromise = Promise.resolve({ session: null, user: null });
-      return { session: null, user: null };
-    }
-  }
+  // Trust Supabase SDK's built-in session management
+  // It handles persistence via SecureStorage/Capacitor Preferences automatically
+  // The previous "first launch" logic was incorrectly clearing valid sessions on app restart
   
   const session = await getSession();
   const user = session?.user ?? null;
