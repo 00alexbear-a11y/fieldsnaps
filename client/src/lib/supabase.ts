@@ -9,8 +9,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('[Supabase] Missing environment variables. Auth features may not work.');
 }
 
-const SUPABASE_AUTH_KEY = 'supabase.auth.token';
-let cachedSession: string | null = null;
+// In-memory cache for all Supabase storage keys to prevent repeated SecureStorage reads
+// Supabase SDK v2 uses key format: sb-{project_ref}-auth-token
+const storageCache: Map<string, string | null> = new Map();
 
 // Use getPlatform() which is more reliable than isNativePlatform()
 // isNativePlatform() can return false on iOS in some edge cases
@@ -93,25 +94,20 @@ export const supabase = createClient(
       autoRefreshToken: true,
       storage: isNative ? {
         getItem: async (key: string) => {
-          if (cachedSession && key === SUPABASE_AUTH_KEY) {
-            return cachedSession;
+          // Check in-memory cache first to avoid repeated SecureStorage reads
+          if (storageCache.has(key)) {
+            return storageCache.get(key) ?? null;
           }
           const value = await getFromSecureStorage(key);
-          if (key === SUPABASE_AUTH_KEY) {
-            cachedSession = value;
-          }
+          storageCache.set(key, value);
           return value;
         },
         setItem: async (key: string, value: string) => {
-          if (key === SUPABASE_AUTH_KEY) {
-            cachedSession = value;
-          }
+          storageCache.set(key, value);
           await setToSecureStorage(key, value);
         },
         removeItem: async (key: string) => {
-          if (key === SUPABASE_AUTH_KEY) {
-            cachedSession = null;
-          }
+          storageCache.delete(key);
           await removeFromSecureStorage(key);
         },
       } : {
