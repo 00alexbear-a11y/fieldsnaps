@@ -1,0 +1,146 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/820D0C5C-FF58-4A8C-A59A-5DA252BD1E56/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 7930ba43-16a6-4aea-a5bc-8609acbf7fbf
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+Loading network plugin
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x13543d7d0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+KeyboardPlugin: resize mode - native
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+Networking process (0x116058190) took 1.006886 seconds to launch
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+⚡️  JS Eval error A JavaScript exception occurred
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[7366] 0xf0000010133cdb8 - [webPageID=8] WebPage::runJavaScriptInFrameInScriptWorld: Request to run JavaScript failed with error <private>
+⚡️  JS Eval error A JavaScript exception occurred
+WebContent[7366] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 128605847
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"checksum":"","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 128605848
+⚡️  To Native ->  CapacitorUpdater addListener 128605849
+⚡️  To Native ->  CapacitorUpdater addListener 128605850
+⚡️  To Native ->  CapacitorUpdater current 128605851
+⚡️  To Native ->  SecureStorage internalGetItem 128605852
+⚡️  TO JS {"bundle":{"checksum":"","version":"builtin","id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z"},"native":"1.0"}
+⚡️  To Native ->  App addListener 128605853
+⚡️  To Native ->  App addListener 128605854
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] Current bundle: {"checksum":"","version":"builtin","id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z"}
+⚡️  To Native ->  SecureStorage internalGetItem 128605855
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  To Native ->  App getLaunchUrl 128605856
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  To Native ->  App addListener 128605857
+⚡️  To Native ->  StatusBar setOverlaysWebView 128605858
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  To Native ->  StatusBar setStyle 128605859
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 128605860
+⚡️  TO JS undefined
+⚡️  To Native ->  Network getStatus 128605861
+⚡️  To Native ->  Network addListener 128605862
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 128605863
+⚡️  To Native ->  Network getStatus 128605864
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 128605865
+⚡️  To Native ->  Network removeListener 128605866
+⚡️  To Native ->  Network getStatus 128605867
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 128605868
+⚡️  To Native ->  Network removeListener 128605869
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  Network getStatus 128605870
+⚡️  To Native ->  Network addListener 128605871
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 128605872
+⚡️  To Native ->  Network getStatus 128605873
+⚡️  To Native ->  Network addListener 128605874
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 128605875
+⚡️  To Native ->  Network getStatus 128605876
+⚡️  To Native ->  Network addListener 128605877
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 128605878
+⚡️  To Native ->  Network getStatus 128605879
+⚡️  To Native ->  Network addListener 128605880
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 128605881
+⚡️  To Native ->  Network getStatus 128605882
+⚡️  To Native ->  Network addListener 128605883
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 128605884
+⚡️  To Native ->  Network getStatus 128605885
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 128605886
+⚡️  To Native ->  Network removeListener 128605887
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  To Native ->  Network getStatus 128605888
+⚡️  To Native ->  Network addListener 128605889
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 128605890
+⚡️  To Native ->  Network getStatus 128605891
+⚡️  To Native ->  Network addListener 128605892
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 128605893
+⚡️  To Native ->  Network getStatus 128605894
+⚡️  To Native ->  ⚡️  TO JS Network addListener 128605895
+{"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 128605896
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
