@@ -10,7 +10,7 @@
 
 import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueItem } from './indexeddb';
 import { generateThumbnail } from './imageCompression';
-import { Network } from '@capacitor/network';
+import { nativeNetwork } from './nativeNetwork';
 import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
 
 const MAX_RETRY_COUNT = 5;
@@ -104,8 +104,8 @@ class SyncManager {
    */
   private async shouldUploadNow(): Promise<{ canUpload: boolean; reason?: string }> {
     try {
-      // Check network status
-      const networkStatus = await Network.getStatus();
+      // Check network status (using cached wrapper to prevent repeated native calls)
+      const networkStatus = await nativeNetwork.getStatus();
       
       if (!networkStatus.connected) {
         return { canUpload: false, reason: 'No network connection' };
