@@ -83,10 +83,10 @@ export function useAuth() {
     queryKey: ["/api/auth/user"],
     retry: false,
     enabled: authState.isInitialized && !!authState.session,
-    // Force refetch on window focus to ensure fresh data
-    refetchOnWindowFocus: true,
-    // Consider data stale immediately to always refetch
-    staleTime: 0,
+    // Don't refetch on window focus - user data doesn't change often
+    refetchOnWindowFocus: false,
+    // Cache user data for 5 minutes to prevent infinite refetch loop
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       if (!authState.session?.access_token) {
         throw new Error('No session');
