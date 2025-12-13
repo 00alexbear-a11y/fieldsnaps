@@ -1,0 +1,405 @@
+Last login: Sat Dec 13 12:52:47 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Documents/Projects/FieldSnaps && echo "=== SEARCHING FOR HOME COMPONENT ===" && find client/src/pages -type f -name "*.tsx" | grep -i home && echo -e "\n=== IF FOUND, SHOW CONTENT ===" && find client/src/pages -type f -name "*.tsx" | grep -i home | head -1 | xargs cat | head -150
+
+=== SEARCHING FOR HOME COMPONENT ===
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % cd ~/Documents/Projects/FieldSnaps && echo "=== PROJECTS PAGE (Main Landing) ===" && cat client/src/pages/Projects.tsx | head -150 && echo -e "\n=== SUPABASE AUTH INIT ===" && cat client/src/lib/supabaseAuth.ts | head -200
+
+=== PROJECTS PAGE (Main Landing) ===
+import { useState, useMemo, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
+import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
+import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { MobileDialogForm } from "@/components/ui/mobile-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import SwipeableProjectCard from "@/components/SwipeableProjectCard";
+import type { Project, Photo } from "../../../shared/schema";
+import { syncManager } from "@/lib/syncManager";
+import { nativeClipboard } from "@/lib/nativeClipboard";
+import { haptics } from "@/lib/nativeHaptics";
+import { nativeDialogs } from "@/lib/nativeDialogs";
+import { Capacitor } from "@capacitor/core";
+
+type ViewFilter = 'all' | 'recent' | 'favorites';
+type SortOption = 'name-asc' | 'name-desc' | 'photos' | 'last-activity' | 'created';
+
+export default function Projects() {
+  const [, setLocation] = useLocation();
+  const { isDark, toggleTheme } = useTheme();
+  const { canWrite, isTrialExpired, isPastDue, isCanceled } = useSubscriptionAccess();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  
+  // Read filter/sort state from URL query params (managed by AppSidebar)
+  const getUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      viewFilter: (params.get('view') || 'all') as ViewFilter,
+      sortBy: (params.get('sort') || 'last-activity') as SortOption,
+      showCompleted: params.get('completed') === 'true',
+    };
+  };
+
+  const [urlParams, setUrlParams] = useState(getUrlParams());
+  const { viewFilter, sortBy, showCompleted } = urlParams;
+  
+  // Listen for filter changes from AppSidebar and browser history navigation
+  useEffect(() => {
+    const handleFilterChange = () => {
+      setUrlParams(getUrlParams());
+    };
+    
+    // Listen for custom filterChange event from AppSidebar
+    window.addEventListener('filterChange', handleFilterChange);
+    // Listen for browser back/forward navigation
+    window.addEventListener('popstate', handleFilterChange);
+    
+    return () => {
+      window.removeEventListener('filterChange', handleFilterChange);
+      window.removeEventListener('popstate', handleFilterChange);
+    };
+  }, []);
+  
+  // Debounce search query for better mobile performance (300ms delay)
+  useEffect(() => {
+    const isMounted = { current: true };
+    const timer = setTimeout(() => {
+      if (isMounted.current) {
+        setDebouncedSearchQuery(searchQuery);
+      }
+    }, 300);
+    
+    return () => {
+      isMounted.current = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+  
+  // Sync debounced value on mount to prevent stale searches
+  useEffect(() => {
+    setDebouncedSearchQuery(searchQuery);
+  }, []);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editUnitCount, setEditUnitCount] = useState(1);
+  const [editCustomerName, setEditCustomerName] = useState("");
+  const [editCustomerPhone, setEditCustomerPhone] = useState("");
+  const [editCustomerEmail, setEditCustomerEmail] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{
+    pending: number;
+    projects: number;
+    photos: number;
+  } | null>(null);
+  const { toast } = useToast();
+
+  // Offline-first: load from IndexedDB immediately, fetch from server in background
+  const { projects: projectsWithCounts, isLoading: projectsLoading, isOnline, hasLocalData } = useOfflineFirstProjects();
+
+  // Fetch user's favorite project IDs (Phase 3.4)
+  const { data: favoriteProjectIds = [] } = useQuery<string[]>({
+    queryKey: ['/api/user/favorite-projects'],
+    enabled: isOnline,
+  });
+
+  // Fetch user's recent project IDs (Phase 3.4)
+  const { data: recentProjectIds = [] } = useQuery<string[]>({
+    queryKey: ['/api/user/recent-projects'],
+    enabled: isOnline,
+  });
+
+  // Load sync status on mount and when online status changes
+  useEffect(() => {
+    const loadSyncStatus = async () => {
+      const status = await syncManager.getSyncStatus();
+      setSyncStatus(status);
+    };
+    loadSyncStatus();
+  }, [isOnline]);
+
+
+=== SUPABASE AUTH INIT ===
+import { supabase, getRedirectUrl, isNativePlatform } from './supabase';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
+import { SocialLogin } from '@capgo/capacitor-social-login';
+import type { Session, User, AuthError } from '@supabase/supabase-js';
+
+// First-launch detection key - stored in Preferences (NOT Keychain)
+// Preferences data is cleared on app uninstall, unlike iOS Keychain
+const FIRST_LAUNCH_COMPLETED_KEY = 'fieldsnaps.first.launch.completed';
+
+// Track if we're in the middle of a fresh-install session clear
+// This prevents onAuthStateChange from immediately restoring the cached session
+let freshInstallSessionCleared = false;
+
+// Track if auth has been initialized to prevent multiple initialization calls
+let authInitializationPromise: Promise<{ session: Session | null; user: User | null }> | null = null;
+
+// Check if user has completed initial login on this app install
+async function hasCompletedFirstLaunch(): Promise<boolean> {
+  try {
+    const { value } = await Preferences.get({ key: FIRST_LAUNCH_COMPLETED_KEY });
+    const completed = value === 'true';
+    console.log('[SupabaseAuth] First launch check:', completed ? 'completed' : 'not completed');
+    return completed;
+  } catch (error) {
+    console.error('[SupabaseAuth] Error checking first launch flag:', error);
+    return false;
+  }
+}
+
+// Mark that user has completed initial login
+export async function setFirstLaunchCompleted(): Promise<void> {
+  try {
+    await Preferences.set({ key: FIRST_LAUNCH_COMPLETED_KEY, value: 'true' });
+    // Reset the fresh-install flag so auth state changes work normally
+    freshInstallSessionCleared = false;
+    console.log('[SupabaseAuth] First launch marked as completed');
+  } catch (error) {
+    console.error('[SupabaseAuth] Error setting first launch flag:', error);
+  }
+}
+
+// Clear the first launch flag (called on sign out)
+export async function clearFirstLaunchFlag(): Promise<void> {
+  try {
+    await Preferences.remove({ key: FIRST_LAUNCH_COMPLETED_KEY });
+    console.log('[SupabaseAuth] First launch flag cleared');
+  } catch (error) {
+    console.error('[SupabaseAuth] Error clearing first launch flag:', error);
+  }
+}
+
+export interface SupabaseAuthState {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  error: AuthError | null;
+}
+
+let deepLinkListenerRegistered = false;
+let socialLoginInitialized = false;
+
+// Initialize SocialLogin for native platforms
+async function initializeSocialLogin(): Promise<void> {
+  if (socialLoginInitialized) return;
+  
+  try {
+    const platform = Capacitor.getPlatform();
+    console.log('[SupabaseAuth] Initializing SocialLogin for platform:', platform);
+    
+    // Initialize with platform-specific options
+    await SocialLogin.initialize({
+      google: {
+        // Web Client ID from Google Cloud Console (also used for iOS)
+        webClientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID || '',
+      },
+      apple: {
+        // Apple Sign-In doesn't require additional config here
+        // It uses the app's entitlements
+      },
+    });
+    
+    socialLoginInitialized = true;
+    console.log('[SupabaseAuth] SocialLogin initialized successfully');
+  } catch (error) {
+    console.error('[SupabaseAuth] Failed to initialize SocialLogin:', error);
+    throw error;
+  }
+}
+
+export async function signInWithGoogle(): Promise<void> {
+  console.log('[SupabaseAuth] Starting Google OAuth sign-in');
+  
+  const isNative = isNativePlatform();
+  console.log('[SupabaseAuth] Platform check for OAuth, isNative:', isNative);
+  
+  // For native iOS/Android, use native Google Sign-In SDK
+  // This returns an ID token that we pass to Supabase signInWithIdToken
+  if (isNative) {
+    console.log('[SupabaseAuth] Using native Google Sign-In SDK');
+    
+    try {
+      await initializeSocialLogin();
+      
+      // Perform native Google Sign-In
+      const response = await SocialLogin.login({
+        provider: 'google',
+        options: {
+          scopes: ['email', 'profile'],
+        },
+      });
+      
+      console.log('[SupabaseAuth] Native Google Sign-In result:', JSON.stringify(response));
+      
+      // Extract idToken from the response (type assertion needed as types may be outdated)
+      const result = response.result as { idToken?: string; accessToken?: { token?: string } };
+      
+      if (result?.idToken) {
+        // Use the ID token to authenticate with Supabase
+        console.log('[SupabaseAuth] Got ID token, authenticating with Supabase...');
+        
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: result.idToken,
+          access_token: result.accessToken?.token,
+        });
+        
+        if (error) {
+          console.error('[SupabaseAuth] Supabase signInWithIdToken error:', error);
+          throw error;
+        }
+        
+        // Mark first launch as completed after successful login
+        await setFirstLaunchCompleted();
+        
+        console.log('[SupabaseAuth] Successfully authenticated with Supabase:', data.user?.id);
+        return;
+      } else {
+        console.error('[SupabaseAuth] No ID token returned from Google Sign-In');
+        throw new Error('No ID token returned from Google Sign-In');
+      }
+    } catch (error: any) {
+      console.error('[SupabaseAuth] Native Google Sign-In error:', error);
+      
+      // Check if user cancelled
+      if (error.message?.includes('cancelled') || error.message?.includes('canceled') || 
+          error.code === 'USER_CANCELLED' || error.message?.includes('USER_CANCELLED')) {
+        console.log('[SupabaseAuth] User cancelled Google Sign-In');
+        return;
+      }
+      
+      throw error;
+    }
+  }
+  
+  // Web flow - use default Supabase OAuth behavior
+  const redirectTo = getRedirectUrl();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+  
+  if (error) {
+    console.error('[SupabaseAuth] Google OAuth error:', error);
+    throw error;
+  }
+  
+  console.log('[SupabaseAuth] OAuth initiated, URL:', data.url);
+}
+
+export async function signInWithApple(): Promise<void> {
+  console.log('[SupabaseAuth] Starting Apple OAuth sign-in');
+  
+  const isNative = isNativePlatform();
+  
+  // For native iOS, use native Apple Sign-In SDK
+  if (isNative) {
+    console.log('[SupabaseAuth] Using native Apple Sign-In SDK');
+    
+    try {
+      await initializeSocialLogin();
+      
+      // Perform native Apple Sign-In
+      const response = await SocialLogin.login({
+        provider: 'apple',
+        options: {
+          scopes: ['email', 'name'],
+        },
+      });
+      
+      console.log('[SupabaseAuth] Native Apple Sign-In result:', JSON.stringify(response));
+      
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
+🎯 FOUND THE BUG!
+Look at line 81-83 in Projects.tsx:
+
+Copy// Sync debounced value on mount to prevent stale searches
+useEffect(() => {
+  setDebouncedSearchQuery(searchQuery);
+}, []);
+This is triggering the infinite loop! Here's why:
+
+useEffect runs with [] dependencies (only on mount)
+It calls setDebouncedSearchQuery(searchQuery)
+But searchQuery is in the component state
+This causes the component to re-render
+Which triggers auth initialization checks
+Which causes another re-render
+INFINITE LOOP 🔄
+🔧 THE FIX:
+Tell Replit AI to make this ONE change in client/src/pages/Projects.tsx:
+
+In client/src/pages/Projects.tsx, REMOVE lines 105-107 (the useEffect that syncs debouncedSearchQuery on mount).
+
+The lines to DELETE are:
+  // Sync debounced value on mount to prevent stale searches
+  useEffect(() => {
+    setDebouncedSearchQuery(searchQuery);
+  }, []);
+
+This useEffect is redundant because searchQuery starts as "" and debouncedSearchQuery also starts as "", so there's nothing to sync on mount. This is causing an infinite render loop.
+📋 Copy This to Replit AI:
+Remove the redundant useEffect in client/src/pages/Projects.tsx (lines 105-107):
+
+Delete these lines:
+  // Sync debounced value on mount to prevent stale searches
+  useEffect(() => {
+    setDebouncedSearchQuery(searchQuery);
+  }, []);
+
+This is causing an infinite render loop because it's setting state with no dependencies.
+After Replit AI makes the change:
+
+Download fresh ZIP from Replit
+Rebuild: cd ~/Documents/Projects && rm -rf FieldSnaps && unzip -o FieldSnaps.zip && cd FieldSnaps && npm install && npm run build && npx cap sync ios && npx cap open ios
+Clean build in Xcode (⌘+Shift+K)
+Run the app
+The spinning should STOP! 🎉
