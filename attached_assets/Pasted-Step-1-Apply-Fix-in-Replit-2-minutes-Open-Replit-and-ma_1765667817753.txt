@@ -1,0 +1,54 @@
+Step 1: Apply Fix in Replit (2 minutes)
+Open Replit and make this ONE-LINE CHANGE:
+
+File: client/src/hooks/useAuth.ts
+Line 89: Change from:
+
+CopystaleTime: 0, // Consider data stale immediately to always refetch
+To:
+
+CopystaleTime: 5 * 60 * 1000, // Cache user data for 5 minutes
+Optional but recommended - Line 87: Change from:
+
+CopyrefetchOnWindowFocus: true,
+To:
+
+CopyrefetchOnWindowFocus: false,
+Step 2: Build and Push (In Replit Shell)
+Copynpm run build
+git add client/src/hooks/useAuth.ts
+git commit -m "Fix: Change user query staleTime from 0 to 5 minutes to prevent infinite refetch loop"
+git push origin main
+Step 3: Pull and Rebuild on Mac
+Copycd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build
+npx cap sync ios
+npx cap open ios
+Step 4: In Xcode
+Product → Clean Build Folder (Cmd+Shift+K)
+Delete app from simulator/device
+Product → Run (Cmd+R)
+📊 Expected Results After Fix
+✅ App opens in 1-2 seconds (no spinner)
+✅ Projects page loads immediately
+✅ NO MORE [SupabaseAuth] Auth initialization already in progress spam
+✅ Login persists across app restarts
+✅ Smooth login/logout
+
+🚨 About Those Warning Logs
+The errors you're seeing (UIScene lifecycle, sandbox extension, CapgoUpdater semaphore, CoreMotion.plist permission) are iOS system warnings that:
+
+Don't cause the app spinning issue (that's the staleTime: 0 bug)
+Are mostly cosmetic/non-blocking
+Will be addressed in Phase 2 of the audit (after the app opens correctly)
+The Semaphore wait timed out is a Capgo internal timeout that doesn't affect functionality since autoUpdate: false is set.
+
+✅ Confirmation
+Once you've completed Steps 1-4, paste the first 50 lines of the Xcode console output here. I expect to see:
+
+✅ "App.tsx: App mounted successfully" (line ~10-15)
+✅ "Successfully loaded Supabase session" (line ~20-30)
+✅ ZERO Auth initialization already in progress messages
+✅ App showing Projects page within 2 seconds
+Do you see the fix in Replit's useAuth.ts file right now, or do you need me to walk you through editing it?
