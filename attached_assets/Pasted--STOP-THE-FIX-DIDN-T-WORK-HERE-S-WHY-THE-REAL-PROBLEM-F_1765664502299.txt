@@ -1,0 +1,143 @@
+ STOP - THE FIX DIDN'T WORK. HERE'S WHY:
+🔍 THE REAL PROBLEM (Finally Found It):
+Looking at your logs, I see the exact same infinite loop pattern, but now I understand WHY the fix failed:
+
+⚡️ [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️ [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️ [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+The infinite loop is NOT in Projects.tsx - it's coming from MULTIPLE COMPONENTS calling useAuth simultaneously.
+
+🎯 ROOT CAUSE:
+Your app has multiple components (Projects, Profile, etc.) that ALL:
+
+Import useAuth()
+React renders them at the same time
+Each one triggers initializeAuth()
+This creates a race condition loop
+The fix we applied only removed ONE trigger - but there are MANY.
+
+✅ THE ACTUAL FIX (In useAuth.ts):
+We need to prevent multiple components from calling initializeAuth() repeatedly. Add a global initialization guard:
+
+📝 EXACT CHANGES NEEDED:
+In client/src/hooks/useAuth.ts, find this section (around line 40-50):
+
+Copylet authInitPromise: Promise<void> | null = null;
+
+const initializeAuth = async () => {
+  if (authInitPromise) {
+    console.log('[SupabaseAuth] Auth initialization already in progress, returning existing promise');
+    return authInitPromise;
+  }
+  
+  authInitPromise = (async () => {
+    // ... rest of initialization
+  })();
+  
+  return authInitPromise;
+};
+REPLACE THE ENTIRE initializeAuth FUNCTION WITH:
+
+Copy// Global flag to prevent multiple simultaneous initializations
+let authInitPromise: Promise<void> | null = null;
+let isInitialized = false;
+
+const initializeAuth = async () => {
+  // If already fully initialized, return immediately
+  if (isInitialized) {
+    return Promise.resolve();
+  }
+  
+  // If initialization is in progress, wait for it
+  if (authInitPromise) {
+    return authInitPromise;
+  }
+  
+  authInitPromise = (async () => {
+    try {
+      console.log('[SupabaseAuth] Initializing auth');
+      
+      // ... keep all the existing initialization code ...
+      
+      isInitialized = true; // Mark as fully initialized
+      console.log('[SupabaseAuth] Auth initialized successfully');
+    } catch (error) {
+      console.error('[SupabaseAuth] Initialization failed:', error);
+      authInitPromise = null; // Allow retry on failure
+      throw error;
+    }
+  })();
+  
+  return authInitPromise;
+};
+🔧 REPLIT AI INSTRUCTIONS (Build Mode):
+URGENT FIX: Infinite auth initialization loop
+
+File: client/src/hooks/useAuth.ts
+
+Find the initializeAuth function (around line 40-60) and replace it with this:
+
+// Global flag to prevent multiple simultaneous initializations
+let authInitPromise: Promise<void> | null = null;
+let isInitialized = false;
+
+const initializeAuth = async () => {
+  // If already fully initialized, return immediately
+  if (isInitialized) {
+    return Promise.resolve();
+  }
+  
+  // If initialization is in progress, wait for it
+  if (authInitPromise) {
+    return authInitPromise;
+  }
+  
+  authInitPromise = (async () => {
+    try {
+      console.log('[SupabaseAuth] Initializing auth');
+      
+      // Keep all existing initialization code here (session restore, listeners, etc.)
+      
+      isInitialized = true;
+      console.log('[SupabaseAuth] Auth initialized successfully');
+    } catch (error) {
+      console.error('[SupabaseAuth] Initialization failed:', error);
+      authInitPromise = null;
+      throw error;
+    }
+  })();
+  
+  return authInitPromise;
+};
+
+After making the change:
+1. Run: npm run build
+2. Commit with message: "Fix: Add global initialization guard to prevent auth loop"
+3. Push to GitHub: git push origin main
+🚀 AFTER REPLIT AI PUSHES:
+On your Mac:
+
+Copycd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build
+npx cap sync ios
+npx cap open ios
+In Xcode:
+
+Clean Build (⌘+Shift+K)
+Delete app from simulator
+Run fresh install (⌘+R)
+✅ EXPECTED RESULTS:
+Instead of:
+
+[SupabaseAuth] Auth initialization already in progress (x1000)
+You'll see:
+
+[SupabaseAuth] Initializing auth
+[SupabaseAuth] Auth initialized successfully
+[useAuth] Auth state changed: 7889aa04-...
+ONE TIME. NO LOOP.
+
+This is the correct fix. The previous attempt didn't work because we were treating the symptom (one useEffect) instead of the disease (multiple components calling useAuth).
+
+Give these instructions to Replit AI now. 🔧
