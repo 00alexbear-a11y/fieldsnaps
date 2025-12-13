@@ -10,7 +10,7 @@ import BackgroundGeolocation, {
 import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { Preferences } from '@capacitor/preferences';
-import { Network } from '@capacitor/network';
+import { nativeNetwork } from './nativeNetwork';
 import { App } from '@capacitor/app';
 import { debugLog } from './geofenceDebugLog';
 
@@ -147,8 +147,8 @@ async function registerNetworkListener(): Promise<void> {
   if (networkListenerRegistered || !Capacitor.isNativePlatform()) return;
   
   try {
-    // Network listener - process queue when connectivity returns
-    await Network.addListener('networkStatusChange', async (status) => {
+    // Network listener - process queue when connectivity returns (using cached wrapper)
+    nativeNetwork.addListener(async (status) => {
       if (status.connected && failedOperationsQueue.length > 0) {
         await debugLog.info('network', 'Network reconnected, processing queued operations');
         await processFailedOperationsQueue();
@@ -158,7 +158,7 @@ async function registerNetworkListener(): Promise<void> {
     // App resume listener - process queue when app comes to foreground
     await App.addListener('appStateChange', async ({ isActive }) => {
       if (isActive && failedOperationsQueue.length > 0) {
-        const status = await Network.getStatus();
+        const status = await nativeNetwork.getStatus();
         if (status.connected) {
           await debugLog.info('network', 'App resumed with connectivity, processing queued operations');
           await processFailedOperationsQueue();
@@ -337,7 +337,7 @@ export async function initializeFailedOperationsQueue(): Promise<void> {
   
   // Process any queued operations immediately if we have connectivity
   if (failedOperationsQueue.length > 0) {
-    const status = await Network.getStatus();
+    const status = await nativeNetwork.getStatus();
     if (status.connected) {
       await debugLog.info('network', 'Found queued operations on startup, processing now');
       await processFailedOperationsQueue();
