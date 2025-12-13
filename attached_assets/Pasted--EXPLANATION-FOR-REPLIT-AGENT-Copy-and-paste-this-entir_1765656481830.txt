@@ -1,0 +1,214 @@
+ EXPLANATION FOR REPLIT AGENT
+Copy and paste this entire message to Replit Agent:
+
+🔴 CRITICAL BUG: Wrong Supabase API Key in iOS Build
+Problem: The iOS app is failing authentication with a 401 "Invalid API key" error because it's using an outdated Supabase anon key that doesn't match our current Supabase project.
+
+Root Cause:
+
+The hardcoded VITE_SUPABASE_ANON_KEY in our iOS build process is using an old key
+Supabase project was likely reset/regenerated, creating a new key
+Current correct key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs
+Impact:
+
+❌ Google Sign-In fails immediately
+❌ Apple Sign-In fails immediately
+❌ All Supabase auth calls return 401 errors
+❌ Users cannot log into the app
+Evidence from logs:
+
+⚡️ TO JS {"data":{"hint":"Double check your Supabase `anon` or `service_role` API key.",
+           "message":"Invalid API key"},"status":401}
+✅ REQUIRED FIXES
+Fix 1: Update .env File with Correct API Key
+Action Required:
+
+Create or update the .env file in project root
+Replace the VITE_SUPABASE_ANON_KEY with the correct current key
+Ensure all environment variables are present
+Expected .env file contents:
+
+Copy# Supabase Configuration
+VITE_SUPABASE_URL=https://pbfuwfzccdmpkmhncyjg.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs
+
+# API Configuration
+VITE_API_URL=https://fieldsnaps.replit.app
+
+# Google OAuth Configuration
+VITE_GOOGLE_WEB_CLIENT_ID=757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com
+Fix 2: Verify .env is Being Loaded
+Check these files to ensure .env is properly configured:
+
+File 1: vite.config.ts - Should already have this (verify):
+
+Copyimport { defineConfig, loadEnv } from 'vite';
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  
+  return {
+    // ... rest of config
+    define: {
+      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
+      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID': JSON.stringify(env.VITE_GOOGLE_WEB_CLIENT_ID),
+    }
+  };
+});
+File 2: .gitignore - Must include:
+
+.env
+.env.local
+.env.*.local
+Fix 3: Update Any Hardcoded Keys
+Search the entire codebase for the OLD key and replace:
+
+Old key (REMOVE):
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2Njk4MTAsImV4cCI6MjA0ODI0NTgxMH0.2dD4TvKdhEd7BL-O5NRiC9GJ3P5LKkMOjJvYStzWJpY
+Files to check:
+
+src/config/supabase.ts
+src/lib/supabaseClient.ts
+Any auth-related files
+capacitor.config.ts
+Any build scripts
+Action: Replace ALL instances with environment variable reference:
+
+Copyconst supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+Never hardcode API keys in source code.
+
+Fix 4: Add Environment Variable Validation
+Create/update file: src/config/env.ts
+
+Copy/**
+ * Validate required environment variables at startup
+ */
+export function validateEnv() {
+  const required = {
+    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    VITE_API_URL: import.meta.env.VITE_API_URL,
+    VITE_GOOGLE_WEB_CLIENT_ID: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID,
+  };
+
+  const missing = Object.entries(required)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key);
+
+  if (missing.length > 0) {
+    console.error('❌ Missing required environment variables:', missing);
+    throw new Error(`Missing env vars: ${missing.join(', ')}`);
+  }
+
+  // Validate key format
+  const key = required.VITE_SUPABASE_ANON_KEY;
+  if (!key.startsWith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.')) {
+    console.error('❌ Invalid Supabase anon key format');
+    throw new Error('VITE_SUPABASE_ANON_KEY appears to be invalid');
+  }
+
+  console.log('✅ Environment variables validated');
+  console.log('📍 Supabase URL:', required.VITE_SUPABASE_URL);
+  console.log('🔑 API Key (first 20 chars):', key.substring(0, 20) + '...');
+}
+Call this in your app entry point (src/main.tsx or src/App.tsx):
+
+Copyimport { validateEnv } from './config/env';
+
+// At the very top of your app initialization
+validateEnv();
+Fix 5: Verify Supabase Client Initialization
+Check file: src/lib/supabaseClient.ts (or wherever you initialize Supabase)
+
+Should look like this:
+
+Copyimport { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: window.localStorage, // or your custom storage
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
+
+console.log('[Supabase] Client initialized with URL:', supabaseUrl);
+console.log('[Supabase] Using anon key starting with:', supabaseAnonKey.substring(0, 20));
+🧪 TESTING STEPS
+After making these changes:
+
+Verify .env file exists and has correct key
+
+Copycat .env | grep VITE_SUPABASE_ANON_KEY
+Rebuild the project
+
+Copynpm run build
+Check build output - Should NOT show any environment variable warnings
+
+Test authentication:
+
+Try Google Sign-In
+Should now get past the 401 error
+May encounter new error about Google OAuth provider not enabled in Supabase (that's next step)
+🎯 SUCCESS CRITERIA
+After these fixes, the logs should change from:
+
+BEFORE (Current - Broken):
+
+⚡️ [error] - [SupabaseAuth] Supabase signInWithIdToken error: 
+   {"__isAuthError":true,"name":"AuthApiError","status":401}
+⚡️ TO JS {"data":{"message":"Invalid API key"},"status":401}
+AFTER (Expected - Fixed):
+
+⚡️ [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️ [log] - [SupabaseAuth] User authenticated successfully
+⚡️ [log] - [TokenManager] Tokens saved to iOS Keychain
+Or if Google OAuth isn't configured in Supabase yet:
+
+⚡️ [error] - Provider not enabled: google
+(This is a different issue - means OAuth provider needs to be enabled in Supabase Dashboard)
+
+📋 SUMMARY OF CHANGES NEEDED
+✅ Create/update .env file with correct VITE_SUPABASE_ANON_KEY
+✅ Add .env to .gitignore
+✅ Search and remove any hardcoded old API keys
+✅ Add environment variable validation
+✅ Verify Supabase client uses import.meta.env variables
+✅ Rebuild project
+⚠️ IMPORTANT NOTES
+Never commit .env file to git - It contains secrets
+The anon key is safe to use client-side - It's designed for public clients
+Service role key should NEVER be in frontend - Only on backend/Replit server
+After fixing this, you'll need to configure Google OAuth in Supabase Dashboard (separate task)
+🔧 QUICK COMMAND FOR REPLIT TO RUN
+Copy# Create .env file with correct keys
+cat > .env << 'EOF'
+VITE_SUPABASE_URL=https://pbfuwfzccdmpkmhncyjg.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs
+VITE_API_URL=https://fieldsnaps.replit.app
+VITE_GOOGLE_WEB_CLIENT_ID=757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com
+EOF
+
+# Verify it was created
+echo "✅ .env file created"
+cat .env
+
+# Ensure .env is in .gitignore
+grep -q "^\.env$" .gitignore || echo ".env" >> .gitignore
+echo "✅ .env added to .gitignore"
+
+# Rebuild project
+npm run build
+echo "✅ Project rebuilt with new environment variables"
+Execute all these fixes and the authentication should start working. The 401 error will be resolved. Let me know the new logs after rebuilding! 🚀

@@ -1,0 +1,1981 @@
+~/workspace$ cat << 'EOF'
+╔════════════════════════════════════════════════════════════════╗
+║          FIELDSNAPS PROJECT AUDIT - COMPLETE SNAPSHOT          ║
+╚════════════════════════════════════════════════════════════════╝
+EOF
+
+echo -e "\n📦 1. PROJECT METADATA"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Framework Detection:"
+cat package.json | grep -E '"(react|vue|angular|@ionic|@capacitor)"' | head -10
+
+echo -e "\n📋 2. PACKAGE.JSON (Dependencies Only)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat package.json | jq '.dependencies, .devDependencies' 2>/dev/null || cat package.json | grep -A 50 '"dependencies"'
+
+echo -e "\n⚙️  3. CAPACITOR CONFIG"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat capacitor.config.ts 2>/dev/null || cat capacitor.config.json 2>/dev/null || echo "❌ Not found"
+
+echo -e "\n🗂️  4. PROJECT STRUCTURE (Key Directories)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.vue" -o -name "*.jsx" \) \
+  -not -path "*/node_modules/*" \
+  -not -path "*/dist/*" \
+  -not -path "*/build/*" \
+  -not -path "*/.next/*" | head -50
+
+echo -e "\n🔐 5. SUPABASE CLIENT CONFIGURATION"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -type f \( -name "*supabase*.ts" -o -name "*supabase*.js" \) -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -150
+
+echo -e "\n🔑 6. AUTH SERVICE/STORE"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -type f \( -name "*auth*.ts" -o -name "*auth*.tsx" -o -name "*Auth*.ts" -o -name "*Auth*.tsx" \) \
+  -not -path "*/node_modules/*" \
+  -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -200
+
+echo -e "\n🚀 7. APP ENTRY POINT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ -f "src/main.ts" ]; then
+  echo "📄 FILE: src/main.ts"
+  cat src/main.ts
+elif [ -f "src/main.tsx" ]; then
+  echo "📄 FILE: src/main.tsx"
+  cat src/main.tsx
+elif [ -f "src/index.tsx" ]; then
+  echo "📄 FILE: src/index.tsx"
+  cat src/index.tsx
+elif [ -f "src/index.ts" ]; then
+  echo "📄 FILE: src/index.ts"
+  cat src/index.ts
+else
+  echo "❌ Entry point not found"
+fi
+
+echo -e "\n🎨 8. APP COMPONENT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -maxdepth 2 -type f \( -name "App.tsx" -o -name "App.ts" -o -name "App.vue" -o -name "App.jsx" \) \
+  -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -200
+
+echo -e "\n🧭 9. ROUTER/NAVIGATION SETUP"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -type f \( -name "*router*.ts" -o -name "*router*.tsx" -o -name "*routes*.ts" -o -name "*Router*.tsx" \) \
+  -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -200
+
+echo -e "\n🔓 10. LOGIN COMPONENT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -type f \( -name "*login*.tsx" -o -name "*Login*.tsx" -o -name "*signin*.tsx" -o -name "*SignIn*.tsx" \) \
+  -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -200
+
+echo -e "\n🏠 11. HOME/DASHBOARD COMPONENT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find src -type f \( -name "*home*.tsx" -o -name "*Home*.tsx" -o -name "*dashboard*.tsx" -o -name "*Dashboard*.tsx" \) \
+  -exec echo "📄 FILE: {}" \; -exec cat {} \; 2>/dev/null | head -200
+
+echo "Copy this entire output and share with Claude"━━━━━━━━━━━━━━""@capacitor" | sort -u | head -20
+╔════════════════════════════════════════════════════════════════╗
+║          FIELDSNAPS PROJECT AUDIT - COMPLETE SNAPSHOT          ║
+╚════════════════════════════════════════════════════════════════╝
+
+📦 1. PROJECT METADATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Framework Detection:
+    "react": "^18.3.1",
+
+📋 2. PACKAGE.JSON (Dependencies Only)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^7.1.3",
+    "@capacitor-community/generic-oauth2": "^7.0.0",
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor/action-sheet": "^7.0.2",
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/browser": "^7.0.2",
+    "@capacitor/camera": "^7.0.2",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/clipboard": "^7.0.2",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/device": "^7.0.2",
+    "@capacitor/dialog": "^7.0.2",
+    "@capacitor/filesystem": "^7.1.4",
+    "@capacitor/geolocation": "^7.1.5",
+    "@capacitor/haptics": "^7.0.2",
+    "@capacitor/ios": "^7.4.3",
+    "@capacitor/keyboard": "^7.0.3",
+    "@capacitor/local-notifications": "^7.0.3",
+    "@capacitor/network": "^7.0.2",
+    "@capacitor/preferences": "^7.0.2",
+    "@capacitor/share": "^7.0.2",
+    "@capacitor/splash-screen": "^7.0.3",
+    "@capacitor/status-bar": "^7.0.3",
+    "@capacitor/toast": "^7.0.2",
+    "@capgo/capacitor-social-login": "^7.20.0",
+    "@capgo/capacitor-updater": "^7.22.0",
+    "@capgo/cli": "^7.17.6",
+    "@google-cloud/storage": "^7.17.2",
+    "@googlemaps/markerclusterer": "^2.6.2",
+    "@hookform/resolvers": "^3.10.0",
+    "@neondatabase/serverless": "^0.10.4",
+    "@radix-ui/react-accordion": "^1.2.4",
+    "@radix-ui/react-alert-dialog": "^1.1.7",
+    "@radix-ui/react-aspect-ratio": "^1.1.3",
+    "@radix-ui/react-avatar": "^1.1.4",
+    "@radix-ui/react-checkbox": "^1.1.5",
+    "@radix-ui/react-collapsible": "^1.1.4",
+    "@radix-ui/react-context-menu": "^2.2.7",
+    "@radix-ui/react-dialog": "^1.1.7",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-hover-card": "^1.1.7",
+    "@radix-ui/react-label": "^2.1.3",
+    "@radix-ui/react-menubar": "^1.1.7",
+    "@radix-ui/react-navigation-menu": "^1.2.6",
+    "@radix-ui/react-popover": "^1.1.7",
+    "@radix-ui/react-progress": "^1.1.3",
+    "@radix-ui/react-radio-group": "^1.2.4",
+    "@radix-ui/react-scroll-area": "^1.2.4",
+    "@radix-ui/react-select": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.3",
+
+⚙️  3. CAPACITOR CONFIG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.fieldsnaps.app',
+  appName: 'FieldSnaps',
+  webDir: 'dist/public',
+  server: {
+    androidScheme: 'https',
+    iosScheme: 'https',
+  },
+  plugins: {
+    CapacitorHttp: {
+      // Enable native HTTP to bypass CORS issues in iOS WebView
+      enabled: true
+    },
+    App: {
+      // Deep linking URL scheme for OAuth callbacks
+      appUrlScheme: 'com.fieldsnaps.app'
+    },
+    Camera: {
+      presentationStyle: 'fullscreen',
+    },
+    SplashScreen: {
+      launchShowDuration: 0,
+      backgroundColor: '#FFFFFF',
+    },
+    CapacitorUpdater: {
+      // Auto-update ENABLED - OTA updates from Capgo
+      // First-launch flag system in supabaseAuth.ts prevents login loops
+      autoUpdate: true,
+      resetWhenUpdate: true,
+      appReadyTimeout: 10000,
+      responseDelay: 0,
+      statsUrl: 'https://api.capgo.app/stats',
+      channelUrl: 'https://api.capgo.app',
+    },
+  },
+  ios: {
+    contentInset: 'automatic',
+  },
+  android: {
+    useLegacyBridge: true, // CRITICAL: Prevents 5-minute timeout issue with TransistorSoft Background Geolocation
+  },
+};
+
+export default config;
+
+🗂️  4. PROJECT STRUCTURE (Key Directories)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+./drizzle.config.ts
+./shared/permissions.ts
+./shared/schema.ts
+./client/src/vite-env.d.ts
+./client/src/main.tsx
+./client/src/App.tsx
+./vite.config.ts
+./server/vite.ts
+./server/db.ts
+./server/errorHandler.ts
+./server/objectAcl.ts
+./server/objectStorage.ts
+./server/email.ts
+./server/subscriptionValidation.ts
+./server/jwtService.ts
+./server/pkce.ts
+./server/fieldFilter.ts
+./server/cache.ts
+./server/chunkedUpload.ts
+./server/uploadMetrics.ts
+./server/billing.ts
+./server/geocoding.ts
+./server/supabaseAuth.ts
+./server/auth.ts
+./server/webauthn.ts
+./server/index.ts
+./server/storage.ts
+./server/routes.ts
+./vite.config.pwa.ts
+./tailwind.config.ts
+./capacitor.config.prod.ts
+./capacitor.config.dev.ts
+./capacitor.config.ts
+
+🔐 5. SUPABASE CLIENT CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔑 6. AUTH SERVICE/STORE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 7. APP ENTRY POINT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ Entry point not found
+
+🎨 8. APP COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧭 9. ROUTER/NAVIGATION SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔓 10. LOGIN COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏠 11. HOME/DASHBOARD COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ 12. VITE/BUILD CONFIG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    runtimeErrorOverlay(),
+    ...(process.env.NODE_ENV !== "production" &&
+    process.env.REPL_ID !== undefined
+      ? [
+          await import("@replit/vite-plugin-cartographer").then((m) =>
+            m.cartographer(),
+          ),
+          await import("@replit/vite-plugin-dev-banner").then((m) =>
+            m.devBanner(),
+          ),
+        ]
+      : []),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+    },
+  },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true,
+  },
+  server: {
+    fs: {
+      strict: true,
+      deny: ["**/.*"],
+    },
+  },
+});
+
+📝 13. TYPESCRIPT CONFIG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{
+  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["./shared/*"]
+    }
+  }
+}
+
+🌍 14. ENVIRONMENT SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Environment files found:
+-rw-r--r-- 1 runner runner   3409 Oct 28 13:21 .env.example
+
+Expected variables (from code):
+
+📱 15. iOS CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                        <key>CFBundleURLSchemes</key>
+                        <array>
+                                <string>com.fieldsnaps.app</string>
+                        </array>
+                </dict>
+                <!-- Google Sign-In URL Scheme (Reversed Client ID) -->
+--
+                        <key>CFBundleURLSchemes</key>
+                        <array>
+                                <string>com.googleusercontent.apps.757835035018-pdftvsoonj4bsd0a8s1m7lh37aadnmac</string>
+                        </array>
+                </dict>
+        </array>
+
+🔌 16. CAPACITOR PLUGINS IN USE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+package.json:    "@capacitor/action-sheet": "^7.0.2",
+package.json:    "@capacitor/app": "^7.1.0",
+package.json:    "@capacitor/browser": "^7.0.2",
+package.json:    "@capacitor/camera": "^7.0.2",
+package.json:    "@capacitor/cli": "^7.4.3",
+package.json:    "@capacitor/clipboard": "^7.0.2",
+package.json:    "@capacitor-community/generic-oauth2": "^7.0.0",
+package.json:    "@capacitor-community/speech-recognition": "^7.0.1",
+package.json:    "@capacitor/core": "^7.4.3",
+package.json:    "@capacitor/device": "^7.0.2",
+package.json:    "@capacitor/dialog": "^7.0.2",
+package.json:    "@capacitor/filesystem": "^7.1.4",
+package.json:    "@capacitor/geolocation": "^7.1.5",
+package.json:    "@capacitor/haptics": "^7.0.2",
+package.json:    "@capacitor/ios": "^7.4.3",
+package.json:    "@capacitor/keyboard": "^7.0.3",
+package.json:    "@capacitor/local-notifications": "^7.0.3",
+package.json:    "@capacitor/network": "^7.0.2",
+package.json:    "@capacitor/preferences": "^7.0.2",
+package.json:    "@capacitor/share": "^7.0.2",
+
+✅ AUDIT COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Copy this entire output and share with Claude
+~/workspace$ echo "╔════════════════════════════════════════════════════════════════╗"
+echo "║          FIELDSNAPS - MISSING FILES AUDIT                      ║"
+echo "╚════════════════════════════════════════════════════════════════╝"
+
+echo -e "\n🚀 CLIENT ENTRY POINT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat client/src/main.tsx
+
+echo -e "\n🎨 APP COMPONENT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat client/src/App.tsx
+
+echo -e "\n🔐 SUPABASE AUTH (SERVER)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat server/supabaseAuth.ts
+
+echo -e "\n🔑 AUTH MODULE (SERVER)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat server/auth.ts | head -100
+
+echo -e "\n🗺️ ROUTES (SERVER)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cat server/routes.ts | head -100
+
+echo -e "\n🔍 FIND ALL AUTH-RELATED CLIENT FILES"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find client/src -type f \( -name "*auth*" -o -name "*login*" -o -name "*user*" -o -name "*session*" \) | head -20
+
+echo -e "\n📁 CLIENT SRC STRUCTURE"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+ls -la client/src/
+
+echo -e "\n📁 CLIENT SRC SUBDIRECTORIES"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find client/src -type d -maxdepth 2
+
+echo -e "\n🔓 ALL CLIENT PAGES/COMPONENTS"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+find client/src -type f -name "*.tsx" | head -30
+
+echo -e "\n✅ FOLLOW-UP AUDIT COMPLETE"
+╔════════════════════════════════════════════════════════════════╗
+║          FIELDSNAPS - MISSING FILES AUDIT                      ║
+╚════════════════════════════════════════════════════════════════╝
+
+🚀 CLIENT ENTRY POINT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { createRoot } from "react-dom/client";
+import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { nativeSplashScreen } from './lib/nativeSplashScreen';
+import App from "./App";
+import "./index.css";
+import { registerServiceWorker } from "./lib/registerServiceWorker";
+import { syncManager } from "./lib/syncManager";
+import { indexedDB } from "./lib/indexeddb";
+
+// Initialize Capacitor app
+const initializeApp = async () => {
+  const platform = Capacitor.getPlatform();
+  const isNative = Capacitor.isNativePlatform();
+  
+  console.log('[App] Platform:', platform);
+  console.log('[App] Is Native:', isNative);
+  
+  // Register Service Worker for offline functionality (web only)
+  if (!isNative) {
+    registerServiceWorker().catch((error) => {
+      console.error('[PWA] Failed to register Service Worker:', error);
+    });
+  }
+  
+  // Set up Capgo OTA updates (native only)
+  if (isNative) {
+    try {
+      // Notify Capgo that app is ready
+      await CapacitorUpdater.notifyAppReady();
+      console.log('[Capgo] App ready notification sent');
+      
+      // Listen for update events
+      CapacitorUpdater.addListener('updateAvailable', (info) => {
+        console.log('[Capgo] Update available:', info);
+        // Update will download automatically in background
+      });
+      
+      CapacitorUpdater.addListener('downloadComplete', (info) => {
+        console.log('[Capgo] Download complete:', info);
+        // Update will be installed on next app restart
+      });
+      
+      CapacitorUpdater.addListener('updateFailed', (info) => {
+        console.error('[Capgo] Update failed:', info);
+      });
+      
+      // Check for updates manually
+      const { bundle } = await CapacitorUpdater.current();
+      console.log('[Capgo] Current bundle:', bundle);
+      
+    } catch (error) {
+      console.error('[Capgo] Updater initialization failed:', error);
+    }
+  }
+  
+  // Set up native app lifecycle handlers
+  if (isNative) {
+    CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      console.log('[App] State changed. Active:', isActive);
+      if (isActive) {
+        // Trigger sync when app comes to foreground
+        window.dispatchEvent(new CustomEvent('app-resumed'));
+      }
+    });
+    
+    CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      console.log('[App] Back button pressed. Can go back:', canGoBack);
+      if (canGoBack) {
+        window.history.back();
+      }
+    });
+  }
+};
+
+// Initialize and render app
+initializeApp().then(() => {
+  createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Expose syncManager and idb globally for testing
+  if (import.meta.env.DEV) {
+    (window as any).syncManager = syncManager;
+    (window as any).idb = indexedDB;
+    console.log('[App] Test globals exposed: window.syncManager, window.idb');
+  }
+  
+  // Hide splash screen after app renders
+  if (Capacitor.isNativePlatform()) {
+    setTimeout(() => {
+      nativeSplashScreen.hide();
+    }, 300); // Small delay to ensure UI is ready
+  }
+}).catch((error) => {
+  console.error('[App] Initialization failed:', error);
+  createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Expose globals even on error (for testing)
+  if (import.meta.env.DEV) {
+    (window as any).syncManager = syncManager;
+    (window as any).idb = indexedDB;
+    console.log('[App] Test globals exposed: window.syncManager, window.idb');
+  }
+  
+  // Hide splash screen even on initialization error
+  if (Capacitor.isNativePlatform()) {
+    setTimeout(() => {
+      nativeSplashScreen.hide();
+    }, 300);
+  }
+});
+
+🎨 APP COMPONENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { Switch, Route, useLocation } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { useEffect, useState, lazy, Suspense } from "react";
+
+// Lazy-load Toaster to prevent Safari dispatcher error
+const Toaster = lazy(() => import("@/components/ui/toaster").then(m => ({ default: m.Toaster })));
+
+// Lazy-load the 4 largest pages (2228, 1730, 1548, 1393 lines respectively)
+const ProjectPhotos = lazy(() => import("./pages/ProjectPhotos"));
+const Camera = lazy(() => import("./pages/Camera"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ToDos = lazy(() => import("./pages/ToDos"));
+
+// Eager-load smaller, frequently-used pages
+import Projects from "./pages/Projects";
+import AllPhotos from "./pages/AllPhotos";
+import Activity from "./pages/Activity";
+import PhotoEdit from "./pages/PhotoEdit";
+import PhotoView from "./pages/PhotoView";
+import SyncStatus from "./pages/SyncStatus";
+import Trash from "./pages/Trash";
+import ShareView from "./pages/ShareView";
+import Map from "./pages/Map";
+import Help from "./pages/Help";
+import Login from "./pages/Login";
+import NativeAppLogin from "./pages/NativeAppLogin";
+import Landing from "./pages/Landing";
+import Waitlist from "./pages/Waitlist";
+import Impact from "./pages/Impact";
+import BillingSuccess from "./pages/BillingSuccess";
+import CompanySetup from "./pages/CompanySetup";
+import MyTasks from "./pages/MyTasks";
+import Timesheets from "./pages/Timesheets";
+import Time from "./pages/Time";
+import AdminLocations from "./pages/AdminLocations";
+import AdminTimesheets from "./pages/AdminTimesheets";
+import LocationPrivacy from "./pages/LocationPrivacy";
+import LocationPermissionEducation from "./pages/LocationPermissionEducation";
+import GeofenceDebugConsole from "./pages/GeofenceDebugConsole";
+import AuthCallback from "./pages/AuthCallback";
+import NotFound from "./pages/not-found";
+import BottomNav from "./components/BottomNav";
+import { AppSidebar } from "./components/AppSidebar";
+import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
+import { Button } from "./components/ui/button";
+import { PaymentNotification } from "./components/PaymentNotification";
+import { SyncStatusNotifier } from "./components/SyncStatusNotifier";
+import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
+import { OfflineIndicator } from "./components/OfflineIndicator";
+import OnboardingPage from "./pages/Onboarding";
+import { CreateProjectDialog } from "./components/CreateProjectDialog";
+import { ProfileSetupDialog } from "./components/ProfileSetupDialog";
+import { UpgradeModal } from "./components/UpgradeModal";
+import { useAuth } from "./hooks/useAuth";
+import { useTheme } from "./hooks/useTheme";
+import { useIsNativeApp } from "./hooks/usePlatform";
+import { useSubscriptionAccess } from "./hooks/useSubscriptionAccess";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { SwipeBackGesture } from "./components/SwipeBackGesture";
+import { TodoSessionProvider } from "./contexts/TodoSessionContext";
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { isNativePlatform } from './lib/nativeNavigation';
+import { nativeStatusBar } from './lib/nativeStatusBar';
+import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
+
+function AppContent() {
+  // CRITICAL: All hooks must be called at the top, before any conditional logic
+  const [location, setLocation] = useLocation();
+  
+  // Auto-login in development mode (tree-shaken from production)
+  // Disabled auto dev login - user must manually login
+  // useDevAutoLogin();
+  
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const isNativeApp = useIsNativeApp();
+  const { canWrite } = useSubscriptionAccess();
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  
+  // Email whitelist - only these emails can access the app
+  const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local', 'snapspeak@test.com', 'hello@fieldsnaps.com', 'alexmbear@yahoo.com'];
+  const isWhitelisted = user && user.email && WHITELIST_EMAILS.includes(user.email);
+  
+  // Initialize theme (handles localStorage and DOM automatically)
+  useTheme();
+  
+
+  // Profile setup state - show before onboarding if user is missing name
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && isWhitelisted && user?.id) {
+      // ONLY check database fields - trust the server, not localStorage
+      // If user already has firstName AND lastName in database, they don't need setup
+      const hasName = user.firstName && user.lastName;
+      
+      // Only show profile setup if user is missing name data in the database
+      // This prevents the dialog from showing for existing users on fresh iOS installs
+      if (!hasName) {
+        setShowProfileSetup(true);
+      } else {
+        // User has name data - ensure dialog stays closed
+        setShowProfileSetup(false);
+      }
+    }
+  }, [isAuthenticated, isWhitelisted, user]);
+
+  const handleProfileSetupComplete = () => {
+    // Close the dialog and refetch user data
+    setShowProfileSetup(false);
+    if (user?.id) {
+      // Refetch user data to update UI with new profile data
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    }
+  };
+  
+  // Disable swipe back on main pages to prevent blank white screen
+  const isMainPage = location === '/projects' || location === '/todos' || location === '/map' || location === '/camera';
+  const disableSwipeBack = isMainPage;
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/share/', '/impact', '/login', '/waitlist', '/auth/callback'];
+  const isPublicRoute = publicRoutes.some(route => location.startsWith(route)) || location === '/';
+  
+  // Onboarding routes are authenticated but before full setup
+  const onboardingRoutes = ['/onboarding/company-setup', '/onboarding'];
+  const isOnboardingRoute = onboardingRoutes.some(route => location.startsWith(route));
+  
+  // Check if user needs onboarding - ONLY if they don't have a company
+  // If user has companyId, they're already set up (ignore onboardingComplete flag)
+  // This prevents existing users from getting stuck in onboarding loop
+  const needsOnboarding = isAuthenticated && isWhitelisted && user && !user.companyId;
+
+  // Redirect authenticated whitelisted users from landing to dashboard or onboarding
+  // Non-whitelisted users can stay on landing page
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && isWhitelisted && location === '/') {
+      if (needsOnboarding) {
+        setLocation('/onboarding');
+      } else {
+        setLocation('/projects');
+      }
+    }
+  }, [isAuthenticated, isWhitelisted, isLoading, location, needsOnboarding, setLocation]);
+  
+  // Redirect users who need onboarding to /onboarding page
+  useEffect(() => {
+    if (!isLoading && needsOnboarding && !isOnboardingRoute && !isPublicRoute) {
+      setLocation('/onboarding');
+    }
+  }, [isLoading, needsOnboarding, isOnboardingRoute, isPublicRoute, setLocation]);
+
+  // Redirect unauthenticated users from private routes to landing
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
+      setLocation('/');
+    }
+  }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, setLocation]);
+
+  // Redirect non-whitelisted authenticated users to waitlist
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !isWhitelisted && location !== '/waitlist' && !isPublicRoute) {
+      setLocation('/waitlist');
+    }
+  }, [isAuthenticated, isLoading, isWhitelisted, location, isPublicRoute, setLocation]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
+  // This prevents data queries from firing without auth credentials
+  // Allow onboarding routes for authenticated users without companies
+  if (!isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  // Render onboarding routes without bottom nav
+  if (isAuthenticated && isOnboardingRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          <Route path="/onboarding" component={OnboardingPage} />
+          <Route path="/onboarding/company-setup" component={CompanySetup} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    );
+  }
+
+  // Public routes get different layout (no bottom nav)
+  if (!isAuthenticated && isPublicRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          {/* Native app users see mobile-optimized login, web users see marketing landing */}
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/impact" component={Impact} />
+          <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
+          <Route path="/auth/callback" component={AuthCallback} />
+          <Route path="/waitlist" component={Waitlist} />
+          <Route path="/share/:token" component={ShareView} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    );
+  }
+
+  // Authenticated but not whitelisted users can see landing and waitlist pages
+  if (isAuthenticated && !isWhitelisted) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
+          <Route path="/auth/callback" component={AuthCallback} />
+          <Route path="/waitlist" component={Waitlist} />
+          <Route path="/share/:token" component={ShareView} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    );
+  }
+
+  // Routes where sidebar should be hidden (camera, edit modes, full-screen views)
+  // Extract pathname without query params or hash
+  const pathname = location.split('?')[0].split('#')[0];
+  
+  const hideSidebarRoutes = ['/camera', '/photo/:id/edit', '/photo/:id/view'];
+  const shouldShowSidebar = !hideSidebarRoutes.some(route => {
+    // Route matching with pathname parsing
+    if (route.includes(':')) {
+      // Convert route pattern to regex (e.g., /photo/:id/edit -> /photo/[^/]+/edit)
+      const pattern = route.replace(/:[^/]+/g, '[^/]+');
+      return new RegExp(`^${pattern}/?$`).test(pathname); // Allow optional trailing slash
+    }
+    // Exact match with optional trailing slash
+    return pathname === route || pathname === route + '/';
+  });
+
+  return (
+    <SidebarProvider defaultOpen={false}>
+      <div className="app-shell bg-white dark:bg-black text-foreground">
+        {/* Universal swipe-back gesture (disabled on main pages) */}
+        <SwipeBackGesture disabled={disableSwipeBack} />
+        
+        {/* Global offline indicator */}
+        <OfflineIndicator />
+        
+        {/* Show payment notification for past_due users */}
+        <PaymentNotification />
+        
+        {/* Profile setup for first-time login (show before onboarding) */}
+        {showProfileSetup && (
+          <ProfileSetupDialog
+            open={showProfileSetup}
+            onOpenChange={setShowProfileSetup}
+            user={user || null}
+            isFirstTime={true}
+            onComplete={handleProfileSetupComplete}
+          />
+        )}
+        
+        
+        {/* Sidebar - only shown on non-camera pages */}
+        {shouldShowSidebar && <AppSidebar />}
+        
+        <div className="flex flex-col flex-1 min-w-0 h-full">
+          {/* Header with menu button and logo - only shown when sidebar is visible */}
+          {shouldShowSidebar && (
+            <header className="flex-shrink-0 flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
+              <SidebarTrigger 
+                data-testid="button-sidebar-trigger"
+                className="hover-elevate active-elevate-2 !h-auto !w-auto flex items-center gap-2 px-1"
+                aria-label="Toggle sidebar"
+              >
+                <img 
+                  src={logoPath} 
+                  alt="FieldSnaps" 
+                  className="h-8 w-auto object-contain"
+                  data-testid="img-fieldsnaps-logo"
+                />
+              </SidebarTrigger>
+              {/* New Project button - only shown on /projects route */}
+              {pathname === '/projects' && (
+                <CreateProjectDialog 
+                  canWrite={canWrite} 
+                  onUpgradeRequired={() => setUpgradeModalOpen(true)} 
+                />
+              )}
+            </header>
+          )}
+          
+          <main className="flex-1 bg-white dark:bg-black scroll-container">
+            <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <Switch>
+                <Route path="/auth/callback" component={AuthCallback} />
+                <Route path="/camera" component={Camera} />
+                <Route path="/projects" component={Projects} />
+                <Route path="/projects/:id" component={ProjectPhotos} />
+                <Route path="/all-photos" component={AllPhotos} />
+                <Route path="/activity" component={Activity} />
+                <Route path="/photo/:id/edit" component={PhotoEdit} />
+                <Route path="/photo/:id/view" component={PhotoView} />
+                <Route path="/my-tasks" component={MyTasks} />
+                <Route path="/timesheets" component={Timesheets} />
+                <Route path="/settings" component={Settings} />
+                <Route path="/location-privacy" component={LocationPrivacy} />
+                <Route path="/location-permission" component={LocationPermissionEducation} />
+                <Route path="/debug-console" component={GeofenceDebugConsole} />
+                <Route path="/help" component={Help} />
+                <Route path="/sync-status" component={SyncStatus} />
+                <Route path="/trash" component={Trash} />
+                <Route path="/map" component={Map} />
+                <Route path="/todos" component={ToDos} />
+                <Route path="/time" component={Time} />
+                <Route path="/admin/locations" component={AdminLocations} />
+                <Route path="/admin/timesheets" component={AdminTimesheets} />
+                <Route path="/billing/success" component={BillingSuccess} />
+                <Route path="/share/:token" component={ShareView} />
+                <Route component={NotFound} />
+              </Switch>
+            </Suspense>
+          </main>
+          <BottomNav />
+        </div>
+        
+        {/* Upgrade Modal */}
+        <UpgradeModal open={upgradeModalOpen} onClose={() => setUpgradeModalOpen(false)} />
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export default function App() {
+  // Initialize status bar for native apps (transparent with dark content)
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      // Set status bar to overlay the webview (transparent)
+      nativeStatusBar.setOverlay(true);
+      // Use dark style (dark text/icons) for light backgrounds
+      nativeStatusBar.setDark();
+    }
+  }, []);
+
+  // Note: OAuth deep link handling is now obsolete with ASWebAuthenticationSession.
+  // ASWebAuthenticationSession handles the entire OAuth flow internally and returns
+  // the authorization code directly to the app without using deep links.
+  // The NativeAppLogin component handles the complete OAuth flow including token storage.
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TodoSessionProvider>
+          <AppContent />
+          <SyncStatusNotifier />
+          <ServiceWorkerUpdate />
+          <Suspense fallback={null}>
+            <Toaster />
+          </Suspense>
+        </TodoSessionProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+}
+
+🔐 SUPABASE AUTH (SERVER)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import jwt from 'jsonwebtoken';
+import { db } from './db';
+import { users } from '../shared/schema';
+import { eq } from 'drizzle-orm';
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+
+if (!SUPABASE_URL) {
+  console.warn('[SupabaseAuth] SUPABASE_URL not configured');
+}
+
+export interface SupabaseTokenPayload {
+  sub: string;
+  email?: string;
+  phone?: string;
+  app_metadata?: {
+    provider?: string;
+    providers?: string[];
+  };
+  user_metadata?: {
+    full_name?: string;
+    name?: string;
+    avatar_url?: string;
+    picture?: string;
+    email?: string;
+  };
+  role?: string;
+  aal?: string;
+  amr?: Array<{ method: string; timestamp: number }>;
+  session_id?: string;
+  iat?: number;
+  exp?: number;
+  iss?: string;
+  aud?: string;
+}
+
+let cachedJwks: { keys: any[] } | null = null;
+let jwksCacheTime = 0;
+const JWKS_CACHE_TTL = 60 * 60 * 1000;
+
+async function getJwks(): Promise<{ keys: any[] }> {
+  const now = Date.now();
+  if (cachedJwks && (now - jwksCacheTime) < JWKS_CACHE_TTL) {
+    return cachedJwks;
+  }
+
+  if (!SUPABASE_URL) {
+    throw new Error('SUPABASE_URL not configured');
+  }
+
+  const jwksUrl = `${SUPABASE_URL}/auth/v1/.well-known/jwks.json`;
+  
+  try {
+    const response = await fetch(jwksUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch JWKS: ${response.status}`);
+    }
+    cachedJwks = await response.json();
+    jwksCacheTime = now;
+    console.log('[SupabaseAuth] JWKS cached successfully');
+    return cachedJwks!;
+  } catch (error) {
+    console.error('[SupabaseAuth] Error fetching JWKS:', error);
+    throw error;
+  }
+}
+
+export async function verifySupabaseToken(token: string): Promise<SupabaseTokenPayload | null> {
+  if (!token) {
+    return null;
+  }
+
+  try {
+    if (SUPABASE_JWT_SECRET) {
+      const decoded = jwt.verify(token, SUPABASE_JWT_SECRET, {
+        algorithms: ['HS256'],
+      }) as SupabaseTokenPayload;
+      
+      return decoded;
+    }
+
+    const decoded = jwt.decode(token, { complete: true });
+    if (!decoded) {
+      console.log('[SupabaseAuth] Failed to decode token');
+      return null;
+    }
+
+    const jwks = await getJwks();
+    const kid = decoded.header.kid;
+    const key = jwks.keys.find(k => k.kid === kid);
+    
+    if (!key) {
+      console.log('[SupabaseAuth] No matching key found in JWKS');
+      return null;
+    }
+
+    const publicKey = await importJwk(key);
+    
+    const verified = jwt.verify(token, publicKey, {
+      algorithms: ['RS256'],
+    }) as SupabaseTokenPayload;
+
+    return verified;
+  } catch (error: any) {
+    if (error.name === 'TokenExpiredError') {
+      console.log('[SupabaseAuth] Token expired');
+    } else if (error.name === 'JsonWebTokenError') {
+      console.log('[SupabaseAuth] Invalid token:', error.message);
+    } else {
+      console.error('[SupabaseAuth] Token verification error:', error);
+    }
+    return null;
+  }
+}
+
+async function importJwk(jwk: any): Promise<string> {
+  const crypto = await import('crypto');
+  const keyObject = crypto.createPublicKey({ key: jwk, format: 'jwk' });
+  return keyObject.export({ type: 'spki', format: 'pem' }) as string;
+}
+
+export async function getOrCreateUserFromSupabase(payload: SupabaseTokenPayload): Promise<{
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImageUrl: string | null;
+  companyId: string | null;
+  role: string | null;
+  isNewUser: boolean;
+} | null> {
+  const supabaseUserId = payload.sub;
+  const email = payload.email || payload.user_metadata?.email;
+  
+  if (!supabaseUserId) {
+    console.error('[SupabaseAuth] No sub claim in token');
+    return null;
+  }
+
+  let [existingBySupabaseId] = await db.select()
+    .from(users)
+    .where(eq(users.supabaseUserId, supabaseUserId))
+    .limit(1);
+
+  if (existingBySupabaseId) {
+    return {
+      id: existingBySupabaseId.id,
+      email: existingBySupabaseId.email,
+      firstName: existingBySupabaseId.firstName,
+      lastName: existingBySupabaseId.lastName,
+      profileImageUrl: existingBySupabaseId.profileImageUrl,
+      companyId: existingBySupabaseId.companyId,
+      role: existingBySupabaseId.role,
+      isNewUser: false,
+    };
+  }
+
+  if (email) {
+    const [existingByEmail] = await db.select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (existingByEmail) {
+      const provider = payload.app_metadata?.provider || 'supabase';
+      await db.update(users)
+        .set({ 
+          supabaseUserId,
+          authProvider: provider,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, existingByEmail.id));
+
+      console.log(`[SupabaseAuth] Linked existing user ${existingByEmail.id} to Supabase ID ${supabaseUserId}`);
+
+      return {
+        id: existingByEmail.id,
+        email: existingByEmail.email,
+        firstName: existingByEmail.firstName,
+        lastName: existingByEmail.lastName,
+        profileImageUrl: existingByEmail.profileImageUrl,
+        companyId: existingByEmail.companyId,
+        role: existingByEmail.role,
+        isNewUser: false,
+      };
+    }
+  }
+
+  const fullName = payload.user_metadata?.full_name || payload.user_metadata?.name || '';
+  const nameParts = fullName.split(' ');
+  const firstName = nameParts[0] || null;
+  const lastName = nameParts.slice(1).join(' ') || null;
+  const profileImageUrl = payload.user_metadata?.avatar_url || payload.user_metadata?.picture || null;
+  const provider = payload.app_metadata?.provider || 'supabase';
+
+  const result = await db.insert(users).values({
+    email: email || null,
+    firstName,
+    lastName,
+    profileImageUrl,
+    supabaseUserId,
+    authProvider: provider,
+    role: 'member',
+    subscriptionStatus: 'trial',
+  }).returning();
+  
+  const newUser = Array.isArray(result) ? result[0] : (result as any).rows?.[0];
+
+  console.log(`[SupabaseAuth] Created new user ${newUser.id} from Supabase ID ${supabaseUserId}`);
+
+  return {
+    id: newUser.id,
+    email: newUser.email,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
+    profileImageUrl: newUser.profileImageUrl,
+    companyId: newUser.companyId,
+    role: newUser.role,
+    isNewUser: true,
+  };
+}
+
+export function extractTokenFromHeader(authHeader: string | undefined): string | null {
+  if (!authHeader) {
+    return null;
+  }
+
+  if (authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  return authHeader;
+}
+
+🔑 AUTH MODULE (SERVER)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import session from "express-session";
+import type { Express, RequestHandler } from "express";
+import connectPg from "connect-pg-simple";
+import { storage } from "./storage";
+import { verifyAccessToken, refreshAccessToken as refreshJwtAccessToken, revokeRefreshToken } from "./jwtService";
+import { verifySupabaseToken, getOrCreateUserFromSupabase } from "./supabaseAuth";
+
+export function getSession() {
+  const sessionTtl = 7 * 24 * 60 * 60 * 1000;
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: true,
+    ttl: sessionTtl,
+    tableName: "sessions",
+  });
+  
+  return session({
+    secret: process.env.SESSION_SECRET!,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: sessionTtl,
+    },
+  });
+}
+
+export async function setupAuth(app: Express, authRateLimiter?: any) {
+  app.set("trust proxy", 1);
+  app.use(getSession());
+
+  // JWT token refresh endpoint for native apps
+  app.post("/api/auth/refresh", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
+    console.log('[JWT Refresh] Request received');
+    const { refresh_token } = req.body;
+    
+    if (!refresh_token) {
+      console.error('[JWT Refresh] Missing refresh_token in request');
+      return res.status(400).json({ error: 'Missing refresh_token' });
+    }
+
+    try {
+      const payload = verifyAccessToken(refresh_token);
+      if (!payload) {
+        console.log('[JWT Refresh] Invalid or expired refresh token');
+        return res.status(401).json({ error: 'Invalid refresh token' });
+      }
+
+      const user = await storage.getUser(payload.sub);
+      if (!user) {
+        console.error('[JWT Refresh] User not found:', payload.sub);
+        return res.status(401).json({ error: 'User not found' });
+      }
+
+      const newAccessToken = await refreshJwtAccessToken(refresh_token, {
+        id: user.id,
+        email: user.email || '',
+        displayName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : undefined,
+        profilePicture: user.profileImageUrl || undefined,
+      });
+
+      if (!newAccessToken) {
+        console.log('[JWT Refresh] Failed to refresh token');
+        return res.status(401).json({ error: 'Failed to refresh token' });
+      }
+
+      console.log('[JWT Refresh] Token refreshed successfully');
+      return res.json({
+        access_token: newAccessToken,
+        expires_in: 15 * 60,
+      });
+    } catch (error: any) {
+      console.error('[JWT Refresh] Error:', error.message);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // JWT logout endpoint
+  app.post("/api/auth/logout", authRateLimiter || ((req: any, res: any, next: any) => next()), async (req, res) => {
+    console.log('[JWT Logout] Request received');
+    const { refresh_token } = req.body;
+    
+    if (refresh_token) {
+      const revoked = await revokeRefreshToken(refresh_token);
+      if (revoked) {
+        console.log('[JWT Logout] Refresh token revoked');
+      }
+    }
+
+    return res.json({ success: true });
+  });
+
+  // Session logout endpoint (clears session cookie)
+  app.get("/api/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+
+🗺️ ROUTES (SERVER)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import type { Express } from "express";
+import express from "express";
+import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
+import rateLimit from "express-rate-limit";
+import { storage } from "./storage";
+import { db } from "./db";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema, insertGeofenceSchema, insertLocationLogSchema, insertUserPermissionSchema, insertTimeEntryEditSchema, companies, clockEntries } from "../shared/schema";
+import { eq, and, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
+import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./auth";
+import { setupWebAuthn } from "./webauthn";
+import { handleError, errors } from "./errorHandler";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
+import { billingService } from "./billing";
+import { emailService } from "./email";
+import { cacheMiddleware, invalidateUserCache, invalidateCachePattern } from "./cache";
+import { fieldFilterMiddleware } from "./fieldFilter";
+import { geocodeAddress } from "./geocoding";
+import { Client } from "@replit/object-storage";
+import {
+  initChunkedUpload,
+  initUploadSession,
+  uploadChunk,
+  getUploadStatus,
+  cancelUpload,
+  chunkUpload,
+  assembleChunks,
+  cleanupUploadSession,
+  validateUploadSession
+} from "./chunkedUpload";
+import { uploadMetrics } from "./uploadMetrics";
+import { corsConfig } from "./index";
+
+// Configure multer for file uploads with strict validation
+const ALLOWED_FILE_TYPES = [
+  // Images
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  // Videos
+  'video/mp4',
+  'video/quicktime', // .mov files
+  'video/x-msvideo', // .avi files  
+  'video/webm',
+  // PDFs
+  'application/pdf',
+];
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Store in memory for processing
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit for videos
+    files: 2, // Allow photo + thumbnail upload
+  },
+  fileFilter: (req, file, cb) => {
+    // Validate MIME type against whitelist
+    if (ALLOWED_FILE_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type: ${file.mimetype}. Allowed types: ${ALLOWED_FILE_TYPES.join(', ')}`));
+    }
+  },
+});
+
+// Rate limiting for upload endpoints - prevents abuse from mobile clients
+// Key by authenticated user ID instead of IP to support multiple workers on same site
+const uploadRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Max 100 uploads per window per user
+  message: 'Too many upload requests, please try again later',
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false,
+  keyGenerator: (req: any) => {
+    // Use authenticated user ID as rate limit key (no IP fallback to avoid IPv6 warnings)
+    // Upload endpoints require authentication, so this should always have a value
+    return req.user?.claims?.sub || 'unauthenticated';
+  },
+  skip: (req: any) => {
+    // Skip rate limiting in development mode
+    return process.env.NODE_ENV === 'development';
+  },
+});
+
+// Rate limiting for auth endpoints - prevents brute force attacks
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Max 10 auth attempts per window per IP
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req: any) => {
+    // Skip rate limiting in development mode
+    return process.env.NODE_ENV === 'development';
+
+🔍 FIND ALL AUTH-RELATED CLIENT FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+client/src/lib/authUtils.ts
+
+📁 CLIENT SRC STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+total 52
+drwxr-xr-x 1 runner runner   162 Dec 11 00:51 .
+drwxr-xr-x 1 runner runner    38 Nov  4 01:08 ..
+-rw-r--r-- 1 runner runner 16798 Dec 11 00:51 App.tsx
+drwxr-xr-x 1 runner runner  1210 Dec  6 20:49 components
+drwxr-xr-x 1 runner runner    20 Dec  4 18:11 config
+drwxr-xr-x 1 runner runner    44 Nov 11 02:31 contexts
+drwxr-xr-x 1 runner runner   456 Dec 13 19:19 hooks
+-rw-r--r-- 1 runner runner 20277 Dec  6 20:49 index.css
+drwxr-xr-x 1 runner runner  1100 Dec 12 22:33 lib
+-rw-r--r-- 1 runner runner  3690 Oct 28 03:04 main.tsx
+drwxr-xr-x 1 runner runner   904 Dec 12 20:30 pages
+-rw-r--r-- 1 runner runner    87 Oct 13 21:12 vite-env.d.ts
+drwxr-xr-x 1 runner runner    52 Oct 19 01:59 workers
+
+📁 CLIENT SRC SUBDIRECTORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+find: warning: you have specified the global option -maxdepth after the argument -type, but global options are not positional, i.e., -maxdepth affects tests specified before it as well as those specified after it.  Please specify global options before other arguments.
+client/src
+client/src/hooks
+client/src/components
+client/src/components/ui
+client/src/lib
+client/src/pages
+client/src/workers
+client/src/config
+client/src/contexts
+
+🔓 ALL CLIENT PAGES/COMPONENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+client/src/hooks/use-mobile.tsx
+client/src/components/ui/resizable.tsx
+client/src/components/ui/breadcrumb.tsx
+client/src/components/ui/separator.tsx
+client/src/components/ui/popover.tsx
+client/src/components/ui/avatar.tsx
+client/src/components/ui/skeleton.tsx
+client/src/components/ui/slider.tsx
+client/src/components/ui/form.tsx
+client/src/components/ui/radio-group.tsx
+client/src/components/ui/toggle.tsx
+client/src/components/ui/carousel.tsx
+client/src/components/ui/card.tsx
+client/src/components/ui/badge.tsx
+client/src/components/ui/chart.tsx
+client/src/components/ui/menubar.tsx
+client/src/components/ui/tabs.tsx
+client/src/components/ui/dropdown-menu.tsx
+client/src/components/ui/context-menu.tsx
+client/src/components/ui/command.tsx
+client/src/components/ui/input-otp.tsx
+client/src/components/ui/accordion.tsx
+client/src/components/ui/hover-card.tsx
+client/src/components/ui/collapsible.tsx
+client/src/components/ui/table.tsx
+client/src/components/ui/scroll-area.tsx
+client/src/components/ui/alert.tsx
+client/src/components/ui/toggle-group.tsx
+client/src/components/ui/label.tsx
+client/src/components/ui/progress.tsx
+PERFECT! Now I have everything I need. I can see the exact problem and how to fix it. Let me give you both the solution AND the Replit problem-solving guide.
+
+🎯 ROOT CAUSE IDENTIFIED
+Your app uses TWO separate authentication systems that are fighting each other:
+
+Server-side (Express session) - Cookie-based, works on web
+Client-side (Supabase JWT) - Token-based for native apps
+The Problem:
+
+iOS app sends Supabase JWT token → Server verifies it → Creates user
+But then Capgo reloads the app → Token lost → Back to login
+No persistent storage of the JWT on the client side
+Why it's flashing:
+
+App launches → No token in memory → Shows login
+User logs in → Token stored in memory → Shows home
+Capgo update triggers → App reloads → Token cleared from memory → Back to login
+🔧 COMPLETE FIX (3 Steps)
+Run these commands in Replit Shell one at a time:
+
+STEP 1: Create Client-Side Auth Utils (Token Persistence)
+Copycat > client/src/lib/authUtils.ts << 'EOF'
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from '@capacitor/core';
+
+const AUTH_TOKEN_KEY = 'fieldsnaps_auth_token';
+const REFRESH_TOKEN_KEY = 'fieldsnaps_refresh_token';
+const USER_KEY = 'fieldsnaps_user_data';
+
+/**
+ * Client-side auth token storage using Capacitor Preferences
+ * Persists across app restarts and Capgo updates
+ */
+
+export interface StoredUser {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImageUrl: string | null;
+  companyId: string | null;
+  role: string | null;
+}
+
+export const authStorage = {
+  /**
+   * Save access token (persists across app restarts)
+   */
+  async setAccessToken(token: string): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: AUTH_TOKEN_KEY, value: token });
+    } else {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+    }
+  },
+
+  /**
+   * Get access token from persistent storage
+   */
+  async getAccessToken(): Promise<string | null> {
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: AUTH_TOKEN_KEY });
+      return value;
+    } else {
+      return localStorage.getItem(AUTH_TOKEN_KEY);
+    }
+  },
+
+  /**
+   * Save refresh token (persists across app restarts)
+   */
+  async setRefreshToken(token: string): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: REFRESH_TOKEN_KEY, value: token });
+    } else {
+      localStorage.setItem(REFRESH_TOKEN_KEY, token);
+    }
+  },
+
+  /**
+   * Get refresh token from persistent storage
+   */
+  async getRefreshToken(): Promise<string | null> {
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: REFRESH_TOKEN_KEY });
+      return value;
+    } else {
+      return localStorage.getItem(REFRESH_TOKEN_KEY);
+    }
+  },
+
+  /**
+   * Save user data (persists across app restarts)
+   */
+  async setUser(user: StoredUser): Promise<void> {
+    const userData = JSON.stringify(user);
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: USER_KEY, value: userData });
+    } else {
+      localStorage.setItem(USER_KEY, userData);
+    }
+  },
+
+  /**
+   * Get user data from persistent storage
+   */
+  async getUser(): Promise<StoredUser | null> {
+    let userData: string | null;
+    
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: USER_KEY });
+      userData = value;
+    } else {
+      userData = localStorage.getItem(USER_KEY);
+    }
+
+    if (!userData) return null;
+
+    try {
+      return JSON.parse(userData);
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Clear all auth data (logout)
+   */
+  async clearAll(): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Promise.all([
+        Preferences.remove({ key: AUTH_TOKEN_KEY }),
+        Preferences.remove({ key: REFRESH_TOKEN_KEY }),
+        Preferences.remove({ key: USER_KEY }),
+      ]);
+    } else {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+  },
+};
+
+/**
+ * Check if access token is expired or expiring soon (within 5 minutes)
+ */
+export function isTokenExpired(token: string): boolean {
+  try {
+    // Decode JWT payload (middle part of token)
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp;
+
+    if (!exp) return true;
+
+    // Check if token expires within 5 minutes
+    const now = Math.floor(Date.now() / 1000);
+    const fiveMinutes = 5 * 60;
+    return exp - now < fiveMinutes;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Refresh access token using refresh token
+ */
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = await authStorage.getRefreshToken();
+  
+  if (!refreshToken) {
+    console.log('[AuthUtils] No refresh token available');
+    return null;
+  }
+
+  try {
+    const response = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      console.error('[AuthUtils] Token refresh failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (data.access_token) {
+      // Save new access token
+      await authStorage.setAccessToken(data.access_token);
+      console.log('[AuthUtils] Access token refreshed successfully');
+      return data.access_token;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('[AuthUtils] Token refresh error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get valid access token (refreshes if expired)
+ */
+export async function getValidAccessToken(): Promise<string | null> {
+  let token = await authStorage.getAccessToken();
+
+  if (!token) {
+    console.log('[AuthUtils] No access token found');
+    return null;
+  }
+
+  // Check if token is expired or expiring soon
+  if (isTokenExpired(token)) {
+    console.log('[AuthUtils] Token expired, refreshing...');
+    token = await refreshAccessToken();
+  }
+
+  return token;
+}
+EOF
+
+echo "✅ Auth utils created with persistent storage"
+STEP 2: Update useAuth Hook to Use Persistent Storage
+Copycat > client/src/hooks/useAuth.ts << 'EOF'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authStorage, getValidAccessToken } from '@/lib/authUtils';
+import type { StoredUser } from '@/lib/authUtils';
+
+export function useAuth() {
+  const queryClient = useQueryClient();
+
+  // Fetch user from persistent storage first, then validate with server
+  const { data: user, isLoading, error } = useQuery<StoredUser | null>({
+    queryKey: ['/api/auth/user'],
+    queryFn: async () => {
+      console.log('[useAuth] Checking authentication...');
+      
+      // Step 1: Try to get valid token from storage
+      const token = await getValidAccessToken();
+      
+      if (!token) {
+        console.log('[useAuth] No valid token, user not authenticated');
+        return null;
+      }
+
+      // Step 2: Validate token with server and get latest user data
+      try {
+        const response = await fetch('/api/auth/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.log('[useAuth] Token validation failed:', response.status);
+          
+          // Clear invalid tokens
+          await authStorage.clearAll();
+          return null;
+        }
+
+        const userData = await response.json();
+        console.log('[useAuth] User authenticated:', userData.email);
+        
+        // Update stored user data
+        await authStorage.setUser(userData);
+        
+        return userData;
+      } catch (error) {
+        console.error('[useAuth] Auth check error:', error);
+        return null;
+      }
+    },
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    retry: false, // Don't retry on auth failures
+  });
+
+  const isAuthenticated = !!user;
+
+  const logout = useMutation({
+    mutationFn: async () => {
+      const refreshToken = await authStorage.getRefreshToken();
+      
+      // Call server logout endpoint
+      if (refreshToken) {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+        } catch (error) {
+          console.error('[useAuth] Logout API error:', error);
+        }
+      }
+
+      // Clear all local auth data
+      await authStorage.clearAll();
+    },
+    onSuccess: () => {
+      // Clear all React Query cache
+      queryClient.clear();
+      
+      // Redirect to login (handled by App.tsx)
+      window.location.href = '/';
+    },
+  });
+
+  return {
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    logout: logout.mutate,
+  };
+}
+EOF
+
+echo "✅ useAuth hook updated with persistent storage"
+STEP 3: Update NativeAppLogin to Save Tokens
+Copy# First, let's see the current NativeAppLogin file
+echo "Checking current NativeAppLogin..."
+cat client/src/pages/NativeAppLogin.tsx | head -150
+→ Share the output of this command so I can see how your OAuth flow works, then I'll give you the final fix.
+
+STEP 4: Disable Capgo Auto-Update (CRITICAL)
+Copycat > capacitor.config.ts << 'EOF'
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.fieldsnaps.app',
+  appName: 'FieldSnaps',
+  webDir: 'dist/public',
+  server: {
+    androidScheme: 'https',
+    iosScheme: 'https',
+  },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true
+    },
+    App: {
+      appUrlScheme: 'com.fieldsnaps.app'
+    },
+    Camera: {
+      presentationStyle: 'fullscreen',
+    },
+    SplashScreen: {
+      launchShowDuration: 0,
+      backgroundColor: '#FFFFFF',
+    },
+    CapacitorUpdater: {
+      // DISABLED: Causing login loops - re-enable after auth persistence is stable
+      autoUpdate: false,
+      resetWhenUpdate: false,
+      appReadyTimeout: 10000,
+      responseDelay: 0,
+      statsUrl: 'https://api.capgo.app/stats',
+      channelUrl: 'https://api.capgo.app',
+    },
+  },
+  ios: {
+    contentInset: 'automatic',
+  },
+  android: {
+    useLegacyBridge: true,
+  },
+};
+
+export default config;
+EOF
+
+echo "✅ Capgo auto-update disabled"
+📋 REPLIT PROBLEM-SOLVING GUIDE
+Save this as a reference for Replit AI:
+
+Copycat > REPLIT_PROBLEMSOLVING_GUIDE.md << 'EOF'
+# Replit AI Problem-Solving Framework for FieldSnaps
+
+## Project Architecture Overview
+
+**Type:** Full-stack monorepo (Express backend + React frontend + Capacitor mobile)
+
+**Structure:**
+workspace/ ├── client/src/ ← React app (runs in iOS WebView) ├── server/ ← Node.js Express API ├── shared/ ← Shared types/schema └── capacitor.config.ts ← Native app configuration
+
+
+**Authentication Flow:**
+- Web: Express session (cookie-based)
+- Native iOS: Supabase JWT tokens (Bearer header)
+- Tokens MUST be persisted using Capacitor Preferences API
+- Server validates tokens via `/api/auth/user` endpoint
+
+---
+
+## Critical Rules for Code Changes
+
+### 1. **Understand Token Persistence**
+- ❌ **NEVER** store auth tokens in memory only (`useState`, `let`, `const`)
+- ✅ **ALWAYS** use `authStorage` (Capacitor Preferences or localStorage)
+- ✅ Check if token exists on app launch (before showing login)
+
+### 2. **Capacitor Native APIs**
+- Client code runs in **iOS WebView** (not native Swift)
+- Use `@capacitor/*` plugins for native features (camera, storage, geolocation)
+- `Capacitor.isNativePlatform()` distinguishes web vs native
+
+### 3. **Full-Stack Data Flow**
+iOS App → React Client (client/src/) → Fetch API → Express Server (server/) → PostgreSQL ↓ Capacitor Plugins (native features)
+
+
+### 4. **Authentication Debug Checklist**
+```typescript
+// Check these in order:
+1. Does token exist? → await authStorage.getAccessToken()
+2. Is token valid? → isTokenExpired(token)
+3. Can server validate it? → fetch('/api/auth/user', { headers: { Authorization: `Bearer ${token}` }})
+4. Is token being saved after login? → await authStorage.setAccessToken(newToken)
+5. OAuth Flow (Native Apps)
+1. User taps "Sign in with Google"
+2. ASWebAuthenticationSession opens (native Safari modal)
+3. User authenticates → Supabase returns auth code
+4. Exchange code for tokens → save to Capacitor Preferences
+5. **CRITICAL:** Save both access_token AND refresh_token
+6. Capgo OTA Updates
+autoUpdate: true causes login loops if tokens aren't persisted
+Disable during development (autoUpdate: false)
+Only re-enable after confirming token persistence works
+Common Issues & Solutions
+Issue: "Login loop / flashing between screens"
+Root Cause: Tokens stored in memory, cleared on app reload
+
+Fix:
+
+Copy// ❌ BAD - loses data on reload
+const [token, setToken] = useState(null);
+
+// ✅ GOOD - persists across reloads
+import { authStorage } from '@/lib/authUtils';
+const token = await authStorage.getAccessToken();
+Issue: "useAuth returns null on app launch"
+Root Cause: Token not being loaded from storage before query runs
+
+Fix:
+
+Copy// In useAuth hook:
+queryFn: async () => {
+  // FIRST: Load token from storage
+  const token = await getValidAccessToken();
+  if (!token) return null;
+  
+  // THEN: Validate with server
+  const response = await fetch('/api/auth/user', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.json();
+}
+Issue: "Token expired" errors
+Root Cause: Access token expired, refresh token not being used
+
+Fix:
+
+Copy// Auto-refresh logic in authUtils.ts:
+export async function getValidAccessToken() {
+  let token = await authStorage.getAccessToken();
+  
+  if (isTokenExpired(token)) {
+    token = await refreshAccessToken(); // Uses refresh token
+  }
+  
+  return token;
+}
+Decision Tree for Auth Changes
+User reports login issue
+    ↓
+Is token persisted? (Check authStorage usage)
+    ├─ NO → Add authStorage.setAccessToken() after OAuth
+    └─ YES → Is token being loaded on app launch?
+        ├─ NO → Update useAuth to call getValidAccessToken()
+        └─ YES → Is server validating token correctly?
+            ├─ NO → Check server/supabaseAuth.ts verification
+            └─ YES → Is Capgo triggering reloads?
+                ├─ YES → Disable autoUpdate in capacitor.config.ts
+                └─ NO → Check for race conditions in App.tsx routing
+Testing Checklist (Before Marking Issue "Fixed")
+Fresh install test:
+
+Delete app from iOS device
+Rebuild: npm run build && npx cap sync ios
+Install via Xcode
+Login → Close app → Reopen → Should stay logged in
+Token refresh test:
+
+Login → Wait 16 minutes (token expires after 15min)
+Make an API call → Should auto-refresh without logout
+Logout test:
+
+Logout → Check authStorage.getAccessToken() returns null
+Reopen app → Should show login screen
+Capgo update test (only after auth is stable):
+
+Enable autoUpdate: true
+Trigger OTA update
+App should update without logout
+Key Files Reference
+Authentication:
+
+client/src/lib/authUtils.ts - Token storage/refresh logic
+client/src/hooks/useAuth.ts - React Query auth state
+client/src/pages/NativeAppLogin.tsx - OAuth flow
+server/supabaseAuth.ts - Token verification
+server/auth.ts - Refresh token endpoint
+App Initialization:
+
+client/src/main.tsx - App entry, Capgo setup
+client/src/App.tsx - Routing, auth guards
+Configuration:
+
+capacitor.config.ts - Native app config (Capgo settings here)
+vite.config.ts - Build config
+When Making Changes
+✅ DO:
+Check if code runs in native vs web context
+Persist auth state using Capacitor Preferences
+Test token refresh flow
+Verify tokens are saved BEFORE redirecting to home screen
+Use console.log for debugging (visible in Xcode console)
+❌ DON'T:
+Assume localStorage works on native (use Capacitor Preferences)
+Store tokens in React state without persistence
+Enable Capgo autoUpdate before testing auth thoroughly
+Modify server auth logic without understanding client flow
+Make assumptions about user data - always check database state
+Emergency Rollback
+If changes break authentication:
+
+Copy# Revert to last working commit
+git log --oneline | head -10  # Find last working commit
+git checkout <commit-hash> client/src/lib/authUtils.ts
+git checkout <commit-hash> client/src/hooks/useAuth.ts
+
+# Disable Capgo to stop reload loops
+sed -i 's/autoUpdate: true/autoUpdate: false/g' capacitor.config.ts
+
+# Rebuild
+npm run build && npx cap sync ios
+Questions to Ask Before Implementing
+Does this change affect authentication flow?
+Is token persistence handled correctly?
+Will this work after a Capgo update/app restart?
+Am I using the right Capacitor APIs for native features?
+Have I tested on iOS device (not just browser)?
+EOF
+
+cat REPLIT_PROBLEMSOLVING_GUIDE.md
+
+
+---
+
+# 🎬 **Next Steps**
+
+1. **Run Step 1** (create authUtils.ts)
+2. **Run Step 2** (update useAuth hook)
+3. **Run Step 3** - **WAIT** for me to see your NativeAppLogin.tsx first
+4. **Run Step 4** (disable Capgo)
+5. **Rebuild:** `npm run build && npx cap sync ios && npx cap open ios`
+6. **Test:** Login → Close app → Reopen → Should stay logged in
+
+**Share the output of Step 3 command** and I'll give you the final piece! 🚀

@@ -1,0 +1,261 @@
+STOP! Replit is wrong. Let me explain why:
+
+🚨 Why Replit's Diagnosis is INCORRECT
+Replit says:
+"The Supabase anon key is outdated"
+
+Why that's wrong:
+You're NOT using Supabase for authentication in native apps - Look at your server/supabaseAuth.ts:
+
+Copy// Your server validates Supabase JWT tokens
+// But your NATIVE APP uses a different flow
+The anon key was ALREADY updated - Remember earlier in our conversation:
+
+OLD KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...2dD4TvKdhEd7BL-O5NRiC9GJ3P5LKkMOjJvYStzWJpY
+NEW KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs
+That was fixed days ago.
+
+The REAL problem (from the audit):
+
+Copy// client/src/main.tsx
+createRoot(document.getElementById("root")!).render(<App />);
+// ↑ App renders immediately
+
+// client/src/App.tsx - useAuth hook
+const { user, isAuthenticated } = useAuth();
+// ↑ Queries /api/auth/user
+
+// But NO TOKEN is sent because:
+// client/src/hooks/useAuth.ts (OLD VERSION)
+const response = await fetch('/api/auth/user');
+// ↑ Missing Authorization header!
+🎯 The ACTUAL Problem
+From your audit, I can see:
+
+File: client/src/hooks/useAuth.ts
+Copy// Current code (from earlier conversation):
+const { data: user } = useQuery({
+  queryKey: ['/api/auth/user'],
+  queryFn: async () => {
+    const response = await fetch('/api/auth/user');
+    // ❌ NO Authorization header
+    // ❌ NO token loaded from storage
+    return response.json();
+  }
+});
+This is why you're getting 401 errors:
+
+App launches
+useAuth calls /api/auth/user without a token
+Server returns 401
+React Query retries
+Loop repeats → "flashing"
+✅ Tell Replit to STOP and Follow This Instead
+Copy-paste this to Replit:
+
+STOP. The Supabase anon key is not the issue. The problem is that the client is not loading stored auth tokens before making API calls.
+
+Follow these steps EXACTLY:
+
+1. Create client/src/lib/authUtils.ts with persistent token storage (using Capacitor Preferences)
+2. Update client/src/hooks/useAuth.ts to load tokens from storage BEFORE fetching /api/auth/user
+3. Update client/src/pages/NativeAppLogin.tsx to SAVE tokens after OAuth success
+4. Disable Capgo autoUpdate in capacitor.config.ts
+
+The files I need you to create/update are:
+- client/src/lib/authUtils.ts (NEW FILE - see Claude's Step 1)
+- client/src/hooks/useAuth.ts (UPDATE - see Claude's Step 2)
+- capacitor.config.ts (UPDATE - see Claude's Step 4)
+
+Do NOT change any Replit secrets or environment variables. The Supabase anon key is already correct.
+📋 Give Replit This Exact Command
+Tell Replit to run this in Shell:
+
+Copy# Step 1: Create authUtils.ts
+cat > client/src/lib/authUtils.ts << 'EOF'
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from '@capacitor/core';
+
+const AUTH_TOKEN_KEY = 'fieldsnaps_auth_token';
+const REFRESH_TOKEN_KEY = 'fieldsnaps_refresh_token';
+const USER_KEY = 'fieldsnaps_user_data';
+
+export interface StoredUser {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImageUrl: string | null;
+  companyId: string | null;
+  role: string | null;
+}
+
+export const authStorage = {
+  async setAccessToken(token: string): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: AUTH_TOKEN_KEY, value: token });
+    } else {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+    }
+  },
+
+  async getAccessToken(): Promise<string | null> {
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: AUTH_TOKEN_KEY });
+      return value;
+    } else {
+      return localStorage.getItem(AUTH_TOKEN_KEY);
+    }
+  },
+
+  async setRefreshToken(token: string): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: REFRESH_TOKEN_KEY, value: token });
+    } else {
+      localStorage.setItem(REFRESH_TOKEN_KEY, token);
+    }
+  },
+
+  async getRefreshToken(): Promise<string | null> {
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: REFRESH_TOKEN_KEY });
+      return value;
+    } else {
+      return localStorage.getItem(REFRESH_TOKEN_KEY);
+    }
+  },
+
+  async setUser(user: StoredUser): Promise<void> {
+    const userData = JSON.stringify(user);
+    if (Capacitor.isNativePlatform()) {
+      await Preferences.set({ key: USER_KEY, value: userData });
+    } else {
+      localStorage.setItem(USER_KEY, userData);
+    }
+  },
+
+  async getUser(): Promise<StoredUser | null> {
+    let userData: string | null;
+    
+    if (Capacitor.isNativePlatform()) {
+      const { value } = await Preferences.get({ key: USER_KEY });
+      userData = value;
+    } else {
+      userData = localStorage.getItem(USER_KEY);
+    }
+
+    if (!userData) return null;
+
+    try {
+      return JSON.parse(userData);
+    } catch {
+      return null;
+    }
+  },
+
+  async clearAll(): Promise<void> {
+    if (Capacitor.isNativePlatform()) {
+      await Promise.all([
+        Preferences.remove({ key: AUTH_TOKEN_KEY }),
+        Preferences.remove({ key: REFRESH_TOKEN_KEY }),
+        Preferences.remove({ key: USER_KEY }),
+      ]);
+    } else {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+  },
+};
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp;
+    if (!exp) return true;
+    const now = Math.floor(Date.now() / 1000);
+    const fiveMinutes = 5 * 60;
+    return exp - now < fiveMinutes;
+  } catch {
+    return true;
+  }
+}
+
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = await authStorage.getRefreshToken();
+  
+  if (!refreshToken) {
+    console.log('[AuthUtils] No refresh token available');
+    return null;
+  }
+
+  try {
+    const response = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      console.error('[AuthUtils] Token refresh failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (data.access_token) {
+      await authStorage.setAccessToken(data.access_token);
+      console.log('[AuthUtils] Access token refreshed successfully');
+      return data.access_token;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('[AuthUtils] Token refresh error:', error);
+    return null;
+  }
+}
+
+export async function getValidAccessToken(): Promise<string | null> {
+  let token = await authStorage.getAccessToken();
+
+  if (!token) {
+    console.log('[AuthUtils] No access token found');
+    return null;
+  }
+
+  if (isTokenExpired(token)) {
+    console.log('[AuthUtils] Token expired, refreshing...');
+    token = await refreshAccessToken();
+  }
+
+  return token;
+}
+EOF
+
+echo "✅ Step 1 complete: authUtils.ts created"
+🔍 Why Replit Got Confused
+Replit saw "401 errors" and assumed it's an API key issue because:
+
+It doesn't understand the full-stack architecture
+It doesn't know tokens are stored client-side
+It's pattern-matching "401" → "bad credentials" → "update API key"
+But the real flow is:
+
+App launches
+  ↓
+useAuth hook runs
+  ↓
+fetch('/api/auth/user') ← NO TOKEN SENT
+  ↓
+Server: "401 Unauthorized" ← Expected! No token = not logged in
+  ↓
+React Query retries
+  ↓
+Loop continues → Flashing
+✅ What to Do Now
+Stop Replit from changing secrets
+Give it the command above (Step 1)
+Then give it Step 2 (I'll provide after Step 1 succeeds)
+Test the fix
+Does this make sense? Should I give you all the commands to paste into Replit at once?
