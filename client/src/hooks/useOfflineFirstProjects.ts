@@ -1,9 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { indexedDB as idb } from '@/lib/indexeddb';
 import type { Project, Photo } from '../../../shared/schema';
 
 type ProjectWithCounts = Project & { photoCount: number; coverPhoto?: Photo };
+
+// Module-level flag to track if we've saved this app session
+// This persists across component remounts to prevent infinite loops
+let hasSavedThisSession = false;
 
 /**
  * Offline-first hook for loading projects
@@ -15,9 +19,6 @@ type ProjectWithCounts = Project & { photoCount: number; coverPhoto?: Photo };
 export function useOfflineFirstProjects() {
   const [localProjects, setLocalProjects] = useState<ProjectWithCounts[]>([]);
   const [isLoadingLocal, setIsLoadingLocal] = useState(true);
-  
-  // Track if we've already saved this session - only save ONCE per component mount
-  const hasSavedRef = useRef<boolean>(false);
 
   // Load from IndexedDB immediately
   useEffect(() => {
@@ -33,6 +34,9 @@ export function useOfflineFirstProjects() {
               name: p.name,
               description: p.description || null,
               address: null, // LocalProject doesn't store address
+              city: null,
+              state: null,
+              zipCode: null,
               latitude: null,
               longitude: null,
               coverPhotoId: null,
@@ -44,6 +48,11 @@ export function useOfflineFirstProjects() {
               lastActivityAt: new Date(p.updatedAt),
               deletedAt: null,
               userId: null,
+              unitCount: 1,
+              unitLabels: null,
+              customerName: null,
+              customerPhone: null,
+              customerEmail: null,
               photoCount: photos.length,
               coverPhoto: undefined,
             };
@@ -78,15 +87,15 @@ export function useOfflineFirstProjects() {
   });
 
   // Save server data back to IndexedDB when it arrives
-  // Only saves ONCE per component mount to prevent infinite loops
+  // Only saves ONCE per app session to prevent infinite loops
   useEffect(() => {
     // Skip if already saved this session or no projects
-    if (hasSavedRef.current || serverProjects.length === 0) {
+    if (hasSavedThisSession || serverProjects.length === 0) {
       return;
     }
     
     // Mark as saved IMMEDIATELY to prevent any race conditions
-    hasSavedRef.current = true;
+    hasSavedThisSession = true;
     
     const saveToIndexedDB = async () => {
       try {

@@ -1,0 +1,511 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/447EC5F6-BB74-4B41-AE30-5B659EF0AB1B/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device ea28c116-a7c8-448e-b988-52c27f47c002
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+Loading network plugin
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x135495a10 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+⚡️  Loading app at capacitor://localhost...
+quic_conn_process_inbound [C1.1.2.1:2] [-01540215942082640957de15af20aa27b40f5719] unable to parse packet
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[7110] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 74874678
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","version":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","id":"builtin"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 74874679
+⚡️  To Native ->  CapacitorUpdater addListener 74874680
+⚡️  To Native ->  CapacitorUpdater addListener 74874681
+⚡️  To Native ->  CapacitorUpdater addListener 74874682
+⚡️  To Native ->  CapacitorUpdater current 74874683
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"native":"1.0","bundle":{"version":"builtin","checksum":"","id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  To Native ->  SecureStorage internalGetItem 74874684
+⚡️  To Native ->  App addListener 74874685
+⚡️  To Native ->  App addListener 74874686
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"5webd5evedqd\\\",\\\"expires_in\\\":3600,\\\"expires_at\\\":1765664372,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"aud\\\":\\\"authenticated\\\",\\\"email_confirmed_at\\\":\\\"2025-12-03T16:50:14.584552Z\\\",\\\"creat
+⚡️  [log] - [Capgo] Current bundle: {"version":"builtin","checksum":"","id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z"}
+⚡️  To Native ->  CapacitorHttp request 74874687
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 74874688
+⚡️  To Native ->  App addListener 74874689
+⚡️  To Native ->  StatusBar setOverlaysWebView 74874690
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setStyle 74874691
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 74874692
+⚡️  TO JS undefined
+⚡️  TO JS {"status":200,"headers":{"x-envoy-attempt-count":"1","sb-auth-session-id":"47a81dd5-60e5-42e3-9c51-7b60a58410a3","server-timing":"cfExtPri","cf-ray":"9ad8d77ffe5896ba-PDX","sb-auth-user-id":"7889aa04-6fdf-473b-bb80-bcc7d4899d8e","content-encoding":"gzip","
+⚡️  To Native ->  SecureStorage internalSetItem 74874693
+⚡️  TO JS undefined
+⚡️  To Native ->  SecureStorage internalGetItem 74874694
+⚡️  To Native ->  SecureStorage internalGetItem 74874695
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 74874696
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874697
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874698
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  SecureStorage internalGetItem 74874699
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874700
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 74874701
+⚡️  To Native ->  Network removeListener 74874702
+⚡️  To Native ->  SecureStorage internalGetItem 74874703
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874704
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874705
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874706
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874707
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874708
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874709
+⚡️  To Native ->  SecureStorage internalGetItem 74874710
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874711
+⚡️  To Native ->  SecureStorage internalGetItem 74874712
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874713
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874714
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 74874715
+⚡️  To Native ->  Network removeListener 74874716
+⚡️  To Native ->  SecureStorage internalGetItem 74874717
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874718
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874719
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874720
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874721
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874722
+⚡️  To Native ->  SecureStorage internalGetItem 74874723
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874724
+⚡️  To Native ->  SecureStorage internalGetItem 74874725
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874726
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874727
+⚡️  To Native ->  Network addListener 74874728
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874729
+⚡️  To Native ->  SecureStorage internalGetItem 74874730
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874731
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874732
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874733
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874734
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874735
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874736
+⚡️  To Native ->  SecureStorage internalGetItem 74874737
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874738
+⚡️  To Native ->  SecureStorage internalGetItem 74874739
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874740
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874741
+⚡️  To Native ->  Network addListener 74874742
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 74874743
+⚡️  To Native ->  SecureStorage internalGetItem 74874744
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874745
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874746
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874747
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874748
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874749
+⚡️  To Native ->  SecureStorage internalGetItem 74874750
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874751
+⚡️  To Native ->  SecureStorage internalGetItem 74874752
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874753
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874754
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 74874755
+⚡️  To Native ->  Network removeListener 74874756
+⚡️  To Native ->  SecureStorage internalGetItem 74874757
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874758
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874759
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874760
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874761
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874762
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874763
+⚡️  To Native ->  SecureStorage internalGetItem 74874764
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874765
+⚡️  To Native ->  SecureStorage internalGetItem 74874766
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874767
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874768
+⚡️  To Native ->  Network addListener 74874769
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874770
+⚡️  To Native ->  SecureStorage internalGetItem 74874771
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874772
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874773
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874774
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874775
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874776
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874777
+⚡️  To Native ->  SecureStorage internalGetItem 74874778
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874779
+⚡️  To Native ->  SecureStorage internalGetItem 74874780
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874781
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874782
+⚡️  To Native ->  Network addListener 74874783
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874784
+⚡️  To Native ->  SecureStorage internalGetItem 74874785
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874786
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874787
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874788
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874789
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874790
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874791
+⚡️  To Native ->  SecureStorage internalGetItem 74874792
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874793
+⚡️  To Native ->  SecureStorage internalGetItem 74874794
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874795
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874796
+⚡️  To Native ->  Network addListener 74874797
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874798
+⚡️  To Native ->  SecureStorage internalGetItem 74874799
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874800
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874801
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874802
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874803
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874804
+⚡️  To Native ->  SecureStorage internalGetItem 74874805
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874806
+⚡️  To Native ->  SecureStorage internalGetItem 74874807
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874808
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874809
+⚡️  To Native ->  Network addListener 74874810
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874811
+⚡️  To Native ->  SecureStorage internalGetItem 74874812
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874813
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874814
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874815
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874816
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874817
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874818
+⚡️  To Native ->  SecureStorage internalGetItem 74874819
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874820
+⚡️  To Native ->  SecureStorage internalGetItem 74874821
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874822
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874823
+⚡️  To Native ->  Network addListener 74874824
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874825
+⚡️  To Native ->  SecureStorage internalGetItem 74874826
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874827
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874828
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874829
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874830
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874831
+⚡️  To Native ->  SecureStorage internalGetItem 74874832
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874833
+⚡️  To Native ->  SecureStorage internalGetItem 74874834
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874835
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874836
+⚡️  To Native ->  Network addListener 74874837
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 74874838
+⚡️  To Native ->  SecureStorage internalGetItem 74874839
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874840
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874841
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874842
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874843
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874844
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874845
+⚡️  To Native ->  SecureStorage internalGetItem 74874846
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874847
+⚡️  To Native ->  SecureStorage internalGetItem 74874848
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874849
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874850
+⚡️  To Native ->  Network addListener 74874851
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874852
+⚡️  To Native ->  SecureStorage internalGetItem 74874853
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874854
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874855
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874856
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874857
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874858
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874859
+⚡️  To Native ->  SecureStorage internalGetItem 74874860
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874861
+⚡️  To Native ->  SecureStorage internalGetItem 74874862
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874863
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874864
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 74874865
+⚡️  To Native ->  Network removeListener 74874866
+⚡️  To Native ->  SecureStorage internalGetItem 74874867
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874868
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874869
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874870
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874871
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874872
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874873
+⚡️  To Native ->  SecureStorage internalGetItem 74874874
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874875
+⚡️  To Native ->  SecureStorage internalGetItem 74874876
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874877
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  [log] - [SupabaseAuth] Auth initialization already in progress, returning existing promise
+⚡️  To Native ->  Network getStatus 74874878
+⚡️  To Native ->  Network addListener 74874879
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 74874880
+⚡️  To Native ->  SecureStorage internalGetItem 74874881
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  SecureStorage internalGetItem 74874882
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874883
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874884
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874885
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874886
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874887
+⚡️  To Native ->  SecureStorage internalGetItem 74874888
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874889
+⚡️  To Native ->  SecureStorage internalGetItem 74874890
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+⚡️  To Native ->  SecureStorage internalGetItem 74874891
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"expires_at\\\":1765667954,\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNl
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
