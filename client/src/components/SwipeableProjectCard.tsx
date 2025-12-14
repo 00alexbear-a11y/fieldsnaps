@@ -328,40 +328,64 @@ export default function SwipeableProjectCard({
         {/* Project Info */}
         <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold truncate" data-testid={`text-project-name-${project.id}`}>
+            <h3 className="text-base font-semibold truncate" data-testid={`text-project-name-${project.id}`}>
               {project.name}
             </h3>
 
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Camera className="w-3.5 h-3.5" />
-                  <span data-testid={`text-photo-count-${project.id}`}>
-                    {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
-                  </span>
-                </div>
-                
-                {pendingSyncCount > 0 && (
-                  <div className="flex items-center gap-1 text-warning" data-testid={`text-pending-sync-${project.id}`}>
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{pendingSyncCount} pending</span>
-                  </div>
-                )}
+            {/* Subtitle: "Location · Phase" format (e.g., "Lot 12 · Framing", "Austin · Foundation") */}
+            {(() => {
+              // Location part: unit label > city
+              const locationPart = (project.unitLabels && project.unitLabels.length > 0)
+                ? project.unitLabels[0]
+                : project.city || null;
+              
+              // Phase part: description
+              const phasePart = project.description || null;
+              
+              // Build subtitle
+              const parts = [locationPart, phasePart].filter(Boolean);
+              const subtitle = parts.join(' · ');
+              
+              return subtitle ? (
+                <p className="text-sm text-muted-foreground truncate mt-0.5" data-testid={`text-subtitle-${project.id}`}>
+                  {subtitle}
+                </p>
+              ) : null;
+            })()}
+
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground/80">
+              {/* Photo count with label */}
+              <div className="flex items-center gap-1" data-testid={`text-photo-count-${project.id}`}>
+                <Camera className="w-3 h-3" />
+                <span>{photoCount} {photoCount === 1 ? 'photo' : 'photos'}</span>
               </div>
               
-              {/* Last updated */}
-              <div className="text-xs text-muted-foreground/70" data-testid={`text-last-updated-${project.id}`}>
+              {/* Pending sync indicator */}
+              {pendingSyncCount > 0 && (
+                <div className="flex items-center gap-1 text-amber-500" data-testid={`text-pending-sync-${project.id}`}>
+                  <Clock className="w-3 h-3" />
+                  <span>{pendingSyncCount} pending</span>
+                </div>
+              )}
+              
+              {/* Last updated - relative time */}
+              <span data-testid={`text-last-updated-${project.id}`}>
                 {(() => {
                   const lastActivity = new Date(project.lastActivityAt || project.createdAt);
                   const now = new Date();
                   const diffMs = now.getTime() - lastActivity.getTime();
+                  const diffMins = Math.floor(diffMs / (1000 * 60));
+                  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
                   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                   
-                  if (diffDays === 0) return 'Last updated: today';
-                  if (diffDays === 1) return 'Last updated: 1 day ago';
-                  return `Last updated: ${diffDays} days ago`;
+                  if (diffMins < 1) return 'Just now';
+                  if (diffMins < 60) return `${diffMins}m ago`;
+                  if (diffHours < 24) return `${diffHours}h ago`;
+                  if (diffDays === 1) return '1d ago';
+                  if (diffDays < 7) return `${diffDays}d ago`;
+                  return `${Math.floor(diffDays / 7)}w ago`;
                 })()}
-              </div>
+              </span>
             </div>
           </div>
 
