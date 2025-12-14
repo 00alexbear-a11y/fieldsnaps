@@ -1,0 +1,80 @@
+The problem is NOT in the OfflineIndicator or nativeNetwork - those are actually well-written. The real culprit is in useOfflineFirstProjects.ts combined with how React Query works.
+
+🔴 The Infinite Loop Chain
+Looking at your logs and code, here's what's happening:
+
+1. Projects Query Triggers Network Checks
+Copy// useOfflineFirstProjects.ts line 58
+useQuery<ProjectWithCounts[]>({
+  queryKey: ['/api/projects/with-counts'],
+  staleTime: 5 * 60 * 1000, // ✅ This is good
+  retry: false,
+});
+2. BUT - The Query is Being Called Repeatedly
+Your logs show:
+
+⚡️ To Native -> Network getStatus 132640163
+⚡️ To Native -> Network getStatus 132640166
+... [850+ times]
+This means something is re-rendering the component that uses useOfflineFirstProjects hundreds of times per second.
+
+🔍 Let Me See Your App.tsx
+Copycat client/src/App.tsx
+And also:
+
+Copygrep -r "useOfflineFirstProjects" client/src/ --include="*.tsx" --include="*.ts"
+💡 Likely Causes
+Based on patterns I've seen:
+
+Theory 1: App.tsx Has Routing/State Loop
+Your App.tsx probably has:
+
+State that changes on every render
+Navigation logic that triggers re-renders
+useOfflineFirstProjects being called at the top level
+Theory 2: Query Client Default Config
+Copycat client/src/lib/queryClient.ts
+There might be aggressive defaults like:
+
+CopyrefetchOnMount: true  // ❌ Refetches on every mount
+refetchOnWindowFocus: true  // ❌ Refetches when window focused
+🚀 Emergency Fix (Apply NOW)
+While you get me those files, try this emergency patch:
+
+In Replit Shell:
+Copy# Create a backup
+cp client/src/hooks/useOfflineFirstProjects.ts client/src/hooks/useOfflineFirstProjects.ts.backup
+
+# Edit the file
+nano client/src/hooks/useOfflineFirstProjects.ts
+Change line 58-63 from:
+
+Copyconst {
+  data: serverProjects = [],
+  isLoading: isLoadingServer,
+  error: serverError,
+} = useQuery<ProjectWithCounts[]>({
+  queryKey: ['/api/projects/with-counts'],
+  staleTime: 5 * 60 * 1000,
+  retry: false,
+  meta: {
+    skipErrorToast: true,
+  },
+});
+To:
+
+Copyconst {
+  data: serverProjects = [],
+  isLoading: isLoadingServer,
+  error: serverError,
+} = useQuery<ProjectWithCounts[]>({
+  queryKey: ['/api/projects/with-counts'],
+  staleTime: 5 * 60 * 1000,
+  retry: false,
+  refetchOnMount: false,  // ✅ ADD THIS
+  refetchOnWindowFocus: false,  // ✅ ADD THIS
+  refetchOnReconnect: false,  // ✅ ADD THIS
+  meta: {
+    skipErrorToast: true,
+  },
+});
