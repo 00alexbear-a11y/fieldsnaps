@@ -80,14 +80,24 @@ export function useAuth() {
     };
   }, [queryClient]);
 
-  const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser } = useQuery<User>({
+  // Log enabled state for debugging
+  const queryEnabled = authState.isInitialized && !!authState.session;
+  console.log('[useAuth] Query enabled check:', { 
+    isInitialized: authState.isInitialized, 
+    hasSession: !!authState.session,
+    enabled: queryEnabled 
+  });
+
+  const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser, refetch } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
-    enabled: authState.isInitialized && !!authState.session,
+    enabled: queryEnabled,
     // Don't refetch on window focus - user data doesn't change often
     refetchOnWindowFocus: false,
     // Cache user data for 5 minutes to prevent infinite refetch loop
     staleTime: 5 * 60 * 1000,
+    // CRITICAL: Ensure query refetches when enabled changes from false to true
+    refetchOnMount: true,
     queryFn: async () => {
       console.log('[useAuth] Fetching user data...');
       
