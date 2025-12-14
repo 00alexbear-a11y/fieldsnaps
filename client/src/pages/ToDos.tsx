@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle, Clock, FolderOpen } from "lucide-react";
+import { CheckSquare, Plus, Check, X, Image as ImageIcon, MoreVertical, Settings, Camera, Upload, CalendarIcon, Calendar as CalendarIconOutline, User, Home, Filter, Flag, ListTodo, CheckCircle, Clock, FolderOpen, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,6 +23,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { haptics } from "@/lib/nativeHaptics";
 import type { ToDo, Project } from "@shared/schema";
+import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -84,6 +85,7 @@ export default function ToDos() {
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
   const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -961,29 +963,42 @@ export default function ToDos() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Top Action Bar */}
-      <div className="flex items-center justify-between p-3 border-b">
-        <h1 className="text-xl font-semibold" data-testid="text-list-title">
-          {smartListLabels[selectedList]}
-        </h1>
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between p-3 border-b flex-shrink-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <h1 className="text-xl font-semibold truncate" data-testid="text-list-title">
+            {smartListLabels[selectedList]}
+          </h1>
+          <span className="text-muted-foreground text-sm whitespace-nowrap" data-testid="text-task-count">
+            · {filteredTodos.length} {filteredTodos.length === 1 ? 'task' : 'tasks'} scheduled
+          </span>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Button
-            variant={dateFilter ? "default" : "outline"}
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowFilterSheet(true)}
+            data-testid="button-todo-filters"
+          >
+            <SlidersHorizontal className="w-5 h-5" />
+          </Button>
+          <Button
+            variant={dateFilter ? "default" : "ghost"}
             size="sm"
             onClick={() => setShowFullScreenCalendar(true)}
+            className="gap-1"
             data-testid="button-date-filter"
           >
             <CalendarIconOutline className="w-4 h-4" />
             {dateFilter && (
-              <span className="ml-2">{format(dateFilter, 'MMM d')}</span>
+              <span className="text-xs">{format(dateFilter, 'MMM d')}</span>
             )}
           </Button>
           <Button
             onClick={() => setShowAddDialog(true)}
-            size="sm"
+            size="icon"
             data-testid="button-add-todo"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            New Task
+            <Plus className="w-5 h-5" />
           </Button>
         </div>
       </div>
@@ -1424,6 +1439,13 @@ export default function ToDos() {
             setShowTodoDueDatePicker(false);
           }
         }}
+      />
+
+      {/* Filter Sheet */}
+      <ToDosFilterSheet
+        open={showFilterSheet}
+        onOpenChange={setShowFilterSheet}
+        counts={smartListCounts}
       />
     </div>
   );
