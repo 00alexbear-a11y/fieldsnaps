@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
-import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check, Cloud, ChevronRight } from "lucide-react";
+import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check, Cloud, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import SwipeableProjectCard from "@/components/SwipeableProjectCard";
+import { ProjectsFilterSheet } from "@/components/ProjectsFilterSheet";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
 import { nativeClipboard } from "@/lib/nativeClipboard";
@@ -113,6 +114,7 @@ export default function Projects() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{
     pending: number;
     projects: number;
@@ -520,9 +522,9 @@ export default function Projects() {
           </button>
         )}
 
-        {/* Search Bar */}
-        <div className="p-3">
-          <div className="relative">
+        {/* Search Bar with Filter Button */}
+        <div className="p-3 flex items-center gap-2">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
@@ -533,8 +535,23 @@ export default function Projects() {
               data-testid="input-search-projects"
             />
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setFilterSheetOpen(true)}
+            className="h-9 w-9 shrink-0"
+            data-testid="button-open-filters"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+          </Button>
         </div>
       </div>
+
+      {/* Filter Bottom Sheet */}
+      <ProjectsFilterSheet
+        open={filterSheetOpen}
+        onOpenChange={setFilterSheetOpen}
+      />
 
       {/* Projects List - only this section scrolls */}
       <div className="flex-1 pb-52 bg-white dark:bg-black">
