@@ -78,6 +78,20 @@ function AppContent() {
   const { canWrite } = useSubscriptionAccess();
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   
+  // EMERGENCY: If still loading after 5 seconds, force render anyway
+  const [forceRender, setForceRender] = useState(false);
+  
+  useEffect(() => {
+    if (isLoading && !forceRender) {
+      console.log('[App] Loading... isAuthenticated:', isAuthenticated, 'user:', !!user);
+      const timeout = setTimeout(() => {
+        console.error('[App] Loading timeout (5s) - forcing render');
+        setForceRender(true);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isLoading, forceRender, isAuthenticated, user]);
+  
   // Email whitelist - only these emails can access the app
   const WHITELIST_EMAILS = ['team.abgroup@gmail.com', 'dev@fieldsnaps.local', 'snapspeak@test.com', 'hello@fieldsnaps.com', 'alexmbear@yahoo.com'];
   const isWhitelisted = user && user.email && WHITELIST_EMAILS.includes(user.email);
@@ -162,11 +176,14 @@ function AppContent() {
     }
   }, [isAuthenticated, isLoading, isWhitelisted, isPublicRoute, location, setLocation]);
 
-  // Show loading state while checking authentication
-  if (isLoading) {
+  // Show loading state while checking authentication (with 5s timeout fallback)
+  if (isLoading && !forceRender) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }

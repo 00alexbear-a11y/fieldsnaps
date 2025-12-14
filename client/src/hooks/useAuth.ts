@@ -89,18 +89,27 @@ export function useAuth() {
     // Cache user data for 5 minutes to prevent infinite refetch loop
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
+      console.log('[useAuth] Fetching user data...');
+      
       // Use tokenManager for consistency with other queries (same token source)
       const token = await tokenManager.getValidAccessToken();
       if (!token) {
+        console.error('[useAuth] No valid token available');
         throw new Error('No valid token');
       }
       
+      console.log('[useAuth] Token obtained, making request...');
+      
       // Use getApiUrl to ensure iOS native app hits the correct backend server
+      // Add 10 second timeout to prevent hanging requests
       const response = await fetch(getApiUrl('/api/auth/user'), {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        signal: AbortSignal.timeout(10000), // 10 second timeout
       });
+      
+      console.log('[useAuth] Response received:', response.status);
       
       if (!response.ok) {
         // Handle 401/403: Backend doesn't recognize the Supabase token
