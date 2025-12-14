@@ -28,6 +28,8 @@ import { Trash2, ListChecks } from "lucide-react";
 import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
 import { InlineWeekCalendar } from "@/components/InlineWeekCalendar";
 import { InlineDayHeader } from "@/components/InlineDayHeader";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -48,7 +50,7 @@ type TodoWithDetails = ToDo & {
 };
 
 type SmartList = 'today' | 'flagged' | 'assigned-to-me' | 'all' | 'completed';
-type ViewMode = 'month' | 'week' | 'day';
+type ViewMode = 'month' | 'week' | 'day' | 'list';
 
 export default function ToDos() {
   const [location, setLocation] = useLocation();
@@ -307,6 +309,59 @@ export default function ToDos() {
 
     return groups;
   }, [filteredTodos, selectedList]);
+
+  // Group todos by project for list view
+  const groupedByProject = useMemo(() => {
+    const groups: Record<string, { projectName: string; todos: TodoWithDetails[] }> = {};
+    
+    filteredTodos.forEach((todo) => {
+      const projectId = todo.project?.id || 'no-project';
+      const projectName = todo.project?.name || 'No Project';
+      
+      if (!groups[projectId]) {
+        groups[projectId] = { projectName, todos: [] };
+      }
+      groups[projectId].todos.push(todo);
+    });
+    
+    // Sort groups: projects with tasks first, then alphabetically, "No Project" last
+    const sortedEntries = Object.entries(groups).sort((a, b) => {
+      if (a[0] === 'no-project') return 1;
+      if (b[0] === 'no-project') return -1;
+      return a[1].projectName.localeCompare(b[1].projectName);
+    });
+    
+    return sortedEntries;
+  }, [filteredTodos]);
+
+  // Track expanded/collapsed state for list view project sections
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+
+  // Memoize project IDs string for dependency tracking
+  const projectIdsKey = useMemo(() => 
+    groupedByProject.map(([id]) => id).join('|'),
+    [groupedByProject]
+  );
+
+  // Reset and expand all project sections when entering list view or when project set changes
+  useEffect(() => {
+    if (viewMode === 'list') {
+      const allProjectIds = groupedByProject.map(([id]) => id);
+      setExpandedProjects(new Set(allProjectIds));
+    }
+  }, [viewMode, projectIdsKey]);
+
+  const toggleProjectExpanded = (projectId: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+      }
+      return next;
+    });
+  };
 
   // Fetch projects for assignment
   const { data: projects = [] } = useQuery<Project[]>({
@@ -1079,6 +1134,63 @@ export default function ToDos() {
     );
   };
 
+  // Render list view with collapsible project sections
+  const renderListView = () => {
+    if (groupedByProject.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <FolderOpen className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+          <p className="text-muted-foreground" data-testid="text-no-projects-list">
+            No tasks found
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3" data-testid="list-view-container">
+        {groupedByProject.map(([projectId, { projectName, todos }]) => {
+          const isExpanded = expandedProjects.has(projectId);
+          const completedCount = todos.filter(t => t.completed).length;
+          
+          return (
+            <Collapsible
+              key={projectId}
+              open={isExpanded}
+              onOpenChange={() => toggleProjectExpanded(projectId)}
+              data-testid={`collapsible-project-${projectId}`}
+            >
+              <CollapsibleTrigger asChild>
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2.5 bg-muted/30 hover:bg-muted/50 active:bg-muted rounded-lg transition-colors"
+                  data-testid={`button-toggle-project-${projectId}`}
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  )}
+                  <FolderOpen className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="font-medium text-sm flex-1 text-left truncate">
+                    {projectName}
+                  </span>
+                  <Badge variant="secondary" className="text-xs">
+                    {completedCount > 0 ? `${completedCount}/${todos.length}` : todos.length}
+                  </Badge>
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-2 pl-2">
+                <div className="space-y-1.5">
+                  {todos.map(renderTaskCard)}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        })}
+      </div>
+    );
+  };
+
   // Smart list labels for display
   const smartListLabels: Record<SmartList, string> = {
     'today': 'Today',
@@ -1181,6 +1293,8 @@ export default function ToDos() {
                   Create Task
                 </Button>
               </div>
+            ) : viewMode === 'list' ? (
+              renderListView()
             ) : (
               <div className="space-y-6 max-w-3xl">
                 {selectedList === 'completed' ? (
