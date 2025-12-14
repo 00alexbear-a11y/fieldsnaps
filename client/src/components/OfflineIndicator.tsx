@@ -1,21 +1,24 @@
-import { useState, useEffect } from 'react';
-import { WifiOff, Wifi, Signal } from 'lucide-react';
+import { useState, useEffect, memo } from 'react';
+import { WifiOff } from 'lucide-react';
 import { nativeNetwork } from '@/lib/nativeNetwork';
 import type { NetworkStatus } from '@/lib/nativeNetwork';
 
-export function OfflineIndicator() {
+// Memoize to prevent re-renders when parent (App) re-renders
+export const OfflineIndicator = memo(function OfflineIndicator() {
   const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({ 
     connected: navigator.onLine, 
     connectionType: 'unknown' 
   });
 
   useEffect(() => {
+    // Only fetch status once on mount
     nativeNetwork.getStatus().then(setNetworkStatus);
 
+    // Set up listener for network changes
     const cleanup = nativeNetwork.addListener(setNetworkStatus);
 
     return cleanup;
-  }, []);
+  }, []); // Empty deps - only run on mount/unmount
 
   if (networkStatus.connected) return null;
 
@@ -28,4 +31,4 @@ export function OfflineIndicator() {
       <span>You're offline. Changes will sync when you're back online.</span>
     </div>
   );
-}
+});

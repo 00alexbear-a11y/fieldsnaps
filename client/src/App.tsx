@@ -136,34 +136,31 @@ function AppContent() {
   // Non-whitelisted users can stay on landing page
   useEffect(() => {
     if (!isLoading && isAuthenticated && isWhitelisted && location === '/') {
-      if (needsOnboarding) {
-        setLocation('/onboarding');
-      } else {
-        setLocation('/projects');
-      }
+      // When at '/', always redirect to appropriate destination
+      setLocation(needsOnboarding ? '/onboarding' : '/projects');
     }
-  }, [isAuthenticated, isWhitelisted, isLoading, location, needsOnboarding, setLocation]);
+  }, [isAuthenticated, isWhitelisted, isLoading, needsOnboarding, location, setLocation]);
   
   // Redirect users who need onboarding to /onboarding page
   useEffect(() => {
-    if (!isLoading && needsOnboarding && !isOnboardingRoute && !isPublicRoute) {
+    if (!isLoading && needsOnboarding && !isOnboardingRoute && !isPublicRoute && location !== '/onboarding') {
       setLocation('/onboarding');
     }
-  }, [isLoading, needsOnboarding, isOnboardingRoute, isPublicRoute, setLocation]);
+  }, [isLoading, needsOnboarding, isOnboardingRoute, isPublicRoute, location, setLocation]);
 
   // Redirect unauthenticated users from private routes to landing
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute && !isOnboardingRoute && location !== '/') {
       setLocation('/');
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, setLocation]);
+  }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, location, setLocation]);
 
   // Redirect non-whitelisted authenticated users to waitlist
   useEffect(() => {
-    if (!isLoading && isAuthenticated && !isWhitelisted && location !== '/waitlist' && !isPublicRoute) {
+    if (!isLoading && isAuthenticated && !isWhitelisted && !isPublicRoute && location !== '/waitlist') {
       setLocation('/waitlist');
     }
-  }, [isAuthenticated, isLoading, isWhitelisted, location, isPublicRoute, setLocation]);
+  }, [isAuthenticated, isLoading, isWhitelisted, isPublicRoute, location, setLocation]);
 
   // Show loading state while checking authentication
   if (isLoading) {
