@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CalendarDays, Flag, User, ListTodo, CheckCircle2, Check, Calendar, CalendarRange, List, ArrowUpAZ, ArrowDownAZ, Clock, FolderOpen } from 'lucide-react';
+import { CalendarDays, Flag, User, ListTodo, CheckCircle2, Check, Calendar, CalendarRange, List, ArrowUpAZ, ArrowDownAZ, Clock, FolderOpen, LayoutList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Drawer,
@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import type { Project } from '@shared/schema';
 
 type SmartList = 'today' | 'flagged' | 'assigned-to-me' | 'all' | 'completed';
-type ViewMode = 'month' | 'week' | 'day';
+type ViewMode = 'month' | 'week' | 'day' | 'list';
 type SortOption = 'due-date' | 'created' | 'name-asc' | 'name-desc' | 'priority';
 
 interface ToDosFilterSheetProps {
@@ -94,6 +94,7 @@ export function ToDosFilterSheet({ open, onOpenChange, counts }: ToDosFilterShee
     { id: 'month' as ViewMode, label: 'Month', icon: Calendar },
     { id: 'week' as ViewMode, label: 'Week', icon: CalendarRange },
     { id: 'day' as ViewMode, label: 'Day', icon: List },
+    { id: 'list' as ViewMode, label: 'List', icon: LayoutList },
   ];
 
   const sortOptions = [
