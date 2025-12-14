@@ -289,10 +289,10 @@ function AppContent() {
         {/* Sidebar - only shown on non-camera pages */}
         {shouldShowSidebar && <AppSidebar />}
         
-        <div className="flex flex-col flex-1 min-w-0 h-full">
+        <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
           {/* Header with menu button and logo - only shown when sidebar is visible */}
           {shouldShowSidebar && (
-            <header className="flex-shrink-0 flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative z-50">
+            <header className="flex-shrink-0 flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
               <SidebarTrigger 
                 data-testid="button-sidebar-trigger"
                 className="hover-elevate active-elevate-2 !h-auto !w-auto flex items-center gap-2 px-1"
@@ -315,7 +315,7 @@ function AppContent() {
             </header>
           )}
           
-          <main className="flex-1 bg-white dark:bg-black scroll-container">
+          <main className="flex-1 min-h-0 bg-white dark:bg-black scroll-container">
             <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
               <Switch>
                 <Route path="/auth/callback" component={AuthCallback} />
