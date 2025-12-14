@@ -181,7 +181,7 @@ export interface IStorage {
   // Clock Entries (time tracking)
   createClockEntry(data: InsertClockEntry): Promise<ClockEntry>;
   getClockEntries(companyId: string, options?: { userId?: string; startDate?: Date; endDate?: Date }): Promise<(ClockEntry & { user: { id: string; firstName: string | null; lastName: string | null; email: string | null } })[]>;
-  getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null }>;
+  getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null; lastProjectId?: string | null; lastProjectName?: string | null }>;
   getClockEntriesForUser(userId: string, startDate: Date, endDate: Date): Promise<ClockEntry[]>;
   updateClockEntry(id: string, data: { timestamp: Date; editedBy: string; editReason: string; originalTimestamp: Date }): Promise<ClockEntry | undefined>;
   switchProject(userId: string, companyId: string, newProjectId: string, location?: string, notes?: string): Promise<{ clockOutEntry: ClockEntry; clockInEntry: ClockEntry }>;
@@ -1918,7 +1918,7 @@ export class DbStorage implements IStorage {
     return result;
   }
 
-  async getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null }> {
+  async getTodayClockStatus(userId: string): Promise<{ isClockedIn: boolean; onBreak: boolean; clockInTime?: Date; totalHoursToday: number; currentProjectId?: string | null; lastProjectId?: string | null; lastProjectName?: string | null }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -1977,12 +1977,39 @@ export class DbStorage implements IStorage {
     
     const totalHoursToday = totalMs / (1000 * 60 * 60);
     
+    // Get the last project the user clocked into (for quick selection)
+    let lastProjectId: string | null = null;
+    let lastProjectName: string | null = null;
+    
+    // Find the most recent clock_in entry with a project (look back further than just today)
+    const recentClockIns = await db
+      .select({
+        projectId: clockEntries.projectId,
+        projectName: projects.name,
+      })
+      .from(clockEntries)
+      .leftJoin(projects, eq(clockEntries.projectId, projects.id))
+      .where(and(
+        eq(clockEntries.userId, userId),
+        eq(clockEntries.type, 'clock_in'),
+        isNotNull(clockEntries.projectId)
+      ))
+      .orderBy(sql`${clockEntries.timestamp} DESC`)
+      .limit(1);
+    
+    if (recentClockIns.length > 0 && recentClockIns[0].projectId) {
+      lastProjectId = recentClockIns[0].projectId;
+      lastProjectName = recentClockIns[0].projectName;
+    }
+    
     return {
       isClockedIn,
       onBreak,
       clockInTime,
       totalHoursToday,
       currentProjectId,
+      lastProjectId,
+      lastProjectName,
     };
   }
 

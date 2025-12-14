@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Clock, Play, Square, Coffee, CheckCircle2, ArrowRightLeft } from "lucide-react";
+import { Clock, Play, Square, Coffee, CheckCircle2, ArrowRightLeft, History } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { haptics } from "@/lib/nativeHaptics";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Project } from "@shared/schema";
 
 interface ClockStatus {
@@ -19,6 +19,8 @@ interface ClockStatus {
   clockInTime?: string;
   totalHoursToday: number;
   currentProjectId?: string | null;
+  lastProjectId?: string | null;
+  lastProjectName?: string | null;
 }
 
 export function ClockStatusCard() {
@@ -27,6 +29,7 @@ export function ClockStatusCard() {
   const [showSwitchDialog, setShowSwitchDialog] = useState(false);
   const [newProjectId, setNewProjectId] = useState<string>("");
   const [showTimeReview, setShowTimeReview] = useState(false);
+  const [liveSeconds, setLiveSeconds] = useState(0);
 
   const { data: status, isLoading } = useQuery<ClockStatus>({
     queryKey: ['/api/clock/status'],
@@ -37,6 +40,41 @@ export function ClockStatusCard() {
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
+
+  // Live timer effect - updates every second when clocked in
+  useEffect(() => {
+    if (!status?.isClockedIn || !status.clockInTime) {
+      setLiveSeconds(0);
+      return;
+    }
+
+    const clockInTime = new Date(status.clockInTime).getTime();
+    
+    const updateTimer = () => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - clockInTime) / 1000);
+      setLiveSeconds(elapsed);
+    };
+    
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    
+    return () => clearInterval(interval);
+  }, [status?.isClockedIn, status?.clockInTime]);
+
+  // Get current project name
+  const currentProject = useMemo(() => {
+    if (!status?.currentProjectId) return null;
+    return projects.find(p => p.id === status.currentProjectId);
+  }, [status?.currentProjectId, projects]);
+
+  // Format live timer as HH:MM:SS
+  const formatLiveTimer = (seconds: number): string => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   const clockMutation = useMutation({
     mutationFn: async (data: { type: 'clock_in' | 'clock_out' | 'break_start' | 'break_end'; totalHoursToday?: number; projectId?: string }) => {
@@ -180,10 +218,23 @@ export function ClockStatusCard() {
               </p>
             </div>
             
+            {/* Last Project Shortcut */}
+            {status.lastProjectId && status.lastProjectName && !selectedProjectId && (
+              <Button
+                variant="outline"
+                onClick={() => setSelectedProjectId(status.lastProjectId!)}
+                className="rounded-full"
+                data-testid="button-last-project"
+              >
+                <History className="mr-2 h-4 w-4" />
+                Continue with {status.lastProjectName}
+              </Button>
+            )}
+            
             {/* Project Selector */}
             <div className="w-full max-w-xs space-y-2">
               <Label htmlFor="project-select" className="text-sm font-medium">
-                Select Project *
+                {selectedProjectId ? "Selected Project" : "Or select a project"}
               </Label>
               <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
                 <SelectTrigger id="project-select" data-testid="select-project">
@@ -225,50 +276,58 @@ export function ClockStatusCard() {
   return (
     <Card className="mb-6 border-primary/20 bg-gradient-to-br from-primary/5 to-card" data-testid="clock-status-card">
       <CardContent className="p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          {/* Status Info */}
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-              {status.onBreak ? (
-                <Coffee className="h-7 w-7 text-primary" />
-              ) : (
-                <CheckCircle2 className="h-7 w-7 text-primary" />
-              )}
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-foreground" data-testid="clock-status-title">
-                {status.onBreak ? "On Break" : "Clocked In"}
-              </h3>
-              {status.clockInTime && (
-                <p className="text-xs text-muted-foreground" data-testid="text-clock-in-time">
-                  Started: {format(new Date(status.clockInTime), 'h:mm a')}
-                </p>
-              )}
-              <div className="flex items-baseline gap-2 mt-1">
-                <p className="text-2xl font-bold text-primary" data-testid="text-hours-today">
-                  {formatHours(status.totalHoursToday)}
-                </p>
-                <p className="text-sm text-muted-foreground">today</p>
-              </div>
-            </div>
+        <div className="flex flex-col items-center text-center gap-4">
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${status.onBreak ? 'bg-amber-500' : 'bg-green-500'} animate-pulse`} />
+            <span className="text-sm font-medium text-muted-foreground" data-testid="clock-status-title">
+              {status.onBreak ? "On Break" : "Working"}
+            </span>
           </div>
-
+          
+          {/* Large Timer Display */}
+          <div className="py-2">
+            <p className="text-5xl font-bold tabular-nums tracking-tight text-foreground" data-testid="text-live-timer">
+              {formatLiveTimer(liveSeconds)}
+            </p>
+            {status.clockInTime && (
+              <p className="text-sm text-muted-foreground mt-2" data-testid="text-clock-in-time">
+                Started at {format(new Date(status.clockInTime), 'h:mm a')}
+              </p>
+            )}
+          </div>
+          
+          {/* Current Project Display */}
+          {currentProject && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full" data-testid="badge-current-project">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-sm font-medium">{currentProject.name}</span>
+            </div>
+          )}
+          
+          {/* Today's Total */}
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground" data-testid="text-hours-today">{formatHours(status.totalHoursToday)}</span> worked today
+          </p>
+          
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2 pt-2">
             {!status.onBreak && (
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setShowSwitchDialog(true)}
                 disabled={clockMutation.isPending || switchProjectMutation.isPending}
                 data-testid="button-switch-project"
               >
                 <ArrowRightLeft className="mr-2 h-4 w-4" />
-                Switch Project
+                Switch
               </Button>
             )}
             {status.onBreak ? (
               <Button
-                variant="default"
+                variant="outline"
+                size="sm"
                 onClick={handleBreakEnd}
                 disabled={clockMutation.isPending}
                 data-testid="button-end-break"
@@ -279,22 +338,24 @@ export function ClockStatusCard() {
             ) : (
               <Button
                 variant="outline"
+                size="sm"
                 onClick={handleBreakStart}
                 disabled={clockMutation.isPending}
                 data-testid="button-start-break"
               >
                 <Coffee className="mr-2 h-4 w-4" />
-                Start Break
+                Break
               </Button>
             )}
             <Button
-              variant={status.onBreak ? "outline" : "default"}
+              variant="default"
+              size="sm"
               onClick={handleClockOut}
               disabled={clockMutation.isPending}
               data-testid="button-clock-out"
             >
               <Square className="mr-2 h-4 w-4" />
-              End Your Day
+              Clock Out
             </Button>
           </div>
         </div>
