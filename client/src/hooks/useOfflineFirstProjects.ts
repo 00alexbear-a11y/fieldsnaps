@@ -80,6 +80,9 @@ export function useOfflineFirstProjects() {
     queryKey: ['/api/projects/with-counts'],
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes to prevent infinite refetch loops
     retry: false, // Don't retry if offline
+    refetchOnMount: false, // Prevent refetch on component mount
+    refetchOnWindowFocus: false, // Prevent refetch when window gains focus
+    refetchOnReconnect: false, // Prevent refetch when network reconnects
     meta: {
       // Custom meta to handle offline gracefully
       skipErrorToast: true,
