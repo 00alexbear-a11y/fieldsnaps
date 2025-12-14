@@ -25,6 +25,7 @@ import { haptics } from "@/lib/nativeHaptics";
 import type { ToDo, Project } from "@shared/schema";
 import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
 import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
+import { InlineWeekCalendar } from "@/components/InlineWeekCalendar";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -1017,6 +1018,15 @@ export default function ToDos() {
             {/* Month View Calendar */}
             {viewMode === 'month' && (
               <InlineMonthCalendar
+                selectedDate={dateFilter}
+                taskCountByDate={taskCountByDate}
+                onSelectDay={setDateFilter}
+              />
+            )}
+
+            {/* Week View Calendar */}
+            {viewMode === 'week' && (
+              <InlineWeekCalendar
                 selectedDate={dateFilter}
                 taskCountByDate={taskCountByDate}
                 onSelectDay={setDateFilter}
