@@ -13,6 +13,7 @@ import {
   signUpWithEmail,
 } from "@/lib/supabaseAuth";
 import { getApiUrl } from "@/lib/apiUrl";
+import { tokenManager } from "@/lib/tokenManager";
 
 interface AuthState {
   session: Session | null;
@@ -88,14 +89,16 @@ export function useAuth() {
     // Cache user data for 5 minutes to prevent infinite refetch loop
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      if (!authState.session?.access_token) {
-        throw new Error('No session');
+      // Use tokenManager for consistency with other queries (same token source)
+      const token = await tokenManager.getValidAccessToken();
+      if (!token) {
+        throw new Error('No valid token');
       }
       
       // Use getApiUrl to ensure iOS native app hits the correct backend server
       const response = await fetch(getApiUrl('/api/auth/user'), {
         headers: {
-          'Authorization': `Bearer ${authState.session.access_token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       
