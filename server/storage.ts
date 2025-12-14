@@ -1,14 +1,14 @@
 import { db } from "./db";
-import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits, clockEntries, geofences, locationLogs, userPermissions, timeEntryEdits } from "../shared/schema";
+import { companies, projects, photos, photoAnnotations, comments, users, userSettings, credentials, shares, shareViewLogs, tags, photoTags, pdfs, tasks, todos, subtasks, subscriptions, subscriptionEvents, waitlist, activityLogs, notifications, projectFavorites, projectVisits, clockEntries, geofences, locationLogs, userPermissions, timeEntryEdits } from "../shared/schema";
 import type {
   Company, InsertCompany,
   User, UpsertUser,
   UserSettings, UpdateUserSettings,
   Credential, InsertCredential,
-  Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo,
+  Project, Photo, PhotoAnnotation, Comment, Share, ShareViewLog, Tag, PhotoTag, Pdf, Task, ToDo, Subtask,
   Subscription, SubscriptionEvent, Waitlist, ActivityLog, Notification, ProjectFavorite, ProjectVisit, ClockEntry,
   Geofence, LocationLog, UserPermission, TimeEntryEdit,
-  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo,
+  InsertProject, InsertPhoto, InsertPhotoAnnotation, InsertComment, InsertShare, InsertShareViewLog, InsertTag, InsertPhotoTag, InsertPdf, InsertTask, InsertToDo, InsertSubtask,
   InsertSubscription, InsertSubscriptionEvent, InsertWaitlist, InsertActivityLog, InsertNotification, InsertProjectFavorite, InsertProjectVisit, InsertClockEntry,
   InsertGeofence, InsertLocationLog, InsertUserPermission, InsertTimeEntryEdit,
   BatchTodoInput
@@ -134,6 +134,15 @@ export interface IStorage {
   completeTodo(id: string, userId: string): Promise<ToDo | undefined>;
   toggleTodoFlag(id: string): Promise<ToDo | undefined>;
   deleteTodo(id: string): Promise<boolean>;
+  
+  // Subtasks
+  getSubtasksByTodoId(todoId: string): Promise<Subtask[]>;
+  getSubtask(id: string): Promise<Subtask | undefined>;
+  createSubtask(data: InsertSubtask): Promise<Subtask>;
+  updateSubtask(id: string, data: Partial<InsertSubtask>): Promise<Subtask | undefined>;
+  completeSubtask(id: string): Promise<Subtask | undefined>;
+  deleteSubtask(id: string): Promise<boolean>;
+  getSubtaskCountsByTodoIds(todoIds: string[]): Promise<{ todoId: string; total: number; completed: number }[]>;
   
   // Billing & Subscriptions
   updateUserStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
@@ -1382,6 +1391,66 @@ export class DbStorage implements IStorage {
   async deleteTodo(id: string): Promise<boolean> {
     const result = await db.delete(todos).where(eq(todos.id, id)).returning();
     return result.length > 0;
+  }
+
+  // Subtasks
+  async getSubtasksByTodoId(todoId: string): Promise<Subtask[]> {
+    return await db.select().from(subtasks)
+      .where(eq(subtasks.todoId, todoId))
+      .orderBy(subtasks.sortOrder);
+  }
+
+  async getSubtask(id: string): Promise<Subtask | undefined> {
+    const result = await db.select().from(subtasks).where(eq(subtasks.id, id));
+    return result[0];
+  }
+
+  async createSubtask(data: InsertSubtask): Promise<Subtask> {
+    const result = await db.insert(subtasks).values(data).returning();
+    return result[0];
+  }
+
+  async updateSubtask(id: string, data: Partial<InsertSubtask>): Promise<Subtask | undefined> {
+    const result = await db.update(subtasks)
+      .set(data)
+      .where(eq(subtasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async completeSubtask(id: string): Promise<Subtask | undefined> {
+    const subtask = await this.getSubtask(id);
+    if (!subtask) return undefined;
+    
+    const result = await db.update(subtasks)
+      .set({ 
+        completed: !subtask.completed,
+        completedAt: subtask.completed ? null : new Date()
+      })
+      .where(eq(subtasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteSubtask(id: string): Promise<boolean> {
+    const result = await db.delete(subtasks).where(eq(subtasks.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getSubtaskCountsByTodoIds(todoIds: string[]): Promise<{ todoId: string; total: number; completed: number }[]> {
+    if (todoIds.length === 0) return [];
+    
+    const result = await db
+      .select({
+        todoId: subtasks.todoId,
+        total: sql<number>`CAST(COUNT(*) AS INTEGER)`,
+        completed: sql<number>`CAST(SUM(CASE WHEN ${subtasks.completed} THEN 1 ELSE 0 END) AS INTEGER)`,
+      })
+      .from(subtasks)
+      .where(inArray(subtasks.todoId, todoIds))
+      .groupBy(subtasks.todoId);
+    
+    return result;
   }
 
   // Billing & Subscriptions

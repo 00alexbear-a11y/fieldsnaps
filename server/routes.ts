@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, batchTodoSchema, insertWaitlistSchema, insertGeofenceSchema, insertLocationLogSchema, insertUserPermissionSchema, insertTimeEntryEditSchema, companies, clockEntries } from "../shared/schema";
+import { insertProjectSchema, insertPhotoSchema, insertPhotoAnnotationSchema, insertCommentSchema, insertShareSchema, insertTagSchema, insertPhotoTagSchema, insertPdfSchema, insertTaskSchema, insertTodoSchema, insertSubtaskSchema, batchTodoSchema, insertWaitlistSchema, insertGeofenceSchema, insertLocationLogSchema, insertUserPermissionSchema, insertTimeEntryEditSchema, companies, clockEntries } from "../shared/schema";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { setupAuth, isAuthenticated, isAuthenticatedAndWhitelisted } from "./auth";
@@ -3218,6 +3218,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "To-do not found" });
       }
       res.status(204).send();
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // ========================================
+  // Subtask Routes
+  // ========================================
+
+  // Get subtasks for a todo
+  app.get("/api/todos/:todoId/subtasks", isAuthenticatedAndWhitelisted, validateUuidParam('todoId'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.todoId)) return;
+      
+      const subtasks = await storage.getSubtasksByTodoId(req.params.todoId);
+      res.json(subtasks);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Create subtask
+  app.post("/api/todos/:todoId/subtasks", isAuthenticatedAndWhitelisted, validateUuidParam('todoId'), async (req, res) => {
+    try {
+      if (!await verifyTodoCompanyAccess(req, res, req.params.todoId)) return;
+      
+      const data = insertSubtaskSchema.omit({ id: true, createdAt: true }).parse({
+        ...req.body,
+        todoId: req.params.todoId,
+      });
+      
+      const subtask = await storage.createSubtask(data);
+      res.status(201).json(subtask);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Update subtask
+  app.patch("/api/subtasks/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const subtask = await storage.getSubtask(req.params.id);
+      if (!subtask) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      if (!await verifyTodoCompanyAccess(req, res, subtask.todoId)) return;
+      
+      const updateSchema = z.object({
+        title: z.string().min(1).optional(),
+        completed: z.boolean().optional(),
+        sortOrder: z.number().optional(),
+      });
+      
+      const data = updateSchema.parse(req.body);
+      const updated = await storage.updateSubtask(req.params.id, data);
+      
+      if (!updated) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Toggle subtask completion
+  app.post("/api/subtasks/:id/complete", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const subtask = await storage.getSubtask(req.params.id);
+      if (!subtask) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      if (!await verifyTodoCompanyAccess(req, res, subtask.todoId)) return;
+      
+      const updated = await storage.completeSubtask(req.params.id);
+      
+      if (!updated) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      res.json(updated);
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Delete subtask
+  app.delete("/api/subtasks/:id", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const subtask = await storage.getSubtask(req.params.id);
+      if (!subtask) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      if (!await verifyTodoCompanyAccess(req, res, subtask.todoId)) return;
+      
+      const deleted = await storage.deleteSubtask(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Subtask not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error: any) {
+      handleError(res, error);
+    }
+  });
+
+  // Get subtask counts for multiple todos (bulk endpoint for list views)
+  app.post("/api/todos/subtask-counts", isAuthenticatedAndWhitelisted, async (req, res) => {
+    try {
+      const user = await getUserWithCompany(req, res);
+      if (!user) return;
+      
+      const schema = z.object({
+        todoIds: z.array(z.string().uuid()),
+      });
+      
+      const { todoIds } = schema.parse(req.body);
+      const counts = await storage.getSubtaskCountsByTodoIds(todoIds);
+      res.json(counts);
     } catch (error: any) {
       handleError(res, error);
     }
