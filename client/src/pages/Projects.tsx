@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useOfflineFirstProjects } from "@/hooks/useOfflineFirstProjects";
-import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check } from "lucide-react";
+import { Plus, Home, Camera, Search, ArrowUpDown, RefreshCw, Copy, Check, Cloud, ChevronRight } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useSubscriptionAccess } from "@/hooks/useSubscriptionAccess";
 import { Button } from "@/components/ui/button";
@@ -496,12 +496,28 @@ export default function Projects() {
     <div className="flex flex-col h-full">
       {/* Sticky header section */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b">
+        {/* Pending Uploads Banner */}
         {syncStatus && syncStatus.pending > 0 && (
-          <div className="px-4 py-2 border-b">
-            <p className="text-xs text-muted-foreground">
-              {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
-            </p>
-          </div>
+          <button
+            onClick={() => setLocation('/uploads')}
+            className="w-full px-4 py-3 bg-primary/10 border-b border-primary/20 flex items-center justify-between gap-3 active:bg-primary/15 transition-colors"
+            data-testid="banner-pending-uploads"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <Cloud className="w-4 h-4 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium text-foreground">
+                  {syncStatus.pending} pending upload{syncStatus.pending > 1 ? 's' : ''}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isSyncing ? 'Syncing...' : 'Tap to view uploads'}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </button>
         )}
 
         {/* Search Bar */}
