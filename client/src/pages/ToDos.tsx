@@ -26,6 +26,7 @@ import type { ToDo, Project } from "@shared/schema";
 import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
 import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
 import { InlineWeekCalendar } from "@/components/InlineWeekCalendar";
+import { InlineDayHeader } from "@/components/InlineDayHeader";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -66,6 +67,7 @@ export default function ToDos() {
   
   const [selectedList, setSelectedList] = useState<SmartList>(getSelectedList());
   const [viewMode, setViewMode] = useState<ViewMode>(getViewMode());
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   
   // Listen for filter changes from AppSidebar and browser history navigation
   useEffect(() => {
@@ -84,6 +86,14 @@ export default function ToDos() {
       window.removeEventListener('popstate', handleFilterChange);
     };
   }, []);
+  
+  // Auto-set dateFilter to today when entering day view without a date
+  useEffect(() => {
+    if (viewMode === 'day' && !dateFilter) {
+      setDateFilter(new Date());
+    }
+  }, [viewMode, dateFilter]);
+
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingTodo, setEditingTodo] = useState<TodoWithDetails | null>(null);
@@ -91,7 +101,6 @@ export default function ToDos() {
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
-  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
   const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
@@ -1030,6 +1039,16 @@ export default function ToDos() {
                 selectedDate={dateFilter}
                 taskCountByDate={taskCountByDate}
                 onSelectDay={setDateFilter}
+              />
+            )}
+
+            {/* Day View Header */}
+            {viewMode === 'day' && (
+              <InlineDayHeader
+                selectedDate={dateFilter || new Date()}
+                taskCount={filteredTodos.filter(t => !t.completed).length}
+                onSelectDay={(date) => setDateFilter(date)}
+                onOpenCalendar={() => setShowFullScreenCalendar(true)}
               />
             )}
 
