@@ -277,6 +277,21 @@ export const todos = pgTable("todos", {
   index("idx_todos_flag").on(table.flag),
 ]);
 
+// Subtasks table - individual subtasks within a to-do item
+export const subtasks = pgTable("subtasks", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  todoId: varchar("todo_id").notNull().references(() => todos.id, { onDelete: "cascade" }), // Parent todo
+  title: text("title").notNull(),
+  completed: boolean("completed").default(false).notNull(),
+  completedAt: timestamp("completed_at"),
+  sortOrder: integer("sort_order").default(0).notNull(), // For ordering subtasks
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_subtasks_todo_id").on(table.todoId),
+  index("idx_subtasks_completed").on(table.completed),
+  index("idx_subtasks_sort_order").on(table.sortOrder),
+]);
+
 // Activity logs table - tracks all user actions for accountability and audit trail
 export const activityLogs = pgTable("activity_logs", {
   id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -575,6 +590,7 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({ id: true, creat
 export const insertTodoSchema = createInsertSchema(todos).omit({ id: true, createdAt: true }).extend({
   dueDate: z.coerce.date().optional(),
 });
+export const insertSubtaskSchema = createInsertSchema(subtasks).omit({ id: true, createdAt: true });
 
 // Batch todo creation schema for camera-to-do voice sessions
 export const batchTodoSchema = z.object({
@@ -629,6 +645,7 @@ export type PhotoAnnotation = typeof photoAnnotations.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type ToDo = typeof todos.$inferSelect;
+export type Subtask = typeof subtasks.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type ShareViewLog = typeof shareViewLogs.$inferSelect;
 export type Tag = typeof tags.$inferSelect;
@@ -647,6 +664,7 @@ export type InsertPhotoAnnotation = z.infer<typeof insertPhotoAnnotationSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
 export type InsertToDo = z.infer<typeof insertTodoSchema>;
+export type InsertSubtask = z.infer<typeof insertSubtaskSchema>;
 export type BatchTodoInput = z.infer<typeof batchTodoSchema>;
 export type InsertShare = z.infer<typeof insertShareSchema>;
 export type InsertShareViewLog = z.infer<typeof insertShareViewLogSchema>;
