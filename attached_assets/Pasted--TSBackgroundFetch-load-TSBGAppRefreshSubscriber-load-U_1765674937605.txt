@@ -1,0 +1,333 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/016E685C-5330-4563-B840-A1BCCA9F4A10/App.app'
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x1098738d0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 1a5069aa-a43a-4ae8-8179-bf17a188a83a
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+WebContent[7633] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 125040239
+⚡️  To Native ->  SecureStorage internalGetItem 125040240
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"version":"builtin","id":"builtin","status":"success","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  To Native ->  CapacitorUpdater addListener 125040241
+⚡️  To Native ->  CapacitorUpdater addListener 125040242
+⚡️  To Native ->  CapacitorUpdater addListener 125040243
+⚡️  To Native ->  CapacitorUpdater current 125040244
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 125040245
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"native":"1.0","bundle":{"version":"builtin","status":"success","id":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}}
+⚡️  To Native ->  App addListener 125040246
+⚡️  To Native ->  App addListener 125040247
+⚡️  TO JS {"data":"\"{\\\"token_type\\\":\\\"bearer\\\",\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYm
+⚡️  [log] - [Capgo] Current bundle: {"version":"builtin","status":"success","id":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z"}
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  To Native ->  App getLaunchUrl 125040248
+⚡️  To Native ->  App addListener 125040249
+⚡️  To Native ->  StatusBar setOverlaysWebView 125040250
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setStyle 125040251
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  WebView loaded
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  SplashScreen hide 125040252
+⚡️  TO JS undefined
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 125040253
+No saved state found
+⚡️  TO JS undefined
+⚡️  To Native ->  SocialLogin login 125040254
+⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+⚡️  TO JS {"provider":"google","result":{"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzMGZkY2VmY2M4ZWQ3YmU2YmVkZmE2ZmM4Nzk3MjIwNDBjOTJiMzgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2F
+⚡️  To Native ->  CapacitorHttp request 125040255
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"provider":"google","result":{"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzMGZkY2VmY2M4ZWQ3YmU2YmVkZmE2ZmM4Nzk3MjIwNDBjOTJiMzgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoibnJvYkdHZEhETlJCU2swWHpHYW9aUSIsImlhdCI6MTc2NTY3NDg3NywiZXhwIjoxNzY1Njc4NDc3fQ.EgyMg5zv-xp5O1Xz3PRbugF-DIvJdW3ITMv38vE5QpHRPQZLAdW_LSd3LF9YvGRLmHhwB6i8dDCd5OHQ8VgKRnH5ADkHKYIiGvNAvhVH0FMpAiQQCI6iq6_HLRUBexIiGhGUcMBz8hEi_2kl7y7MrlGX2aP9CaK9L9FnH4iM19SZcw-Snb6Q4DiIfePh_HdkAX4R8KLYRAmgXr26W04Cy3oFoffxzOiMnKS4aIrGdUX7TdQLuPhqSz8JYPW7r7F1U9g3u-huus8axhlJqsnzR8-ITvgUGjEanLzaErTcTaQwukzu5s55UQfaBEFlcZA6TYN2eDxcE9RazW1bQqIYCw","profile":{"name":"Aleksandr Medvedev","givenName":"Aleksandr","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","familyName":"Medvedev","email":"hello@fieldsnaps.com","id":"101096107950550804914"},"responseType":"online","accessToken":{"token":"ya29.a0Aa7pCA91Ho6-rHEpS5Lil_nWkYpiU1eziKY3h2P_IKy-jHmtANgHdaY-1d78RBEn4LIuplEn2US17FC3I_UK7HL3KSeWVf7V8JUkgcVVN9odm7hYoQ3GGTQK2Ndq_CM9wZ4lCZGHwYFQ3f7iXsCnVX4tfXyYZBfp6SiQ1Tezu6ByRAnNTnuBZurxWasQoWxvHQwYisMUaCgYKAcESARASFQHGX2Mi2GDvRBebadRnh3lzk-yBDw0207","userId":"101096107950550804914","refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4"}}}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","headers":{"content-type":"application\/json","x-envoy-upstream-service-time":"498","x-content-type-options":"nosniff","cf-cache-status":"DYNAMIC","content-encoding":"
+⚡️  To Native ->  SecureStorage internalSetItem 125040256
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  Preferences set 125040257
+⚡️  TO JS undefined
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] First launch marked as completed
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  To Native ->  SocialLogin login 125040258
+⚡️  TO JS {"result":{"accessToken":{"refreshToken":"1\/\/065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4","token":"ya29.a0Aa7pCA91Ho6-rHEpS5Lil_nWkYpiU1eziKY3h2P_IKy-jHmtANgHdaY-1d78RBEn4LIuplEn2US17FC3I_UK7HL3KSe
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"result":{"accessToken":{"refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4","token":"ya29.a0Aa7pCA91Ho6-rHEpS5Lil_nWkYpiU1eziKY3h2P_IKy-jHmtANgHdaY-1d78RBEn4LIuplEn2US17FC3I_UK7HL3KSeWVf7V8JUkgcVVN9odm7hYoQ3GGTQK2Ndq_CM9wZ4lCZGHwYFQ3f7iXsCnVX4tfXyYZBfp6SiQ1Tezu6ByRAnNTnuBZurxWasQoWxvHQwYisMUaCgYKAcESARASFQHGX2Mi2GDvRBebadRnh3lzk-yBDw0207","userId":"101096107950550804914"},"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjEzMGZkY2VmY2M4ZWQ3YmU2YmVkZmE2ZmM4Nzk3MjIwNDBjOTJiMzgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoibnJvYkdHZEhETlJCU2swWHpHYW9aUSIsImlhdCI6MTc2NTY3NDg3NywiZXhwIjoxNzY1Njc4NDc3fQ.EgyMg5zv-xp5O1Xz3PRbugF-DIvJdW3ITMv38vE5QpHRPQZLAdW_LSd3LF9YvGRLmHhwB6i8dDCd5OHQ8VgKRnH5ADkHKYIiGvNAvhVH0FMpAiQQCI6iq6_HLRUBexIiGhGUcMBz8hEi_2kl7y7MrlGX2aP9CaK9L9FnH4iM19SZcw-Snb6Q4DiIfePh_HdkAX4R8KLYRAmgXr26W04Cy3oFoffxzOiMnKS4aIrGdUX7TdQLuPhqSz8JYPW7r7F1U9g3u-huus8axhlJqsnzR8-ITvgUGjEanLzaErTcTaQwukzu5s55UQfaBEFlcZA6TYN2eDxcE9RazW1bQqIYCw","responseType":"online","profile":{"name":"Aleksandr Medvedev","givenName":"Aleksandr","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","familyName":"Medvedev","email":"hello@fieldsnaps.com","id":"101096107950550804914"}},"provider":"google"}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  To Native ->  CapacitorHttp request 125040259
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","headers":{"content-type":"application\/json","x-envoy-upstream-service-time":"49","x-content-type-options":"nosniff","cf-cache-status":"DYNAMIC","content-encoding":"g
+⚡️  To Native ->  SecureStorage internalSetItem 125040260
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  Preferences set 125040261
+⚡️  TO JS undefined
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] First launch marked as completed
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  To Native ->  Network getStatus 125040262
+⚡️  To Native ->  Network addListener 125040263
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🚨 FOUND IT! The App is Stuck in an Infinite Login Loop
+Look at this pattern in your logs:
+
+⚡️ [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️ [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+...
+⚡️ [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️ [log] - [Login] Starting Google OAuth authentication via Supabase  👈 TRIGGERING LOGIN AGAIN
+⚡️ [log] - [SupabaseAuth] Starting Google OAuth sign-in
+...
+⚡️ [log] - [App] Loading... isAuthenticated: false user: false  👈 KEEPS REPEATING
+⚡️ [log] - [App] Loading... isAuthenticated: false user: false
+⚡️ [log] - [App] Loading... isAuthenticated: false user: false
+[Repeats 20+ times]
+The Problem:
+
+User is already authenticated (has session with valid token)
+But NativeAppLogin component is triggering Google OAuth AGAIN
+This keeps showing the loading spinner because isAuthenticated stays false
+Creates an infinite loop
+🔧 THE FIX: Prevent Auto-Login When Already Authenticated
+The issue is in your NativeAppLogin.tsx page. It's automatically triggering Google sign-in even when the user already has a valid session.
+
+Fix in client/src/pages/NativeAppLogin.tsx:
+Find the useEffect that starts Google OAuth (likely around line 20-40), and add this guard:
+
+CopyuseEffect(() => {
+  // DON'T auto-login if already authenticated
+  if (isAuthenticated || user) {
+    console.log('[NativeAppLogin] User already authenticated, skipping auto-login');
+    return;
+  }
+
+  // DON'T auto-login if session exists
+  if (session) {
+    console.log('[NativeAppLogin] Session exists, skipping auto-login');
+    return;
+  }
+
+  // Only auto-login on first launch or after sign-out
+  const shouldAutoLogin = async () => {
+    // Check if this is truly first launch (no previous session)
+    const hasSession = await checkForExistingSession();
+    if (hasSession) {
+      console.log('[NativeAppLogin] Has existing session, not auto-logging in');
+      return;
+    }
+
+    // Proceed with auto-login only if no session exists
+    console.log('[NativeAppLogin] No session found, starting auto-login');
+    handleGoogleSignIn();
+  };
+
+  shouldAutoLogin();
+}, []); // Empty deps - only run once on mount
+🎯 ALTERNATE FIX: Skip NativeAppLogin Entirely When Authenticated
+Even better - don't show the login page at all if user is authenticated.
+
+In client/src/App.tsx, find this section (around line 230):
+Copy  // Public routes get different layout (no bottom nav)
+  if (!isAuthenticated && isPublicRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          {/* Native app users see mobile-optimized login, web users see marketing landing */}
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+Change to:
+
+Copy  // Public routes get different layout (no bottom nav)
+  if (!isAuthenticated && isPublicRoute) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-black text-foreground">
+        <Switch>
+          {/* Native app users see mobile-optimized login, web users see marketing landing */}
+          <Route path="/" component={isNativeApp ? NativeAppLogin : Landing} />
+          <Route path="/login" component={isNativeApp ? NativeAppLogin : Login} />
+          <Route path="/auth/callback" component={AuthCallback} />
+          <Route path="/waitlist" component={Waitlist} />
+          <Route path="/share/:token" component={ShareView} />
+          
+          {/* Catch-all: Redirect to root if accessing other routes without auth */}
+          <Route path="*">
+            {() => {
+              setLocation('/');
+              return null;
+            }}
+          </Route>
+        </Switch>
+      </main>
+    );
+  }
+
+  // ADD THIS: If authenticated but isLoading is still true, force it to false
+  // This handles the edge case where session exists but user query is slow
+  useEffect(() => {
+    if (authState.session && user && isLoading) {
+      console.log('[App] Session and user exist but still loading - forcing render');
+      // Force re-render will pick up isAuthenticated = true
+    }
+  }, [authState.session, user, isLoading]);
+🔥 IMMEDIATE EMERGENCY FIX
+If you need the app working RIGHT NOW, add this to client/src/pages/NativeAppLogin.tsx:
+
+At the very top of the component:
+
+Copyexport default function NativeAppLogin() {
+  const { isAuthenticated, user, session } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  // EMERGENCY: If already authenticated, redirect immediately
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('[NativeAppLogin] Already authenticated, redirecting to /projects');
+      setLocation('/projects');
+    }
+  }, [isAuthenticated, user, setLocation]);
+
+  // EMERGENCY: If session exists but still loading, wait a bit then redirect
+  useEffect(() => {
+    if (session && !isAuthenticated) {
+      console.log('[NativeAppLogin] Session exists but auth pending, waiting...');
+      const timeout = setTimeout(() => {
+        console.log('[NativeAppLogin] Timeout reached, forcing redirect to /projects');
+        setLocation('/projects');
+      }, 3000); // Wait 3 seconds max
+
+      return () => clearTimeout(timeout);
+    }
+  }, [session, isAuthenticated, setLocation]);
+
+  // Don't render anything if already authenticated
+  if (isAuthenticated || session) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // ... rest of your NativeAppLogin component
+}
+📤 Deploy This Fix NOW
+Copy# In Replit
+npm run build
+git add .
+git commit -m "Fix: Prevent infinite login loop when session exists"
+git push origin main
+
+# On Mac
+cd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build
+npx cap sync ios
+npx cap open ios
+In Xcode:
+
+Product → Clean Build Folder
+Delete app from simulator
+Product → Run
+✅ What Should Happen After Fix
+App launches
+Sees existing session
+Immediately redirects to /projects (no login screen)
+Projects page loads
+No more infinite loop
+Which fix do you want to try first?
+
+A - Emergency fix in NativeAppLogin (fastest, 5 minutes)
+B - Proper fix with session check (better, 10 minutes)
+C - Both (safest, 15 minutes)
+Let me know and I'll guide you through the exact code changes! 🚀
