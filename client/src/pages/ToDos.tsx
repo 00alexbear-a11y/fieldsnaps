@@ -738,21 +738,42 @@ export default function ToDos() {
     restingOffsetRef.current = 0;
   };
 
-  // Render task card - simplified, minimal design with iOS-style swipe gestures
+  // Render task card - Apple-inspired design with larger thumbnails and better visual hierarchy
   const renderTaskCard = (todo: TodoWithDetails) => {
     const isThisTodoSwiped = swipedTodo === todo.id;
     const currentOffset = isThisTodoSwiped ? swipeOffset : 0;
     const isAnimating = animatingTasks.has(todo.id);
+
+    // Due date info for display
+    const getDueDateInfo = () => {
+      if (!todo.dueDate) return null;
+      const date = new Date(todo.dueDate);
+      const now = startOfDay(new Date());
+      const due = startOfDay(date);
+      
+      if (todo.completed) {
+        return { color: 'text-muted-foreground', label: format(date, 'MMM d') };
+      }
+      if (isPast(due) && !isSameDay(due, now)) {
+        return { color: 'text-destructive', label: 'Overdue' };
+      }
+      if (isToday(due)) {
+        return { color: 'text-orange-500', label: 'Today' };
+      }
+      return { color: 'text-muted-foreground', label: format(date, 'MMM d') };
+    };
+
+    const dueDateInfo = getDueDateInfo();
 
     return (
       <div 
         className={`transition-all duration-500 ease-out ${isAnimating ? 'max-h-0 opacity-0 mb-0 overflow-hidden' : 'max-h-96 opacity-100 mb-2'}`}
         key={todo.id}
       >
-      <div className="relative overflow-hidden rounded-lg">
+      <div className="relative overflow-hidden rounded-xl">
         {/* Swipe action backgrounds with dynamic visual feedback */}
         {/* Right swipe - complete action (green) */}
-        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-lg overflow-hidden">
+        <div className="absolute inset-0 bg-green-500 flex items-center justify-start px-4 rounded-xl overflow-hidden">
           <div className="flex items-center gap-2">
             <Check className="w-6 h-6 text-white" />
             <span className="text-white font-medium">Complete</span>
@@ -760,7 +781,7 @@ export default function ToDos() {
         </div>
         
         {/* Left swipe - delete action (red shows when swiped far, gray for reveal) */}
-        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-lg overflow-hidden ${
+        <div className={`absolute inset-0 flex items-center justify-end px-4 transition-colors rounded-xl overflow-hidden ${
           currentOffset < -100 ? 'bg-red-500' : 'bg-muted'
         }`}>
           <div className="flex items-center gap-2">
@@ -800,7 +821,7 @@ export default function ToDos() {
         </div>
 
         <Card
-          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-50' : ''} px-3 py-2 ${!isSwiping.current ? 'transition-all duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''} ${animatingTasks.has(todo.id) ? 'translate-x-full opacity-0 scale-95' : ''}`}
+          className={`relative cursor-pointer overflow-hidden ${todo.completed ? 'opacity-60' : ''} p-3 ${!isSwiping.current ? 'transition-all duration-200 ease-out' : ''} ${currentOffset > 0 ? 'bg-transparent' : ''} ${animatingTasks.has(todo.id) ? 'translate-x-full opacity-0 scale-95' : ''}`}
           style={{ transform: animatingTasks.has(todo.id) ? undefined : `translateX(${currentOffset}px)` }}
           onClick={() => { 
             if (!isSwiping.current) {
@@ -813,26 +834,28 @@ export default function ToDos() {
           onTouchEnd={() => handleTouchEnd(todo)}
           data-testid={`card-todo-${todo.id}`}
         >
-        <div className="flex items-center gap-2">
-          {/* Checkbox */}
-          <Checkbox
-            checked={todo.completed}
-            onCheckedChange={(checked) => {
-              if (!checked && todo.completed) {
-                toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
-              } else if (checked && !todo.completed) {
-                completeMutation.mutate(todo.id);
-              }
-            }}
-            onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4 flex-shrink-0"
-            data-testid={`checkbox-todo-complete-${todo.id}`}
-          />
+        <div className="flex gap-3">
+          {/* Left side - Checkbox */}
+          <div className="flex-shrink-0 pt-0.5">
+            <Checkbox
+              checked={todo.completed}
+              onCheckedChange={(checked) => {
+                if (!checked && todo.completed) {
+                  toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                } else if (checked && !todo.completed) {
+                  completeMutation.mutate(todo.id);
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="h-5 w-5"
+              data-testid={`checkbox-todo-complete-${todo.id}`}
+            />
+          </div>
 
-          {/* Photo thumbnail - small indicator */}
+          {/* Photo thumbnail - larger, more prominent */}
           {todo.photo && (
             <div
-              className="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-muted"
+              className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-muted shadow-sm"
               onClick={(e) => {
                 e.stopPropagation();
                 setLocation(`/photo/${todo.photoId}/view`);
@@ -847,78 +870,75 @@ export default function ToDos() {
             </div>
           )}
 
-          {/* Title and metadata - main content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3
-                className={`font-medium text-sm leading-tight truncate ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
-                data-testid={`text-todo-title-${todo.id}`}
+          {/* Main content area */}
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            {/* Project label - above title */}
+            {todo.project && (
+              <span 
+                className="text-[10px] font-medium text-primary uppercase tracking-wide mb-0.5"
+                data-testid={`text-project-${todo.id}`}
               >
-                {todo.title}
-              </h3>
-              
-              {/* Inline indicators */}
-              {todo.project && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal" data-testid={`badge-project-${todo.id}`}>
-                  {todo.project.name}
-                </Badge>
-              )}
-            </div>
+                {todo.project.name}
+              </span>
+            )}
+
+            {/* Title */}
+            <h3
+              className={`font-semibold text-sm leading-tight ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
+              data-testid={`text-todo-title-${todo.id}`}
+            >
+              {todo.title}
+            </h3>
             
-            {/* Secondary info row - only show if has content */}
-            {(todo.assignee || todo.description) && (
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                {todo.assignee && (
-                  <span className="flex items-center gap-0.5" data-testid={`text-assignee-${todo.id}`}>
-                    <User className="w-2.5 h-2.5" />
-                    {getDisplayName(todo.assignee)}
+            {/* Metadata row - always show if any content exists */}
+            {(dueDateInfo || todo.assignee) && (
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {/* Due date */}
+                {dueDateInfo && (
+                  <span className={`text-[11px] font-medium flex items-center gap-1 ${dueDateInfo.color}`} data-testid={`text-due-${todo.id}`}>
+                    <Clock className="w-3 h-3" />
+                    {dueDateInfo.label}
                   </span>
                 )}
-                {todo.description && (
-                  <span className="truncate max-w-[150px]" data-testid={`text-description-preview-${todo.id}`}>
-                    {todo.description.substring(0, 40)}{todo.description.length > 40 ? '...' : ''}
+                
+                {/* Assignee */}
+                {todo.assignee && (
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1" data-testid={`text-assignee-${todo.id}`}>
+                    <User className="w-3 h-3" />
+                    {getDisplayName(todo.assignee)}
                   </span>
                 )}
               </div>
             )}
+
+            {/* Description preview */}
+            {todo.description && (
+              <p 
+                className="text-xs text-muted-foreground mt-1 line-clamp-2"
+                data-testid={`text-description-preview-${todo.id}`}
+              >
+                {todo.description}
+              </p>
+            )}
           </div>
 
-          {/* Right indicators - flag and due date */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* Due date indicator (icon with color coding for all tasks) */}
-            {todo.dueDate && (() => {
-              const date = new Date(todo.dueDate);
-              const now = startOfDay(new Date());
-              const due = startOfDay(date);
-              
-              if (todo.completed) {
-                return <Clock className="w-3.5 h-3.5 text-muted-foreground" data-testid={`icon-due-completed-${todo.id}`} />;
-              }
-              
-              if (isPast(due) && !isSameDay(due, now)) {
-                return <Clock className="w-3.5 h-3.5 text-destructive" data-testid={`icon-overdue-${todo.id}`} />;
-              } else if (isToday(due)) {
-                return <Clock className="w-3.5 h-3.5 text-orange-500" data-testid={`icon-due-today-${todo.id}`} />;
-              } else {
-                return <Clock className="w-3.5 h-3.5 text-muted-foreground" data-testid={`icon-due-future-${todo.id}`} />;
-              }
-            })()}
-
-            {/* Flag indicator */}
+          {/* Right side - Flag & Actions */}
+          <div className="flex-shrink-0 flex items-start gap-1">
+            {/* Flag indicator - always visible when flagged */}
             {todo.flag && (
-              <Flag className="w-3.5 h-3.5 text-orange-500 fill-orange-500" data-testid={`icon-flag-${todo.id}`} />
+              <div className="pt-1">
+                <Flag className="w-4 h-4 text-orange-500 fill-orange-500" data-testid={`icon-flag-${todo.id}`} />
+              </div>
             )}
-
-            {/* Actions menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6"
+                  className="h-7 w-7"
                   data-testid={`button-todo-menu-${todo.id}`}
                 >
-                  <MoreVertical className="w-3.5 h-3.5" />
+                  <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
