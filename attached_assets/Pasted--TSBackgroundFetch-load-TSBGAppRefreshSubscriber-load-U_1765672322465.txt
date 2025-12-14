@@ -1,0 +1,1195 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/1F353CB7-FB25-431C-B9B8-D4DE6F8FE83C/App.app'
+Loading network plugin
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device a989b724-6efd-4510-add9-0f28f6c1aaac
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 10000 ms, then check for notifyAppReady
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x12189d470 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+quic_recovery_pto PTO fired after validation
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[7489] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 25303574
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 25303575
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","checksum":""}}
+⚡️  To Native ->  CapacitorUpdater addListener 25303576
+⚡️  To Native ->  CapacitorUpdater addListener 25303577
+⚡️  To Native ->  CapacitorUpdater addListener 25303578
+⚡️  To Native ->  CapacitorUpdater current 25303579
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  SecureStorage internalGetItem 25303580
+⚡️  TO JS {"bundle":{"id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","checksum":""},"native":"1.0"}
+⚡️  To Native ->  App addListener 25303581
+⚡️  To Native ->  App addListener 25303582
+⚡️  TO JS {"data":"\"{\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3ZDQ4OTlkOGUiLCJhdWQiOiJh
+⚡️  [log] - [Capgo] Current bundle: {"id":"builtin","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z","status":"success","checksum":""}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  To Native ->  App getLaunchUrl 25303583
+⚡️  To Native ->  App addListener 25303584
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setOverlaysWebView 25303585
+⚡️  To Native ->  StatusBar setStyle 25303586
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  To Native ->  CapacitorHttp request 25303587
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 25303588
+⚡️  TO JS undefined
+⚡️  TO JS {"status":200,"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=refresh_token","data":{"token_type":"bearer","access_token":"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3Znpj
+⚡️  To Native ->  SecureStorage internalSetItem 25303589
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  To Native ->  Network getStatus 25303590
+⚡️  To Native ->  Network addListener 25303591
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303592
+⚡️  To Native ->  Network getStatus 25303593
+⚡️  To Native ->  Network addListener 25303594
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303595
+⚡️  [log] - [Offline] Saved 1 projects to IndexedDB (once per session)
+⚡️  To Native ->  Network getStatus 25303596
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 25303597
+⚡️  To Native ->  Network removeListener 25303598
+⚡️  To Native ->  Network getStatus 25303599
+⚡️  To Native ->  Network addListener 25303600
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303601
+⚡️  To Native ->  Network getStatus 25303602
+⚡️  To Native ->  Network addListener 25303603
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303604
+⚡️  To Native ->  Network getStatus 25303605
+⚡️  To Native ->  Network addListener 25303606
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303607
+⚡️  To Native ->  Network getStatus 25303608
+⚡️  To Native ->  Network addListener 25303609
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303610
+⚡️  To Native ->  Network getStatus 25303611
+⚡️  To Native ->  Network addListener 25303612
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303613
+⚡️  To Native ->  Network getStatus 25303614
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 25303615
+⚡️  To Native ->  Network removeListener 25303616
+⚡️  To Native ->  Network getStatus 25303617
+⚡️  To Native ->  Network addListener 25303618
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303619
+⚡️  To Native ->  Network getStatus 25303620
+⚡️  To Native ->  Network addListener 25303621
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303622
+⚡️  To Native ->  Network getStatus 25303623
+⚡️  To Native ->  Network addListener 25303624
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303625
+⚡️  To Native ->  Network getStatus 25303626
+⚡️  To Native ->  Network addListener 25303627
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303628
+⚡️  To Native ->  Network getStatus 25303629
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 25303630
+⚡️  To Native ->  Network removeListener 25303631
+⚡️  To Native ->  Network getStatus 25303632
+⚡️  To Native ->  Network addListener 25303633
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303634
+⚡️  To Native ->  Network getStatus 25303635
+⚡️  To Native ->  Network addListener 25303636
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303637
+⚡️  To Native ->  Network getStatus 25303638
+⚡️  To Native ->  Network addListener 25303639
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303640
+⚡️  To Native ->  Network getStatus 25303641
+⚡️  To Native ->  Network addListener 25303642
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303643
+⚡️  To Native ->  Network getStatus 25303644
+⚡️  To Native ->  Network addListener 25303645
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303646
+⚡️  To Native ->  Network getStatus 25303647
+⚡️  To Native ->  Network addListener 25303648
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303649
+⚡️  To Native ->  Network getStatus 25303650
+⚡️  To Native ->  Network addListener 25303651
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303652
+⚡️  To Native ->  Network getStatus 25303653
+⚡️  To Native ->  Network addListener 25303654
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303655
+⚡️  To Native ->  Network getStatus 25303656
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 25303657
+⚡️  To Native ->  Network removeListener 25303658
+⚡️  To Native ->  Network getStatus 25303659
+⚡️  To Native ->  Network addListener 25303660
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303661
+⚡️  To Native ->  Network getStatus 25303662
+⚡️  To Native ->  Network addListener 25303663
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303664
+⚡️  To Native ->  Network getStatus 25303665
+⚡️  To Native ->  Network addListener 25303666
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303667
+⚡️  To Native ->  Network getStatus 25303668
+⚡️  To Native ->  Network addListener 25303669
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303670
+⚡️  To Native ->  Network getStatus 25303671
+⚡️  To Native ->  Network addListener 25303672
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303673
+⚡️  To Native ->  Network getStatus 25303674
+⚡️  To Native ->  Network addListener 25303675
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303676
+⚡️  To Native ->  Network getStatus 25303677
+⚡️  To Native ->  Network addListener 25303678
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303679
+⚡️  To Native ->  Network getStatus 25303680
+⚡️  To Native ->  Network addListener 25303681
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303682
+⚡️  To Native ->  Network getStatus 25303683
+⚡️  To Native ->  Network addListener 25303684
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303685
+⚡️  To Native ->  Network getStatus 25303686
+⚡️  To Native ->  Network addListener 25303687
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303688
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  To Native ->  Network getStatus 25303689
+⚡️  To Native ->  Network addListener 25303690
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303691
+⚡️  To Native ->  Network getStatus 25303692
+⚡️  To Native ->  Network addListener 25303693
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303694
+⚡️  To Native ->  Network getStatus 25303695
+⚡️  To Native ->  Network addListener 25303696
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303697
+⚡️  To Native ->  Network getStatus 25303698
+⚡️  To Native ->  Network addListener 25303699
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303700
+⚡️  To Native ->  Network getStatus 25303701
+⚡️  To Native ->  Network addListener 25303702
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303703
+⚡️  To Native ->  Network getStatus 25303704
+⚡️  To Native ->  Network addListener 25303705
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303706
+⚡️  To Native ->  Network getStatus 25303707
+⚡️  To Native ->  Network addListener 25303708
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303709
+⚡️  To Native ->  Network getStatus 25303710
+⚡️  To Native ->  Network addListener 25303711
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303712
+⚡️  To Native ->  Network getStatus 25303713
+⚡️  To Native ->  Network addListener 25303714
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303715
+⚡️  To Native ->  Network getStatus 25303716
+⚡️  To Native ->  Network addListener 25303717
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303718
+⚡️  To Native ->  Network getStatus 25303719
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network addListener 25303720
+⚡️  To Native ->  Network removeListener 25303721
+⚡️  To Native ->  Network getStatus 25303722
+⚡️  To Native ->  Network addListener 25303723
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303724
+⚡️  To Native ->  Network getStatus 25303725
+⚡️  To Native ->  Network addListener 25303726
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303727
+⚡️  To Native ->  Network getStatus 25303728
+⚡️  To Native ->  Network addListener 25303729
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303730
+⚡️  To Native ->  Network getStatus 25303731
+⚡️  To Native ->  Network addListener 25303732
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303733
+⚡️  To Native ->  Network getStatus 25303734
+⚡️  To Native ->  Network addListener 25303735
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303736
+⚡️  To Native ->  Network getStatus 25303737
+⚡️  To Native ->  Network addListener 25303738
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303739
+⚡️  To Native ->  Network getStatus 25303740
+⚡️  To Native ->  Network addListener 25303741
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303742
+⚡️  To Native ->  Network getStatus 25303743
+⚡️  To Native ->  Network addListener 25303744
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303745
+⚡️  To Native ->  Network getStatus 25303746
+⚡️  To Native ->  Network addListener 25303747
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303748
+⚡️  To Native ->  Network getStatus 25303749
+⚡️  To Native ->  Network addListener 25303750
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303751
+⚡️  To Native ->  Network getStatus 25303752
+⚡️  To Native ->  Network addListener 25303753
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303754
+⚡️  To Native ->  Network getStatus 25303755
+⚡️  To Native ->  Network addListener 25303756
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303757
+⚡️  To Native ->  Network getStatus 25303758
+⚡️  To Native ->  Network addListener 25303759
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303760
+⚡️  To Native ->  Network getStatus 25303761
+⚡️  To Native ->  Network addListener 25303762
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303763
+⚡️  To Native ->  Network getStatus 25303764
+⚡️  To Native ->  Network addListener 25303765
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303766
+⚡️  To Native ->  Network getStatus 25303767
+⚡️  To Native ->  Network addListener 25303768
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303769
+⚡️  To Native ->  Network getStatus 25303770
+⚡️  To Native ->  Network addListener 25303771
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303772
+⚡️  To Native ->  Network getStatus 25303773
+⚡️  To Native ->  Network addListener 25303774
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303775
+⚡️  To Native ->  Network getStatus 25303776
+⚡️  To Native ->  Network addListener 25303777
+⚡️  TO JS {"connectionType":"wifi","connected":true}
+⚡️  To Native ->  Network removeListener 25303778
+⚡️  To Native ->  Network getStatus 25303779
+⚡️  To Native ->  Network addListener 25303780
+⚡️  To Native ->  Network removeListener ⚡️  TO JS {"connectionType":"wifi","connected":true}
+25303781
+⚡️  To Native ->  Network getStatus 25303782
+⚡️  To Native ->  Network addListener 25303783
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303784
+⚡️  To Native ->  Network getStatus 25303785
+⚡️  To Native ->  Network addListener 25303786
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303787
+⚡️  To Native ->  Network getStatus 25303788
+⚡️  To Native ->  Network addListener 25303789
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303790
+⚡️  To Native ->  Network getStatus 25303791
+⚡️  To Native ->  Network addListener 25303792
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303793
+⚡️  To Native ->  Network getStatus 25303794
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 25303795
+⚡️  To Native ->  Network removeListener 25303796
+⚡️  To Native ->  Network getStatus 25303797
+⚡️  To Native ->  Network addListener 25303798
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303799
+⚡️  To Native ->  Network getStatus 25303800
+⚡️  To Native ->  Network addListener 25303801
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303802
+⚡️  To Native ->  Network getStatus 25303803
+⚡️  To Native ->  Network addListener 25303804
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303805
+⚡️  To Native ->  Network getStatus 25303806
+⚡️  To Native ->  Network addListener 25303807
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303808
+⚡️  To Native ->  Network getStatus 25303809
+⚡️  To Native ->  Network addListener 25303810
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303811
+⚡️  To Native ->  Network getStatus 25303812
+⚡️  To Native ->  Network addListener 25303813
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303814
+⚡️  To Native ->  Network getStatus 25303815
+⚡️  To Native ->  Network addListener 25303816
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303817
+⚡️  To Native ->  Network getStatus 25303818
+⚡️  To Native ->  Network addListener 25303819
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303820
+⚡️  To Native ->  Network getStatus 25303821
+⚡️  To Native ->  Network addListener 25303822
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303823
+⚡️  To Native ->  Network getStatus 25303824
+⚡️  To Native ->  Network addListener 25303825
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303826
+⚡️  To Native ->  Network getStatus 25303827
+⚡️  To Native ->  Network addListener 25303828
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303829
+⚡️  To Native ->  Network getStatus 25303830
+⚡️  To Native ->  Network addListener 25303831
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303832
+⚡️  To Native ->  Network getStatus 25303833
+⚡️  To Native ->  Network addListener 25303834
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303835
+⚡️  To Native ->  Network getStatus 25303836
+⚡️  To Native ->  Network addListener 25303837
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303838
+⚡️  To Native ->  Network getStatus 25303839
+⚡️  To Native ->  Network addListener 25303840
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303841
+⚡️  To Native ->  Network getStatus 25303842
+⚡️  To Native ->  Network addListener 25303843
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303844
+⚡️  To Native ->  Network getStatus 25303845
+⚡️  To Native ->  Network addListener 25303846
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303847
+⚡️  To Native ->  Network getStatus 25303848
+⚡️  To Native ->  Network addListener 25303849
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303850
+⚡️  To Native ->  Network getStatus 25303851
+⚡️  To Native ->  Network addListener 25303852
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303853
+⚡️  To Native ->  Network getStatus 25303854
+⚡️  To Native ->  Network addListener 25303855
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303856
+⚡️  To Native ->  Network getStatus 25303857
+⚡️  To Native ->  Network addListener 25303858
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303859
+⚡️  To Native ->  Network getStatus 25303860
+⚡️  To Native ->  Network addListener 25303861
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303862
+⚡️  To Native ->  Network getStatus 25303863
+⚡️  To Native ->  Network addListener 25303864
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303865
+⚡️  To Native ->  Network getStatus 25303866
+⚡️  To Native ->  Network addListener 25303867
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303868
+⚡️  To Native ->  Network getStatus 25303869
+⚡️  To Native ->  Network addListener 25303870
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303871
+⚡️  To Native ->  Network getStatus 25303872
+⚡️  To Native ->  Network addListener 25303873
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303874
+⚡️  To Native ->  Network getStatus 25303875
+⚡️  To Native ->  Network addListener 25303876
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303877
+⚡️  To Native ->  Network getStatus 25303878
+⚡️  To Native ->  Network addListener 25303879
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303880
+⚡️  To Native ->  Network getStatus 25303881
+⚡️  To Native ->  Network addListener 25303882
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303883
+⚡️  To Native ->  Network getStatus 25303884
+⚡️  To Native ->  Network addListener 25303885
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303886
+⚡️  To Native ->  Network getStatus 25303887
+⚡️  To Native ->  Network addListener 25303888
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303889
+⚡️  To Native ->  Network getStatus 25303890
+⚡️  To Native ->  Network addListener 25303891
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303892
+⚡️  To Native ->  Network getStatus 25303893
+⚡️  To Native ->  Network addListener 25303894
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303895
+⚡️  To Native ->  Network getStatus 25303896
+⚡️  To Native ->  Network addListener 25303897
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303898
+⚡️  To Native ->  Network getStatus 25303899
+⚡️  To Native ->  Network addListener 25303900
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303901
+⚡️  To Native ->  Network getStatus 25303902
+⚡️  To Native ->  Network addListener 25303903
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303904
+⚡️  To Native ->  Network getStatus 25303905
+⚡️  To Native ->  Network addListener 25303906
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303907
+⚡️  To Native ->  Network getStatus 25303908
+⚡️  To Native ->  Network addListener 25303909
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303910
+⚡️  To Native ->  Network getStatus 25303911
+⚡️  To Native ->  Network addListener 25303912
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303913
+⚡️  To Native ->  Network getStatus 25303914
+⚡️  To Native ->  Network addListener 25303915
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303916
+⚡️  To Native ->  Network getStatus 25303917
+⚡️  To Native ->  Network addListener 25303918
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303919
+⚡️  To Native ->  Network getStatus 25303920
+⚡️  To Native ->  Network addListener 25303921
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303922
+⚡️  To Native ->  Network getStatus 25303923
+⚡️  To Native ->  Network addListener 25303924
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303925
+⚡️  To Native ->  Network getStatus 25303926
+⚡️  To Native ->  Network addListener 25303927
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303928
+⚡️  To Native ->  Network getStatus 25303929
+⚡️  To Native ->  Network addListener 25303930
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303931
+⚡️  To Native ->  Network getStatus 25303932
+⚡️  To Native ->  Network addListener 25303933
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303934
+⚡️  To Native ->  Network getStatus 25303935
+⚡️  To Native ->  Network addListener 25303936
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303937
+⚡️  To Native ->  Network getStatus 25303938
+⚡️  To Native ->  Network addListener 25303939
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303940
+⚡️  To Native ->  Network getStatus 25303941
+⚡️  To Native ->  Network addListener 25303942
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303943
+⚡️  To Native ->  Network getStatus 25303944
+⚡️  To Native ->  Network addListener 25303945
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303946
+⚡️  To Native ->  Network getStatus 25303947
+⚡️  To Native ->  Network addListener 25303948
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303949
+⚡️  To Native ->  Network getStatus 25303950
+⚡️  To Native ->  Network addListener 25303951
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303952
+⚡️  To Native ->  Network getStatus 25303953
+⚡️  To Native ->  Network addListener 25303954
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303955
+⚡️  To Native ->  Network getStatus 25303956
+⚡️  To Native ->  Network addListener 25303957
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303958
+⚡️  To Native ->  Network getStatus 25303959
+⚡️  To Native ->  Network addListener 25303960
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303961
+⚡️  To Native ->  Network getStatus 25303962
+⚡️  To Native ->  Network addListener 25303963
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303964
+⚡️  To Native ->  Network getStatus 25303965
+⚡️  To Native ->  Network addListener 25303966
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303967
+⚡️  To Native ->  Network getStatus 25303968
+⚡️  To Native ->  Network addListener 25303969
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303970
+⚡️  To Native ->  Network getStatus 25303971
+⚡️  To Native ->  Network addListener 25303972
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303973
+⚡️  To Native ->  Network getStatus 25303974
+⚡️  To Native ->  Network addListener 25303975
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303976
+⚡️  To Native ->  Network getStatus 25303977
+⚡️  To Native ->  Network addListener 25303978
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303979
+⚡️  To Native ->  Network getStatus 25303980
+⚡️  To Native ->  Network addListener 25303981
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303982
+⚡️  To Native ->  Network getStatus 25303983
+⚡️  To Native ->  Network addListener 25303984
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303985
+⚡️  To Native ->  Network getStatus 25303986
+⚡️  To Native ->  Network addListener 25303987
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303988
+⚡️  To Native ->  Network getStatus 25303989
+⚡️  To Native ->  Network addListener 25303990
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303991
+⚡️  To Native ->  Network getStatus 25303992
+⚡️  To Native ->  Network addListener 25303993
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303994
+⚡️  To Native ->  Network getStatus 25303995
+⚡️  To Native ->  Network addListener 25303996
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25303997
+⚡️  To Native ->  Network getStatus 25303998
+⚡️  To Native ->  Network addListener 25303999
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304000
+⚡️  To Native ->  Network getStatus 25304001
+⚡️  To Native ->  Network addListener 25304002
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304003
+⚡️  To Native ->  Network getStatus 25304004
+⚡️  To Native ->  Network addListener 25304005
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304006
+⚡️  To Native ->  Network getStatus 25304007
+⚡️  To Native ->  Network addListener 25304008
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304009
+⚡️  To Native ->  Network getStatus 25304010
+⚡️  To Native ->  Network addListener 25304011
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304012
+⚡️  To Native ->  Network getStatus 25304013
+⚡️  To Native ->  Network addListener 25304014
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304015
+⚡️  To Native ->  Network getStatus 25304016
+⚡️  To Native ->  Network addListener 25304017
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304018
+⚡️  To Native ->  Network getStatus 25304019
+⚡️  To Native ->  Network addListener 25304020
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304021
+⚡️  To Native ->  Network getStatus 25304022
+⚡️  To Native ->  Network addListener 25304023
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304024
+⚡️  To Native ->  Network getStatus 25304025
+⚡️  To Native ->  Network addListener 25304026
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304027
+⚡️  To Native ->  Network getStatus 25304028
+⚡️  To Native ->  Network addListener 25304029
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304030
+⚡️  To Native ->  Network getStatus 25304031
+⚡️  To Native ->  Network addListener 25304032
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304033
+⚡️  To Native ->  Network getStatus 25304034
+⚡️  To Native ->  Network addListener 25304035
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304036
+⚡️  To Native ->  Network getStatus 25304037
+⚡️  To Native ->  Network addListener 25304038
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304039
+⚡️  To Native ->  Network getStatus 25304040
+⚡️  To Native ->  Network addListener 25304041
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304042
+⚡️  To Native ->  Network getStatus 25304043
+⚡️  To Native ->  Network addListener 25304044
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304045
+⚡️  To Native ->  Network getStatus 25304046
+⚡️  To Native ->  Network addListener 25304047
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304048
+⚡️  To Native ->  Network getStatus 25304049
+⚡️  To Native ->  Network addListener 25304050
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304051
+⚡️  To Native ->  Network getStatus 25304052
+⚡️  To Native ->  Network addListener 25304053
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304054
+⚡️  To Native ->  Network getStatus 25304055
+⚡️  To Native ->  Network addListener 25304056
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304057
+⚡️  To Native ->  Network getStatus 25304058
+⚡️  To Native ->  Network addListener 25304059
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304060
+⚡️  To Native ->  Network getStatus 25304061
+⚡️  To Native ->  Network addListener 25304062
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304063
+⚡️  To Native ->  Network getStatus 25304064
+⚡️  To Native ->  Network addListener 25304065
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304066
+⚡️  To Native ->  Network getStatus 25304067
+⚡️  To Native ->  Network addListener 25304068
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304069
+⚡️  To Native ->  Network getStatus 25304070
+⚡️  To Native ->  Network addListener 25304071
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304072
+⚡️  To Native ->  Network getStatus 25304073
+⚡️  To Native ->  Network addListener 25304074
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304075
+⚡️  To Native ->  Network getStatus 25304076
+⚡️  To Native ->  Network addListener 25304077
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304078
+⚡️  To Native ->  Network getStatus 25304079
+⚡️  To Native ->  Network addListener 25304080
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304081
+⚡️  To Native ->  Network getStatus 25304082
+⚡️  To Native ->  Network addListener 25304083
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304084
+⚡️  To Native ->  Network getStatus 25304085
+⚡️  To Native ->  Network addListener 25304086
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304087
+⚡️  To Native ->  Network getStatus 25304088
+⚡️  To Native ->  Network addListener 25304089
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304090
+⚡️  To Native ->  Network getStatus 25304091
+⚡️  To Native ->  Network addListener 25304092
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304093
+⚡️  To Native ->  Network getStatus 25304094
+⚡️  To Native ->  Network addListener 25304095
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304096
+⚡️  To Native ->  Network getStatus 25304097
+⚡️  To Native ->  Network addListener 25304098
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304099
+⚡️  To Native ->  Network getStatus 25304100
+⚡️  To Native ->  Network addListener 25304101
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304102
+⚡️  To Native ->  Network getStatus 25304103
+⚡️  To Native ->  Network addListener 25304104
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304105
+⚡️  To Native ->  Network getStatus 25304106
+⚡️  To Native ->  Network addListener 25304107
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304108
+⚡️  To Native ->  Network getStatus 25304109
+⚡️  To Native ->  Network addListener 25304110
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304111
+⚡️  To Native ->  Network getStatus 25304112
+⚡️  To Native ->  Network addListener 25304113
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304114
+⚡️  To Native ->  Network getStatus 25304115
+⚡️  To Native ->  Network addListener 25304116
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304117
+⚡️  To Native ->  Network getStatus 25304118
+⚡️  To Native ->  Network addListener 25304119
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304120
+⚡️  To Native ->  Network getStatus 25304121
+⚡️  To Native ->  Network addListener 25304122
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304123
+⚡️  To Native ->  Network getStatus 25304124
+⚡️  To Native ->  Network addListener 25304125
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304126
+⚡️  To Native ->  Network getStatus 25304127
+⚡️  To Native ->  Network addListener 25304128
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304129
+⚡️  To Native ->  Network getStatus 25304130
+⚡️  To Native ->  Network addListener 25304131
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304132
+⚡️  To Native ->  Network getStatus 25304133
+⚡️  To Native ->  Network addListener 25304134
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304135
+⚡️  To Native ->  Network getStatus 25304136
+⚡️  To Native ->  Network addListener 25304137
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304138
+⚡️  To Native ->  Network getStatus 25304139
+⚡️  To Native ->  Network addListener 25304140
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304141
+⚡️  To Native ->  Network getStatus 25304142
+⚡️  To Native ->  Network addListener 25304143
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304144
+⚡️  To Native ->  Network getStatus 25304145
+⚡️  To Native ->  Network addListener 25304146
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304147
+⚡️  To Native ->  Network getStatus 25304148
+⚡️  To Native ->  Network addListener 25304149
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304150
+⚡️  To Native ->  Network getStatus 25304151
+⚡️  To Native ->  Network addListener 25304152
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304153
+⚡️  To Native ->  Network getStatus 25304154
+⚡️  To Native ->  Network addListener 25304155
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304156
+⚡️  To Native ->  Network getStatus 25304157
+⚡️  To Native ->  Network addListener 25304158
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304159
+⚡️  To Native ->  Network getStatus 25304160
+⚡️  To Native ->  Network addListener 25304161
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304162
+⚡️  To Native ->  Network getStatus 25304163
+⚡️  To Native ->  Network addListener 25304164
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304165
+⚡️  To Native ->  Network getStatus 25304166
+⚡️  To Native ->  Network addListener 25304167
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304168
+⚡️  To Native ->  Network getStatus 25304169
+⚡️  To Native ->  Network addListener 25304170
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304171
+⚡️  To Native ->  Network getStatus 25304172
+⚡️  To Native ->  Network addListener 25304173
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304174
+⚡️  To Native ->  Network getStatus 25304175
+⚡️  To Native ->  Network addListener 25304176
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304177
+⚡️  To Native ->  Network getStatus 25304178
+⚡️  To Native ->  Network addListener 25304179
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304180
+⚡️  To Native ->  Network getStatus 25304181
+⚡️  To Native ->  Network addListener 25304182
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304183
+⚡️  To Native ->  Network getStatus 25304184
+⚡️  To Native ->  Network addListener 25304185
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304186
+⚡️  To Native ->  Network getStatus 25304187
+⚡️  To Native ->  Network addListener 25304188
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304189
+⚡️  To Native ->  Network getStatus 25304190
+⚡️  To Native ->  Network addListener 25304191
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304192
+⚡️  To Native ->  Network getStatus 25304193
+⚡️  To Native ->  Network addListener 25304194
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304195
+⚡️  To Native ->  Network getStatus 25304196
+⚡️  To Native ->  Network addListener 25304197
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304198
+⚡️  To Native ->  Network getStatus 25304199
+⚡️  To Native ->  Network addListener 25304200
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304201
+⚡️  To Native ->  Network getStatus 25304202
+⚡️  To Native ->  Network addListener 25304203
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304204
+⚡️  To Native ->  Network getStatus 25304205
+⚡️  To Native ->  Network addListener 25304206
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304207
+⚡️  To Native ->  Network getStatus 25304208
+⚡️  To Native ->  Network addListener 25304209
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304210
+⚡️  To Native ->  Network getStatus 25304211
+⚡️  To Native ->  Network addListener 25304212
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304213
+⚡️  To Native ->  Network getStatus 25304214
+⚡️  To Native ->  Network addListener 25304215
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304216
+⚡️  To Native ->  Network getStatus 25304217
+⚡️  To Native ->  Network addListener 25304218
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304219
+⚡️  To Native ->  Network getStatus 25304220
+⚡️  To Native ->  Network addListener 25304221
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304222
+⚡️  To Native ->  Network getStatus 25304223
+⚡️  To Native ->  Network addListener 25304224
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304225
+⚡️  To Native ->  Network getStatus 25304226
+⚡️  To Native ->  Network addListener 25304227
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304228
+⚡️  To Native ->  Network getStatus 25304229
+⚡️  To Native ->  Network addListener 25304230
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304231
+⚡️  To Native ->  Network getStatus 25304232
+⚡️  To Native ->  Network addListener 25304233
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304234
+⚡️  To Native ->  Network getStatus 25304235
+⚡️  To Native ->  Network addListener 25304236
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304237
+⚡️  To Native ->  Network getStatus 25304238
+⚡️  To Native ->  Network addListener 25304239
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304240
+⚡️  To Native ->  Network getStatus 25304241
+⚡️  To Native ->  Network addListener 25304242
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304243
+⚡️  To Native ->  Network getStatus 25304244
+⚡️  To Native ->  Network addListener 25304245
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304246
+⚡️  To Native ->  Network getStatus 25304247
+⚡️  To Native ->  Network addListener 25304248
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304249
+⚡️  To Native ->  Network getStatus 25304250
+⚡️  To Native ->  Network addListener 25304251
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304252
+⚡️  To Native ->  Network getStatus 25304253
+⚡️  To Native ->  Network addListener 25304254
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304255
+⚡️  To Native ->  Network getStatus 25304256
+⚡️  To Native ->  Network addListener 25304257
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304258
+⚡️  To Native ->  Network getStatus 25304259
+⚡️  To Native ->  Network addListener 25304260
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304261
+⚡️  To Native ->  Network getStatus 25304262
+⚡️  To Native ->  Network addListener 25304263
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304264
+⚡️  To Native ->  Network getStatus 25304265
+⚡️  To Native ->  Network addListener 25304266
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304267
+⚡️  To Native ->  Network getStatus 25304268
+⚡️  To Native ->  Network addListener 25304269
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304270
+⚡️  To Native ->  Network getStatus 25304271
+⚡️  To Native ->  Network addListener 25304272
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304273
+⚡️  To Native ->  Network getStatus 25304274
+⚡️  To Native ->  Network addListener 25304275
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304276
+⚡️  To Native ->  Network getStatus 25304277
+⚡️  To Native ->  Network addListener 25304278
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304279
+⚡️  To Native ->  Network getStatus 25304280
+⚡️  To Native ->  Network addListener 25304281
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304282
+⚡️  To Native ->  Network getStatus 25304283
+⚡️  To Native ->  Network addListener 25304284
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304285
+⚡️  To Native ->  Network getStatus 25304286
+⚡️  To Native ->  Network addListener 25304287
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304288
+⚡️  To Native ->  Network getStatus 25304289
+⚡️  To Native ->  Network addListener 25304290
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304291
+⚡️  To Native ->  Network getStatus 25304292
+⚡️  To Native ->  Network addListener 25304293
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304294
+⚡️  To Native ->  Network getStatus 25304295
+⚡️  To Native ->  Network addListener 25304296
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304297
+⚡️  To Native ->  Network getStatus 25304298
+⚡️  To Native ->  Network addListener 25304299
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304300
+⚡️  To Native ->  Network getStatus 25304301
+⚡️  To Native ->  Network addListener 25304302
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304303
+⚡️  To Native ->  Network getStatus 25304304
+⚡️  To Native ->  Network addListener 25304305
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304306
+⚡️  To Native ->  Network getStatus 25304307
+⚡️  To Native ->  Network addListener 25304308
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304309
+⚡️  To Native ->  Network getStatus 25304310
+⚡️  To Native ->  Network addListener 25304311
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304312
+⚡️  To Native ->  Network getStatus 25304313
+⚡️  To Native ->  Network addListener 25304314
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304315
+⚡️  To Native ->  Network getStatus 25304316
+⚡️  To Native ->  Network addListener 25304317
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304318
+⚡️  To Native ->  Network getStatus 25304319
+⚡️  To Native ->  Network addListener 25304320
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304321
+⚡️  To Native ->  Network getStatus 25304322
+⚡️  To Native ->  Network addListener 25304323
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304324
+⚡️  To Native ->  Network getStatus 25304325
+⚡️  To Native ->  Network addListener 25304326
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304327
+⚡️  To Native ->  Network getStatus 25304328
+⚡️  To Native ->  Network addListener 25304329
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304330
+⚡️  To Native ->  Network getStatus 25304331
+⚡️  To Native ->  Network addListener 25304332
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304333
+⚡️  To Native ->  Network getStatus 25304334
+⚡️  To Native ->  Network addListener 25304335
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304336
+⚡️  To Native ->  Network getStatus 25304337
+⚡️  To Native ->  Network addListener 25304338
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304339
+⚡️  To Native ->  Network getStatus 25304340
+⚡️  To Native ->  Network addListener 25304341
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304342
+⚡️  To Native ->  Network getStatus 25304343
+⚡️  To Native ->  Network addListener 25304344
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304345
+⚡️  To Native ->  Network getStatus 25304346
+⚡️  To Native ->  Network addListener 25304347
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304348
+⚡️  To Native ->  Network getStatus 25304349
+⚡️  To Native ->  Network addListener 25304350
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304351
+⚡️  To Native ->  Network getStatus 25304352
+⚡️  To Native ->  Network addListener 25304353
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304354
+⚡️  To Native ->  Network getStatus 25304355
+⚡️  To Native ->  Network addListener 25304356
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304357
+⚡️  To Native ->  Network getStatus 25304358
+⚡️  To Native ->  Network addListener 25304359
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304360
+⚡️  To Native ->  Network getStatus 25304361
+⚡️  To Native ->  Network addListener 25304362
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304363
+⚡️  To Native ->  Network getStatus 25304364
+⚡️  To Native ->  Network addListener 25304365
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304366
+⚡️  To Native ->  Network getStatus 25304367
+⚡️  To Native ->  Network addListener 25304368
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304369
+⚡️  To Native ->  Network getStatus 25304370
+⚡️  To Native ->  Network addListener 25304371
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304372
+⚡️  To Native ->  Network getStatus 25304373
+⚡️  To Native ->  Network addListener 25304374
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304375
+⚡️  To Native ->  Network getStatus 25304376
+⚡️  To Native ->  Network addListener 25304377
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304378
+⚡️  To Native ->  Network getStatus 25304379
+⚡️  To Native ->  Network addListener 25304380
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304381
+⚡️  To Native ->  Network getStatus 25304382
+⚡️  To Native ->  Network addListener 25304383
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304384
+⚡️  To Native ->  Network getStatus 25304385
+⚡️  To Native ->  Network addListener 25304386
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304387
+⚡️  To Native ->  Network getStatus 25304388
+⚡️  To Native ->  Network addListener 25304389
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304390
+⚡️  To Native ->  Network getStatus 25304391
+⚡️  To Native ->  Network addListener 25304392
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304393
+⚡️  To Native ->  Network getStatus 25304394
+⚡️  To Native ->  Network addListener 25304395
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304396
+⚡️  To Native ->  Network getStatus 25304397
+⚡️  To Native ->  Network addListener 25304398
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304399
+⚡️  To Native ->  Network getStatus 25304400
+⚡️  To Native ->  Network addListener 25304401
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304402
+⚡️  To Native ->  Network getStatus 25304403
+⚡️  To Native ->  Network addListener 25304404
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304405
+⚡️  To Native ->  Network getStatus 25304406
+⚡️  To Native ->  Network addListener 25304407
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304408
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  To Native ->  Network getStatus 25304409
+⚡️  To Native ->  Network addListener 25304410
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304411
+⚡️  To Native ->  Network getStatus 25304412
+⚡️  To Native ->  Network addListener 25304413
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network removeListener 25304414
+⚡️  To Native ->  Network getStatus 25304415
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Network addListener 25304416
+⚡️  To Native ->  Network removeListener 25304417
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
