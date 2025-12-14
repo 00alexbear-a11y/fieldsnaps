@@ -594,7 +594,7 @@ export default function Settings() {
     <div className="flex flex-col h-full bg-background">
       {/* Sticky Header */}
       <div className="sticky top-0 z-50 bg-background border-b">
-        <div className="px-4 pt-safe-3 pb-3">
+        <div className="px-4 pt-1 pb-2">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Settings</h1>
             <Button
