@@ -19,6 +19,7 @@ import Activity from "./pages/Activity";
 import PhotoEdit from "./pages/PhotoEdit";
 import PhotoView from "./pages/PhotoView";
 import SyncStatus from "./pages/SyncStatus";
+import Uploads from "./pages/Uploads";
 import Trash from "./pages/Trash";
 import ShareView from "./pages/ShareView";
 import Map from "./pages/Map";
@@ -334,6 +335,7 @@ function AppContent() {
                 <Route path="/debug-console" component={GeofenceDebugConsole} />
                 <Route path="/help" component={Help} />
                 <Route path="/sync-status" component={SyncStatus} />
+                <Route path="/uploads" component={Uploads} />
                 <Route path="/trash" component={Trash} />
                 <Route path="/map" component={Map} />
                 <Route path="/todos" component={ToDos} />
