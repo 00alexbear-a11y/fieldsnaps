@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { haptics } from "@/lib/nativeHaptics";
 import type { ToDo, Project } from "@shared/schema";
 import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
+import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
 
 const createTodoSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -44,24 +45,32 @@ type TodoWithDetails = ToDo & {
 };
 
 type SmartList = 'today' | 'flagged' | 'assigned-to-me' | 'all' | 'completed';
+type ViewMode = 'month' | 'week' | 'day';
 
 export default function ToDos() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Read selected list from URL query params (managed by AppSidebar)
+  // Read selected list and view mode from URL query params
   const getSelectedList = (): SmartList => {
     const params = new URLSearchParams(window.location.search);
     return (params.get('list') || 'assigned-to-me') as SmartList;
   };
   
+  const getViewMode = (): ViewMode => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('view') || 'month') as ViewMode;
+  };
+  
   const [selectedList, setSelectedList] = useState<SmartList>(getSelectedList());
+  const [viewMode, setViewMode] = useState<ViewMode>(getViewMode());
   
   // Listen for filter changes from AppSidebar and browser history navigation
   useEffect(() => {
     const handleFilterChange = () => {
       setSelectedList(getSelectedList());
+      setViewMode(getViewMode());
     };
     
     // Listen for custom filterChange event from AppSidebar
@@ -1005,6 +1014,15 @@ export default function ToDos() {
 
           {/* Content */}
           <main className="flex-1 overflow-y-auto p-4 pb-20">
+            {/* Month View Calendar */}
+            {viewMode === 'month' && (
+              <InlineMonthCalendar
+                selectedDate={dateFilter}
+                taskCountByDate={taskCountByDate}
+                onSelectDay={setDateFilter}
+              />
+            )}
+
             {isLoading ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Loading tasks...</p>
