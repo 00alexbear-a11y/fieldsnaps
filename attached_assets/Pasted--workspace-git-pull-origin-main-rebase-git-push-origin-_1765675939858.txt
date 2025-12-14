@@ -1,0 +1,43 @@
+~/workspace$ git pull origin main --rebase && git push origin main
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+Current branch main is up to date.
+Enumerating objects: 23, done.
+Counting objects: 100% (23/23), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (17/17), done.
+Writing objects: 100% (17/17), 8.82 KiB | 8.82 MiB/s, done.
+Total 17 (delta 14), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (14/14), completed with 6 local objects.
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: 
+remote: - GITHUB PUSH PROTECTION
+remote:   —————————————————————————————————————————
+remote:     Resolve the following violations before pushing again
+remote: 
+remote:     - Push cannot contain secrets
+remote: 
+remote:     
+remote:      (?) Learn how to resolve a blocked push
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push
+remote:     
+remote:      (?) This repository does not have Secret Scanning enabled, but is eligible. Enable Secret Scanning to view and manage detected secrets.
+remote:      Visit the repository settings page, https://github.com/00alexbear-a11y/fieldsnaps/settings/security_analysis
+remote:     
+remote:     
+remote:       —— Google OAuth Access Token —————————————————————————
+remote:        locations:
+remote:          - commit: 2e8e05a4f09314cf741b3ab58f1f7d81a83f3492
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765674937605.txt:92
+remote:          - commit: 2e8e05a4f09314cf741b3ab58f1f7d81a83f3492
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765674937605.txt:114
+remote:     
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.
+remote:        https://github.com/00alexbear-a11y/fieldsnaps/security/secret-scanning/unblock-secret/36oaeO3SyvNY0poixyzG2tZ06XL
+remote:     
+remote: 
+remote: 
+To https://github.com/00alexbear-a11y/fieldsnaps.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/00alexbear-a11y/fieldsnaps.git'
+~/workspace$ 
