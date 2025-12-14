@@ -104,6 +104,7 @@ export default function ToDos() {
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
   const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
+  const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -175,12 +176,15 @@ export default function ToDos() {
   });
 
   // Filter todos based on selected smart list
-  // IMPORTANT: Keep todos that are animating (in animatingTasks) so the slide-out animation
+  // IMPORTANT: Keep todos that are animating (in animatingTasks or completingTasks) so animations
   // can play before they're removed from the DOM
   const filteredTodos = useMemo(() => {
     const now = startOfDay(new Date());
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Helper to check if task is in any animation phase
+    const isAnimating = (todoId: string) => animatingTasks.has(todoId) || completingTasks.has(todoId);
 
     let todos: TodoWithDetails[] = [];
     
@@ -188,20 +192,20 @@ export default function ToDos() {
       case 'today':
         todos = allTodos.filter(todo => {
           // Keep animating todos in the list so animation can play
-          if (animatingTasks.has(todo.id)) return true;
+          if (isAnimating(todo.id)) return true;
           if (todo.completed || !todo.dueDate) return false;
           const dueDate = new Date(todo.dueDate);
           return dueDate >= now && dueDate < tomorrow;
         });
         break;
       case 'flagged':
-        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || todo.flag);
+        todos = allTodos.filter(todo => isAnimating(todo.id) || todo.flag);
         break;
       case 'assigned-to-me':
-        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || (todo.assignedTo === user?.id && !todo.completed));
+        todos = allTodos.filter(todo => isAnimating(todo.id) || (todo.assignedTo === user?.id && !todo.completed));
         break;
       case 'all':
-        todos = allTodos.filter(todo => animatingTasks.has(todo.id) || !todo.completed);
+        todos = allTodos.filter(todo => isAnimating(todo.id) || !todo.completed);
         break;
       case 'completed':
         todos = allTodos.filter(todo => todo.completed);
@@ -215,7 +219,7 @@ export default function ToDos() {
       const filterDate = startOfDay(dateFilter);
       todos = todos.filter(todo => {
         // Keep animating todos even if they don't match date filter
-        if (animatingTasks.has(todo.id)) return true;
+        if (isAnimating(todo.id)) return true;
         if (!todo.dueDate) return false;
         const dueDate = startOfDay(new Date(todo.dueDate));
         return isSameDay(dueDate, filterDate);
@@ -223,7 +227,7 @@ export default function ToDos() {
     }
     
     return todos;
-  }, [allTodos, selectedList, user?.id, dateFilter, animatingTasks]);
+  }, [allTodos, selectedList, user?.id, dateFilter, animatingTasks, completingTasks]);
 
   // Calculate badge counts for all smart lists (from full dataset)
   const smartListCounts = useMemo(() => {
@@ -312,14 +316,14 @@ export default function ToDos() {
     queryKey: ['/api/companies/members'],
   });
 
-  // Complete todo mutation with slide-out animation
+  // Complete todo mutation with green checkmark + slide-out animation
   const completeMutation = useMutation({
     mutationFn: async (todoId: string) => {
       return apiRequest('POST', `/api/todos/${todoId}/complete`, {});
     },
     onMutate: async (todoId: string) => {
-      // Start slide-out animation
-      setAnimatingTasks(prev => new Set(prev).add(todoId));
+      // Phase 1: Start green checkmark animation (mark as completing)
+      setCompletingTasks(prev => new Set(prev).add(todoId));
       
       await queryClient.cancelQueries({ queryKey: ['/api/todos'] });
       
@@ -348,19 +352,35 @@ export default function ToDos() {
     onSuccess: (_, todoId) => {
       haptics.success();
       toast({ title: "Task completed!" });
-      // Wait for animation to complete before refreshing
+      
+      // Phase 2: After green checkmark shows (400ms), start slide-out animation
       setTimeout(() => {
-        setAnimatingTasks(prev => {
-          const next = new Set(prev);
-          next.delete(todoId);
-          return next;
-        });
-        queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
-      }, 500);
+        setAnimatingTasks(prev => new Set(prev).add(todoId));
+        
+        // Phase 3: After slide-out animation (500ms), clean up and refresh
+        setTimeout(() => {
+          setCompletingTasks(prev => {
+            const next = new Set(prev);
+            next.delete(todoId);
+            return next;
+          });
+          setAnimatingTasks(prev => {
+            const next = new Set(prev);
+            next.delete(todoId);
+            return next;
+          });
+          queryClient.invalidateQueries({ queryKey: ['/api/todos'] });
+        }, 500);
+      }, 400);
     },
     onError: (error, todoId, context) => {
       haptics.error();
-      // Clear animation state on error
+      // Clear all animation states on error
+      setCompletingTasks(prev => {
+        const next = new Set(prev);
+        next.delete(todoId);
+        return next;
+      });
       setAnimatingTasks(prev => {
         const next = new Set(prev);
         next.delete(todoId);
@@ -835,21 +855,30 @@ export default function ToDos() {
           data-testid={`card-todo-${todo.id}`}
         >
         <div className="flex gap-3">
-          {/* Left side - Checkbox */}
+          {/* Left side - Animated Checkbox */}
           <div className="flex-shrink-0 pt-0.5">
-            <Checkbox
-              checked={todo.completed}
-              onCheckedChange={(checked) => {
-                if (!checked && todo.completed) {
-                  toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
-                } else if (checked && !todo.completed) {
-                  completeMutation.mutate(todo.id);
-                }
-              }}
-              onClick={(e) => e.stopPropagation()}
-              className="h-5 w-5"
-              data-testid={`checkbox-todo-complete-${todo.id}`}
-            />
+            {completingTasks.has(todo.id) ? (
+              <div 
+                className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center animate-in zoom-in-50 duration-200"
+                data-testid={`checkbox-completing-${todo.id}`}
+              >
+                <Check className="h-4 w-4 text-white animate-in zoom-in-0 duration-300" strokeWidth={3} />
+              </div>
+            ) : (
+              <Checkbox
+                checked={todo.completed}
+                onCheckedChange={(checked) => {
+                  if (!checked && todo.completed) {
+                    toast({ title: "Cannot uncomplete tasks", variant: "destructive" });
+                  } else if (checked && !todo.completed) {
+                    completeMutation.mutate(todo.id);
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="h-5 w-5"
+                data-testid={`checkbox-todo-complete-${todo.id}`}
+              />
+            )}
           </div>
 
           {/* Photo thumbnail - larger, more prominent */}
