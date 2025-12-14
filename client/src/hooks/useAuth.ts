@@ -45,10 +45,10 @@ export function useAuth() {
         });
         
         if (session) {
-          // Use resetQueries to CLEAR cache (not just invalidate) - this ensures
-          // fresh data is loaded with proper loading state, preventing stale
-          // user data (e.g., missing companyId) from causing wrong routing
-          queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
+          // Use invalidateQueries instead of resetQueries to trigger a refetch
+          // resetQueries clears the cache but doesn't trigger refetch when enabled changes
+          console.log('[useAuth] Session found, invalidating user query to trigger fetch');
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         }
         
         // Register auth state change listener AFTER initialization completes
@@ -62,9 +62,12 @@ export function useAuth() {
             supabaseUser: user,
           }));
           
-          // Use resetQueries to CLEAR cache - prevents stale user data from
+          // Use invalidateQueries to trigger refetch - prevents stale user data from
           // causing incorrect onboarding/routing decisions
-          queryClient.resetQueries({ queryKey: ["/api/auth/user"] });
+          if (session) {
+            console.log('[useAuth] Session available after auth change, invalidating query');
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          }
         });
       } catch (error) {
         console.error('[useAuth] Initialization error:', error);
