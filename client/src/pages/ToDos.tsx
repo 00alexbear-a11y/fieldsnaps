@@ -22,8 +22,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { haptics } from "@/lib/nativeHaptics";
-import type { ToDo, Project } from "@shared/schema";
+import type { ToDo, Project, Subtask } from "@shared/schema";
 import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
+import { Trash2, ListChecks } from "lucide-react";
 import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
 import { InlineWeekCalendar } from "@/components/InlineWeekCalendar";
 import { InlineDayHeader } from "@/components/InlineDayHeader";
@@ -106,6 +107,7 @@ export default function ToDos() {
   const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle photo attachment from camera
@@ -534,6 +536,64 @@ export default function ToDos() {
     onError: () => {
       haptics.error();
       toast({ title: "Failed to update task", variant: "destructive" });
+    },
+  });
+
+  // Subtasks query - fetch when a todo is selected for details
+  // Uses default fetcher which builds URL from queryKey segments: ['/api/todos', id, 'subtasks'] -> /api/todos/{id}/subtasks
+  const todoIdForSubtasks = selectedTodoForDetails?.id;
+  const { data: subtasks = [], isLoading: subtasksLoading } = useQuery<Subtask[]>({
+    queryKey: todoIdForSubtasks ? ['/api/todos', todoIdForSubtasks, 'subtasks'] : ['subtasks-disabled'],
+    enabled: !!todoIdForSubtasks,
+  });
+
+  // Create subtask mutation
+  const createSubtaskMutation = useMutation({
+    mutationFn: async ({ todoId, title }: { todoId: string; title: string }) => {
+      return apiRequest('POST', `/api/todos/${todoId}/subtasks`, { title });
+    },
+    onSuccess: (_, variables) => {
+      haptics.light();
+      queryClient.invalidateQueries({ queryKey: ['/api/todos', variables.todoId, 'subtasks'] });
+      setNewSubtaskTitle('');
+    },
+    onError: () => {
+      haptics.error();
+      toast({ title: "Failed to add subtask", variant: "destructive" });
+    },
+  });
+
+  // Complete subtask mutation
+  const completeSubtaskMutation = useMutation({
+    mutationFn: async (subtaskId: string) => {
+      return apiRequest('POST', `/api/subtasks/${subtaskId}/complete`, {});
+    },
+    onSuccess: () => {
+      haptics.light();
+      if (todoIdForSubtasks) {
+        queryClient.invalidateQueries({ queryKey: ['/api/todos', todoIdForSubtasks, 'subtasks'] });
+      }
+    },
+    onError: () => {
+      haptics.error();
+      toast({ title: "Failed to update subtask", variant: "destructive" });
+    },
+  });
+
+  // Delete subtask mutation
+  const deleteSubtaskMutation = useMutation({
+    mutationFn: async (subtaskId: string) => {
+      return apiRequest('DELETE', `/api/subtasks/${subtaskId}`, {});
+    },
+    onSuccess: () => {
+      haptics.warning();
+      if (todoIdForSubtasks) {
+        queryClient.invalidateQueries({ queryKey: ['/api/todos', todoIdForSubtasks, 'subtasks'] });
+      }
+    },
+    onError: () => {
+      haptics.error();
+      toast({ title: "Failed to delete subtask", variant: "destructive" });
     },
   });
 
@@ -1449,6 +1509,93 @@ export default function ToDos() {
                 )}
               </div>
               
+              {/* Subtasks Section */}
+              <div className="pt-4 border-t">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <ListChecks className="w-4 h-4" />
+                    Subtasks
+                    {subtasks.length > 0 && (
+                      <span className="text-xs text-muted-foreground font-normal">
+                        ({subtasks.filter(s => s.completed).length}/{subtasks.length})
+                      </span>
+                    )}
+                  </h3>
+                </div>
+                
+                {/* Add subtask input */}
+                <div className="flex gap-2 mb-3">
+                  <Input
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    placeholder="Add a subtask..."
+                    className="flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newSubtaskTitle.trim() && selectedTodoForDetails) {
+                        e.preventDefault();
+                        createSubtaskMutation.mutate({ 
+                          todoId: selectedTodoForDetails.id, 
+                          title: newSubtaskTitle.trim() 
+                        });
+                      }
+                    }}
+                    data-testid="input-new-subtask"
+                  />
+                  <Button
+                    size="icon"
+                    onClick={() => {
+                      if (newSubtaskTitle.trim() && selectedTodoForDetails) {
+                        createSubtaskMutation.mutate({ 
+                          todoId: selectedTodoForDetails.id, 
+                          title: newSubtaskTitle.trim() 
+                        });
+                      }
+                    }}
+                    disabled={!newSubtaskTitle.trim() || createSubtaskMutation.isPending}
+                    data-testid="button-add-subtask"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                {/* Subtasks list */}
+                {subtasksLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading subtasks...</p>
+                ) : subtasks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No subtasks yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {subtasks.map((subtask) => (
+                      <div 
+                        key={subtask.id} 
+                        className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 group"
+                        data-testid={`subtask-item-${subtask.id}`}
+                      >
+                        <Checkbox
+                          checked={subtask.completed}
+                          onCheckedChange={() => completeSubtaskMutation.mutate(subtask.id)}
+                          className="flex-shrink-0"
+                          data-testid={`checkbox-subtask-${subtask.id}`}
+                        />
+                        <span className={`flex-1 text-sm ${subtask.completed ? 'line-through text-muted-foreground' : ''}`}>
+                          {subtask.title}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => deleteSubtaskMutation.mutate(subtask.id)}
+                          disabled={deleteSubtaskMutation.isPending}
+                          data-testid={`button-delete-subtask-${subtask.id}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="pt-4 border-t">
                 <h3 className="text-sm font-semibold mb-2">Notes</h3>
                 <Textarea
