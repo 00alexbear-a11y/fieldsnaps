@@ -127,12 +127,16 @@ export default function Projects() {
   const { data: favoriteProjectIds = [] } = useQuery<string[]>({
     queryKey: ['/api/user/favorite-projects'],
     enabled: isOnline,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // Fetch user's recent project IDs (Phase 3.4)
   const { data: recentProjectIds = [] } = useQuery<string[]>({
     queryKey: ['/api/user/recent-projects'],
     enabled: isOnline,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   // Load sync status on mount and when online status changes
