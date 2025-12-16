@@ -191,7 +191,7 @@ function Sidebar({
           data-slot="sidebar"
           data-mobile="true"
           hideOverlay={true}
-          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden !rounded-tr-2xl !rounded-br-2xl !rounded-tl-none border-r border-border shadow-lg"
+          className="bg-sidebar text-sidebar-foreground w-[var(--sidebar-width)] p-0 [&>button]:hidden border-r-0 shadow-xl"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
