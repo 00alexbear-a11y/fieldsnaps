@@ -1,0 +1,60 @@
+■  ❌ No development environment detected
+│
+│
+●  📱 To develop mobile apps with Capacitor, you need:
+│
+●     • For iOS: Xcode (macOS only) - https://developer.apple.com/xcode/
+│
+●     • For Android: Android Studio - https://developer.android.com/studio
+│
+│
+◇  Continue onboarding without a development environment? (You won't be able to build or test)
+│  Yes
+│
+▲  ⚠️  Continuing without development environment - you'll need to set it up later
+│
+◇  Add com.fieldsnaps.app in Capgo?
+│  No
+│
+●  If you change your mind, run it for yourself with: "npx @capgo/cli@latest app add com.fieldsnaps.app"
+│
+◇  Create default channel production for com.fieldsnaps.app in Capgo?
+│  Yes
+│
+◑  Running: npx @capgo/cli@latest channel add production com.fieldsnaps.app --defaultError: App com.fieldsnaps.app does not exist, run first `npx @capgo/cli app add com.fieldsnaps.app` to create it
+    at Me (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:171:2632)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async wy (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:226:832)
+    at async Y7 (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:286:324)
+    at async t.s2 (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:329:2236)
+    at async t.parseAsync (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:17:4207)
+│
+■  Error during onboarding.
+│   if the error persists please contact support@capgo.app
+│   Or use manual installation: https://capgo.app/docs/getting-started/add-an-app/
+■  Canceled
+~/workspace$ npx @capgo/cli@latest app add com.fieldsnaps.app
+┌  Adding
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Using the organization "Alex organization" as the app owner
+│
+●  Adding com.fieldsnaps.app to Capgo
+│
+▲  Cannot find app icon in any of the following locations: resources/icon.png, assets/icon.png
+│
+◆  App com.fieldsnaps.app added to Capgo. You can upload a bundle now
+│
+└  Done ✅
+
+~/workspace$ npx @capgo/cli@latest channel add production com.fieldsnaps.app --default
+┌  Create channel
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Creating channel com.fieldsnaps.app#production to Capgo
+│
+◆  Channel created ✅
+│
+└  Done ✅
