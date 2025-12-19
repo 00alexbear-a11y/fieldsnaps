@@ -104,9 +104,9 @@ export function MobileDialog({
         }}
       >
         {/* Header - not scrollable */}
-        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0 relative">
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0 relative text-center">
+          <DialogTitle className="text-center">{title}</DialogTitle>
+          {description && <DialogDescription className="text-center">{description}</DialogDescription>}
           {showCloseButton && dismissible && (
             <Button
               variant="ghost"

@@ -65,7 +65,7 @@ export default function ToDos() {
   
   const getViewMode = (): ViewMode => {
     const params = new URLSearchParams(window.location.search);
-    return (params.get('view') || 'month') as ViewMode;
+    return (params.get('view') || 'week') as ViewMode;
   };
   
   const [selectedList, setSelectedList] = useState<SmartList>(getSelectedList());
