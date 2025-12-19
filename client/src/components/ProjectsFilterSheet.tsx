@@ -92,7 +92,7 @@ export function ProjectsFilterSheet({ open, onOpenChange }: ProjectsFilterSheetP
           <DrawerTitle>Filter & Sort</DrawerTitle>
         </DrawerHeader>
 
-        <div className="px-4 pb-8 space-y-6 overflow-y-auto">
+        <div className="px-4 pb-24 space-y-6 overflow-y-auto">
           <div>
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
               Smart Views

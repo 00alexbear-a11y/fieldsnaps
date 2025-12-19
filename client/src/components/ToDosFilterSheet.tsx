@@ -35,7 +35,7 @@ export function ToDosFilterSheet({ open, onOpenChange, counts }: ToDosFilterShee
     const params = new URLSearchParams(window.location.search);
     return {
       currentList: (params.get('list') || 'assigned-to-me') as SmartList,
-      currentView: (params.get('view') || 'month') as ViewMode,
+      currentView: (params.get('view') || 'week') as ViewMode,
       currentSort: (params.get('sort') || 'due-date') as SortOption,
       currentProject: params.get('project') || 'all',
       showCompleted: params.get('showCompleted') === 'true',
@@ -112,7 +112,7 @@ export function ToDosFilterSheet({ open, onOpenChange, counts }: ToDosFilterShee
           <DrawerTitle>Filter & Sort</DrawerTitle>
         </DrawerHeader>
 
-        <div className="px-4 pb-8 space-y-6 overflow-y-auto">
+        <div className="px-4 pb-24 space-y-6 overflow-y-auto">
           {/* Smart Lists */}
           <div>
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">

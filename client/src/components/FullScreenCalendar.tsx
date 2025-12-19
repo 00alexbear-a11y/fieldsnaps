@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isToday } from "date-fns";
 
 interface FullScreenCalendarProps {
@@ -52,18 +52,10 @@ export function FullScreenCalendar({
       <SheetContent side="bottom" className="h-[90vh] p-0 overflow-hidden">
         <div className="flex flex-col h-full bg-background">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-center p-4 border-b">
             <h2 className="text-lg font-semibold" data-testid="text-calendar-title">
               {format(currentMonth, 'MMMM yyyy')}
             </h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-              data-testid="button-close-calendar"
-            >
-              <X className="h-5 w-5" />
-            </Button>
           </div>
 
           {/* Month Navigation */}

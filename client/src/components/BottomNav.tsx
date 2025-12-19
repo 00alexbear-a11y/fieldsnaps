@@ -87,7 +87,7 @@ export default function BottomNav() {
       />
       
       <nav
-        className="fixed left-0 right-0 z-[100] bg-transparent"
+        className="fixed left-0 right-0 z-[100] bg-transparent touch-none"
         style={{ bottom: 'calc(1rem + var(--safe-area-bottom, 0px))' }}
         data-testid="nav-bottom"
       >
