@@ -1,0 +1,163 @@
+
+~/workspace$ npx @capgo/cli@latest init
+┌  Capgo onboarding 🛫
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Using the organization "Alex organization" as the app owner
+│
+●  📋 Checking development environment prerequisites
+│
+●     For mobile development, you need at least one platform setup
+│
+▲  ⚠️  Android SDK not found
+│
+■  ❌ No development environment detected
+│
+│
+●  📱 To develop mobile apps with Capacitor, you need:
+│
+●     • For iOS: Xcode (macOS only) - https://developer.apple.com/xcode/
+│
+●     • For Android: Android Studio - https://developer.android.com/studio
+│
+│
+◇  Continue onboarding without a development environment? (You won't be able to build or test)
+│  Yes
+│
+▲  ⚠️  Continuing without development environment - you'll need to set it up later
+│
+◇  Add com.fieldsnaps.app in Capgo?
+│  No
+│
+●  If you change your mind, run it for yourself with: "npx @capgo/cli@latest app add com.fieldsnaps.app"
+│
+◇  Create default channel production for com.fieldsnaps.app in Capgo?
+│  Yes
+│
+◑  Running: npx @capgo/cli@latest channel add production com.fieldsnaps.app --defaultError: App com.fieldsnaps.app does not exist, run first `npx @capgo/cli app add com.fieldsnaps.app` to create it
+    at Me (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:171:2632)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async wy (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:226:832)
+    at async Y7 (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:286:324)
+    at async t.s2 (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:329:2236)
+    at async t.parseAsync (/home/runner/.npm/_npx/cbe5d2f7487966de/node_modules/@capgo/cli/dist/index.js:17:4207)
+│
+■  Error during onboarding.
+│   if the error persists please contact support@capgo.app
+│   Or use manual installation: https://capgo.app/docs/getting-started/add-an-app/
+■  Canceled
+~/workspace$ npx @capgo/cli@latest app add com.fieldsnaps.app
+┌  Adding
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Using the organization "Alex organization" as the app owner
+│
+●  Adding com.fieldsnaps.app to Capgo
+│
+▲  Cannot find app icon in any of the following locations: resources/icon.png, assets/icon.png
+│
+◆  App com.fieldsnaps.app added to Capgo. You can upload a bundle now
+│
+└  Done ✅
+
+~/workspace$ npx @capgo/cli@latest channel add production com.fieldsnaps.app --default
+┌  Create channel
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Creating channel com.fieldsnaps.app#production to Capgo
+│
+◆  Channel created ✅
+│
+└  Done ✅
+
+~/workspace$ npm run build && npx @capgo/cli bundle upload --channel production
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (46) src/pages/LocationPermissionEducation.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3267 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-B3JXdbXc.css                                131.51 kB │ gzip:  20.44 kB
+../dist/public/assets/web-DBMSpCV-.js                                     0.12 kB │ gzip:   0.12 kB
+../dist/public/assets/web-DroSO41x.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-A2ynIS6l.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-DQ9SP-im.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-DtFh9OMy.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-DiT7ARL7.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-DifOYh15.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-BX2Vho_k.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/subDays-CTIJBkBv.js                                 0.67 kB │ gzip:   0.35 kB
+../dist/public/assets/native-BHGzl3bB.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-Cm3z1b04.js                                     0.76 kB │ gzip:   0.35 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-grYGncKl.js                                     0.80 kB │ gzip:   0.42 kB
+../dist/public/assets/web-CMkvZLAQ.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-BGYLfioN.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-DXOF_fnX.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-BYqOqz1u.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-Ch-mVjyG.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-Cs5uMo7P.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-YMCNkwAG.js                                     3.44 kB │ gzip:   1.10 kB
+../dist/public/assets/web-CrXQiHBw.js                                     8.86 kB │ gzip:   3.06 kB
+../dist/public/assets/toaster-DFX1LjLC.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.75 kB
+../dist/public/assets/web-BXNoSglg.js                                    23.59 kB │ gzip:   6.72 kB
+../dist/public/assets/Settings-hFNbpKq6.js                               43.40 kB │ gzip:   9.58 kB
+../dist/public/assets/ToDos-BSE1tHWE.js                                  50.91 kB │ gzip:  12.93 kB
+../dist/public/assets/Camera-CUS2HuiJ.js                                 78.78 kB │ gzip:  21.31 kB
+../dist/public/assets/ProjectPhotos-6vq_4GuJ.js                         125.57 kB │ gzip:  36.72 kB
+../dist/public/assets/index.es-Cy_i1bNZ.js                              150.57 kB │ gzip:  51.31 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  47.70 kB
+../dist/public/assets/index-B6nPT6_u.js                               1,696.23 kB │ gzip: 489.15 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 13.48s
+
+  dist/index.js  308.3kb
+
+⚡ Done in 404ms
+┌  Uploading with CLI version 7.17.6
+│
+▲  🚨 You are using @capgo/cli@7.17.6 it's not the latest version.
+│  Please use @capgo/cli@7.56.4" or @capgo/cli@7 to keep up to date with the latest features and bug fixes.
+│
+●  Use global API key /home/runner/.capgo
+│
+●  Upload com.fieldsnaps.app@1.0.0 started from path "dist/public" to Capgo cloud
+│
+▲  WARNING !!
+│  Trial expires in 15 days, upgrade here: https://web.capgo.app/dashboard/settings/plans
+│  
+│
+▲  WARNING !!
+│  Trial expires in 15 days
+│
+▲  Upgrade here: https://web.capgo.app/dashboard/settings/plans?oid=6b4c0963-772d-4cf5-bbf0-1aae4ab992d0
+│
+▲  Channel production is new or it's your first upload with compatibility check, it will be ignored this time
+│
+◇  Checksum: 3d2bfd8ef7a3fdab262cf7cfc2633c849d9fda645429c7389d7c1b6d335f2ba8
+│
+◇  No checksum found for channel production, the bundle will be uploaded
+│
+│
+●  Uploading bundle with TUS protocol
+◇  Bundle uploaded 💪 in (7.65 seconds)
+│
+●  Your update is now available in your public channel 🎉
+│
+└  Time to share your update to the world 🌍

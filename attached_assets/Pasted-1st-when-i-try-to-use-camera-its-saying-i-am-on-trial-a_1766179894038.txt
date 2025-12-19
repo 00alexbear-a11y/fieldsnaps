@@ -1,0 +1,25 @@
+1st  when i try to use camera its saying i am on trial and that my trial has ended. plus i get a network error fo some kind. 
+
+![Screenshot 2025-12-19 at 1.19.23 PM.png](attachment:0094feb8-ba59-4652-844d-edf90084d8bb:Screenshot_2025-12-19_at_1.19.23_PM.png)
+
+2nd i cant create a job, i think its linked to the same issue, my trail has ended. 
+
+![Screenshot 2025-12-19 at 1.21.35 PM.png](attachment:a35bc74d-2a84-4892-adb7-c65a895d18e9:Screenshot_2025-12-19_at_1.21.35_PM.png)
+
+3rd when i hit the little sort and iflter button it overlaps with the bottom buttons. 
+
+4th When adding the to do, the task name and menu needs to be  centered, also the bottom edge of that pop up needs to rounded just like the top is.when i try to add a photo again my trail is ended, but also the camera view is not correct. the camera view is not correct in gereral, it loosks like the ui got hsifted incorrectly, also there is a white menu at the top that does not belong. 
+
+![Screenshot 2025-12-19 at 1.22.46 PM.png](attachment:506ef754-f2c9-4dfe-83c3-597d2b548bc4:Screenshot_2025-12-19_at_1.22.46_PM.png)
+
+![Screenshot 2025-12-19 at 1.24.54 PM.png](attachment:fcfd988b-4059-4dce-a682-6068212490db:Screenshot_2025-12-19_at_1.24.54_PM.png)
+
+5th, when in the main menu, i can still scroll if i start from top or the bottom and teh top menu bar and our bottom buttons scroll up and down, that should never happen . it looks like when i scroll down the bottom menu looks good adn teh top goes down, but when i scroll up the top menu looks good and the bottom shifts bad. they both need to be locked in througout the whole app. 
+
+6th. i would like the default view of tasks to be the week view, not the whole month. also when i press onthe calender there are 2 xs on the top right t close it 
+
+![Screenshot 2025-12-19 at 1.29.29 PM.png](attachment:bc8e8a07-c236-4aaa-8483-de9f6a59576a:Screenshot_2025-12-19_at_1.29.29_PM.png)
+
+![Screenshot 2025-12-19 at 1.27.51 PM.png](attachment:415113e8-4188-49bf-88ef-c14062cff257:Screenshot_2025-12-19_at_1.27.51_PM.png)
+
+7th, it looks like our google maps is still not wokring, something is wrong with our API key.
