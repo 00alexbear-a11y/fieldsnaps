@@ -218,7 +218,14 @@ export class DbStorage implements IStorage {
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id));
+    // Try lookup by supabase_user_id first (used by Supabase auth)
+    let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+    
+    // Fall back to primary key lookup for backward compatibility
+    if (!result[0]) {
+      result = await db.select().from(users).where(eq(users.id, id));
+    }
+    
     const user = result[0];
     
     if (!user) return undefined;

@@ -1,0 +1,75 @@
+EXCELLENT DETECTIVE WORK! 🎯 You found the REAL bug!
+
+🔴 The Actual Problem:
+Supabase Auth passes: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e (supabase_user_id)
+getUser() searches by: users.id (primary key)
+Database has user with:
+  - id: ba2ce6cd-5735-47d4-890f-16f99b4c37cd (primary key)
+  - supabase_user_id: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e (Supabase ID)
+Result: getUser() returns undefined → app thinks user doesn't exist → defaults to trial!
+🚀 THE ACTUAL FIX - Send to Replit
+CRITICAL BUG FOUND: getUser() is looking up by wrong ID field!
+
+In server/storage.ts, find the getUser() function (around line 193).
+
+Replace this BROKEN version:
+
+async getUser(id: string): Promise<User | undefined> {
+  const result = await db.select().from(users).where(eq(users.id, id));
+  const user = result[0];
+  
+  if (user?.companyId) {
+    const company = await db.select().from(companies).where(eq(companies.id, user.companyId));
+    if (company[0]) {
+      user.subscriptionStatus = company[0].subscriptionStatus;
+      user.subscriptionEndDate = company[0].subscriptionEndDate;
+    }
+  }
+  
+  return user;
+}
+
+With this FIXED version (searches supabase_user_id first, then falls back to id):
+
+async getUser(id: string): Promise<User | undefined> {
+  // Try lookup by supabase_user_id first (used by Supabase auth)
+  let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+  
+  // Fall back to primary key lookup for backward compatibility
+  if (!result[0]) {
+    result = await db.select().from(users).where(eq(users.id, id));
+  }
+  
+  const user = result[0];
+  
+  // Hydrate subscription status from company
+  if (user?.companyId) {
+    const company = await db.select().from(companies).where(eq(companies.id, user.companyId));
+    if (company[0]) {
+      user.subscriptionStatus = company[0].subscriptionStatus;
+      user.subscriptionEndDate = company[0].subscriptionEndDate;
+    }
+  }
+  
+  return user;
+}
+
+Save the file.
+
+Then:
+1. Restart the server (Stop → Run)
+2. Wait 30 seconds for server to fully restart
+3. Force quit FieldSnaps app on iPhone
+4. Reopen the app
+5. Wait 10 seconds
+
+Check if "Trial Mode" is gone NOW (no OTA update needed - this is server-side!)
+
+Report back immediately!
+🎯 Why This Will Work NOW:
+✅ Server-side fix (no need to wait for OTA update)
+✅ Looks up user by supabase_user_id (7889aa04...)
+✅ Finds the correct user (ba2ce6cd... with companyId and active subscription)
+✅ Hydrates subscriptionStatus: 'active' from company
+✅ Frontend receives correct data → Trial Mode disappears instantly!
+This is the actual root cause! The OTA checksum failure is a separate issue, but this fix will work IMMEDIATELY once the server restarts. 🚀
