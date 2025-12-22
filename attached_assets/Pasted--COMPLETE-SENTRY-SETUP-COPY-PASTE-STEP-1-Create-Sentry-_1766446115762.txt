@@ -1,0 +1,540 @@
+🚀 COMPLETE SENTRY SETUP - COPY & PASTE
+STEP 1: Create Sentry Account & Get DSN
+1. Go to https://sentry.io/signup/
+2. Sign up (free - use your email or GitHub)
+3. Create new project:
+   - Platform: Node.js
+   - Project name: fieldsnaps-backend
+4. Copy the DSN (looks like: https://xxxxx@o123456.ingest.sentry.io/789012)
+5. Create ANOTHER project:
+   - Platform: React
+   - Project name: fieldsnaps-frontend
+6. Copy this DSN too
+
+You now have 2 DSNs:
+- Backend DSN: https://xxxxx@o123456.ingest.sentry.io/111111
+- Frontend DSN: https://xxxxx@o123456.ingest.sentry.io/222222
+STEP 2: Install Sentry Packages
+Copy# Run in Replit Shell:
+
+npm install @sentry/node @sentry/integrations @sentry/react
+STEP 3: Add Sentry to Backend (Server)
+File: server/sentry.ts (CREATE THIS NEW FILE)
+Copyimport * as Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
+
+export function initSentry() {
+  if (!process.env.SENTRY_DSN_BACKEND) {
+    console.warn("⚠️  Sentry DSN not configured - error tracking disabled");
+    return;
+  }
+
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN_BACKEND,
+    environment: process.env.NODE_ENV || "production",
+    
+    // Performance Monitoring
+    tracesSampleRate: 1.0, // Capture 100% of transactions (reduce to 0.1 in production if too many)
+    
+    // Profiling (optional, helps find slow code)
+    profilesSampleRate: 1.0,
+    integrations: [
+      nodeProfilingIntegration(),
+    ],
+    
+    // Release tracking (links errors to specific code versions)
+    release: process.env.npm_package_version || "1.0.0",
+    
+    // Additional context
+    beforeSend(event, hint) {
+      // Add extra context to every error
+      if (event.request) {
+        event.request.cookies = undefined; // Remove sensitive cookies
+      }
+      return event;
+    },
+  });
+
+  console.log("✅ Sentry initialized for backend");
+}
+
+// Helper to manually capture errors with context
+export function captureError(error: Error, context?: Record<string, any>) {
+  Sentry.captureException(error, {
+    extra: context,
+  });
+}
+
+// Helper to add user context
+export function setUserContext(user: { id: string; email?: string; companyId?: string }) {
+  Sentry.setUser({
+    id: user.id,
+    email: user.email,
+    companyId: user.companyId,
+  });
+}
+
+// Helper to add breadcrumb (tracks user actions)
+export function addBreadcrumb(message: string, data?: Record<string, any>) {
+  Sentry.addBreadcrumb({
+    message,
+    level: "info",
+    data,
+  });
+}
+File: server/index.ts (MODIFY EXISTING)
+Copy// ADD THIS AT THE VERY TOP (line 1-2)
+import { initSentry } from "./sentry";
+initSentry(); // Must be first thing that runs!
+
+// ... rest of your imports ...
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
+import * as Sentry from "@sentry/node"; // Import Sentry again for middleware
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// ADD SENTRY REQUEST HANDLER (after express.json, before routes)
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
+// ... your existing middleware ...
+
+// Register your routes
+(async () => {
+  const server = registerRoutes(app);
+
+  // ADD SENTRY ERROR HANDLER (after routes, before generic error handler)
+  app.use(Sentry.Handlers.errorHandler());
+
+  // Generic error handler (ADD THIS if you don't have it)
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error("Unhandled error:", err);
+    
+    // Error is already sent to Sentry by Sentry.Handlers.errorHandler() above
+    
+    res.status(500).json({ 
+      error: "Internal server error",
+      message: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  });
+
+  // ... rest of server setup ...
+})();
+File: server/routes.ts (MODIFY EXISTING - Add Context)
+Copy// Add this import at the top
+import { setUserContext, addBreadcrumb, captureError } from "./sentry";
+
+// Find your auth middleware (wherever you set req.user)
+// ADD THIS RIGHT AFTER YOU VERIFY USER:
+
+// Example location: around line 1257 where you have /api/auth/user endpoint
+app.get("/api/auth/user", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const userId = req.user.claims.sub; // Supabase ID
+    
+    // ADD BREADCRUMB
+    addBreadcrumb("Fetching user data", { userId, supabaseId: userId });
+    
+    const user = await storage.getUser(userId);
+    
+    if (!user) {
+      // ADD ERROR TRACKING for user not found
+      const error = new Error("User not found after Supabase auth");
+      captureError(error, {
+        supabaseId: userId,
+        claims: req.user.claims,
+      });
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // ADD USER CONTEXT (so all future errors know which user)
+    setUserContext({
+      id: user.id,
+      email: user.email || undefined,
+      companyId: user.companyId || undefined,
+    });
+    
+    // ADD BREADCRUMB
+    addBreadcrumb("User data fetched successfully", { 
+      userId: user.id, 
+      subscriptionStatus: user.subscriptionStatus 
+    });
+    
+    res.json(user);
+  } catch (error) {
+    // This error will be auto-captured by Sentry error handler
+    console.error("Error fetching user:", error);
+    throw error; // Re-throw so Sentry catches it
+  }
+});
+STEP 4: Add Sentry to Frontend (React)
+File: client/src/sentry.ts (CREATE THIS NEW FILE)
+Copyimport * as Sentry from "@sentry/react";
+
+export function initSentry() {
+  // Only initialize in production or if explicitly enabled
+  const isProduction = import.meta.env.PROD;
+  const dsn = import.meta.env.VITE_SENTRY_DSN_FRONTEND;
+  
+  if (!dsn) {
+    console.warn("⚠️  Sentry frontend DSN not configured");
+    return;
+  }
+
+  if (!isProduction && !import.meta.env.VITE_SENTRY_ENABLE_DEV) {
+    console.log("ℹ️  Sentry disabled in development (set VITE_SENTRY_ENABLE_DEV=true to enable)");
+    return;
+  }
+
+  Sentry.init({
+    dsn,
+    environment: import.meta.env.MODE,
+    
+    // Performance Monitoring
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        maskAllText: false, // Show actual text in replays
+        blockAllMedia: true, // Don't record images/videos (privacy)
+      }),
+    ],
+    
+    // Performance tracking
+    tracesSampleRate: 1.0, // 100% of transactions
+    
+    // Session Replay (records user sessions when errors occur)
+    replaysSessionSampleRate: 0.1, // 10% of normal sessions
+    replaysOnErrorSampleRate: 1.0, // 100% of error sessions
+    
+    // Release tracking
+    release: import.meta.env.VITE_APP_VERSION || "1.0.0",
+    
+    // Additional context
+    beforeSend(event, hint) {
+      // Filter out noisy errors
+      if (event.exception) {
+        const error = hint.originalException;
+        if (error instanceof Error) {
+          // Ignore network errors (user went offline)
+          if (error.message.includes("Network request failed")) {
+            return null;
+          }
+        }
+      }
+      return event;
+    },
+  });
+
+  console.log("✅ Sentry initialized for frontend");
+}
+
+// Helper to set user context
+export function setSentryUser(user: { id: string; email?: string; subscriptionStatus?: string }) {
+  Sentry.setUser({
+    id: user.id,
+    email: user.email,
+    subscription: user.subscriptionStatus,
+  });
+}
+
+// Helper to clear user context (on logout)
+export function clearSentryUser() {
+  Sentry.setUser(null);
+}
+
+// Helper to add breadcrumb
+export function addSentryBreadcrumb(message: string, data?: Record<string, any>) {
+  Sentry.addBreadcrumb({
+    message,
+    level: "info",
+    data,
+  });
+}
+
+// Helper to manually capture error
+export function captureSentryError(error: Error, context?: Record<string, any>) {
+  Sentry.captureException(error, {
+    extra: context,
+  });
+}
+File: client/src/main.tsx (MODIFY EXISTING)
+Copy// ADD THIS IMPORT AT THE TOP
+import { initSentry } from "./sentry";
+
+// INITIALIZE SENTRY FIRST (before React)
+initSentry();
+
+// ... rest of your existing imports ...
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { Toaster } from "@/components/ui/toaster";
+import App from "./App";
+import "./index.css";
+import * as Sentry from "@sentry/react"; // Import Sentry
+
+// WRAP YOUR APP WITH SENTRY ERROR BOUNDARY
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <Sentry.ErrorBoundary 
+      fallback={({ error, resetError }) => (
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="text-center max-w-md">
+            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+            <p className="text-muted-foreground mb-4">
+              The error has been reported and we'll fix it soon.
+            </p>
+            <details className="mb-4 text-left">
+              <summary className="cursor-pointer text-sm text-muted-foreground">
+                Error details
+              </summary>
+              <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
+                {error.toString()}
+              </pre>
+            </details>
+            <button
+              onClick={resetError}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      )}
+      showDialog // Shows user a feedback dialog when error occurs
+    >
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <Toaster />
+      </QueryClientProvider>
+    </Sentry.ErrorBoundary>
+  </React.StrictMode>
+);
+File: client/src/hooks/useAuth.ts (MODIFY EXISTING - Add User Context)
+Copy// Add this import at the top
+import { setSentryUser, clearSentryUser, addSentryBreadcrumb } from "@/sentry";
+
+// Find where you fetch user data (around the useQuery hook)
+// ADD SENTRY CONTEXT when user is loaded:
+
+export function useAuth() {
+  // ... your existing code ...
+
+  const { data: user, isLoading, error } = useQuery<User>({
+    queryKey: ['/api/auth/user'],
+    queryFn: async () => {
+      // ... your existing fetch logic ...
+      const response = await fetch('/api/auth/user');
+      const userData = await response.json();
+      
+      // ADD THIS: Set Sentry user context
+      if (userData && userData.id) {
+        setSentryUser({
+          id: userData.id,
+          email: userData.email,
+          subscriptionStatus: userData.subscriptionStatus,
+        });
+        addSentryBreadcrumb("User authenticated", {
+          userId: userData.id,
+          subscriptionStatus: userData.subscriptionStatus,
+        });
+      }
+      
+      return userData;
+    },
+    // ... rest of your query config ...
+  });
+
+  // ADD THIS: Clear Sentry context on logout
+  const logout = async () => {
+    // ... your existing logout logic ...
+    clearSentryUser();
+    addSentryBreadcrumb("User logged out");
+  };
+
+  // ... rest of your hook ...
+}
+STEP 5: Add Environment Variables to Replit
+Click 🔒 Secrets in Replit sidebar
+
+Add these 3 secrets:
+
+1. SENTRY_DSN_BACKEND
+   Value: https://xxxxx@o123456.ingest.sentry.io/111111
+   (Your backend DSN from Step 1)
+
+2. VITE_SENTRY_DSN_FRONTEND
+   Value: https://xxxxx@o123456.ingest.sentry.io/222222
+   (Your frontend DSN from Step 1)
+
+3. VITE_SENTRY_ENABLE_DEV (optional - for testing in dev)
+   Value: true
+   (Remove this later in production)
+STEP 6: Add Version to package.json
+Copy// In package.json, make sure you have a version:
+{
+  "name": "fieldsnaps",
+  "version": "1.0.3",  // <-- Add/update this
+  "private": true,
+  // ... rest of package.json
+}
+STEP 7: Deploy & Test
+Copy# In Replit Shell:
+
+# 1. Commit changes
+git add .
+git commit -m "Add Sentry error tracking for frontend and backend"
+git push origin main
+
+# 2. Restart server
+# Click Stop → Run in Replit
+
+# 3. Test Sentry is working
+# Add this test endpoint to server/routes.ts:
+
+app.get("/api/test-sentry", (req, res) => {
+  throw new Error("Test error - Sentry should catch this!");
+});
+
+# 4. Visit in browser:
+# https://your-replit-app.repl.co/api/test-sentry
+
+# 5. Check Sentry dashboard:
+# https://sentry.io/organizations/your-org/issues/
+# You should see the test error appear!
+
+# 6. Delete the test endpoint after confirming it works
+STEP 8: Test on iOS App
+1. Force quit FieldSnaps app
+2. Reopen app
+3. Wait for OTA update (if needed)
+4. Try to reproduce the "Trial Mode" bug
+5. Check Sentry dashboard - error should appear with full context!
+
+You'll see:
+✅ User ID: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ Error: "Cannot read subscriptionStatus of undefined"
+✅ Stack trace: exact line in useAuth.ts
+✅ Breadcrumbs:
+   - User logged in
+   - Fetching user data
+   - API call to /api/auth/user
+   - Response received
+   - subscriptionStatus undefined
+✅ Device: iPhone 15, iOS 18.1
+✅ App version: 1.0.3
+STEP 9: Configure Alerts (Optional)
+Go to Sentry dashboard:
+https://sentry.io/organizations/your-org/projects/
+
+1. Click "fieldsnaps-backend"
+2. Go to Settings → Alerts
+3. Create new alert rule:
+   - Name: "Critical Errors"
+   - Conditions: "Any error occurs"
+   - Actions: "Send email to [your-email]"
+   - Save
+
+Now you get emailed when errors occur!
+
+For Slack integration:
+1. Go to Settings → Integrations
+2. Click "Slack"
+3. Connect your Slack workspace
+4. Choose #bugs channel
+5. Errors will post to Slack automatically!
+BONUS: Source Maps (See Exact Line Numbers)
+Copy// For production builds, add source maps so Sentry shows real line numbers
+
+// In vite.config.ts, add:
+export default defineConfig({
+  // ... existing config ...
+  build: {
+    sourcemap: true, // Generate source maps for production
+  },
+});
+
+// Then in client/src/sentry.ts, add upload config:
+import { sentryVitePlugin } from "@sentry/vite-plugin";
+
+// In vite.config.ts plugins array:
+plugins: [
+  react(),
+  sentryVitePlugin({
+    org: "your-sentry-org",
+    project: "fieldsnaps-frontend",
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+  }),
+],
+
+// Get auth token from:
+// https://sentry.io/settings/account/api/auth-tokens/
+
+// Add to Replit Secrets:
+SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxxx
+📊 What You Get Now
+When an error occurs, Sentry shows:
+🔴 Error: Cannot read property 'subscriptionStatus' of undefined
+
+📍 Location:
+   client/src/hooks/useAuth.ts:45:12
+   
+👤 User:
+   ID: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+   Email: hello@fieldsnaps.com
+   Subscription: undefined
+   
+📱 Device:
+   iPhone 15 Pro
+   iOS 18.1
+   App version: 1.0.3
+   
+🍞 Breadcrumbs (what happened before):
+   1. 14:23:01 - User logged in via Google OAuth
+   2. 14:23:02 - API call: GET /api/auth/user
+   3. 14:23:02 - Fetching user data (userId: 7889aa04...)
+   4. 14:23:03 - Database query: WHERE id = '7889aa04...'
+   5. 14:23:03 - Query returned 0 results ⚠️
+   6. 14:23:03 - User data: null
+   7. 14:23:03 - ERROR: Cannot read subscriptionStatus
+   
+📊 Stack Trace:
+   useAuth.ts:45:12 - const status = user.subscriptionStatus
+   Projects.tsx:23:8 - const { canWrite } = useAuth()
+   App.tsx:15:5 - <Projects />
+   
+🔗 Related Issues:
+   - 47 users affected
+   - First seen: 2 hours ago
+   - Last seen: 2 minutes ago
+   
+💡 Suggested Fix:
+   The error occurs because getUser() returns null.
+   Check database query in server/storage.ts line 193.
+🎯 Summary
+You now have:
+
+✅ Backend error tracking (server crashes, API errors, database errors)
+✅ Frontend error tracking (React errors, API failures, user actions)
+✅ Performance monitoring (slow API calls, slow page loads)
+✅ User context (know WHO experienced the error)
+✅ Breadcrumbs (see what led to the error)
+✅ Release tracking (know which version has bugs)
+✅ Session replay (watch what user did before error - optional)
+✅ Alerts (get notified immediately)
+✅ Source maps (see exact code line numbers)
+Free tier limits:
+
+50,000 errors/month (enough for 100+ users)
+500 performance transactions/month
+30 days retention
+Need help with any step? Let me know! 🚀
