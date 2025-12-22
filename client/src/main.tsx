@@ -1,3 +1,6 @@
+import { initSentry, Sentry } from "./sentry";
+initSentry();
+
 import { createRoot } from "react-dom/client";
 import { Capacitor } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -74,9 +77,40 @@ const initializeApp = async () => {
   }
 };
 
+// Error fallback component for Sentry
+const ErrorFallback = ({ error, resetError }: { error: unknown; resetError: () => void }) => (
+  <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="text-center max-w-md">
+      <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+      <p className="text-muted-foreground mb-4">
+        The error has been reported and we'll fix it soon.
+      </p>
+      <details className="mb-4 text-left">
+        <summary className="cursor-pointer text-sm text-muted-foreground">
+          Error details
+        </summary>
+        <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
+          {error instanceof Error ? error.message : String(error)}
+        </pre>
+      </details>
+      <button
+        onClick={resetError}
+        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+        data-testid="button-error-retry"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
+);
+
 // Initialize and render app
 initializeApp().then(() => {
-  createRoot(document.getElementById("root")!).render(<App />);
+  createRoot(document.getElementById("root")!).render(
+    <Sentry.ErrorBoundary fallback={ErrorFallback} showDialog>
+      <App />
+    </Sentry.ErrorBoundary>
+  );
   
   // Expose syncManager and idb globally for testing
   if (import.meta.env.DEV) {
@@ -93,7 +127,11 @@ initializeApp().then(() => {
   }
 }).catch((error) => {
   console.error('[App] Initialization failed:', error);
-  createRoot(document.getElementById("root")!).render(<App />);
+  createRoot(document.getElementById("root")!).render(
+    <Sentry.ErrorBoundary fallback={ErrorFallback} showDialog>
+      <App />
+    </Sentry.ErrorBoundary>
+  );
   
   // Expose globals even on error (for testing)
   if (import.meta.env.DEV) {

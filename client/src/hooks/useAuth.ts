@@ -14,6 +14,7 @@ import {
 } from "@/lib/supabaseAuth";
 import { getApiUrl } from "@/lib/apiUrl";
 import { tokenManager } from "@/lib/tokenManager";
+import { setSentryUser, clearSentryUser, addSentryBreadcrumb } from "@/sentry";
 
 interface AuthState {
   session: Session | null;
@@ -129,6 +130,7 @@ export function useAuth() {
         // Clear the invalid session to prevent infinite loading state
         if (response.status === 401 || response.status === 403) {
           console.log('[useAuth] Backend rejected token (401/403), clearing session');
+          clearSentryUser();
           try {
             await supabaseSignOut();
           } catch (e) {
@@ -144,13 +146,30 @@ export function useAuth() {
         throw new Error('Failed to fetch user');
       }
       
-      return response.json();
+      const userData = await response.json();
+      
+      // Set Sentry user context for error tracking
+      if (userData && userData.id) {
+        setSentryUser({
+          id: userData.id,
+          email: userData.email,
+          subscriptionStatus: userData.subscriptionStatus,
+        });
+        addSentryBreadcrumb("User authenticated", {
+          userId: userData.id,
+          subscriptionStatus: userData.subscriptionStatus,
+        });
+      }
+      
+      return userData;
     },
   });
 
   const signOut = useCallback(async () => {
     try {
       await supabaseSignOut();
+      clearSentryUser();
+      addSentryBreadcrumb("User logged out");
       setAuthState({
         session: null,
         supabaseUser: null,
