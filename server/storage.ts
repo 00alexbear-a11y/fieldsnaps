@@ -218,17 +218,26 @@ export class DbStorage implements IStorage {
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
+    console.log('[getUser] Looking up user with id:', id);
+    
     // Try lookup by supabase_user_id first (used by Supabase auth)
     let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+    console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
     
     // Fall back to primary key lookup for backward compatibility
     if (!result[0]) {
       result = await db.select().from(users).where(eq(users.id, id));
+      console.log('[getUser] Primary key lookup result:', result[0]?.id || 'not found');
     }
     
     const user = result[0];
     
-    if (!user) return undefined;
+    if (!user) {
+      console.log('[getUser] User not found for id:', id);
+      return undefined;
+    }
+    
+    console.log('[getUser] Found user:', user.email, 'companyId:', user.companyId, 'subscriptionStatus (before hydrate):', user.subscriptionStatus);
     
     // Hydrate subscription status from company (company status takes precedence)
     if (user.companyId) {
@@ -238,14 +247,18 @@ export class DbStorage implements IStorage {
       }).from(companies).where(eq(companies.id, user.companyId));
       
       if (companyResult[0]) {
-        return {
+        console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
+        const hydratedUser = {
           ...user,
           subscriptionStatus: companyResult[0].subscriptionStatus,
           subscriptionEndDate: companyResult[0].subscriptionEndDate,
         };
+        console.log('[getUser] Returning hydrated user with subscriptionStatus:', hydratedUser.subscriptionStatus);
+        return hydratedUser;
       }
     }
     
+    console.log('[getUser] Returning user without company hydration, subscriptionStatus:', user.subscriptionStatus);
     return user;
   }
 
