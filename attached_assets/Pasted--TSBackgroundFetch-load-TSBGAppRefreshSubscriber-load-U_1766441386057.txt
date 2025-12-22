@@ -1,0 +1,107 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/F128B4D4-2C38-4218-B615-F44585A2BAC4/App.app'
+Loading network plugin
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🟢 [✨  CapgoUpdater]: init for device 1a5069aa-a43a-4ae8-8179-bf17a188a83a
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("1a5069aa-a43a-4ae8-8179-bf17a188a83a"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional("production"))
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11c4da4f0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+Networking process (0x117054190) took 1.216135 seconds to launch
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+🟢 [✨  CapgoUpdater]: New bundle: 1.0.1 found. Current is: builtin. Update will occur next time app moves to background.
+🟢 [✨  CapgoUpdater]: No version available /var/mobile/Containers/Data/Application/613A653F-1EF4-4726-8DF8-558E1435889A/Library/NoCloud/ionic_built_snapshots
+WebContent[28373] Unable to hide query parameters from script (missing data)
+🔴 [✨  CapgoUpdater]: Failed to parse info for bundle [0C6NBMf9Ul] No data object found for the given key
+⚡️  WebView loaded
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Failed to parse info for bundle [0C6NBMf9Ul] No data object found for the given key
+🟢 [✨  CapgoUpdater]: Storing info for bundle [0C6NBMf9Ul] { "id": "0C6NBMf9Ul", "version": "1.0.1", "downloaded": "2025-12-22T22:09:11.929Z", "checksum": "", "status": "downloading"}
+⚡️  [warn] - [Supabase] Missing environment variables. Auth features may not work.
+
+⚡️  ------ STARTUP JS ERROR ------
+
+⚡️  Error: supabaseUrl is required.
+⚡️  URL: capacitor://localhost/assets/index-C3cRhOK8.js
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [error] - {}
+⚡️  index-C3cRhOK8.js:74:41746
+
+⚡️  See above for help with debugging blank-screen issues
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [0C6NBMf9Ul] { "id": "0C6NBMf9Ul", "version": "1.0.1", "downloaded": "2025-12-22T22:09:11.929Z", "checksum": "", "status": "downloading"}
+🟢 [✨  CapgoUpdater]: Stats sent for download_0, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_0, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for download_10, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_10, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_20, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_20, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_30, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_30, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_50, version 1.0.1
+🟢 [✨  CapgoUpdater]: Download complete, total received bytes: 7013726
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_50, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Download complete, total received bytes: 7013726
+🟢 [✨  CapgoUpdater]: Encryption not set, no public key or seesion, ignored
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Encryption not set, no public key or seesion, ignored
+🟢 [✨  CapgoUpdater]: Stats sent for download_40, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_40, version 1.0.1
+🟢 [✨  CapgoUpdater]: Downloading: 80% (unzipping)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 80% (unzipping)
+🟢 [✨  CapgoUpdater]: Stats sent for download_70, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_70, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_60, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_60, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_70, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_70, version 1.0.1
+🟢 [✨  CapgoUpdater]: Downloading: 90% (wrapping up)
+🟢 [✨  CapgoUpdater]: Storing info for bundle [0C6NBMf9Ul] { "id": "0C6NBMf9Ul", "version": "1.0.1", "downloaded": "2025-12-22T22:09:13.503Z", "checksum": "2ca364c29be5034dd1d26aa75aef59f0d336e690a5af24c41c308c498b7608e9", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 90% (wrapping up)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [0C6NBMf9Ul] { "id": "0C6NBMf9Ul", "version": "1.0.1", "downloaded": "2025-12-22T22:09:13.503Z", "checksum": "2ca364c29be5034dd1d26aa75aef59f0d336e690a5af24c41c308c498b7608e9", "status": "pending"}
+🟢 [✨  CapgoUpdater]: Downloading: 100% (complete)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 100% (complete)
+🟢 [✨  CapgoUpdater]: No encryption set (public key) ignored
+🔴 [✨  CapgoUpdater]: Error checksum 2ca364c29be5034dd1d26aa75aef59f0d336e690a5af24c41c308c498b7608e9 a234c8ae
+⚡️  [info] - 🟢 ✨  CapgoUpdater : No encryption set (public key) ignored
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Error checksum 2ca364c29be5034dd1d26aa75aef59f0d336e690a5af24c41c308c498b7608e9 a234c8ae
+🟢 [✨  CapgoUpdater]: Stats sent for download_80, version 1.0.1
+🟢 [✨  CapgoUpdater]: Removing info for bundle [0C6NBMf9Ul]
+🟢 [✨  CapgoUpdater]: bundle delete 1.0.1
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif Error checksum current: builtin latestVersionName: 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_80, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Removing info for bundle [0C6NBMf9Ul]
+⚡️  [info] - 🟢 ✨  CapgoUpdater : bundle delete 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : endBackGroundTaskWithNotif Error checksum current: builtin latestVersionName: 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_90, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_90, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_complete, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_complete, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for delete, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for delete, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_fail, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for checksum_fail, version 1.0.1
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_fail, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for checksum_fail, version 1.0.1
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
