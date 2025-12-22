@@ -1,0 +1,402 @@
+🚀 FINAL COMPLETE FIX - ALL Issues (Login, Supabase, UI)
+STEP 1: Install Supabase Dependencies
+Run this command in the Replit Shell:
+
+npm install @supabase/supabase-js
+
+Wait for installation to complete, then confirm here.
+STEP 2: Add Supabase Environment Variables
+Click 🔒 Secrets in the left Replit sidebar.
+
+Add these 4 secrets:
+
+1. SUPABASE_URL = https://pbfuwfzccdmpkmhncyjg.supabase.co
+2. SUPABASE_ANON_KEY = [Get from Supabase Dashboard → Settings → API → anon public key]
+3. SUPABASE_JWT_SECRET = [Get from Supabase Dashboard → Settings → Database → JWT Secret]
+4. SUPABASE_SERVICE_ROLE_KEY = [Get from Supabase Dashboard → Settings → API → service_role key]
+
+To get these values:
+1. Go to https://supabase.com/dashboard/project/pbfuwfzccdmpkmhncyjg/settings/api
+2. Copy "Project URL" (should be https://pbfuwfzccdmpkmhncyjg.supabase.co)
+3. Copy "anon public" key (starts with "eyJ...")
+4. Copy "service_role" key (starts with "eyJ...")
+5. Go to https://supabase.com/dashboard/project/pbfuwfzccdmpkmhncyjg/settings/database
+6. Copy "JWT Secret"
+
+Paste all 4 into Replit Secrets, then confirm when done.
+STEP 3: Create Supabase Client File
+Create a new file: server/supabase.ts
+
+Paste this content:
+
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: false,
+    detectSessionInUrl: false
+  }
+});
+
+Save the file and confirm.
+STEP 4: Update User Type Definition
+In shared/schema.ts, find the User type definition (near the bottom of the file).
+
+Add these two fields to the User type:
+
+subscriptionStatus?: string;
+subscriptionEndDate?: Date;
+
+The complete User type should now include these fields along with all existing ones.
+
+Save and confirm.
+STEP 5: Fix getUser() - JOIN COMPANIES TABLE ⚠️ MOST CRITICAL
+In server/storage.ts, find the getUser() function (around line 193).
+
+Current broken code:
+async getUser(id: string): Promise<User | undefined> {
+  const result = await db.select().from(users).where(eq(users.id, id));
+  return result[0];
+}
+
+Replace with this FIXED version:
+
+async getUser(id: string): Promise<User | undefined> {
+  const result = await this.db
+    .select({
+      // All user fields
+      id: users.id,
+      username: users.username,
+      email: users.email,
+      password: users.password,
+      companyId: users.companyId,
+      role: users.role,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
+      lastLoginAt: users.lastLoginAt,
+      profilePictureUrl: users.profilePictureUrl,
+      phoneNumber: users.phoneNumber,
+      title: users.title,
+      department: users.department,
+      notificationPreferences: users.notificationPreferences,
+      twoFactorEnabled: users.twoFactorEnabled,
+      locationTrackingEnabled: users.locationTrackingEnabled,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      removedAt: users.removedAt,
+      
+      // CRITICAL: Pull subscriptionStatus from company row (not user row)
+      subscriptionStatus: companies.subscriptionStatus,
+      subscriptionEndDate: companies.subscriptionEndDate,
+    })
+    .from(users)
+    .leftJoin(companies, eq(users.companyId, companies.id))
+    .where(eq(users.id, id))
+    .limit(1);
+  
+  return result[0] as User;
+}
+
+Save the file.
+What this fixes:
+
+✅ "Trial Mode" banner disappears (company subscription now propagates to user)
+✅ Camera unlocks (no more "trial ended" error)
+✅ Create Job unlocks (no more "trial ended" error)
+✅ /api/auth/user now returns subscriptionStatus: "active"
+STEP 6: Verify Database Has Active Subscription
+Run this SQL query in Supabase SQL Editor:
+https://supabase.com/dashboard/project/pbfuwfzccdmpkmhncyjg/editor
+
+SELECT 
+  u.id,
+  u.email, 
+  u.company_id, 
+  u.subscription_status as user_sub,
+  c.subscription_status as company_sub,
+  c.subscription_end_date
+FROM users u
+LEFT JOIN companies c ON u.company_id = c.id
+WHERE u.email = 'hello@fieldsnaps.com';
+
+Expected result:
+- user_sub: might be null or 'trial'
+- company_sub: should be 'active' ← THIS is what we're pulling now!
+- company_id: should NOT be null
+
+Paste the result here to confirm the fix will work.
+STEP 7: Fix Filter Sheet Overlapping Bottom Buttons
+Find the file: client/src/components/ProjectsFilterSheet.tsx
+
+In the SheetContent component, add bottom padding:
+
+Replace:
+<SheetContent side="bottom" className="h-[50vh]">
+
+With:
+<SheetContent side="bottom" className="h-[50vh] pb-24">
+
+This adds 96px bottom padding to prevent overlap with navigation.
+
+Save the file.
+STEP 8: Fix To-Do Dialog - Center Title & Round Bottom Corners
+Find the file where "New Task" dialog is defined.
+Check these locations:
+- client/src/components/ui/mobile-dialog.tsx
+- client/src/components/MobileDialogForm.tsx
+- client/src/pages/ToDo.tsx
+
+1. Find DialogTitle and add text-center:
+<DialogTitle className="text-center">{title}</DialogTitle>
+
+2. Find DialogContent and ensure both top and bottom are rounded:
+<DialogContent className="... rounded-2xl">
+(or if separate: rounded-t-2xl rounded-b-2xl)
+
+Save the file.
+STEP 9: Fix Camera UI Shift & White Menu
+Find the file: client/src/pages/Camera.tsx (or CameraView.tsx)
+
+1. Ensure camera container fills entire viewport:
+<div className="fixed inset-0 w-full h-full overflow-hidden bg-black">
+
+2. Remove any extra header components at the top.
+
+3. Camera preview should fill the screen:
+<CameraPreview className="absolute inset-0 w-full h-full object-cover" />
+
+4. Camera controls should be overlaid with absolute positioning:
+<div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
+  {/* Camera button */}
+</div>
+
+Save the file.
+STEP 10: Lock Header/Footer - Prevent Scroll
+Update these files to use fixed header/footer with scrollable content:
+
+Files to update:
+- client/src/pages/Projects.tsx
+- client/src/pages/ToDo.tsx
+- client/src/pages/Locations.tsx
+- client/src/pages/Time.tsx
+
+Standard pattern for each file:
+
+<div className="flex flex-col h-screen overflow-hidden">
+  {/* Fixed header - NEVER scrolls */}
+  <header className="sticky top-0 z-10 bg-background border-b shrink-0">
+    {/* Search, filters, banner, etc. */}
+  </header>
+
+  {/* Scrollable content */}
+  <main className="flex-1 overflow-y-auto overscroll-none">
+    {/* List items, cards, etc. */}
+    <div className="pb-20"> {/* Bottom padding for nav clearance */}
+      {/* Content */}
+    </div>
+  </main>
+
+  {/* Fixed bottom navigation - NEVER scrolls */}
+  <nav className="fixed bottom-0 left-0 right-0 z-10 bg-background border-t shrink-0">
+    {/* Navigation buttons */}
+  </nav>
+</div>
+
+Key CSS classes:
+- Parent: h-screen overflow-hidden (locks viewport height)
+- Header: sticky top-0 shrink-0 (prevents shrinking)
+- Main: flex-1 overflow-y-auto (only this scrolls)
+- Nav: fixed bottom-0 (stays at bottom)
+
+Apply to all 4 files, then save.
+STEP 11: Set Default Week View for Tasks Calendar
+In client/src/pages/ToDo.tsx:
+
+Find calendar component initialization and add default view:
+
+const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
+
+Then in Calendar component props:
+<Calendar 
+  defaultView="week"
+  view={calendarView}
+  onViewChange={setCalendarView}
+  // ... other props
+/>
+
+Save the file.
+STEP 12: Remove Double X Buttons on Calendar
+In the calendar dialog component (likely in ToDo.tsx or a Calendar component):
+
+Find the DialogHeader with two close buttons:
+
+<DialogHeader className="relative">
+  <DialogTitle>Calendar</DialogTitle>
+  {/* Remove one of these two close buttons - keep only ONE: */}
+  <DialogClose className="absolute right-4 top-4">
+    <X className="h-4 w-4" />
+  </DialogClose>
+</DialogHeader>
+
+Delete the duplicate X button, keeping only one.
+
+Save the file.
+STEP 13: Fix Google Maps API Key
+1. Add Google Maps API key to Replit Secrets:
+
+Click 🔒 Secrets → Add new secret:
+Key: VITE_GOOGLE_MAPS_API_KEY
+Value: [Your Google Maps API Key]
+
+If you don't have an API key:
+a) Go to https://console.cloud.google.com/apis/credentials
+b) Create API Key
+c) Enable "Maps JavaScript API"
+d) (Optional) Restrict key to your domain
+
+2. Update client/src/pages/Locations.tsx:
+
+Ensure LoadScript uses the environment variable:
+
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
+
+<LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+  <GoogleMap
+    mapContainerClassName="w-full h-full"
+    center={defaultCenter}
+    zoom={10}
+  >
+    {/* Map markers, etc. */}
+  </GoogleMap>
+</LoadScript>
+
+Save the file.
+STEP 14: Restart Replit Server
+1. Stop the current server (Ctrl+C or click Stop button)
+2. Click the Run button to restart
+3. Wait for "Server running on port 5000" (or similar)
+4. Check console for any errors
+
+If you see errors related to:
+- Supabase: Check that all 4 secrets are added correctly
+- Database: The getUser() fix should resolve this
+- Build errors: Share the error message here
+
+Confirm when server is running without errors.
+STEP 15: Test API Endpoint Directly
+Test if the getUser() fix worked by checking the API response.
+
+Option 1 (if you can login in the browser):
+1. Open FieldSnaps in browser
+2. Login with hello@fieldsnaps.com
+3. Open DevTools (F12) → Network tab
+4. Find the /api/auth/user request
+5. Look at the Response - it should now include:
+
+{
+  "id": "...",
+  "email": "hello@fieldsnaps.com",
+  "companyId": "...",
+  "subscriptionStatus": "active",  ← THIS SHOULD BE HERE NOW!
+  "subscriptionEndDate": "2025-..."
+}
+
+Option 2 (using curl in Replit shell):
+curl http://localhost:5000/api/auth/user -H "Cookie: connect.sid=YOUR_SESSION_COOKIE"
+
+Paste the JSON response here to verify subscriptionStatus is now 'active'.
+STEP 16: Deploy to GitHub (Triggers Capgo OTA)
+Commit all changes to GitHub:
+
+git add .
+git commit -m "Fix subscription status join, Supabase setup, UI issues"
+git push origin main
+
+This triggers Capgo to build and deploy the update to iOS.
+
+Wait 2-3 minutes for Capgo build to complete.
+
+Confirm when pushed successfully.
+STEP 17: Test on iOS App
+1. Force quit FieldSnaps app (swipe up from app switcher)
+2. Reopen the app
+3. Wait 5-10 seconds for Capgo OTA update to download
+4. Look for update confirmation (may be silent)
+
+Test checklist:
+✅ No "Trial Mode" banner at top
+✅ Camera button works (no "trial ended" error)
+✅ Create new job works (no "trial ended" error)
+✅ Filter sheet doesn't overlap bottom navigation
+✅ To-Do dialog title is centered
+✅ To-Do dialog has rounded bottom corners
+✅ Camera UI is correct (no white menu, no shift)
+✅ Header stays at top when scrolling
+✅ Bottom navigation stays at bottom when scrolling
+✅ Calendar opens in week view by default
+✅ Calendar has only one X close button
+✅ Maps load correctly (if API key was added)
+
+Report results for each item.
+STEP 18: Verify Subscription Status in App
+In the iOS app, check your account/settings page.
+
+It should now show:
+- Subscription Status: Active ✅
+- End Date: 2025-12-31 (or your actual date)
+- NOT: "Trial Mode" or "Trial Ended"
+
+If it still shows trial mode:
+1. Check that Step 15 shows subscriptionStatus: "active" in API response
+2. Force quit app again and wait longer for OTA update
+3. Check Capgo dashboard to confirm new version was deployed
+
+Confirm subscription shows correctly.
+📋 Execution Checklist (Send to Replit in Order)
+Phase 1: Supabase Setup (Steps 1-4)
+ Step 1: Install @supabase/supabase-js
+ Step 2: Add 4 Supabase secrets to Replit
+ Step 3: Create server/supabase.ts file
+ Step 4: Update User type in shared/schema.ts
+Phase 2: Critical Fix (Steps 5-6)
+ Step 5: Fix getUser() to JOIN companies table ⚠️ MOST IMPORTANT
+ Step 6: Run SQL query to verify company has active subscription
+Phase 3: UI Fixes (Steps 7-13)
+ Step 7: Filter sheet bottom padding
+ Step 8: To-Do dialog centering & corners
+ Step 9: Camera UI fixes
+ Step 10: Lock header/footer scroll
+ Step 11: Calendar default week view
+ Step 12: Remove double X buttons
+ Step 13: Google Maps API key
+Phase 4: Deploy & Test (Steps 14-18)
+ Step 14: Restart server
+ Step 15: Test API endpoint
+ Step 16: Push to GitHub
+ Step 17: Test on iOS
+ Step 18: Verify subscription status
+🎯 Root Cause Summary
+Why "Trial Mode" appeared:
+
+User row has company_id pointing to company
+Company row has subscription_status: 'active'
+BUT getUser() only queried users table
+So API returned user WITHOUT company's subscription status
+Frontend saw subscriptionStatus: undefined → defaulted to "trial"
+After Step 5 fix:
+
+getUser() now JOINs with companies table
+Returns subscriptionStatus: 'active' from company
+Frontend sees "active" → unlocks all features ✅
+This is now the COMPLETE list covering:
+
+✅ Supabase setup (Steps 1-4)
+✅ Login/subscription fix (Steps 5-6)
+✅ All 7 UI issues you reported (Steps 7-13)
+✅ Testing and deployment (Steps 14-18)
+Send these to Replit AI in order! 🚀

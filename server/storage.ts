@@ -219,7 +219,27 @@ export class DbStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
-    return result[0];
+    const user = result[0];
+    
+    if (!user) return undefined;
+    
+    // Hydrate subscription status from company (company status takes precedence)
+    if (user.companyId) {
+      const companyResult = await db.select({
+        subscriptionStatus: companies.subscriptionStatus,
+        subscriptionEndDate: companies.subscriptionEndDate,
+      }).from(companies).where(eq(companies.id, user.companyId));
+      
+      if (companyResult[0]) {
+        return {
+          ...user,
+          subscriptionStatus: companyResult[0].subscriptionStatus,
+          subscriptionEndDate: companyResult[0].subscriptionEndDate,
+        };
+      }
+    }
+    
+    return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
