@@ -1,3 +1,6 @@
+import { initSentry, Sentry } from "./sentry";
+initSentry();
+
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import compression from "compression";
@@ -67,6 +70,7 @@ export const corsConfig = cors({
 
 // Enable gzip compression for all responses - reduces payload size by up to 70%
 app.use(compression());
+
 
 // Security headers middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -264,12 +268,17 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Sentry error handler (must be before generic error handler)
+  if (process.env.SENTRY_DSN) {
+    Sentry.setupExpressErrorHandler(app);
+  }
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    console.error('[Error]', err.message);
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after
