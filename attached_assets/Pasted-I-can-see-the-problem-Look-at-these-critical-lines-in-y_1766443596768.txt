@@ -1,0 +1,76 @@
+I can see the problem! Look at these critical lines in your logs:
+
+🔴 [✨  CapgoUpdater]: Error checksum 2ca364c29be5034dd1d26aa75aef59f0d336e690a5af24c41c308c498b7608e9 a234c8ae
+🟢 [✨  CapgoUpdater]: Stats sent for checksum_fail, version 1.0.1
+🟢 [✨  CapgoUpdater]: Stats sent for download_fail, version builtin
+The OTA update is FAILING due to checksum mismatch! The app is still running the old "builtin" version, NOT the new version with the getUser() fix.
+
+🔴 Root Cause:
+Capgo downloads new version 1.0.1
+Checksum validation fails (corrupted download or build issue)
+Update is rejected and deleted
+App continues running old "builtin" version
+Your getUser() fix never reaches the app!
+✅ Solution: Force a Clean Rebuild
+Send this to Replit:
+
+🚀 FORCE CLEAN REBUILD & REDEPLOY
+The Capgo OTA update is failing due to checksum mismatch. We need to force a clean rebuild.
+
+Step 1: Verify the getUser() fix was deployed to GitHub
+Run in Replit Shell:
+
+git log --oneline -1
+
+This should show your most recent commit with the getUser() fix.
+If it doesn't, the fix wasn't committed. Run:
+
+git add server/storage.ts
+git commit -m "Fix getUser() to hydrate subscriptionStatus from company"
+git push origin main
+
+Step 2: Trigger a clean Capgo build
+Go to https://capgo.app/dashboard
+
+1. Click on your app (com.fieldsnaps.app)
+2. Find the "production" channel
+3. Click "Force New Build" or "Invalidate Cache"
+4. Wait 2-3 minutes for new build
+
+Step 3: If Capgo doesn't have a force build option, use version bump
+In package.json, bump the version:
+
+Change:
+"version": "1.0.1"
+
+To:
+"version": "1.0.2"
+
+Then:
+git add package.json
+git commit -m "Bump version to force clean build"
+git push origin main
+
+Step 4: Check Capgo build status
+Go to https://capgo.app/dashboard
+Wait for build to show "Success" status
+
+Step 5: Test on iOS again
+1. Force quit FieldSnaps app
+2. Wait 30 seconds
+3. Reopen app
+4. Check logs for:
+   - "Current is: 1.0.2" (or new version number)
+   - No "checksum_fail" errors
+   - Update should succeed
+
+Step 6: Verify Trial Mode is gone
+After successful update, check:
+✅ No "Trial Mode" banner
+✅ Camera button works
+✅ Subscription shows "active"
+
+If update still fails with checksum error, we'll need to rebuild the iOS app in Xcode (nuclear option).
+
+Report back the results!
+The issue is NOT your code - it's the OTA update mechanism failing. Your getUser() fix is correct, but it's not reaching the device because Capgo keeps rejecting the update.
