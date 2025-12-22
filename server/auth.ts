@@ -4,6 +4,7 @@ import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { verifyAccessToken, refreshAccessToken as refreshJwtAccessToken, revokeRefreshToken } from "./jwtService";
 import { verifySupabaseToken, getOrCreateUserFromSupabase } from "./supabaseAuth";
+import { setUserContext, clearUserContext } from "./sentry";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000;
@@ -124,6 +125,8 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
         displayName: payload.displayName,
         profilePicture: payload.profilePicture,
       };
+      setUserContext({ id: payload.sub, email: payload.email || undefined });
+      res.on('finish', () => clearUserContext());
       return next();
     }
     
@@ -145,6 +148,8 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
             supabaseUserId: supabasePayload.sub,
             isNewUser: user.isNewUser,
           };
+          setUserContext({ id: user.id, email: user.email || undefined, companyId: user.companyId || undefined });
+          res.on('finish', () => clearUserContext());
           return next();
         }
       }

@@ -1,4 +1,4 @@
-import { initSentry, Sentry } from "./sentry";
+import { initSentry, Sentry, sentryUserMiddleware, sentryErrorMiddleware } from "./sentry";
 initSentry();
 
 import express, { type Request, Response, NextFunction } from "express";
@@ -270,7 +270,7 @@ app.use((req, res, next) => {
 
   // Sentry error handler (must be before generic error handler)
   if (process.env.SENTRY_DSN) {
-    Sentry.setupExpressErrorHandler(app);
+    app.use(sentryErrorMiddleware);
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

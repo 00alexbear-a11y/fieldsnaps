@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import type { Request, Response, NextFunction } from "express";
 
 export function initSentry() {
   const dsn = process.env.SENTRY_DSN;
@@ -50,6 +51,29 @@ export function addBreadcrumb(message: string, data?: Record<string, any>) {
 
 export function clearUserContext() {
   Sentry.setUser(null);
+}
+
+export function sentryUserMiddleware(req: Request, res: Response, next: NextFunction) {
+  const user = (req as any).user;
+  if (user?.claims?.sub) {
+    Sentry.setUser({
+      id: user.claims.sub,
+      email: user.claims.email,
+    });
+  }
+  next();
+}
+
+export function sentryErrorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
+  Sentry.captureException(err, {
+    extra: {
+      method: req.method,
+      path: req.path,
+      query: req.query,
+      userId: (req as any).user?.claims?.sub,
+    },
+  });
+  next(err);
 }
 
 export { Sentry };

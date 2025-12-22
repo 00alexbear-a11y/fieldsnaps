@@ -377,6 +377,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sentry test endpoint - throws an error to verify Sentry is capturing
+  app.get('/api/test-sentry', (req, res) => {
+    throw new Error('Test error - Sentry should catch this!');
+  });
+  
   // Apple App Site Association (AASA) file for Universal Links
   // Required for iOS to recognize this domain as associated with the app
   // NOTE: Update APPLE_TEAM_ID environment variable with your Apple Developer Team ID
