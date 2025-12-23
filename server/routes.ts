@@ -1259,11 +1259,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // User is authenticated (via JWT or session) - return user data
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub;
+      
+      if (!userId) {
+        console.error('[/api/auth/user] No user ID in request after authentication');
+        return res.status(500).json({ message: "User ID missing from auth context" });
+      }
+      
+      console.log('[/api/auth/user] Fetching user with ID:', userId);
       const user = await storage.getUser(userId);
+      
+      if (!user) {
+        console.error('[/api/auth/user] User not found in database for ID:', userId);
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      console.log('[/api/auth/user] Returning user:', user.email);
       return res.json(user);
     } catch (error) {
-      console.error("Error fetching authenticated user:", error);
+      console.error("[/api/auth/user] Error fetching authenticated user:", error);
       return res.status(500).json({ message: "Failed to fetch user" });
     }
   });

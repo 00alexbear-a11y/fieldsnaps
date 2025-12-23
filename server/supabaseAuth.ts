@@ -138,7 +138,10 @@ export async function getOrCreateUserFromSupabase(payload: SupabaseTokenPayload)
     return null;
   }
 
-  let [existingBySupabaseId] = await db.select()
+  console.log('[SupabaseAuth] getOrCreateUserFromSupabase called with:', { supabaseUserId, email });
+
+  try {
+    let [existingBySupabaseId] = await db.select()
     .from(users)
     .where(eq(users.supabaseUserId, supabaseUserId))
     .limit(1);
@@ -209,16 +212,20 @@ export async function getOrCreateUserFromSupabase(payload: SupabaseTokenPayload)
 
   console.log(`[SupabaseAuth] Created new user ${newUser.id} from Supabase ID ${supabaseUserId}`);
 
-  return {
-    id: newUser.id,
-    email: newUser.email,
-    firstName: newUser.firstName,
-    lastName: newUser.lastName,
-    profileImageUrl: newUser.profileImageUrl,
-    companyId: newUser.companyId,
-    role: newUser.role,
-    isNewUser: true,
-  };
+    return {
+      id: newUser.id,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      profileImageUrl: newUser.profileImageUrl,
+      companyId: newUser.companyId,
+      role: newUser.role,
+      isNewUser: true,
+    };
+  } catch (error: any) {
+    console.error('[SupabaseAuth] Error in getOrCreateUserFromSupabase:', error.message, error.stack);
+    return null;
+  }
 }
 
 export function extractTokenFromHeader(authHeader: string | undefined): string | null {
