@@ -218,11 +218,17 @@ export class DbStorage implements IStorage {
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
+    if (!id) {
+      console.error('[getUser] No ID provided - returning undefined');
+      return undefined;
+    }
+    
     console.log('[getUser] Looking up user with id:', id);
     
-    // Try lookup by supabase_user_id first (used by Supabase auth)
-    let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
-    console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
+    try {
+      // Try lookup by supabase_user_id first (used by Supabase auth)
+      let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+      console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
     
     // Fall back to primary key lookup for backward compatibility
     if (!result[0]) {
@@ -260,6 +266,10 @@ export class DbStorage implements IStorage {
     
     console.log('[getUser] Returning user without company hydration, subscriptionStatus:', user.subscriptionStatus);
     return user;
+    } catch (error: any) {
+      console.error('[getUser] Database error:', error.message, error.stack);
+      throw error;
+    }
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
