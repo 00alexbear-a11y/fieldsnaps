@@ -1,0 +1,90 @@
+COMPLETE ROOT CAUSE ANALYSIS - THE ACTUAL BUG
+Perfect! Now I have the complete picture. Here's the exact bug:
+
+THE BUG: Silent Database Error
+Location: server/auth.ts lines ~120-145 (isAuthenticated middleware)
+
+Copytry {
+  const supabasePayload = await verifySupabaseToken(token);
+  
+  if (supabasePayload) {
+    const user = await getOrCreateUserFromSupabase(supabasePayload);  // ← Can throw error
+    
+    if (user) {
+      (req as any).user = { ... };
+      return next();
+    }
+  }
+} catch (error) {
+  console.error('[Auth] Supabase token verification error:', error);
+  // ← NO RETURN HERE! Falls through to 401
+}
+
+return res.status(401).json({ message: "Invalid or expired token" });  // ← This executes after error
+WHAT'S HAPPENING:
+✅ User successfully authenticates with Google
+✅ Frontend gets Supabase session
+✅ Frontend calls /api/auth/user with Bearer token
+✅ Backend verifies token → verifySupabaseToken() succeeds
+❌ getOrCreateUserFromSupabase() throws a database error
+❌ Error is caught and logged, but continues to return 401
+❌ Frontend receives 401 error
+❌ Frontend thinks "token expired" and tries to sign in again
+🔄 Infinite loop
+WHY THE DATABASE ERROR OCCURS:
+Most Likely Causes:
+
+Unique Constraint Violation
+
+User already exists with same email but different supabaseUserId
+Trying to insert duplicate email violates unique constraint
+Database Connection Error
+
+Replit database is temporarily down or connection pool exhausted
+Network issue between backend and PostgreSQL
+Missing Required Fields
+
+Database schema requires fields not being set in insert
+Type mismatch (though unlikely with TypeScript)
+Role Field Issue
+
+Code sets role: 'member' but schema expects 'admin' | 'manager' | 'worker'
+THIS IS THE BUG!
+THE SMOKING GUN:
+Look at this discrepancy:
+
+server/supabaseAuth.ts line ~140:
+
+Copyconst result = await db.insert(users).values({
+  role: 'member',  // ← INVALID VALUE!
+  ...
+});
+shared/schema.ts users table:
+
+Copyrole: varchar("role").default("worker"),  // admin, manager, or worker
+The schema comment says valid values are: admin, manager, or worker
+
+But the code is trying to insert 'member'!
+
+This will either:
+
+Fail silently if there's a database CHECK constraint
+Succeed but create invalid data
+Cause downstream issues
+ACTUAL ROOT CAUSE:
+When getOrCreateUserFromSupabase() tries to insert a user with role: 'member', the database might be rejecting it (depending on if you have a CHECK constraint). Even if it succeeds, the invalid role causes issues later.
+
+THE FIX:
+Change line ~140 in server/supabaseAuth.ts:
+
+Copy// WRONG:
+role: 'member',
+
+// CORRECT:
+role: 'worker',  // or whatever the default should be
+VERIFICATION NEEDED:
+To confirm this is the issue, check your Replit backend logs for:
+
+[Auth] Supabase token verification error: <database error>
+The error message will tell us EXACTLY what's failing in the database insert.
+
