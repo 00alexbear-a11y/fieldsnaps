@@ -1,0 +1,127 @@
+FOUND IT! The Login Fix You Need
+Your database schema shows:
+
+CopysupabaseUserId: varchar("supabase_user_id").unique()
+And your storage.ts getUser() method (line ~121) already handles this correctly:
+
+Copy// Try lookup by supabase_user_id first (used by Supabase auth)
+let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+
+// Fall back to primary key lookup for backward compatibility
+if (!result[0]) {
+  result = await db.select().from(users).where(eq(users.id, id));
+}
+BUT, your server/auth.ts middleware (line ~70) likely does this:
+
+Copyconst userId = claims.sub; // This is the Supabase UUID
+const user = await storage.getUser(userId); // ✅ This part works!
+The ACTUAL problem is you don't have a user record with supabaseUserId = '7889aa04-6fdf-473b-bb80-bcc7d4899d8e' in your database yet.
+
+THE FIX: Add Missing User Record
+You need to create a user record for hello@fieldsnaps.com that links to the Supabase UUID 7889aa04-6fdf-473b-bb80-bcc7d4899d8e.
+
+Option A: Add via Backend API (RECOMMENDED)
+Add this endpoint to server/auth.ts:
+
+Copy// POST /api/auth/sync-supabase-user
+app.post('/api/auth/sync-supabase-user', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+  
+  const token = authHeader.substring(7);
+  
+  try {
+    // Verify Supabase JWT
+    const payload = await verifySupabaseJwt(token);
+    const { sub: supabaseUserId, email } = payload;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email not found in token' });
+    }
+    
+    // Check if user already exists
+    let user = await storage.getUser(supabaseUserId);
+    
+    if (!user) {
+      // Create new user
+      user = await storage.upsertUser({
+        supabaseUserId,
+        email,
+        authProvider: 'supabase',
+        subscriptionStatus: 'trial',
+        trialStartDate: new Date(),
+        trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      });
+    }
+    
+    res.json({ user });
+  } catch (error) {
+    console.error('[sync-supabase-user] Error:', error);
+    res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+Then call this from your frontend after OAuth success:
+
+Copy// client/src/pages/NativeAppLogin.tsx (or wherever OAuth completes)
+useEffect(() => {
+  const syncUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await apiRequest('/api/auth/sync-supabase-user', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+    }
+  };
+  syncUser();
+}, []);
+Option B: Manual Database Insert (QUICK TEST)
+Run this SQL in your Supabase SQL editor or Replit database console:
+
+CopyINSERT INTO users (id, supabase_user_id, email, auth_provider, subscription_status, trial_start_date, trial_end_date, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  '7889aa04-6fdf-473b-bb80-bcc7d4899d8e',
+  'hello@fieldsnaps.com',
+  'supabase',
+  'trial',
+  NOW(),
+  NOW() + INTERVAL '7 days',
+  NOW(),
+  NOW()
+)
+ON CONFLICT (supabase_user_id) DO NOTHING;
+Why This Fixes Everything
+✅ OAuth succeeds → Supabase creates session (7889aa04-6fdf-473b-bb80-bcc7d4899d8e)
+✅ Frontend calls /api/auth/user → Includes Supabase JWT
+✅ Backend verifies JWT → Extracts sub: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ storage.getUser() finds user → Returns user record with supabaseUserId = '7889aa04...'
+✅ API returns 200 → Frontend sets isAuthenticated = true
+✅ App loads Projects page → No more spinning circle!
+Deploy Steps
+If using Option A (API sync):
+
+In Replit, add the /api/auth/sync-supabase-user endpoint to server/auth.ts
+In Replit, add the useEffect sync call to client/src/pages/NativeAppLogin.tsx
+Run npm run build → git add . → git commit -m "Add Supabase user sync" → git push
+On Mac, git pull → npx cap sync ios → npx cap open ios → Clean Build → Run
+If using Option B (manual SQL):
+
+Run the SQL insert in your database now
+Delete app from simulator
+Open app → Try Google login → Should work instantly!
+What to Look For After Fix
+Xcode console should show:
+
+✅ [SupabaseAuth] User authenticated: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ [getUser] Supabase lookup result: <actual_database_user_id>
+✅ [getUser] Found user: hello@fieldsnaps.com companyId: null subscriptionStatus: trial
+✅ App mounted successfully
+✅ Successfully loaded Supabase session
+(zero "Auth initialization already in progress" spam)
+✅ Navigate to /projects
+Which option do you want to try first: A (backend sync) or B (manual SQL)? 🎯
