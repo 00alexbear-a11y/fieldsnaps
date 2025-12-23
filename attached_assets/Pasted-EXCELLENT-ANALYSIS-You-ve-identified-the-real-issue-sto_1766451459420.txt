@@ -1,0 +1,241 @@
+EXCELLENT ANALYSIS! You've identified the real issue: storage.getUser() is throwing an exception (500 error), not returning undefined. This means there's a database type mismatch or query error.
+
+ROOT CAUSE: Database Type Mismatch
+Your schema shows:
+
+Copyid: varchar("id").primaryKey().default(sql`gen_random_uuid()`)
+So users.id is a VARCHAR (UUID string), not an integer. But somewhere in the flow, the code might be passing the wrong ID type.
+
+THE ACTUAL BUG
+In server/auth.ts, the isAuthenticated middleware does this:
+
+Copy// After getOrCreateUserFromSupabase()
+req.user = user; // user has { id: "abc-123-def", ... }
+
+// Later in /api/auth/user route:
+const userId = req.user?.id; // This is the DATABASE user.id (UUID string)
+const user = await storage.getUser(userId); // ✅ Should work
+BUT, if getOrCreateUserFromSupabase() fails silently and returns null, then:
+
+Copyreq.user = null; // User creation failed
+// Later:
+const userId = req.user?.id; // userId = undefined
+const user = await storage.getUser(undefined); // ❌ THROWS ERROR
+THE FIX: Add Error Handling + Debug Logging
+Step 1: Fix server/auth.ts - Add Error Handling
+Find the isAuthenticated middleware (around line 70) and update it:
+
+Copyexport async function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    
+    const token = authHeader.substring(7);
+    
+    // Verify Supabase JWT
+    const payload = await verifySupabaseJwt(token);
+    const supabaseUserId = payload.sub;
+    
+    if (!supabaseUserId) {
+      console.error('[isAuthenticated] No sub claim in JWT');
+      return res.status(401).json({ error: 'Invalid token: missing sub claim' });
+    }
+    
+    console.log('[isAuthenticated] Verified Supabase user:', supabaseUserId);
+    
+    // Get or create user from Supabase
+    const user = await getOrCreateUserFromSupabase(payload);
+    
+    if (!user) {
+      console.error('[isAuthenticated] getOrCreateUserFromSupabase returned null for:', supabaseUserId);
+      return res.status(500).json({ error: 'Failed to create or fetch user' });
+    }
+    
+    console.log('[isAuthenticated] User record found/created:', user.id, user.email);
+    
+    // Add user to request
+    req.user = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      companyId: user.companyId,
+      claims: payload,
+    };
+    
+    next();
+  } catch (error: any) {
+    console.error('[isAuthenticated] Error:', error.message, error.stack);
+    return res.status(401).json({ error: 'Authentication failed' });
+  }
+}
+Step 2: Fix getOrCreateUserFromSupabase() - Add Error Logging
+Find the getOrCreateUserFromSupabase function (around line 150) and update it:
+
+Copyasync function getOrCreateUserFromSupabase(payload: any): Promise<User | null> {
+  const { sub: supabaseUserId, email, user_metadata } = payload;
+  
+  if (!supabaseUserId || !email) {
+    console.error('[getOrCreateUserFromSupabase] Missing required fields:', { supabaseUserId, email });
+    return null;
+  }
+  
+  console.log('[getOrCreateUserFromSupabase] Looking up user:', supabaseUserId, email);
+  
+  try {
+    // Try to find existing user by supabaseUserId
+    let user = await storage.getUser(supabaseUserId);
+    
+    if (user) {
+      console.log('[getOrCreateUserFromSupabase] Found existing user:', user.id);
+      return user;
+    }
+    
+    console.log('[getOrCreateUserFromSupabase] User not found, creating new user');
+    
+    // Create new user
+    user = await storage.upsertUser({
+      supabaseUserId,
+      email,
+      firstName: user_metadata?.firstName || user_metadata?.full_name?.split(' ')[0] || null,
+      lastName: user_metadata?.lastName || user_metadata?.full_name?.split(' ').slice(1).join(' ') || null,
+      profileImageUrl: user_metadata?.avatar_url || null,
+      authProvider: 'supabase',
+      subscriptionStatus: 'trial',
+      trialStartDate: new Date(),
+      trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
+    
+    console.log('[getOrCreateUserFromSupabase] Created user:', user.id, user.email);
+    return user;
+  } catch (error: any) {
+    console.error('[getOrCreateUserFromSupabase] Error:', error.message, error.stack);
+    return null;
+  }
+}
+Step 3: Fix /api/auth/user Route - Add Validation
+Find the /api/auth/user route (around line 200) and update it:
+
+Copyapp.get('/api/auth/user', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      console.error('[/api/auth/user] No user ID in request');
+      return res.status(500).json({ error: 'User ID missing from auth context' });
+    }
+    
+    console.log('[/api/auth/user] Fetching user:', userId);
+    
+    const user = await storage.getUser(userId);
+    
+    if (!user) {
+      console.error('[/api/auth/user] User not found in database:', userId);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log('[/api/auth/user] Returning user:', user.email);
+    res.json({ user });
+  } catch (error: any) {
+    console.error('[/api/auth/user] Error:', error.message, error.stack);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+Step 4: Fix storage.getUser() - Add Error Handling
+Update server/storage.ts getUser() method (around line 220):
+
+Copyasync getUser(id: string): Promise<User | undefined> {
+  if (!id) {
+    console.error('[getUser] No ID provided');
+    return undefined;
+  }
+  
+  console.log('[getUser] Looking up user with id:', id);
+  
+  try {
+    // Try lookup by supabase_user_id first (used by Supabase auth)
+    let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
+    console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
+    
+    // Fall back to primary key lookup for backward compatibility
+    if (!result[0]) {
+      result = await db.select().from(users).where(eq(users.id, id));
+      console.log('[getUser] Primary key lookup result:', result[0]?.id || 'not found');
+    }
+    
+    const user = result[0];
+    
+    if (!user) {
+      console.log('[getUser] User not found for id:', id);
+      return undefined;
+    }
+    
+    console.log('[getUser] Found user:', user.email, 'companyId:', user.companyId);
+    
+    // Hydrate subscription status from company
+    if (user.companyId) {
+      const companyResult = await db.select({
+        subscriptionStatus: companies.subscriptionStatus,
+        subscriptionEndDate: companies.subscriptionEndDate,
+      }).from(companies).where(eq(companies.id, user.companyId));
+      
+      if (companyResult[0]) {
+        return {
+          ...user,
+          subscriptionStatus: companyResult[0].subscriptionStatus,
+          subscriptionEndDate: companyResult[0].subscriptionEndDate,
+        };
+      }
+    }
+    
+    return user;
+  } catch (error: any) {
+    console.error('[getUser] Database error:', error.message, error.stack);
+    throw error; // Re-throw to be caught by caller
+  }
+}
+Deploy & Test
+In Replit Shell:
+
+Copynpm run build
+git add .
+git commit -m "Fix: Add comprehensive error handling to auth flow"
+git push origin main
+On Mac:
+
+Copycd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build
+npx cap sync ios
+npx cap open ios
+In Xcode:
+
+Product → Clean Build Folder
+Delete app from simulator
+Product → Run
+Watch Xcode Console AND Replit Logs simultaneously
+
+Expected Logs After Fix
+SUCCESS CASE (Xcode Console):
+
+✅ [SupabaseAuth] User authenticated: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ App making API call: /api/auth/user
+✅ Successfully loaded user data
+✅ Navigate to /projects
+SUCCESS CASE (Replit Backend Logs):
+
+✅ [isAuthenticated] Verified Supabase user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ [getOrCreateUserFromSupabase] Looking up user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e hello@fieldsnaps.com
+✅ [getUser] Looking up user with id: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+✅ [getUser] Supabase lookup result: abc-123-def (or "not found")
+✅ [getOrCreateUserFromSupabase] Created user: abc-123-def hello@fieldsnaps.com
+✅ [isAuthenticated] User record found/created: abc-123-def hello@fieldsnaps.com
+✅ [/api/auth/user] Fetching user: abc-123-def
+✅ [/api/auth/user] Returning user: hello@fieldsnaps.com
+FAILURE CASE (will now show WHERE it fails):
+
+❌ [getOrCreateUserFromSupabase] Database error: <actual error message>
+❌ [isAuthenticated] getOrCreateUserFromSupabase returned null
+This fix will EITHER solve the problem OR give you the EXACT error message showing what's broken. Apply the changes and paste BOTH Xcode console AND Replit logs here! 🎯
