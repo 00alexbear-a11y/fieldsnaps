@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { User } from "@shared/schema";
 import type { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -91,6 +91,11 @@ export function useAuth() {
     enabled: queryEnabled 
   });
 
+  // Create a stable reference to the current session that the queryFn can access
+  // This avoids the stale closure problem where queryFn captures old authState
+  const sessionRef = useRef<Session | null>(null);
+  sessionRef.current = authState.session;
+  
   const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser, refetch } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
@@ -107,13 +112,14 @@ export function useAuth() {
     gcTime: 0,
     queryFn: async () => {
       console.log('[useAuth] ========== QUERY STARTING ==========');
-      console.log('[useAuth] Session available:', !!authState.session);
+      
+      // CRITICAL: Use sessionRef.current to get the CURRENT session value
+      // The queryFn closure would otherwise capture stale authState from when it was defined
+      const currentSession = sessionRef.current;
+      console.log('[useAuth] Session from ref:', !!currentSession);
       console.log('[useAuth] Fetching user data...');
       
-      // CRITICAL: Use the session token directly from authState, NOT tokenManager
-      // tokenManager may have stale state due to async timing issues
-      // The query is only enabled when authState.session exists, so we can safely use it
-      const token = authState.session?.access_token;
+      const token = currentSession?.access_token;
       console.log('[useAuth] Token from session:', !!token, token ? token.substring(0, 30) + '...' : 'null');
       
       if (!token) {
