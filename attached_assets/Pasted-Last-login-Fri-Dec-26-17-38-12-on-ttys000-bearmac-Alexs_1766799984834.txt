@@ -1,0 +1,876 @@
+Last login: Fri Dec 26 17:38:12 on ttys000
+bearmac@Alexs-MacBook-Pro-2 ~ % cd ~/Documents/Projects/FieldSnaps
+git pull origin main
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+remote: Enumerating objects: 138, done.
+remote: Counting objects: 100% (61/61), done.
+remote: Total 138 (delta 61), reused 61 (delta 61), pack-reused 77 (from 1)
+Receiving objects: 100% (138/138), 6.76 MiB | 19.34 MiB/s, done.
+Resolving deltas: 100% (100/100), completed with 10 local objects.
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+   c3cf3b9..c444c38  main       -> origin/main
+Updating c3cf3b9..c444c38
+error: Your local changes to the following files would be overwritten by merge:
+	capacitor.config.ts
+	client/src/hooks/useAuth.ts
+	package-lock.json
+Please commit your changes or stash them before you merge.
+Aborting
+
+> rest-express@1.0.1 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming (8) src/lib/nativeSplashScreen.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3267 modules transformed.
+../dist/public/index.html                                                 2.48 kB │ gzip:   0.92 kB
+../dist/public/assets/photoCompression.worker-Dqm7FVON.js                 2.54 kB
+../dist/public/assets/Fieldsnap logo v1.2_1760310501545-reWcQgwu.png    294.95 kB
+../dist/public/assets/IMG_3762_1762447489193-BUUS8a5E.png               696.18 kB
+../dist/public/assets/camera-roll-mixed-photos-3pVvTezs.png           4,934.62 kB
+../dist/public/assets/index-BuEkCcik.css                                131.49 kB │ gzip:  20.45 kB
+../dist/public/assets/web-CL5SHQD_.js                                     0.12 kB │ gzip:   0.13 kB
+../dist/public/assets/web-C4_r6cpu.js                                     0.29 kB │ gzip:   0.21 kB
+../dist/public/assets/web-DygFRmmZ.js                                     0.35 kB │ gzip:   0.19 kB
+../dist/public/assets/web-C7FXs-5P.js                                     0.36 kB │ gzip:   0.25 kB
+../dist/public/assets/web-Fx7ewIwH.js                                     0.38 kB │ gzip:   0.25 kB
+../dist/public/assets/web-C1YUFcWA.js                                     0.39 kB │ gzip:   0.29 kB
+../dist/public/assets/grid-3x3-CFpML176.js                                0.46 kB │ gzip:   0.31 kB
+../dist/public/assets/tag-DjaLcwpE.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/subDays-drV3DvgX.js                                 0.67 kB │ gzip:   0.35 kB
+../dist/public/assets/native-KikmB1R4.js                                  0.75 kB │ gzip:   0.35 kB
+../dist/public/assets/web-B9V-XZxv.js                                     0.76 kB │ gzip:   0.35 kB
+../dist/public/assets/videoUtils-FQGJR9l4.js                              0.77 kB │ gzip:   0.45 kB
+../dist/public/assets/web-CipYLA1L.js                                     0.80 kB │ gzip:   0.42 kB
+../dist/public/assets/web-BYStUyMC.js                                     0.80 kB │ gzip:   0.24 kB
+../dist/public/assets/web-B8rrs60b.js                                     0.94 kB │ gzip:   0.47 kB
+../dist/public/assets/web-0o6ApBtz.js                                     1.15 kB │ gzip:   0.55 kB
+../dist/public/assets/web-CRl3wVDY.js                                     1.25 kB │ gzip:   0.59 kB
+../dist/public/assets/base-E7_5IMLV.js                                    2.53 kB │ gzip:   0.93 kB
+../dist/public/assets/web-cyEcBi-d.js                                     2.97 kB │ gzip:   0.82 kB
+../dist/public/assets/web-Dy2wKlCC.js                                     3.44 kB │ gzip:   1.10 kB
+../dist/public/assets/web-D96-x21W.js                                     8.86 kB │ gzip:   3.05 kB
+../dist/public/assets/toaster-CabSgAGA.js                                13.73 kB │ gzip:   4.86 kB
+../dist/public/assets/purify.es-sOfw8HaZ.js                              22.67 kB │ gzip:   8.79 kB
+../dist/public/assets/web--kAEZVSB.js                                    23.59 kB │ gzip:   6.70 kB
+../dist/public/assets/Settings-dUwCB0Gw.js                               43.40 kB │ gzip:   9.60 kB
+../dist/public/assets/ToDos-CaaOx2To.js                                  50.77 kB │ gzip:  12.95 kB
+../dist/public/assets/Camera-DmaR5nTH.js                                 78.78 kB │ gzip:  21.37 kB
+../dist/public/assets/ProjectPhotos-BGgzs_jO.js                         125.57 kB │ gzip:  36.80 kB
+../dist/public/assets/index.es-EPsvwUn_.js                              150.57 kB │ gzip:  51.51 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                       201.42 kB │ gzip:  48.03 kB
+../dist/public/assets/index-DHKGnW4W.js                               1,696.59 kB │ gzip: 491.95 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.38s
+
+  dist/index.js  309.8kb
+
+⚡ Done in 13ms
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 9.01ms
+✔ Creating capacitor.config.json in ios/App/App in 639.63μs
+✔ copy ios in 76.72ms
+✔ Updating iOS plugins in 7.47ms
+✔ Updating iOS native dependencies with pod install in 2.55s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 2.60s
+[info] Sync finished in 2.936s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % git stash && git pull origin main && git stash pop
+npm run build && rm -rf ios/App/App/public && npx cap sync ios
+Saved working directory and index state WIP on main: c3cf3b9 Add detailed logging for app startup and update processes
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+Updating c3cf3b9..c444c38
+Fast-forward
+ .replit                                            |   3 +
+ ...hot_2025-12-22_at_15.16.13@2x_1766445375709.png | Bin 0 -> 1720755 bytes
+ ...hot_2025-12-22_at_15.19.18@2x_1766445561406.png | Bin 0 -> 1644345 bytes
+ ...hot_2025-12-22_at_15.19.18@2x_1766445588337.png | Bin 0 -> 1644345 bytes
+ ...hot_2025-12-22_at_15.20.50@2x_1766445652458.png | Bin 0 -> 872117 bytes
+ ...hot_2025-12-22_at_15.21.30@2x_1766445692968.png | Bin 0 -> 1048166 bytes
+ ...hot_2025-12-22_at_16.42.03@2x_1766450524899.png | Bin 0 -> 229307 bytes
+ ...anShot_2025-12-22_at_16.42.44_1766450566632.png | Bin 0 -> 285625 bytes
+ ...hot_2025-12-26_at_16.35.08@2x_1766795710080.png | Bin 0 -> 1615225 bytes
+ ...anShot_2025-12-26_at_17.22.49_1766798571392.png | Bin 0 -> 329627 bytes
+ ...Y-PASTE-STEP-1-Create-Sentry-_1766446039720.txt | 540 +++++++++++++
+ ...Y-PASTE-STEP-1-Create-Sentry-_1766446115762.txt | 540 +++++++++++++
+ ...-at-what-happens-when-Supabas_1766798617494.txt |  74 ++
+ ...andled-yes-level-level-error-_1766448759991.txt | 630 +++++++++++++++
+ ...BGAppRefreshSubscriber-load-U_1766449592690.txt | 209 +++++
+ ...BGAppRefreshSubscriber-load-U_1766511241886.txt | 130 ++++
+ ...BGAppRefreshSubscriber-load-U_1766511559726.txt | 237 ++++++
+ ...BGAppRefreshSubscriber-load-U_1766795840535.txt | 129 +++
+ ...BGAppRefreshSubscriber-load-U_1766795974171.txt | 175 +++++
+ ...BGAppRefreshSubscriber-load-U_1766796771641.txt | 234 ++++++
+ ...BGAppRefreshSubscriber-load-U_1766797013122.txt | 118 +++
+ ...BGAppRefreshSubscriber-load-U_1766797261629.txt | 235 ++++++
+ ...BGAppRefreshSubscriber-load-U_1766797582922.txt |  37 +
+ ...BGAppRefreshSubscriber-load-U_1766797916915.txt | 117 +++
+ ...BGAppRefreshSubscriber-load-U_1766798493111.txt | 120 +++
+ ...IS-THE-ACTUAL-BUG-Perfect-Now_1766510574139.txt |  90 +++
+ ...identified-the-real-issue-sto_1766451459420.txt | 241 ++++++
+ ...-Need-Your-database-schema-sh_1766451144548.txt | 127 +++
+ ...ndled-no-level-level-fatal-ur_1766510116586.txt | 476 ++++++++++++
+ ...ion-Let-me-give-you-a-complet_1766796250392.txt | 140 ++++
+ ...7-10-on-ttys000-bearmac-Alexs_1766797805801.txt | 118 +++
+ ...7-10-on-ttys000-bearmac-Alexs_1766797846920.txt | 121 +++
+ ...7-29-on-ttys000-bearmac-Alexs_1766798335467.txt | 108 +++
+ ...5-20-on-ttys000-bearmac-Alexs_1766797394302.txt | 114 +++
+ ...Now-Line-10-11-in-your-logs-C_1766797052772.txt | 107 +++
+ ...2-FieldSnaps-cat-ios-App-App-_1766797450208.txt |  55 ++
+ ...to-upload-errror-logs-back-in_1766445084378.txt | 658 ++++++++++++++++
+ ...shot_2025-12-22_at_4.31.01_PM_1766449910689.png | Bin 0 -> 241720 bytes
+ capacitor.config.ts                                |   2 +-
+ client/src/hooks/useAuth.ts                        |  45 +-
+ client/src/lib/queryClient.ts                      |  14 +-
+ client/src/main.tsx                                |  42 +-
+ client/src/sentry.ts                               |  79 ++
+ package-lock.json                                  | 862 ++++++++++++++++++++-
+ package.json                                       |   2 +
+ server/auth.ts                                     |  15 +
+ server/index.ts                                    |  11 +-
+ server/routes.ts                                   |  23 +-
+ server/sentry.ts                                   |  79 ++
+ server/storage.ts                                  |  16 +-
+ server/supabaseAuth.ts                             |  29 +-
+ 51 files changed, 7071 insertions(+), 31 deletions(-)
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_15.16.13@2x_1766445375709.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_15.19.18@2x_1766445561406.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_15.19.18@2x_1766445588337.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_15.20.50@2x_1766445652458.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_15.21.30@2x_1766445692968.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_16.42.03@2x_1766450524899.png
+ create mode 100644 attached_assets/CleanShot_2025-12-22_at_16.42.44_1766450566632.png
+ create mode 100644 attached_assets/CleanShot_2025-12-26_at_16.35.08@2x_1766795710080.png
+ create mode 100644 attached_assets/CleanShot_2025-12-26_at_17.22.49_1766798571392.png
+ create mode 100644 attached_assets/Pasted--COMPLETE-SENTRY-SETUP-COPY-PASTE-STEP-1-Create-Sentry-_1766446039720.txt
+ create mode 100644 attached_assets/Pasted--COMPLETE-SENTRY-SETUP-COPY-PASTE-STEP-1-Create-Sentry-_1766446115762.txt
+ create mode 100644 attached_assets/Pasted--FOUND-THE-ROOT-CAUSE-Look-at-what-happens-when-Supabas_1766798617494.txt
+ create mode 100644 attached_assets/Pasted--Highlights-Edit-handled-handled-yes-level-level-error-_1766448759991.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766449592690.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766511241886.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766511559726.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766795840535.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766795974171.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766796771641.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766797013122.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766797261629.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766797582922.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766797916915.txt
+ create mode 100644 attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766798493111.txt
+ create mode 100644 attached_assets/Pasted-COMPLETE-ROOT-CAUSE-ANALYSIS-THE-ACTUAL-BUG-Perfect-Now_1766510574139.txt
+ create mode 100644 attached_assets/Pasted-EXCELLENT-ANALYSIS-You-ve-identified-the-real-issue-sto_1766451459420.txt
+ create mode 100644 attached_assets/Pasted-FOUND-IT-The-Login-Fix-You-Need-Your-database-schema-sh_1766451144548.txt
+ create mode 100644 attached_assets/Pasted-Highlights-Edit-handled-handled-no-level-level-fatal-ur_1766510116586.txt
+ create mode 100644 attached_assets/Pasted-I-understand-your-frustration-Let-me-give-you-a-complet_1766796250392.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Fri-Dec-26-17-07-10-on-ttys000-bearmac-Alexs_1766797805801.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Fri-Dec-26-17-07-10-on-ttys000-bearmac-Alexs_1766797846920.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Fri-Dec-26-17-07-29-on-ttys000-bearmac-Alexs_1766798335467.txt
+ create mode 100644 attached_assets/Pasted-Last-login-Mon-Dec-22-14-15-20-on-ttys000-bearmac-Alexs_1766797394302.txt
+ create mode 100644 attached_assets/Pasted-The-Problem-Crystal-Clear-Now-Line-10-11-in-your-logs-C_1766797052772.txt
+ create mode 100644 attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2-FieldSnaps-cat-ios-App-App-_1766797450208.txt
+ create mode 100644 attached_assets/Pasted-is-there-somehow-we-can-auto-upload-errror-logs-back-in_1766445084378.txt
+ create mode 100644 attached_assets/Screenshot_2025-12-22_at_4.31.01_PM_1766449910689.png
+ create mode 100644 client/src/sentry.ts
+ create mode 100644 server/sentry.ts
+Auto-merging capacitor.config.ts
+CONFLICT (content): Merge conflict in capacitor.config.ts
+Auto-merging client/src/hooks/useAuth.ts
+CONFLICT (content): Merge conflict in client/src/hooks/useAuth.ts
+Auto-merging package-lock.json
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	deleted:    attached_assets/CleanShot 2025-10-12 at 13.35.46@2x_1760301350009.png
+	deleted:    attached_assets/CleanShot 2025-10-12 at 13.44.57@2x_1760301907581.png
+	deleted:    attached_assets/CleanShot 2025-10-13 at 08.49.40@2x_1760370588912.png
+	deleted:    attached_assets/CleanShot 2025-10-13 at 09.33.12_1760373195723.png
+	deleted:    attached_assets/CleanShot 2025-10-13 at 18.32.57@2x_1760405581432.png
+	deleted:    attached_assets/CleanShot 2025-10-14 at 10.05.43_1760461578077.png
+	deleted:    attached_assets/CleanShot 2025-10-14 at 20.23.13@2x_1760498618692.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 11.20.58_1760552462827.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 16.24.38@2x_1760570683345.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 16.33.41@2x_1760571226070.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 16.40.15@2x_1760571620268.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 21.26.24@2x_1760588787601.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 21.27.19@2x_1760588842360.png
+	deleted:    attached_assets/CleanShot 2025-10-15 at 21.28.59@2x_1760588942037.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 07.04.56@2x_1760623502219.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 07.04.59@2x_1760623503523.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 10.07.12@2x_1760634437296.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 10.12.12@2x_1760634736914.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 14.56.42_1760651804678.png
+	deleted:    attached_assets/CleanShot 2025-10-16 at 14.57.03_1760651825754.png
+	deleted:    attached_assets/CleanShot 2025-10-17 at 13.37.09@2x_1760733446021.png
+	deleted:    attached_assets/CleanShot 2025-10-18 at 15.20.20@2x_1760826033616.png
+	deleted:    attached_assets/CleanShot 2025-10-18 at 15.25.41@2x_1760826346150.png
+	deleted:    attached_assets/CleanShot 2025-10-18 at 15.41.30@2x_1760827294748.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 18.28.16@2x_1761010219583.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 18.28.50@2x_1761010220372.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 18.29.07@2x_1761010221313.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 19.08.09@2x_1761012492368.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 22.30.01@2x_1761024606619.png
+	deleted:    attached_assets/CleanShot 2025-10-20 at 23.12.52@2x_1761027178833.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 14.33.30_1761082414365.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 15.58.57_1761087542515.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 18.01.51@2x_1761094913597.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 20.43.10@2x_1761104601695.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.43.25@2x_1761108209959.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.44.40@2x_1761108283494.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.46.41@2x_1761108406352.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.51.20@2x_1761108689461.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.52.35@2x_1761108757478.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 21.53.39@2x_1761108823865.png
+	deleted:    attached_assets/CleanShot 2025-10-21 at 22.01.06@2x_1761109269040.png
+	deleted:    attached_assets/CleanShot 2025-10-22 at 09.46.14@2x_1761151579134.png
+	deleted:    attached_assets/CleanShot 2025-10-22 at 09.54.31@2x_1761152072715.png
+	deleted:    attached_assets/CleanShot 2025-10-22 at 10.11.42@2x_1761153107687.png
+	deleted:    attached_assets/CleanShot 2025-10-22 at 10.14.06@2x_1761153249972.png
+	deleted:    attached_assets/CleanShot 2025-10-22 at 10.33.02@2x_1761154385588.png
+	deleted:    attached_assets/CleanShot 2025-10-24 at 10.08.36@2x_1761314918661.png
+	deleted:    attached_assets/CleanShot 2025-10-24 at 12.47.47@2x_1761324471451.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 13.44.04@2x_1761587049626.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 13.46.34@2x_1761587199314.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.03.52@2x_1761591833941.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.28.51@2x_1761593335604.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.34.27@2x_1761593672256.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.40.32@2x_1761594034531.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.41.55@2x_1761594117488.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.44.58@2x_1761594301846.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.46.46@2x_1761594409305.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.48.03@2x_1761594486247.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 15.50.19@2x_1761594622129.png
+	deleted:    attached_assets/CleanShot 2025-10-27 at 16.19.23@2x_1761596366426.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 08.23.28@2x_1762010774759.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 08.24.40@2x_1762010775951.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.32.21@2x_1762025542878.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.36.56@2x_1762025818762.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.38.05@2x_1762025888819.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.39.32@2x_1762025975233.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.42.15@2x_1762026137773.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.43.49@2x_1762026231912.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.44.45@2x_1762026287060.png
+	deleted:    attached_assets/CleanShot 2025-11-01 at 12.45.00@2x_1762026301768.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.40.52@2x_1762296058087.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.44.51@2x_1762296293192.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.45.53@2x_1762296355319.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.47.31@2x_1762296453248.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.53.44@2x_1762296837400.png
+	deleted:    attached_assets/CleanShot 2025-11-04 at 14.53.45@2x_1762296836133.png
+	deleted:    attached_assets/CleanShot 2025-11-05 at 19.55.00@2x_1762401303778.png
+	deleted:    attached_assets/CleanShot 2025-11-05 at 20.37.04@2x_1762403834013.png
+	deleted:    attached_assets/CleanShot 2025-11-05 at 20.38.27@2x_1762403935456.png
+	deleted:    attached_assets/CleanShot 2025-11-05 at 20.47.11@2x_1762404437082.png
+	deleted:    attached_assets/CleanShot 2025-11-05 at 20.54.41@2x_1762404885141.png
+	deleted:    attached_assets/CleanShot 2025-11-06 at 20.10.25@2x_1762488631126.png
+	deleted:    attached_assets/CleanShot 2025-11-06 at 20.10.32@2x_1762488635632.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 17.00.22@2x_1762650035821.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 17.00.28@2x_1762650034662.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 17.04.40@2x_1762650284311.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 17.26.47@2x_1762651616406.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 17.26.53@2x_1762651617387.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 18.54.00@2x_1762656842945.png
+	deleted:    attached_assets/CleanShot 2025-11-08 at 18.56.28@2x_1762656991815.png
+	deleted:    attached_assets/CleanShot 2025-11-10 at 07.28.45@2x_1762798772125.png
+	deleted:    attached_assets/CleanShot 2025-11-11 at 20.03.38@2x_1762920221502.png
+	deleted:    attached_assets/CleanShot 2025-11-11 at 22.27.07@2x_1762928831298.png
+	deleted:    attached_assets/CleanShot 2025-11-13 at 14.46.14_1763073978640.png
+	deleted:    attached_assets/CleanShot 2025-11-13 at 14.49.25_1763074168510.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 15.51.15@2x_1763682678582.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 15.59.06@2x_1763683162998.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 15.59.13@2x_1763683161977.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.00.28@2x_1763683230157.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.01.46@2x_1763683308614.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.43.14@2x_1763685796196.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.49.44@2x_1763686186523.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.51.37@2x_1763686301929.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 16.55.31@2x_1763686543470.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.03.09@2x_1763686991162.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.05.13@2x_1763687117236.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.06.44@2x_1763687206083.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.08.16@2x_1763687297417.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.11.07@2x_1763687469433.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.12.04@2x_1763687526369.png
+	deleted:    attached_assets/CleanShot 2025-11-20 at 17.13.59@2x_1763687641289.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.14.16_1763756058145.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.15.44_1763756146246.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.18.49_1763756330824.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.19.36_1763756378239.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.21.53_1763756514456.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.27.38_1763756862825.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.29.13_1763756957404.png
+	deleted:    attached_assets/CleanShot 2025-11-21 at 12.30.59_1763757061408.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 16.39.17@2x_1764203958852.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 16.40.33@2x_1764204037420.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 16.42.00@2x_1764204123367.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.00.56@2x_1764205257224.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.07.18@2x_1764205640195.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.12.07@2x_1764205929701.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.12.51@2x_1764205973352.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.14.46@2x_1764206088274.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.15.45@2x_1764206147223.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.19.00@2x_1764206341830.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.46.51@2x_1764208012938.png
+	deleted:    attached_assets/CleanShot 2025-11-26 at 17.46.56@2x_1764208017969.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_07.49.25@2x_1764776967711.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.04.04@2x_1764778153971.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.07.16@2x_1764778147677.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.15.09@2x_1764778517325.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.15.13@2x_1764778516216.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.24.41@2x_1764779087788.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.29.14@2x_1764779382198.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.36.29@2x_1764779790783.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.36.49@2x_1764779810791.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.41.04@2x_1764780077508.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.41.04@2x_1764782579132.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.41.57@2x_1764780119042.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.43.47@2x_1764780230493.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.50.33@2x_1764780635257.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_08.52.39@2x_1764780762535.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.08.27@2x_1764781709181.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.11.20@2x_1764781882842.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.14.31@2x_1764782074517.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.16.57@2x_1764782220386.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.20.06@2x_1764782408139.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_09.32.24@2x_1764783147048.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.04.37@2x_1764806679761.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.07.27@2x_1764806850313.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.08.23@2x_1764806906701.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.10.03@2x_1764807006053.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.33.54@2x_1764808436590.png
+	deleted:    attached_assets/CleanShot_2025-12-03_at_16.50.06@2x_1764809410211.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_09.28.40@2x_1764869327064.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_11.22.21@2x_1764876143043.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_11.27.41@2x_1764876464974.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_11.30.57@2x_1764876699180.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_11.33.47@2x_1764876883778.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_12.59.39@2x_1764881988133.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_13.01.00@2x_1764882065665.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_13.09.38@2x_1764882580546.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_13.11.26@2x_1764882689942.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_13.21.45@2x_1764883309403.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_13.25.44@2x_1764883546735.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.20.33@2x_1764890436689.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.24.15@2x_1764890657674.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.33.44@2x_1764891228746.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.34.25@2x_1764891268663.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.36.31@2x_1764891395080.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_15.58.31@2x_1764892713709.png
+	deleted:    attached_assets/CleanShot_2025-12-04_at_16.04.52@2x_1764893095342.png
+	deleted:    attached_assets/CleanShot_2025-12-05_at_08.16.50@2x_1764951417237.png
+	deleted:    attached_assets/CleanShot_2025-12-05_at_08.26.09@2x_1764951972125.png
+	deleted:    attached_assets/CleanShot_2025-12-05_at_08.26.59@2x_1764952023172.png
+	deleted:    attached_assets/CleanShot_2025-12-10_at_16.13.55_1765412044179.png
+	deleted:    attached_assets/CleanShot_2025-12-10_at_16.22.47@2x_1765412569300.png
+	deleted:    attached_assets/CleanShot_2025-12-12_at_14.19.50_1765577994665.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.36.10@2x_1765654573293.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.43.08@2x_1765654994003.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.49.23@2x_1765655365477.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.49.30@2x_1765655372566.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.53.44@2x_1765655625686.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.57.01@2x_1765655898695.png
+	deleted:    attached_assets/CleanShot_2025-12-13_at_11.58.25@2x_1765655907368.png
+	deleted:    attached_assets/FieldSnaps_1761084555795.png
+	deleted:    attached_assets/Fieldsnap. logo v1.00000_1760310130620.png
+	deleted:    attached_assets/Fieldsnaps logo v1.1_1760310332933.png
+	deleted:    attached_assets/IMG_3007_1760241007880.png
+	deleted:    attached_assets/IMG_3008_1760242341161.png
+	deleted:    attached_assets/IMG_3009_1760242447687.png
+	deleted:    attached_assets/IMG_3010_1760243452702.png
+	deleted:    attached_assets/IMG_3011_1760243817354.png
+	deleted:    attached_assets/IMG_3012_1760244682869.png
+	deleted:    attached_assets/IMG_3013_1760246775794.png
+	deleted:    attached_assets/IMG_3015_1760248885237.png
+	deleted:    attached_assets/IMG_3016_1760248885237.png
+	deleted:    attached_assets/IMG_3017_1760250156424.png
+	deleted:    attached_assets/IMG_3018_1760251702473.png
+	deleted:    attached_assets/IMG_3019_1760254856312.png
+	deleted:    attached_assets/IMG_3020_1760255184302.png
+	deleted:    attached_assets/IMG_3021_1760256497542.png
+	deleted:    attached_assets/IMG_3025_1760313180033.png
+	deleted:    attached_assets/IMG_3026_1760313401316.png
+	deleted:    attached_assets/IMG_3027_1760313581758.png
+	deleted:    attached_assets/IMG_3028_1760314616957.png
+	deleted:    attached_assets/IMG_3029_1760314673929.png
+	deleted:    attached_assets/IMG_3029_1760314771610.jpeg
+	deleted:    attached_assets/IMG_3030_1760317483011.png
+	deleted:    attached_assets/IMG_3032_1760368332678.png
+	deleted:    attached_assets/IMG_3038_1760394930270.png
+	deleted:    attached_assets/IMG_3040_1760397107809.png
+	deleted:    attached_assets/IMG_3041_1760399632121.png
+	deleted:    attached_assets/IMG_3042_1760402348907.png
+	deleted:    attached_assets/IMG_3044_1760408695617.png
+	deleted:    attached_assets/IMG_3048_1760462734505.png
+	deleted:    attached_assets/IMG_3050_1760470502863.png
+	deleted:    attached_assets/IMG_3077_1760545009606.PNG
+	deleted:    attached_assets/IMG_3079_1760547764855.PNG
+	deleted:    attached_assets/IMG_3080_1760547764855.PNG
+	deleted:    attached_assets/IMG_3092_1760570065131.png
+	deleted:    attached_assets/IMG_3098_1760629818743.png
+	deleted:    attached_assets/IMG_3099_1760630010357.png
+	deleted:    attached_assets/IMG_3100_1760630094232.png
+	deleted:    attached_assets/IMG_3101_1760630175113.png
+	deleted:    attached_assets/IMG_3102_1760630522715.png
+	deleted:    attached_assets/IMG_3103_1760630739251.png
+	deleted:    attached_assets/IMG_3104_1760638316502.PNG
+	deleted:    attached_assets/IMG_3127_1760744028363.png
+	deleted:    attached_assets/IMG_3131_1760750657175.png
+	deleted:    attached_assets/IMG_3132_1760752211709.jpeg
+	deleted:    attached_assets/IMG_3133_1760752211709.jpeg
+	deleted:    attached_assets/IMG_3134_1760755630259.png
+	deleted:    attached_assets/IMG_3162_1760851920975.png
+	deleted:    attached_assets/IMG_3163_1760853262027.png
+	deleted:    attached_assets/IMG_3164_1760853262027.png
+	deleted:    attached_assets/IMG_3166_1760907375138.png
+	deleted:    attached_assets/IMG_3168_1760917181744.png
+	deleted:    attached_assets/IMG_3296_1761262342767.png
+	deleted:    attached_assets/IMG_3297_1761262447428.png
+	deleted:    attached_assets/IMG_3299_1761262665282.png
+	deleted:    attached_assets/IMG_3369_1761599861368.png
+	deleted:    attached_assets/IMG_3370_1761600629260.png
+	deleted:    attached_assets/IMG_3371_1761602712560.png
+	deleted:    attached_assets/IMG_3372_1761606479631.png
+	deleted:    attached_assets/IMG_3372_1761606502778.png
+	deleted:    attached_assets/IMG_3373_1761609284367.png
+	deleted:    attached_assets/IMG_3374_1761609604670.png
+	deleted:    attached_assets/IMG_3375_1761609784616.png
+	deleted:    attached_assets/IMG_3376_1761609945286.png
+	deleted:    attached_assets/IMG_3377_1761610125664.png
+	deleted:    attached_assets/IMG_3378_1761611672654.png
+	deleted:    attached_assets/IMG_3379_1761612221078.png
+	deleted:    attached_assets/IMG_3415_1761667993352.PNG
+	deleted:    attached_assets/IMG_3416_1761667993352.PNG
+	deleted:    attached_assets/IMG_3575_1761834666861.PNG
+	deleted:    attached_assets/IMG_3576_1761836135459.PNG
+	deleted:    attached_assets/IMG_3577_1761836135458.PNG
+	deleted:    attached_assets/IMG_3582_1761839407641.png
+	deleted:    attached_assets/IMG_3584_1761844750001.png
+	deleted:    attached_assets/IMG_3585_1761844750000.png
+	deleted:    attached_assets/IMG_3587_1761845245129.PNG
+	deleted:    attached_assets/IMG_3588_1761845662235.png
+	deleted:    attached_assets/IMG_3589_1761867392839.png
+	deleted:    attached_assets/IMG_3590_1761869670771.png
+	deleted:    attached_assets/IMG_3599_1761927506053.png
+	deleted:    attached_assets/IMG_3608_1761934844927.PNG
+	deleted:    attached_assets/IMG_3612_1761936347190.PNG
+	deleted:    attached_assets/IMG_3613_1761936583625.PNG
+	deleted:    attached_assets/IMG_3615_1761938532375.png
+	deleted:    attached_assets/IMG_3616_1761938532375.png
+	deleted:    attached_assets/IMG_3617_1761938874655.png
+	deleted:    attached_assets/IMG_3618_1761938874655.png
+	deleted:    attached_assets/IMG_3619_1761938958509.png
+	deleted:    attached_assets/IMG_3620_1761938958509.png
+	deleted:    attached_assets/IMG_3621_1761939045436.png
+	deleted:    attached_assets/IMG_3622_1761939916675.png
+	deleted:    attached_assets/IMG_3623_1761940011034.png
+	deleted:    attached_assets/IMG_3624_1761940354138.png
+	deleted:    attached_assets/IMG_3634_1762049844822.png
+	deleted:    attached_assets/IMG_3635_1762050292111.png
+	deleted:    attached_assets/IMG_3636_1762050749911.png
+	deleted:    attached_assets/IMG_3637_1762051382733.png
+	deleted:    attached_assets/IMG_3638_1762051950665.png
+	deleted:    attached_assets/IMG_3639_1762052823563.png
+	deleted:    attached_assets/IMG_3640_1762052823563.png
+	deleted:    attached_assets/IMG_3641_1762055983218.png
+	deleted:    attached_assets/IMG_3642_1762059524499.png
+	deleted:    attached_assets/IMG_3645_1762118397157.png
+	deleted:    attached_assets/IMG_3646_1762119039394.png
+	deleted:    attached_assets/IMG_3647_1762119927076.png
+	deleted:    attached_assets/IMG_3721_1762386596117.PNG
+	deleted:    attached_assets/IMG_3721_1762386596117.png
+	deleted:    attached_assets/IMG_3725_1762398819454.png
+	deleted:    attached_assets/IMG_3846_1762810086575.PNG
+	deleted:    attached_assets/IMG_3847_1762810086574.PNG
+	deleted:    attached_assets/IMG_3848_1762822265298.png
+	deleted:    attached_assets/IMG_3853_1762828065544.png
+	deleted:    attached_assets/IMG_3903_1763135538631.PNG
+	deleted:    attached_assets/IMG_3904_1763135538631.PNG
+	deleted:    attached_assets/IMG_4123_1763527732055.png
+	deleted:    attached_assets/IMG_4124_1763527732055.png
+	deleted:    attached_assets/IMG_4125_1763527732055.png
+	deleted:    attached_assets/IMG_4126_1763527732055.png
+	deleted:    attached_assets/IMG_4127_1763527732055.png
+	deleted:    attached_assets/IMG_4411_1764972570697.PNG
+	deleted:    attached_assets/IMG_4412_1764972570696.PNG
+	deleted:    attached_assets/IMG_4415_1764983355399.PNG
+	deleted:    attached_assets/IMG_4416_1764983355399.PNG
+	deleted:    attached_assets/IMG_4417_1764983355399.PNG
+	deleted:    attached_assets/IMG_4418_1764983355399.PNG
+	deleted:    attached_assets/IMG_4419_1764983355399.PNG
+	deleted:    attached_assets/IMG_5581_1762637634891.png
+	deleted:    attached_assets/IMG_5581_1762637646234.png
+	deleted:    attached_assets/IMG_5582_1762637634891.png
+	deleted:    attached_assets/IMG_5582_1762637646234.png
+	deleted:    attached_assets/IMG_5583_1762637634891.png
+	deleted:    attached_assets/IMG_5583_1762637646234.png
+	deleted:    attached_assets/Pasted--ADD-TO-NAVIGATION-BAR-Add-these-links-to-your-top-navigation-Features-How-It-Works--1762388971392_1762388971392.txt
+	deleted:    attached_assets/Pasted--DOCTYPE-html-html-lang-en-head-meta-charset-UTF-8-meta-name-view-1762295760052_1762295760052.txt
+	deleted:    attached_assets/Pasted--Detailed-Audit-Plan-for-Replit-AI-MISSION-Fix-FieldSna_1765658437808.txt
+	deleted:    attached_assets/Pasted--EXPLANATION-FOR-REPLIT-AGENT-Copy-and-paste-this-entir_1765656481830.txt
+	deleted:    attached_assets/Pasted--FIELDSNAPS-MOBILE-FIRST-ARCHITECTURE-IMPROVEMENTS-Research-Context-Industry-leaders-Google-Phot-1762009166564_1762009166565.txt
+	deleted:    attached_assets/Pasted--FINAL-RECOMMENDATION-TransistorSoft-vs-Radar-io-Accurate-Pricing-Breakdown-TransistorSoft-On-1762897919703_1762897919704.txt
+	deleted:    attached_assets/Pasted--FieldSnaps-Production-Ready-Development-Strategy-EXECUTIVE-SUMMARY-FieldSnaps-is-a-constr-1760482366623_1760482366623.txt
+	deleted:    attached_assets/Pasted--Final-Implementation-Plan-for-Replit-Copy-this-message_1765658262718.txt
+	deleted:    attached_assets/Pasted--I-am-testing-all-of-these-features-in-preview-on-the-dev-tab-here-is-our-list-of-corrections-F-1764086763522_1764086763522.txt
+	deleted:    attached_assets/Pasted--I-am-testing-all-of-these-features-in-preview-on-the-dev-tab-here-is-our-list-of-corrections-F-1764090062027_1764090062028.txt
+	deleted:    attached_assets/Pasted--MISSION-Fix-FieldSnaps-iOS-Authentication-Current-Prob_1765658066400.txt
+	deleted:    attached_assets/Pasted--Perfect-You-ve-checked-Sign-In-with-Apple-and-now-a-co_1764799914423.txt
+	deleted:    attached_assets/Pasted--SW-Service-worker-loaded-v1-0-0-2sw-js-265-SW-Cleaned-1-items-from-construction-pwa-dynamic-v1-0-1760322891981_1760322891982.txt
+	deleted:    attached_assets/Pasted--THE-PROBLEM-Your-Cloudflare-DNS-points-to-34-111-179-208-but-your-FieldSnaps-app-is-actually-run-1762010909161_1762010909161.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1763757448246_1763757448246.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764205535608_1764205535609.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764205747935_1764205747936.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764206024469_1764206024470.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764206058813_1764206058813.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764206229017_1764206229018.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-UIScene-lifecycle-will-soon-b-1764206457559_1764206457559.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764882844290.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764882987388.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764884150091.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764884306540.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764884899513.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764885365354.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764885397987.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764885842898.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764888104142.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891136960.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891653060.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764891818418.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764892171530.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764894193620.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950095188.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950318462.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950489523.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764950785716.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951303779.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951617864.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764951774738.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764952160726.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764952219569.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972433115.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972576103.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972744653.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764972929568.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973219348.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973293920.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764973512530.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764975980063.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764975994728.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764976201712.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764982978353.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764983143291.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1764983258555.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765413168375.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765415429274.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765416100198.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765416871240.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765417942658.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765418695958.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765420356322.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765570735945.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765575568582.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765576323620.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765578249359.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765580025770.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765653428204.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765654498047.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765655199212.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765656152012.txt
+	deleted:    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1765656201250.txt
+	deleted:    attached_assets/Pasted--The-Solution-Will-Likely-Work-BUT-The-view-hierarchy-traversal-approach-is-sound-but-there-ar-1761317346235_1761317346236.txt
+	deleted:    attached_assets/Pasted--To-Native-Browser-open-15788794-log-Native-OAuth-Opening-URL-in-browser-https--1761090606813_1761090606814.txt
+	deleted:    attached_assets/Pasted--To-Native-Browser-open-37385759-log-Native-OAuth-Opening-URL-in-browser-https--1761094625038_1761094625039.txt
+	deleted:    attached_assets/Pasted--To-Native-Browser-open-74882196-log-Native-OAuth-Opening-URL-in-browser-https--1761091824026_1761091824026.txt
+	deleted:    attached_assets/Pasted--To-Native-log-Native-OAuth-Opening-URL-in-browser-https-b031dd5d-5c92-4902-b04b-1761092294727_1761092294727.txt
+	deleted:    attached_assets/Pasted--To-Native-log-Native-OAuth-Opening-URL-in-browser-https-b031dd5d-5c92-4902-b04b-1761092480480_1761092480481.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761024659947_1761024659947.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761083617518_1761083617521.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761084621919_1761084621920.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761091754300_1761091754301.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761093461564_1761093461565.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761094071106_1761094071107.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761094271384_1761094271385.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761094433689_1761094433690.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761094842223_1761094842224.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761098618628_1761098618630.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761104853770_1761104853771.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761105566493_1761105566494.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761105721727_1761105721728.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761107747559_1761107747559.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761109236424_1761109236425.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761109987179_1761109987179.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761110294741_1761110294742.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761110651268_1761110651268.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761111681081_1761111681082.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761112187322_1761112187322.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761112550523_1761112550524.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761112695013_1761112695014.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761112936832_1761112936833.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761152787084_1761152787084.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761153662056_1761153662057.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761153784536_1761153784537.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761153972119_1761153972120.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761154167552_1761154167553.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761154559229_1761154559230.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761155457544_1761155457545.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761155707182_1761155707183.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761155996522_1761155996523.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761158724089_1761158724090.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761316974289_1761316974289.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761317689196_1761317689197.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761323868921_1761323868921.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761324351962_1761324351962.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761588749111_1761588749111.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761590207874_1761590207875.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761591050763_1761591050763.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761591708402_1761591708403.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761591920381_1761591920381.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761592937210_1761592937211.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761594206213_1761594206214.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1761594564910_1761594564911.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1764204313313_1764204313313.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1764204442360_1764204442360.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1764205135327_1764205135327.txt
+	deleted:    attached_assets/Pasted--UIScene-lifecycle-will-soon-be-required-Failure-to-adopt-will-result-in-an-assert-in-the-future--1764205411794_1764205411794.txt
+	deleted:    attached_assets/Pasted--YES-THIS-LOOKS-PERFECT-Your-summary-is-excellent-conci_1765658546451.txt
+	deleted:    attached_assets/Pasted--before-after-tw-border-spacing-x-0-tw-border-spacing-y-0-tw-translate-x--1762295823180_1762295823181.txt
+	deleted:    attached_assets/Pasted--before-after-tw-border-spacing-x-0-tw-border-spacing-y-0-tw-translate-x--1762295841051_1762295841052.txt
+	deleted:    attached_assets/Pasted--before-after-tw-border-spacing-x-0-tw-border-spacing-y-0-tw-translate-x--1762295978051_1762295978052.txt
+	deleted:    attached_assets/Pasted--info-Sync-finished-in-2-684s-bearmac-Alexs-MacBook-Pro_1764950682554.txt
+	deleted:    attached_assets/Pasted--info-Sync-finished-in-3-133s-bearmac-Alexs-MacBook-Pro_1764973411257.txt
+	deleted:    attached_assets/Pasted--info-Sync-finished-in-3-133s-bearmac-Alexs-MacBook-Pro_1764976111666.txt
+	deleted:    attached_assets/Pasted--log-Native-Navigation-isNative-true-path-api-dev-login-serverUrl-capacitor-lo-1761083668699_1761083668700.txt
+	deleted:    attached_assets/Pasted--log-Native-OAuth-Opening-URL-in-browser-https-b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1-1761090280482_1761090280482.txt
+	deleted:    attached_assets/Pasted--log-Native-OAuth-Opening-URL-in-browser-https-b031dd5d-5c92-4902-b04b-e2a8255614a2-00-1-1761104584310_1761104584311.txt
+	deleted:    attached_assets/Pasted--workspace-cat-EOF--1765657791806_1765657791808.txt
+	deleted:    attached_assets/Pasted-1-Company-Creation-Force-it-at-signup-Even-solo-users-create-a-company-can-be-their-name-Simpl-1760672176732_1760672176733.txt
+	deleted:    attached_assets/Pasted-10The-source-list-for-the-Content-Security-Policy-directive-default-src-contains-an-invalid-source-1760323076140_1760323076141.txt
+	deleted:    attached_assets/Pasted-2025-11-04-14-54-57-08-5f60ee87-User-at-optionsCallback-home-runner-workspace-node-modules-cors-li-1762297077707_1762297077708.txt
+	deleted:    attached_assets/Pasted-54The-source-list-for-the-Content-Security-Policy-directive-default-src-contains-an-invalid-source-1760322803969_1760322803970.txt
+	deleted:    attached_assets/Pasted-Based-on-my-research-and-your-troubleshooting-history-h_1764779885954.txt
+	deleted:    attached_assets/Pasted-Build-a-construction-photo-documentation-Progressive-Web-App-PWA-focused-on-extreme-simplicity-and-1760216287216_1760216287217.txt
+	deleted:    attached_assets/Pasted-CATEGORY-1-File-Organization-7-10-10-10-Current-Issues-Type-based-folders-components-hook-1761654500068_1761654500069.txt
+	deleted:    attached_assets/Pasted-COMPREHENSIVE-REPLIT-IMPLEMENTATION-PROMPT-FieldSnaps-Auto-Time-Tracking-with-Geofencing-EXECUTIVE--1762898489916_1762898489917.txt
+	deleted:    attached_assets/Pasted-Checkbox-positioning-Move-checkbox-to-RIGHT-side-of-task-row-before-3-dot-menu-Increase-checkbox-1760824101184_1760824101185.txt
+	deleted:    attached_assets/Pasted-Context-FieldSnaps-is-a-photo-documentation-app-for-contractors-Users-organize-work-into-projects--1760670959205_1760670959205.txt
+	deleted:    attached_assets/Pasted-Context-FieldSnaps-is-a-photo-documentation-app-for-contractors-We-need-to-build-a-complete-team-c-1760671933250_1760671933251.txt
+	deleted:    attached_assets/Pasted-Core-Principle-No-Forced-Aspect-Ratios-DO-NOT-force-any-aspect-ratio-at-capture-or-storage-Use-de-1760828003360_1760828003360.txt
+	deleted:    attached_assets/Pasted-Create-a-minimalist-Apple-inspired-homepage-for-FieldSnaps-a-construction-photo-organization-app--1762213746627_1762213746627.txt
+	deleted:    attached_assets/Pasted-Download-the-React-DevTools-for-a-better-development-experience-https-reactjs-org-link-react-devt-1762194559561_1762194559562.txt
+	deleted:    attached_assets/Pasted-Download-the-React-DevTools-for-a-better-development-experience-https-reactjs-org-link-react-devt-1762194891482_1762194891483.txt
+	deleted:    attached_assets/Pasted-FREE-DEBUG-BUILDS-vs-389-PREMIUM-LICENSE-What-s-the-Difference-THE-BOTTOM-LINE-The-plugin-is--1762898952370_1762898952370.txt
+	deleted:    attached_assets/Pasted-Failed-to-install-the-app-on-the-device-Domain-com-apple-dt-CoreDeviceError-Code-3002-User-Info--1764204125101_1764204125101.txt
+	deleted:    attached_assets/Pasted-Hey-I-ve-finalized-all-the-key-decisions-and-messaging-for-FieldSnaps-Here-s-everything-you-need-t-1760594047199_1760594047200.txt
+	deleted:    attached_assets/Pasted-Hey-Now-that-we-re-close-to-having-the-domain-live-I-want-to-understand-the-current-state-of-Field-1760590401968_1760590401969.txt
+	deleted:    attached_assets/Pasted-Hey-Thanks-for-clarifying-the-database-setup-I-now-understand-I-m-already-using-Replit-s-PostgreSQ-1760577097464_1760577097465.txt
+	deleted:    attached_assets/Pasted-Hey-Thanks-for-the-detailed-breakdown-I-ve-made-the-key-decisions-let-s-build-this-out-My-De-1760591302751_1760591302752.txt
+	deleted:    attached_assets/Pasted-I-need-you-to-audit-the-FieldSnaps-codebase-and-give-me-a-score-10-for-each-of-these-12-categories--1761652087146_1761652087146.txt
+	deleted:    attached_assets/Pasted-I-want-to-add-these-features-can-you-dig-deeper-into-what-these-features-would-look-like-and-what-w-1762637649481_1762637649481.txt
+	deleted:    attached_assets/Pasted-IMPORTANT-Before-making-ANY-changes-please-READ-THIS-CAREFULLY-DO-NOT-MODIFY-Existing-came-1761020846596_1761020846596.txt
+	deleted:    attached_assets/Pasted-Last-login-Fri-Dec-12-12-15-42-on-ttys000-bearmac-Alexs_1765575916885.txt
+	deleted:    attached_assets/Pasted-Last-login-Fri-Oct-24-12-35-14-on-ttys000-bearmac-Mac-cd-Documents-Projects-FieldSnaps-npm-in-1761590350203_1761590350204.txt
+	deleted:    attached_assets/Pasted-Last-login-Sat-Dec-13-11-10-48-on-ttys000-bearmac-Alexs_1765654507000.txt
+	deleted:    attached_assets/Pasted-Last-login-Sat-Dec-13-11-43-50-on-ttys000-bearmac-Alexs_1765656158186.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764885283784.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764887977736.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891842805.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891908848.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-12-57-34-on-ttys000-bearmac-Alexs-_1764891954283.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-16-05-47-on-ttys000-bearmac-Alexs-_1764893462196.txt
+	deleted:    attached_assets/Pasted-Last-login-Thu-Dec-4-16-24-48-on-ttys000-bearmac-Alexs-_1764951138131.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-08-37-21-on-ttys000-bearmac-Alexs_1765412094399.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-08-37-21-on-ttys000-bearmac-Alexs_1765412905306.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-08-37-21-on-ttys000-bearmac-Alexs_1765415520683.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-08-37-21-on-ttys000-bearmac-Alexs_1765415918679.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-08-37-21-on-ttys000-bearmac-Alexs_1765420488508.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Dec-10-16-13-02-on-ttys000-bearmac-Alexs_1765570740635.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Nov-26-16-40-57-on-ttys000-bearmac-Alexs-MacBook-Pro-2-cd-Users-bearmac-Documen-1764205321834_1764205321835.txt
+	deleted:    attached_assets/Pasted-Last-login-Wed-Nov-26-17-02-20-on-ttys000-bearmac-Alexs-MacBook-Pro-2-cd-Users-bearmac-Documen-1764205381129_1764205381129.txt
+	deleted:    attached_assets/Pasted-Looking-at-your-screenshots-I-can-see-two-issues-Problem-1-SSL-Certificate-Error-The-error-NE-1762010776926_1762010776926.txt
+	deleted:    attached_assets/Pasted-Message-to-Replit-Hey-We-re-finalizing-the-soft-launch-setup-and-need-your-advice-on-Sentry-Busin-1760589245895_1760589245896.txt
+	deleted:    attached_assets/Pasted-Pasted-continue-i-really-like-your-idea-for-the-top-left-menu-that-slides-out-im-thinking-of-how-to--1762489056200_1762489056201.txt
+	deleted:    attached_assets/Pasted-Result-accumulator-timeout-0-250000-exceeded-To-Native-SplashScreen-hide-69312572-T-1761087702837_1761087702838.txt
+	deleted:    attached_assets/Pasted-SECTION-A-PROACTIVE-BEST-PRACTICES-Items-1-100-Follow-these-rules-when-writing-code-to-prevent-is-1761027565863_1761027565864.txt
+	deleted:    attached_assets/Pasted-STOP-Replit-is-wrong-Let-me-explain-why-Why-Replit-s-Di_1765657899638.txt
+	deleted:    attached_assets/Pasted-TASK-Redesign-the-FieldSnaps-homepage-to-be-clean-simple-and-Apple-inspired-Remove-clutter-simp-1762384661927_1762384661928.txt
+	deleted:    attached_assets/Pasted-am-i-able-to-edit-that-replit-login-page-so-customers-dont-see-anything-with-replit-or-their-0auth-i-1762010133739_1762010133740.txt
+	deleted:    attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2--1764893228991_1764893228991.txt
+	deleted:    attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2-FieldSnaps-VITE-SUPABASE-UR_1764972849679.txt
+	deleted:    attached_assets/Pasted-bearmac-Alexs-MacBook-Pro-2-FieldSnaps-git-stash-Saved-_1764982672146.txt
+	deleted:    attached_assets/Pasted-continue-i-really-like-your-idea-for-the-top-left-menu-that-slides-out-im-thinking-of-how-to-impli-1762467158546_1762467158546.txt
+	deleted:    attached_assets/Pasted-import-UIKit-import-Capacitor-UIApplicationMain-class-AppDelegate-UIResponder-UIApplicationDeleg-1761324517475_1761324517476.txt
+	deleted:    attached_assets/Pasted-import-createClient-from-supabase-supabase-js-import-Ca_1764892973556.txt
+	deleted:    attached_assets/Pasted-with-clear-improvement-path-Your-Strongest-Areas-Offline-Capability-9-10-Production-ready--1761659459316_1761659459316.txt
+	deleted:    attached_assets/ScreenRecording_10-19-2025 14-03-30_1_1760907953530.mp4
+	deleted:    "attached_assets/Screenshot 2025-10-13 at 11.14.57\342\200\257AM_1760379388893.png"
+	deleted:    "attached_assets/Screenshot 2025-10-13 at 6.51.49\342\200\257PM_1760406734202.png"
+	deleted:    "attached_assets/Screenshot 2025-10-14 at 8.34.13\342\200\257PM_1760499268086.png"
+	deleted:    "attached_assets/Screenshot 2025-10-14 at 9.32.02\342\200\257PM_1760502735819.png"
+	deleted:    "attached_assets/Screenshot 2025-10-15 at 8.53.20\342\200\257AM_1760543613850.png"
+	deleted:    "attached_assets/Screenshot 2025-10-15 at 9.30.53\342\200\257AM 2_1760545894863.png"
+	deleted:    "attached_assets/Screenshot 2025-10-16 at 1.22.52\342\200\257PM_1760646188387.png"
+	deleted:    "attached_assets/Screenshot 2025-10-16 at 1.48.50\342\200\257PM_1760647740183.png"
+	deleted:    "attached_assets/Screenshot 2025-10-17 at 5.10.38\342\200\257PM_1760746258295.png"
+	deleted:    "attached_assets/Screenshot 2025-10-18 at 5.03.04\342\200\257PM_1760832478611.png"
+	deleted:    "attached_assets/Screenshot 2025-10-20 at 8.29.35\342\200\257PM_1761017385832.png"
+	deleted:    "attached_assets/Screenshot 2025-10-21 at 2.41.30\342\200\257PM_1761082901280.png"
+	deleted:    "attached_assets/Screenshot 2025-10-21 at 7.49.57\342\200\257AM_1761058211946.png"
+	deleted:    "attached_assets/Screenshot 2025-10-21 at 8.43.59\342\200\257AM_1761061450259.png"
+	deleted:    "attached_assets/Screenshot 2025-10-22 at 10.59.00\342\200\257AM_1761155989413.png"
+	deleted:    "attached_assets/Screenshot 2025-10-22 at 11.26.22\342\200\257AM_1761157599051.png"
+	deleted:    "attached_assets/Screenshot 2025-10-24 at 10.33.56\342\200\257AM_1761316452010.png"
+	deleted:    "attached_assets/Screenshot 2025-10-24 at 12.45.38\342\200\257PM_1761324349123.png"
+	deleted:    "attached_assets/Screenshot 2025-10-27 at 1.48.08\342\200\257PM_1761587306069.png"
+	deleted:    "attached_assets/Screenshot 2025-10-27 at 1.49.58\342\200\257PM_1761587411355.png"
+	deleted:    "attached_assets/Screenshot 2025-10-27 at 1.53.10\342\200\257PM_1761587600470.png"
+	deleted:    "attached_assets/Screenshot 2025-10-27 at 2.50.27\342\200\257PM_1761591041824.png"
+	deleted:    "attached_assets/Screenshot 2025-10-27 at 3.21.22\342\200\257PM_1761592891871.png"
+	deleted:    "attached_assets/Screenshot 2025-10-28 at 1.22.29\342\200\257PM_1761672159068.png"
+	deleted:    "attached_assets/Screenshot 2025-10-28 at 12.41.41\342\200\257PM_1761669711310.png"
+	deleted:    "attached_assets/Screenshot 2025-10-28 at 2.01.36\342\200\257PM_1761674507375.png"
+	deleted:    "attached_assets/Screenshot 2025-10-30 at 7.42.38\342\200\257AM_1761835368183.png"
+	deleted:    "attached_assets/Screenshot 2025-10-30 at 8.00.13\342\200\257AM_1761836421788.png"
+	deleted:    "attached_assets/Screenshot 2025-10-30 at 8.06.13\342\200\257AM_1761836783270.png"
+	deleted:    "attached_assets/Screenshot 2025-10-30 at 9.52.26\342\200\257AM_1761843160441.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.05.38\342\200\257AM_1761930351086.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.20.51\342\200\257AM_1761931261625.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.30.56\342\200\257AM_1761931867625.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.35.36\342\200\257AM_1761932148402.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.43.09\342\200\257AM_1761932600806.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 10.57.15\342\200\257AM_1761933444709.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 11.08.03\342\200\257AM_1761934093835.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 11.21.06\342\200\257AM_1761934873466.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 11.27.39\342\200\257AM_1761935271680.png"
+	deleted:    "attached_assets/Screenshot 2025-10-31 at 11.58.32\342\200\257AM_1761937122779.png"
+	deleted:    "attached_assets/Screenshot 2025-11-02 at 7.01.07\342\200\257AM_1762095678129.png"
+	deleted:    "attached_assets/Screenshot 2025-11-05 at 9.05.57\342\200\257PM_1762405570370.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 7.41.50\342\200\257AM_1762443724071.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 7.46.11\342\200\257AM_1762443979356.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 7.58.02\342\200\257AM_1762444694911.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 8.05.38\342\200\257AM_1762445152192.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 8.06.27\342\200\257AM_1762445195070.png"
+	deleted:    "attached_assets/Screenshot 2025-11-06 at 8.07.00\342\200\257AM_1762445229517.png"
+	deleted:    "attached_assets/Screenshot 2025-11-10 at 11.49.13\342\200\257AM_1762804170439.png"
+	deleted:    "attached_assets/Screenshot 2025-11-12 at 10.57.47\342\200\257PM_1763017079366.png"
+	deleted:    "attached_assets/Screenshot 2025-11-13 at 8.34.04\342\200\257AM_1763051661081.png"
+	deleted:    "attached_assets/Screenshot 2025-11-13 at 8.35.19\342\200\257AM_1763051729735.png"
+	deleted:    "attached_assets/Screenshot 2025-11-14 at 7.08.26\342\200\257AM_1763132919956.png"
+	deleted:    "attached_assets/Screenshot 2025-11-14 at 7.27.29\342\200\257AM_1763134058494.png"
+	deleted:    "attached_assets/Screenshot 2025-11-18 at 5.33.04\342\200\257PM_1763515993593.png"
+	deleted:    "attached_assets/Screenshot 2025-11-21 at 12.37.05\342\200\257PM_1763757443568.png"
+	deleted:    "attached_assets/Screenshot 2025-11-25 at 9.02.35\342\200\257AM_1764090165066.png"
+	deleted:    "attached_assets/Screenshot 2025-11-25 at 9.04.37\342\200\257AM_1764090288343.png"
+	deleted:    "attached_assets/Screenshot 2025-11-26 at 11.12.54\342\200\257AM_1764184388100.png"
+	deleted:    attached_assets/Screenshot_2025-12-04_at_1.13.25_PM_1764882815512.png
+	deleted:    attached_assets/Screenshot_2025-12-05_at_2.21.13_PM_1764973283318.png
+	deleted:    attached_assets/Screenshot_2025-12-10_at_4.31.23_PM_1765413103612.png
+	deleted:    attached_assets/Screenshot_2025-12-10_at_4.34.52_PM_1765413302694.png
+	deleted:    attached_assets/Screenshot_2025-12-10_at_5.21.24_PM_1765416097101.png
+	deleted:    attached_assets/Screenshot_2025-12-10_at_5.52.08_PM_1765417937569.png
+	deleted:    attached_assets/Screenshot_2025-12-13_at_12.03.33_PM_1765656224750.png
+	deleted:    attached_assets/Snaps square lgoo _1760375429021.png
+	deleted:    attached_assets/Square logo_1760375183447.png
+	deleted:    attached_assets/image0_1760545865136.jpeg
+	deleted:    attached_assets/image_1760636733562.png
+	deleted:    attached_assets/image_1761107864574.png
+	deleted:    attached_assets/image_1761108521360.png
+	deleted:    attached_assets/image_1761113001323.png
+	deleted:    attached_assets/image_1761113011928.png
+	deleted:    attached_assets/image_1761113020184.png
+	deleted:    attached_assets/image_1761113037193.png
+	deleted:    attached_assets/image_1761113057460.png
+	deleted:    attached_assets/image_1761155467523.png
+	deleted:    attached_assets/image_1761155700543.png
+	deleted:    attached_assets/image_1761323858737.png
+	deleted:    attached_assets/stock_images/construction_camera__6f918dc2.jpg
+	deleted:    attached_assets/stock_images/construction_documen_6835a822.jpg
+	deleted:    attached_assets/stock_images/construction_worker__c04dcb5d.jpg
+	deleted:    attached_assets/stock_images/electrical_wiring_co_8c1613e4.jpg
+	deleted:    attached_assets/stock_images/professional_constru_67c3b02a.jpg
+	modified:   ios/App/App.xcodeproj/project.pbxproj
+	new file:   ios/App/File.txt
+
+Unmerged paths:
+  (use "git restore --staged <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+	both modified:   capacitor.config.ts
+	both modified:   client/src/hooks/useAuth.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.config/
+	.local/
+	ios/App/App.xcworkspace/contents.xcworkspacedata
+	ios/App/Podfile.lock
+
+The stash entry is kept in case you need it again.
+
+> rest-express@1.0.1 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (1) index.html[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+✓ 13 modules transformed.
+x Build failed in 380ms
+error during build:
+[vite]: Rollup failed to resolve import "@sentry/react" from "/Users/bearmac/Documents/Projects/FieldSnaps/client/src/sentry.ts".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteWarn (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:65854:17)
+    at onwarn (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/@vitejs/plugin-react/dist/index.js:90:7)
+    at onRollupWarning (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:65884:5)
+    at onwarn (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/vite/dist/node/chunks/dep-D_zLpgQd.js:65549:7)
+    at file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:19452:13
+    at Object.logger [as onLog] (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:21178:9)
+    at ModuleLoader.handleInvalidResolvedId (file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20067:26)
+    at file:///Users/bearmac/Documents/Projects/FieldSnaps/node_modules/rollup/dist/es/shared/node-entry.js:20025:26
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % git checkout --theirs .
+Updated 2 paths from the index
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
