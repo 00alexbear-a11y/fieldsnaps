@@ -1,0 +1,107 @@
+The Problem (Crystal Clear Now):
+Line 10-11 in your logs:
+
+🟢 [✨  CapgoUpdater]: New bundle: 1.0.2 found. Current is: builtin. 
+Update will occur next time app moves to background.
+Line 19-21:
+
+⚡️  ------ STARTUP JS ERROR ------
+⚡️  Error: supabaseUrl is required.
+⚡️  URL: capacitor://localhost/assets/index-C3cRhOK8.js
+Line 94-95:
+
+🟢 [✨  CapgoUpdater]: Reloading I9uROktUhn
+🟢 [✨  CapgoUpdater]: Updated to bundle: { "id": "I9uROktUhn", "version": "1.0.2" ...}
+What's Happening (Step by Step):
+Your fresh build starts (has correct env vars)
+Capgo immediately downloads 1.0.2 (which has NO env vars)
+App backgrounds (you swipe or tap home)
+Capgo switches to 1.0.2 → App reloads
+Supabase initialization fails → Error: supabaseUrl is required
+Login impossible → You're stuck
+⚠️ YOU DID NOT DISABLE CAPGO CORRECTLY
+Check Your capacitor.config.ts:
+Run this command:
+
+Copycat ~/Documents/Projects/FieldSnaps/capacitor.config.ts
+You MUST see this:
+
+Copyplugins: {
+  CapacitorUpdater: {
+    autoUpdate: false,
+  },
+},
+If you DON'T see it, Capgo is still active!
+
+🛠️ THE NUCLEAR OPTION (GUARANTEED FIX)
+Since Capgo keeps breaking your app, we need to completely remove it:
+
+STEP 1: Remove Capgo Plugin (2 minutes)
+Copycd ~/Documents/Projects/FieldSnaps
+
+# Uninstall Capgo
+npm uninstall @capgo/capacitor-updater
+
+# Remove from iOS
+npx cap sync ios
+STEP 2: Clean ALL Capgo Data (1 minute)
+Copy# Remove cached bundles
+rm -rf ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Library/NoCloud/ionic_built_snapshots/
+
+# Or just reset the simulator
+xcrun simctl erase all
+STEP 3: Verify .env.local (30 seconds)
+Copycat .env.local
+Must contain:
+
+VITE_API_URL=https://fieldsnaps.replit.app
+VITE_SUPABASE_URL=https://pbfuwfzccdmpkmhncyjg.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiZnV3ZnpjY2RtcGttaG5jeWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxOTA3NTcsImV4cCI6MjA3OTc2Njc1N30.zMNbgQpyQWRJMBfaz5W25JYjwf5Zn6bRIzuq_9Rx1gs
+VITE_GOOGLE_WEB_CLIENT_ID=757835035018-7ilv1jh3as4lu0v5revucs3ku0h6csqe.apps.googleusercontent.com
+VITE_GOOGLE_MAPS_API_KEY=AIzaSyBSbuj-rpcAQ2Nbp1na0Dbig6i9IJnhnt0
+STEP 4: Nuclear Clean Build (3 minutes)
+Copy# Delete everything
+rm -rf dist/
+rm -rf ios/App/App/public/
+rm -rf node_modules/.vite/
+rm -rf node_modules/.cache/
+
+# Rebuild
+npm run build
+
+# Verify Supabase URL is in build
+grep -r "pbfuwfzccdmpkmhncyjg" dist/assets/*.js && echo "✅ SUCCESS" || echo "❌ FAILED"
+STEP 5: Sync and Run (2 minutes)
+Copynpx cap sync ios
+npx cap open ios
+In Xcode:
+
+Product → Clean Build Folder (Cmd+Shift+K)
+Delete app from simulator
+Product → Run (Cmd+R)
+STEP 6: Verify No Capgo (30 seconds)
+In Xcode console, you should NOT see:
+
+🟢 [✨  CapgoUpdater]: ...
+You SHOULD see:
+
+⚡️  [log] - [Supabase] Initializing with URL: https://pbfuwfzccdmpkmhncyjg.supabase.co
+🎯 WHAT TO SEND ME:
+Output of this command:
+
+Copygrep -r "pbfuwfzccdmpkmhncyjg" ~/Documents/Projects/FieldSnaps/dist/assets/*.js | head -n 1
+First 100 lines of Xcode console after running the app
+
+Confirmation that you see NO Capgo logs
+
+📊 EXPECTED RESULT:
+Before (your current logs):
+
+🟢 [✨  CapgoUpdater]: New bundle: 1.0.2 found
+⚡️  Error: supabaseUrl is required
+After (what you'll see):
+
+⚡️  [log] - [Supabase] Initializing with URL: https://pbfuwfzccdmpkmhncyjg.supabase.co
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  Loading app at capacitor://localhost...
+Do these steps NOW. Capgo is the problem. We need to remove it completely.
