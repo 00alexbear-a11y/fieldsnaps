@@ -25,7 +25,7 @@ const config: CapacitorConfig = {
       backgroundColor: '#FFFFFF',
     },
     CapacitorUpdater: {
-      autoUpdate: true,
+      autoUpdate: false,  // TEMPORARILY DISABLED to fix login - re-enable after uploading v1.0.3
       directUpdate: false,
       resetWhenUpdate: false,
       appReadyTimeout: 15000,

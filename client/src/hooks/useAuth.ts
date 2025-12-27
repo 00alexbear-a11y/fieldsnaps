@@ -103,27 +103,32 @@ export function useAuth() {
     // CRITICAL: Ensure query refetches when enabled changes from false to true
     refetchOnMount: true,
     queryFn: async () => {
+      console.log('[useAuth] ========== QUERY STARTING ==========');
       console.log('[useAuth] Fetching user data...');
       
       // Use tokenManager for consistency with other queries (same token source)
+      console.log('[useAuth] Getting token from tokenManager...');
       const token = await tokenManager.getValidAccessToken();
+      console.log('[useAuth] Token result:', !!token, token ? token.substring(0, 30) + '...' : 'null');
+      
       if (!token) {
         console.error('[useAuth] No valid token available');
         throw new Error('No valid token');
       }
       
-      console.log('[useAuth] Token obtained, making request...');
+      const apiUrl = getApiUrl('/api/auth/user');
+      console.log('[useAuth] Token obtained, making request to:', apiUrl);
       
       // Use getApiUrl to ensure iOS native app hits the correct backend server
       // Add 10 second timeout to prevent hanging requests
-      const response = await fetch(getApiUrl('/api/auth/user'), {
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
         signal: AbortSignal.timeout(10000), // 10 second timeout
       });
       
-      console.log('[useAuth] Response received:', response.status);
+      console.log('[useAuth] Response received:', response.status, response.statusText);
       
       if (!response.ok) {
         // Handle 401/403: Backend doesn't recognize the Supabase token
