@@ -98,12 +98,17 @@ export function useAuth() {
     enabled: queryEnabled,
     // Don't refetch on window focus - user data doesn't change often
     refetchOnWindowFocus: false,
-    // Cache user data for 5 minutes to prevent infinite refetch loop
-    staleTime: 5 * 60 * 1000,
-    // CRITICAL: Ensure query refetches when enabled changes from false to true
-    refetchOnMount: true,
+    // Set staleTime to 0 to ensure fresh fetch when enabled changes
+    // The enabled flag already prevents unnecessary fetches
+    staleTime: 0,
+    // Force refetch when query becomes enabled
+    refetchOnMount: 'always',
+    // CRITICAL: gcTime controls how long inactive queries stay in cache
+    // Set to 0 to clear cache immediately when query is disabled
+    gcTime: 0,
     queryFn: async () => {
       console.log('[useAuth] ========== QUERY STARTING ==========');
+      console.log('[useAuth] Session available:', !!authState.session);
       console.log('[useAuth] Fetching user data...');
       
       // Use tokenManager for consistency with other queries (same token source)

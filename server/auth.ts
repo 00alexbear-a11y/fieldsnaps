@@ -110,8 +110,16 @@ export async function setupAuth(app: Express, authRateLimiter?: any) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   
+  // Debug logging for iOS auth troubleshooting
+  console.log('[Auth] Request path:', req.path);
+  console.log('[Auth] Authorization header present:', !!authHeader);
+  if (authHeader) {
+    console.log('[Auth] Auth header prefix:', authHeader.substring(0, 20) + '...');
+  }
+  
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
+    console.log('[Auth] Bearer token extracted, length:', token.length);
     
     // Try internal JWT tokens first
     const payload = verifyAccessToken(token);
@@ -157,11 +165,13 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
       console.error('[Auth] Supabase token verification error:', error);
     }
     
+    console.log('[Auth] Bearer token auth failed - returning 401');
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
   // Fall back to session-based authentication
   if (!req.isAuthenticated || !req.isAuthenticated()) {
+    console.log('[Auth] No Bearer token, session auth failed - returning 401');
     return res.status(401).json({ message: "Unauthorized" });
   }
 
