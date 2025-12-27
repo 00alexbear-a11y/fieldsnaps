@@ -1,0 +1,55 @@
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % cat ios/App/App/capacitor.config.json | grep autoUpdate
+			"autoUpdate": true,
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % sed -i '' 's/autoUpdate: true/autoUpdate: false/' ~/Documents/Projects/FieldSnaps/capacitor.config.ts
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % grep "autoUpdate" capacitor.config.ts
+      autoUpdate: false,
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % npx cap sync ios
+🔧 Configuring dynamic provider dependencies for SocialLogin
+
+Provider configuration:
+  ✔ Google: enabled
+  ✔ Facebook: enabled
+  ✔ Apple: enabled
+  ✔ Twitter: enabled
+
+ℹ Configuring iOS dependencies...
+ℹ Podspec already up to date
+✔ Configuration complete
+
+✔ Copying web assets from public to ios/App/App/public in 16.42ms
+✔ Creating capacitor.config.json in ios/App/App in 479.25μs
+✔ copy ios in 68.92ms
+✔ Updating iOS plugins in 8.27ms
+✔ Updating iOS native dependencies with pod install in 2.30s
+[info] Found 26 Capacitor plugins for ios:
+       @aparajita/capacitor-secure-storage@7.1.3
+       @capacitor-community/generic-oauth2@7.0.0
+       @capacitor-community/speech-recognition@7.0.1
+       @capacitor/action-sheet@7.0.2
+       @capacitor/app@7.1.0
+       @capacitor/browser@7.0.2
+       @capacitor/camera@7.0.2
+       @capacitor/clipboard@7.0.2
+       @capacitor/device@7.0.2
+       @capacitor/dialog@7.0.2
+       @capacitor/filesystem@7.1.4
+       @capacitor/geolocation@7.1.5
+       @capacitor/haptics@7.0.2
+       @capacitor/keyboard@7.0.3
+       @capacitor/local-notifications@7.0.3
+       @capacitor/network@7.0.2
+       @capacitor/preferences@7.0.2
+       @capacitor/share@7.0.2
+       @capacitor/splash-screen@7.0.3
+       @capacitor/status-bar@7.0.3
+       @capacitor/toast@7.0.2
+       @capgo/capacitor-social-login@7.20.0
+       @capgo/capacitor-updater@7.22.0
+       @transistorsoft/capacitor-background-fetch@7.1.0
+       @transistorsoft/capacitor-background-geolocation@7.2.4
+       capacitor-native-settings@7.0.2
+✔ update ios in 2.35s
+[info] Sync finished in 2.66s
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % cat ios/App/App/capacitor.config.json | grep autoUpdate
+			"autoUpdate": false,
+bearmac@Alexs-MacBook-Pro-2 FieldSnaps % 
