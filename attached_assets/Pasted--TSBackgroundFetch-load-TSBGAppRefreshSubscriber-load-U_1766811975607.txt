@@ -1,0 +1,134 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/B2D1368F-B864-43AE-A5C8-3F9B69A91888/App.app'
+Loading network plugin
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x10a073bd0 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device ea43dc3e-bf04-47cd-a93e-b1c86e03644c
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+GPU process (0x11511c1e0) took 1.076211 seconds to launch
+Networking process (0x115070190) took 1.291740 seconds to launch
+WebContent process (0x1150f4100) took 1.093475 seconds to launch
+WebContent[45923] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 77371954
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 77371955
+⚡️  TO JS {"bundle":{"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","status":"success","id":"builtin","checksum":""}}
+⚡️  To Native ->  CapacitorUpdater addListener 77371956
+⚡️  To Native ->  CapacitorUpdater addListener 77371957
+⚡️  To Native ->  CapacitorUpdater addListener 77371958
+⚡️  To Native ->  CapacitorUpdater current 77371959
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  SecureStorage internalGetItem 77371960
+⚡️  TO JS {"native":"1.0","bundle":{"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","status":"success","id":"builtin","checksum":""}}
+⚡️  To Native ->  App addListener 77371961
+⚡️  To Native ->  App addListener 77371962
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"user\\\":{\\\"updated_at\\\":\\\"2025-12-27T01:48:29.491092Z\\\",\\\"email\\\":\\\"hello@fieldsnaps.com\\\",\\\"phone\\\":\\\"\\\",\\\"identities\\\":[{\\\"identity_id\\\":\\\"58376999-18ed-40e9-87d2-22cd102a7be9\\\"
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","status":"success","id":"builtin","checksum":""}
+⚡️  To Native ->  CapacitorHttp request 77371963
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  To Native ->  App getLaunchUrl 77371964
+⚡️  To Native ->  App addListener 77371965
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setOverlaysWebView 77371966
+⚡️  To Native ->  StatusBar setStyle 77371967
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  WebView loaded
+⚡️  To Native ->  SplashScreen hide 77371968
+⚡️  TO JS undefined
+⚡️  TO JS {"headers":{"date":"Sat, 27 Dec 2025 05:05:36 GMT","content-type":"application\/json","sb-request-id":"019b5e32-a35a-7067-8807-0037d97d6fb0","priority":"u=3,i=?0","alt-svc":"h3=\":443\"; ma=86400","cf-ray":"9b4648a54da0efb8-PDX","sb-project-ref":"pbfuwfzcc
+⚡️  To Native ->  SecureStorage internalSetItem 77371969
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session found, invalidating user query to trigger fetch
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session available after auth change, invalidating query
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [error] - [App] Loading timeout (5s) - forcing render
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 77371970
+No saved state found
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+⚡️  To Native ->  SocialLogin login 77371971
+⚡️  TO JS {"result":{"profile":{"familyName":"Medvedev","email":"hello@fieldsnaps.com","givenName":"Aleksandr","id":"101096107950550804914","name":"Aleksandr Medvedev","imageUrl":"https:\/\/lh3.googleusercontent.com\/a\/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEA
+⚡️  To Native ->  CapacitorHttp request 77371972
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"result":{"profile":{"familyName":"Medvedev","email":"hello@fieldsnaps.com","givenName":"Aleksandr","id":"101096107950550804914","name":"Aleksandr Medvedev","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100"},"responseType":"online","accessToken":{"token":"ya29.a0Aa7pCA9fyDN8sDlxchtK9vkN7Ne8_OfGEEr9vu5yrHSfzcsXVcrqhbJclrq-4lkjhl2_7HJfaZMgXcaAnJhFnM2tE3-fw9LswvwunVrrWNOw2r7D9yfAwu1qgPLEm1rax_4uIM9BnDf48wfiwBxFfhJiTbF34QHSL57lM_0PHFze_ThLwx7aqa9NhBJCq-m1nMQvcxa1aCgYKAS0SARASFQHGX2MioIuXr16NDrdXKInFEnNu0Q0207","userId":"101096107950550804914","refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4"},"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjZhOTA2ZWMxMTlkN2JhNDZhNmE0M2VmMWVhODQyZTM0YThlZTA4YjQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiOGUwTjFUYkhtRGE2NDdlVXVXNmJjdyIsImlhdCI6MTc2NjgxMTk0MiwiZXhwIjoxNzY2ODE1NTQyfQ.uSjkzB0NK2OY6I3CwVHGVrpDTaXct-KLq_LmTqRFLmk-p-IZpDqcVzWA3EkYPliqS60psxtzssRyfHJa5VNh-QZEXFrKg1ME_NCWX2iiZHMXRTPsibEoxvt_YJTsumP0ZpE9yuH1IGaJCBnWvvdjTegfeCU1FcIRVEsMXAWaL-mHJd75AOtrRQqVcxVItpwhh8dbeN0e8G0InKFD7sQhOhoQySekiCIH2Hcat9SSEHtlvt7c10Z8ovHrAurH4bq7KcUTABlPDAx7tt0Y9PipA2d9TQN1mKGE615ifBvXdXowMQrZY8fpX-aE2F8-4caEHA9b-iv-V_q7LGRlW19MZw"},"provider":"google"}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","headers":{"x-envoy-upstream-service-time":"192","content-type":"application\/json","date":"Sat, 27 Dec 2025 05:05:43 GMT","set-cookie":"__cf_bm=IicuYkKP9o8mlHPROP8DZ5
+⚡️  To Native ->  SecureStorage internalSetItem 77371973
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session available after auth change, invalidating query
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  Preferences set 77371974
+⚡️  TO JS undefined
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] First launch marked as completed
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+[TSBackgroundFetch removeListener] WARNING:  Failed to find listener for identifier: TSLocationManager
+🟢 [✨  CapgoUpdater]: onActivityDestroyed: all activity destroyed
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
