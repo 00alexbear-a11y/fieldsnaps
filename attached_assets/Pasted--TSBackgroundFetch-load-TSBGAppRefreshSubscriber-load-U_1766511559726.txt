@@ -1,0 +1,237 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/3F786D91-D597-46BA-85FB-14CFC89CA6EA/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 799e4232-bdb0-4fb9-91a8-4591b02bac93
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+KeyboardPlugin: resize mode - native
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("799e4232-bdb0-4fb9-91a8-4591b02bac93"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.1"), version_name: Optional("builtin"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional("production"))
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11d874f90 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_protocol_metadata_internal_block_invoke [C3] Client called nw_connection_copy_protocol_metadata_internal on unconnected nw_connection
+nw_connection_copy_connected_local_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_local_endpoint on unconnected nw_connection
+nw_connection_copy_connected_remote_endpoint_block_invoke [C3] Client called nw_connection_copy_connected_remote_endpoint on unconnected nw_connection
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+🟢 [✨  CapgoUpdater]: New bundle: 1.0.2 found. Current is: builtin. Update will occur next time app moves to background.
+🟢 [✨  CapgoUpdater]: No version available /var/mobile/Containers/Data/Application/DAF55F94-5EAE-4B03-A958-44A27B9AAA62/Library/NoCloud/ionic_built_snapshots
+WebContent[31463] Unable to hide query parameters from script (missing data)
+🔴 [✨  CapgoUpdater]: Failed to parse info for bundle [zFyFuceRfQ] No data object found for the given key
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Failed to parse info for bundle [zFyFuceRfQ] No data object found for the given key
+🟢 [✨  CapgoUpdater]: Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:44.282Z", "checksum": "", "status": "downloading"}
+⚡️  [warn] - [Supabase] Missing environment variables. Auth features may not work.
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+
+⚡️  ------ STARTUP JS ERROR ------
+
+⚡️  Error: supabaseUrl is required.
+⚡️  [error] - {}
+⚡️  URL: capacitor://localhost/assets/index-C3cRhOK8.js
+⚡️  index-C3cRhOK8.js:74:41746
+
+⚡️  See above for help with debugging blank-screen issues
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:44.282Z", "checksum": "", "status": "downloading"}
+⚡️  WebView loaded
+🟢 [✨  CapgoUpdater]: Stats sent for download_0, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_0, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for download_10, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_10, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_20, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_20, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_40, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_40, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_30, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_30, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_50, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_50, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_60, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_60, version 1.0.2
+🟢 [✨  CapgoUpdater]: Download complete, total received bytes: 7097532
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Download complete, total received bytes: 7097532
+🟢 [✨  CapgoUpdater]: Encryption not set, no public key or seesion, ignored
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Encryption not set, no public key or seesion, ignored
+🟢 [✨  CapgoUpdater]: Downloading: 80% (unzipping)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 80% (unzipping)
+🟢 [✨  CapgoUpdater]: Stats sent for download_70, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_70, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_70, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_70, version 1.0.2
+🟢 [✨  CapgoUpdater]: Downloading: 90% (wrapping up)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 90% (wrapping up)
+🟢 [✨  CapgoUpdater]: Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+🟢 [✨  CapgoUpdater]: Downloading: 100% (complete)
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Downloading: 100% (complete)
+🟢 [✨  CapgoUpdater]: No encryption set (public key) ignored
+⚡️  [info] - 🟢 ✨  CapgoUpdater : No encryption set (public key) ignored
+🟢 [✨  CapgoUpdater]: Stats sent for download_80, version 1.0.2
+🟢 [✨  CapgoUpdater]: Setting status for bundle [zFyFuceRfQ] to PENDING
+🟢 [✨  CapgoUpdater]: Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+🟢 [✨  CapgoUpdater]: Stats sent for download_90, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_80, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [zFyFuceRfQ] to PENDING
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_90, version 1.0.2
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif update downloaded, will install next background current: builtin latestVersionName: 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : endBackGroundTaskWithNotif update downloaded, will install next background current: builtin latestVersionName: 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for download_complete, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for download_complete, version 1.0.2
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Next bundle is: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+🟢 [✨  CapgoUpdater]: Current bundle set to: /var/mobile/Containers/Data/Application/DAF55F94-5EAE-4B03-A958-44A27B9AAA62/Library/NoCloud/ionic_built_snapshots/zFyFuceRfQ
+🟢 [✨  CapgoUpdater]: Setting status for bundle [zFyFuceRfQ] to PENDING
+🟢 [✨  CapgoUpdater]: Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: Reloading zFyFuceRfQ
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+🟢 [✨  CapgoUpdater]: Updated to bundle: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+Snapshot request 0x124c16100 complete with error: <NSError: 0x11d95a2b0; domain: BSActionErrorDomain; code: 6 ("anulled")>
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Next bundle is: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle set to: /var/mobile/Containers/Data/Application/DAF55F94-5EAE-4B03-A958-44A27B9AAA62/Library/NoCloud/ionic_built_snapshots/zFyFuceRfQ
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [zFyFuceRfQ] to PENDING
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 0ms
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Reloading zFyFuceRfQ
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 15000 ms, then check for notifyAppReady
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Updated to bundle: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 15000 ms, then check for notifyAppReady
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: Stats sent for set, version 1.0.2
+🟢 [✨  CapgoUpdater]: Check for update via https://plugin.capgo.app/updates
+⚡️  WebView loaded
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for set, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for update via https://plugin.capgo.app/updates
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - ✅ Sentry initialized for frontend
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 103247947
+🟢 [✨  CapgoUpdater]: Setting status for bundle [zFyFuceRfQ] to SUCCESS
+🟢 [✨  CapgoUpdater]: Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  TO JS {"bundle":{"status":"pending","version":"1.0.2","downloaded":"2025-12-23T17:38:51.114Z","id":"zFyFuceRfQ","checksum":"d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2"}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [zFyFuceRfQ] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Storing info for bundle [zFyFuceRfQ] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 103247948
+⚡️  To Native ->  CapacitorUpdater addListener 103247949
+⚡️  To Native ->  CapacitorUpdater addListener 103247950
+⚡️  To Native ->  CapacitorUpdater current 103247951
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "zFyFuceRfQ", "version": "1.0.2", "downloaded": "2025-12-23T17:38:51.114Z", "checksum": "d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2", "status": "pending"}
+⚡️  To Native ->  SecureStorage internalGetItem 103247952
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"status":"success","checksum":"d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2","id":"zFyFuceRfQ","version":"1.0.2","downloaded":"2025-12-23T17:38:51.114Z"},"native":"1.0"}
+⚡️  To Native ->  App addListener 103247953
+⚡️  To Native ->  App addListener 103247954
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","checksum":"d3ad97d7433eff2f1bb2986cebaa34cdbe402a776cf6db406be7a65d7a2d01d2","id":"zFyFuceRfQ","version":"1.0.2","downloaded":"2025-12-23T17:38:51.114Z"}
+⚡️  To Native ->  SecureStorage internalGetItem 103247955
+⚡️  TO JS {"data":"\"{\\\"refresh_token\\\":\\\"3jwff34aermy\\\",\\\"token_type\\\":\\\"bearer\\\",\\\"user\\\":{\\\"created_at\\\":\\\"2025-12-03T16:50:14.549806Z\\\",\\\"role\\\":\\\"authenticated\\\",\\\"aud\\\":\\\"authenticated\\\",\\\"user_metadata\\\":{\\\"em
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  To Native ->  App getLaunchUrl 103247956
+⚡️  To Native ->  App addListener 103247957
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setOverlaysWebView 103247958
+⚡️  To Native ->  StatusBar setStyle 103247959
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session found, invalidating user query to trigger fetch
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session available after auth change, invalidating query
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+🟢 [✨  CapgoUpdater]: Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("799e4232-bdb0-4fb9-91a8-4591b02bac93"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.1"), version_name: Optional("1.0.2"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional("production"))
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto-update parameters: InfoObject(platform: Optional("ios"), device_id: Optional("799e4232-bdb0-4fb9-91a8-4591b02bac93"), app_id: Optional("com.fieldsnaps.app"), custom_id: Optional(""), version_build: Optional("1.0"), version_code: Optional("1"), version_os: Optional("26.1"), version_name: Optional("1.0.2"), old_version_name: nil, plugin_version: Optional("7.22.0"), is_emulator: Optional(false), is_prod: Optional(false), action: nil, channel: nil, defaultChannel: Optional("production"))
+⚡️  To Native ->  SplashScreen hide 103247960
+⚡️  TO JS undefined
+🔴 [✨  CapgoUpdater]: getLatest failed with error: no_new_version_available
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: endBackGroundTaskWithNotif no_new_version_available current: 1.0.2 latestVersionName: 
+⚡️  [error] - 🔴 ✨  CapgoUpdater : getLatest failed with error: no_new_version_available
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : endBackGroundTaskWithNotif no_new_version_available current: 1.0.2 latestVersionName: 
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version 1.0.2
+🟢 [✨  CapgoUpdater]: Stats sent for backend_refusal, version 1.0.2
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for backend_refusal, version 1.0.2
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 103247961
+No saved state found
+⚡️  TO JS undefined
+⚡️  To Native ->  SocialLogin login 103247962
+⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+⚡️  TO JS {"provider":"google","result":{"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjZhOTA2ZWMxMTlkN2JhNDZhNmE0M2VmMWVhODQyZTM0YThlZTA4YjQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2F
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"provider":"google","result":{"idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjZhOTA2ZWMxMTlkN2JhNDZhNmE0M2VmMWVhODQyZTM0YThlZTA4YjQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiNkw5N3ZZM1pYU2szQlI0elFXcGFBZyIsIm5hbWUiOiJBbGVrc2FuZHIgTWVkdmVkZXYiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSzR5VzIzSDBQbGk1SFBVb3lGblpYYzdMR3FhNVVZRFpZa0VlOGJFQW1ZVDhQQlVnPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFsZWtzYW5kciIsImZhbWlseV9uYW1lIjoiTWVkdmVkZXYiLCJpYXQiOjE3NjY1MTAwMTUsImV4cCI6MTc2NjUxMzYxNX0.yxXjDcLv3jQ44VzjdIcTWZq1fT4Z7caCsgF9y4ZrgybvCh7OQt1rdKsWSsLoiHStyPWIUKFJf_lA9HmLC-CihG2r3QMccDU_K_ghs2fxD-JS18L4FOAbxYIH7DHIMQfGjqHFhqAWfrq3lAor49PkKNwfCRG5r41WrUZWFuC2WzC5x_8HpC4BJu01KmTyh23PI_PH2uSrtWYlK62ypThLynTRJjOBcm_j4L7P2P0TCIR47DJo0kPKglrAyuJ0_RfKinh3xuIBftUYd5dhZk4fNGMY4p-lBEQhzr0fWbl4xHT_FGo46XzUlnRcRb7cOaxzf4A4uEDVjpiH61xCasiCRg","accessToken":{"userId":"101096107950550804914","token":"ya29.a0Aa7pCA934xj5P3cZWqEgm2ZYdzZDIHoniE5jRxTVRq9EnC09Zmz1iyfLenzCGZf4QssEUh0X763Ibiqq3yq7ybFEhMz0Av0JB1awM7GfpZWPZcd16qwM8RbtTe4lDCw3lgPMkCIVGJU7OruU4zKgIffGUjp0dotEVkbXOKCgabs3uJ7vkDdq-0sOglZleY7NjaZ01NNTaCgYKAeMSARASFQHGX2MihJ36Kw--TjokDsXZOkIVyQ0207","refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4"},"profile":{"name":"Aleksandr Medvedev","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100","id":"101096107950550804914","email":"hello@fieldsnaps.com","familyName":"Medvedev","givenName":"Aleksandr"},"responseType":"online"}}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  To Native ->  CapacitorHttp request 103247963
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","status":200,"data":{"token_type":"bearer","access_token":"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2Rtc
+⚡️  To Native ->  SecureStorage internalSetItem 103247964
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [useAuth] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Session available after auth change, invalidating query
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  Preferences set 103247965
+⚡️  TO JS undefined
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] First launch marked as completed
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [useAuth] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
