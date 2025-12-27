@@ -13,7 +13,6 @@ import {
   signUpWithEmail,
 } from "@/lib/supabaseAuth";
 import { getApiUrl } from "@/lib/apiUrl";
-import { tokenManager } from "@/lib/tokenManager";
 import { setSentryUser, clearSentryUser, addSentryBreadcrumb } from "@/sentry";
 
 interface AuthState {
@@ -111,18 +110,20 @@ export function useAuth() {
       console.log('[useAuth] Session available:', !!authState.session);
       console.log('[useAuth] Fetching user data...');
       
-      // Use tokenManager for consistency with other queries (same token source)
-      console.log('[useAuth] Getting token from tokenManager...');
-      const token = await tokenManager.getValidAccessToken();
-      console.log('[useAuth] Token result:', !!token, token ? token.substring(0, 30) + '...' : 'null');
+      // CRITICAL: Use the session token directly from authState, NOT tokenManager
+      // tokenManager may have stale state due to async timing issues
+      // The query is only enabled when authState.session exists, so we can safely use it
+      const token = authState.session?.access_token;
+      console.log('[useAuth] Token from session:', !!token, token ? token.substring(0, 30) + '...' : 'null');
       
       if (!token) {
-        console.error('[useAuth] No valid token available');
-        throw new Error('No valid token');
+        // This should never happen since query is only enabled when session exists
+        console.error('[useAuth] No token in session - this should not happen');
+        throw new Error('No session token available');
       }
       
       const apiUrl = getApiUrl('/api/auth/user');
-      console.log('[useAuth] Token obtained, making request to:', apiUrl);
+      console.log('[useAuth] Making request to:', apiUrl);
       
       // Use getApiUrl to ensure iOS native app hits the correct backend server
       // Add 10 second timeout to prevent hanging requests
@@ -136,10 +137,20 @@ export function useAuth() {
       console.log('[useAuth] Response received:', response.status, response.statusText);
       
       if (!response.ok) {
+        // Log the response body for debugging
+        let errorBody = '';
+        try {
+          errorBody = await response.text();
+          console.error('[useAuth] Error response body:', errorBody);
+        } catch (e) {
+          console.error('[useAuth] Could not read error body');
+        }
+        
         // Handle 401/403: Backend doesn't recognize the Supabase token
         // Clear the invalid session to prevent infinite loading state
         if (response.status === 401 || response.status === 403) {
-          console.log('[useAuth] Backend rejected token (401/403), clearing session');
+          console.error('[useAuth] Backend rejected token (401/403), clearing session');
+          console.error('[useAuth] Error details:', errorBody);
           clearSentryUser();
           try {
             await supabaseSignOut();
@@ -151,9 +162,9 @@ export function useAuth() {
             supabaseUser: null,
             isInitialized: true,
           });
-          throw new Error('Session expired - please login again');
+          throw new Error(`Session expired - ${errorBody || 'please login again'}`);
         }
-        throw new Error('Failed to fetch user');
+        throw new Error(`Failed to fetch user: ${response.status} ${errorBody}`);
       }
       
       const userData = await response.json();
