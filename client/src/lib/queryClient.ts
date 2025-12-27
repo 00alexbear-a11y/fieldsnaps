@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction, QueryCache, MutationCache } from "@tanstack/react-query";
+import { Capacitor } from "@capacitor/core";
 import { tokenManager } from "./tokenManager";
 import { getApiUrl } from "./apiUrl";
 import { toast } from "@/hooks/use-toast";
@@ -85,12 +86,23 @@ export const getQueryFn: <T>(options: {
       }
     }
     
-    // Add JWT token if available (for native apps)
+    // Get JWT token for authentication
     const token = await tokenManager.getValidAccessToken();
+    const isNative = Capacitor.isNativePlatform();
     
     const headers: Record<string, string> = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
+      console.log('[QueryClient] Token attached to request:', url.substring(0, 30));
+    } else if (isNative) {
+      // On native platforms, protected endpoints REQUIRE a token
+      // Without it, the request will fail with 401
+      // Throw an error to trigger React Query retry/error handling
+      const isProtectedEndpoint = url.includes('/api/') && !url.includes('/api/public');
+      if (isProtectedEndpoint) {
+        console.error('[QueryClient] Native platform requires token for:', url);
+        throw new Error('Authentication required - no token available');
+      }
     }
     
     const res = await fetch(getApiUrl(url), {
