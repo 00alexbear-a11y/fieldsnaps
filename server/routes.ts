@@ -1259,7 +1259,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // User is authenticated (via JWT or session) - return user data
     try {
+      // Detailed logging for debugging iOS auth
+      console.log('[/api/auth/user] Full req.user object:', JSON.stringify(req.user, null, 2));
+      
       const userId = req.user?.claims?.sub;
+      const supabaseUserId = req.user?.supabaseUserId;
+      const userEmail = req.user?.claims?.email;
+      
+      console.log('[/api/auth/user] Extracted IDs - userId:', userId, 'supabaseUserId:', supabaseUserId, 'email:', userEmail);
       
       if (!userId) {
         console.error('[/api/auth/user] No user ID in request after authentication');
@@ -1274,11 +1281,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      console.log('[/api/auth/user] Returning user:', user.email);
+      console.log('[/api/auth/user] Successfully returning user:', user.email, 'companyId:', user.companyId);
       return res.json(user);
-    } catch (error) {
-      console.error("[/api/auth/user] Error fetching authenticated user:", error);
-      return res.status(500).json({ message: "Failed to fetch user" });
+    } catch (error: any) {
+      console.error("[/api/auth/user] Error fetching authenticated user:", error?.message || error);
+      console.error("[/api/auth/user] Error stack:", error?.stack);
+      return res.status(500).json({ message: "Failed to fetch user", details: error?.message });
     }
   });
 

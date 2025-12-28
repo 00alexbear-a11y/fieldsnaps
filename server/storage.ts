@@ -227,47 +227,53 @@ export class DbStorage implements IStorage {
     
     try {
       // Try lookup by supabase_user_id first (used by Supabase auth)
+      console.log('[getUser] Step 1: Trying supabaseUserId lookup...');
       let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
       console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
     
-    // Fall back to primary key lookup for backward compatibility
-    if (!result[0]) {
-      result = await db.select().from(users).where(eq(users.id, id));
-      console.log('[getUser] Primary key lookup result:', result[0]?.id || 'not found');
-    }
-    
-    const user = result[0];
-    
-    if (!user) {
-      console.log('[getUser] User not found for id:', id);
-      return undefined;
-    }
-    
-    console.log('[getUser] Found user:', user.email, 'companyId:', user.companyId, 'subscriptionStatus (before hydrate):', user.subscriptionStatus);
-    
-    // Hydrate subscription status from company (company status takes precedence)
-    if (user.companyId) {
-      const companyResult = await db.select({
-        subscriptionStatus: companies.subscriptionStatus,
-        subscriptionEndDate: companies.subscriptionEndDate,
-      }).from(companies).where(eq(companies.id, user.companyId));
-      
-      if (companyResult[0]) {
-        console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
-        const hydratedUser = {
-          ...user,
-          subscriptionStatus: companyResult[0].subscriptionStatus,
-          subscriptionEndDate: companyResult[0].subscriptionEndDate,
-        };
-        console.log('[getUser] Returning hydrated user with subscriptionStatus:', hydratedUser.subscriptionStatus);
-        return hydratedUser;
+      // Fall back to primary key lookup for backward compatibility
+      if (!result[0]) {
+        console.log('[getUser] Step 2: Trying primary key lookup...');
+        result = await db.select().from(users).where(eq(users.id, id));
+        console.log('[getUser] Primary key lookup result:', result[0]?.id || 'not found');
       }
-    }
-    
-    console.log('[getUser] Returning user without company hydration, subscriptionStatus:', user.subscriptionStatus);
-    return user;
+      
+      const user = result[0];
+      
+      if (!user) {
+        console.log('[getUser] User not found for id:', id);
+        return undefined;
+      }
+      
+      console.log('[getUser] Found user:', user.email, 'dbId:', user.id, 'supabaseUserId:', user.supabaseUserId, 'companyId:', user.companyId);
+      
+      // Hydrate subscription status from company (company status takes precedence)
+      if (user.companyId) {
+        console.log('[getUser] Step 3: Fetching company subscription for companyId:', user.companyId);
+        const companyResult = await db.select({
+          subscriptionStatus: companies.subscriptionStatus,
+          subscriptionEndDate: companies.subscriptionEndDate,
+        }).from(companies).where(eq(companies.id, user.companyId));
+        
+        if (companyResult[0]) {
+          console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
+          const hydratedUser = {
+            ...user,
+            subscriptionStatus: companyResult[0].subscriptionStatus,
+            subscriptionEndDate: companyResult[0].subscriptionEndDate,
+          };
+          console.log('[getUser] SUCCESS: Returning hydrated user');
+          return hydratedUser;
+        } else {
+          console.warn('[getUser] Company not found for companyId:', user.companyId, '- returning user without hydration');
+        }
+      }
+      
+      console.log('[getUser] SUCCESS: Returning user without company hydration');
+      return user;
     } catch (error: any) {
-      console.error('[getUser] Database error:', error.message, error.stack);
+      console.error('[getUser] DATABASE ERROR:', error.message);
+      console.error('[getUser] Error stack:', error.stack);
       throw error;
     }
   }
