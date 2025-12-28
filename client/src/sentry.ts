@@ -1,6 +1,15 @@
 import * as Sentry from "@sentry/react";
 
 export function initSentry() {
+  // TEMPORARILY DISABLED: Sentry's browserTracingIntegration() intercepts network requests
+  // and corrupts the Authorization header on iOS, causing "string did not match expected pattern" errors.
+  // This is blocking iOS authentication. Once auth is confirmed working, we'll re-enable
+  // Sentry with network breadcrumbs excluded for auth endpoints.
+  console.log("ℹ️  Sentry temporarily disabled to debug iOS authentication");
+  return;
+
+  // Original implementation preserved below for re-enabling later:
+  /*
   const dsn = import.meta.env.VITE_SENTRY_DSN;
   const isProduction = import.meta.env.PROD;
   
@@ -49,6 +58,7 @@ export function initSentry() {
   });
 
   console.log("✅ Sentry initialized for frontend");
+  */
 }
 
 export function setSentryUser(user: { id: string; email?: string; subscriptionStatus?: string }) {
