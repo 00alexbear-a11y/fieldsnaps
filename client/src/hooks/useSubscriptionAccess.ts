@@ -1,42 +1,33 @@
-import { useQuery } from "@tanstack/react-query";
-import { User } from "@shared/schema";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export function useSubscriptionAccess() {
-  const { data: user } = useQuery<User>({
-    queryKey: ["auth", "currentUser"],
-  });
+  const { user } = useAuthContext();
 
-  // Check if user can perform write operations (create/upload/edit)
   const canWrite = (() => {
     if (!user) return false;
     
     const status = user.subscriptionStatus;
     
-    // Active subscription or admin
     if (status === 'active' || status === 'admin') return true;
     
-    // Trial with valid end date
     if (status === 'trial') {
-      if (!user.trialEndDate) return true; // Trial not started yet
+      if (!user.trialEndDate) return true;
       const now = new Date();
       const trialEnd = new Date(user.trialEndDate);
-      return now < trialEnd; // Trial still active
+      return now < trialEnd;
     }
     
-    // Past due has 2-week grace period from when payment failed
     if (status === 'past_due') {
       if (!user.pastDueSince) {
-        // If pastDueSince not set yet, allow writes (backend will set it on payment failure)
         console.warn('[SubscriptionAccess] past_due status without pastDueSince, allowing writes');
         return true;
       }
       const now = new Date();
       const graceEnd = new Date(user.pastDueSince);
-      graceEnd.setDate(graceEnd.getDate() + 14); // 2 weeks grace from payment failure
+      graceEnd.setDate(graceEnd.getDate() + 14);
       return now < graceEnd;
     }
     
-    // All other cases: read-only
     return false;
   })();
 

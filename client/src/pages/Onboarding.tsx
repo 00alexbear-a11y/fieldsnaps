@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Building2, User, ArrowRight, ArrowLeft, Check, Users, Link2, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { useQuery } from '@tanstack/react-query';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabaseAuth';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, type UserRole } from '@shared/permissions';
@@ -34,9 +34,7 @@ export default function Onboarding() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidation | null>(null);
   const [isValidatingInvite, setIsValidatingInvite] = useState(false);
 
-  const { data: user } = useQuery<any>({
-    queryKey: ['auth', 'currentUser'],
-  });
+  const { user } = useAuthContext();
 
   useEffect(() => {
     if (user) {

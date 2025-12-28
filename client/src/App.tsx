@@ -60,6 +60,7 @@ import { useSubscriptionAccess } from "./hooks/useSubscriptionAccess";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SwipeBackGesture } from "./components/SwipeBackGesture";
 import { TodoSessionProvider } from "./contexts/TodoSessionContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isNativePlatform } from './lib/nativeNavigation';
@@ -377,14 +378,16 @@ export default function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TodoSessionProvider>
-          <AppContent />
-          <SyncStatusNotifier />
-          <ServiceWorkerUpdate />
-          <Suspense fallback={null}>
-            <Toaster />
-          </Suspense>
-        </TodoSessionProvider>
+        <AuthProvider>
+          <TodoSessionProvider>
+            <AppContent />
+            <SyncStatusNotifier />
+            <ServiceWorkerUpdate />
+            <Suspense fallback={null}>
+              <Toaster />
+            </Suspense>
+          </TodoSessionProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
