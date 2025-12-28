@@ -229,44 +229,62 @@ export class DbStorage implements IStorage {
       // Try lookup by supabase_user_id first (used by Supabase auth)
       console.log('[getUser] Step 1: Trying supabaseUserId lookup...');
       let result = await db.select().from(users).where(eq(users.supabaseUserId, id));
-      console.log('[getUser] Supabase lookup result:', result[0]?.id || 'not found');
+      console.log('[getUser] Supabase lookup result:', result && result[0] ? result[0].id : 'not found');
     
       // Fall back to primary key lookup for backward compatibility
-      if (!result[0]) {
+      if (!result || !result[0]) {
         console.log('[getUser] Step 2: Trying primary key lookup...');
         result = await db.select().from(users).where(eq(users.id, id));
-        console.log('[getUser] Primary key lookup result:', result[0]?.id || 'not found');
+        console.log('[getUser] Primary key lookup result:', result && result[0] ? result[0].id : 'not found');
       }
       
-      const user = result[0];
-      
-      if (!user) {
+      if (!result || !result[0]) {
         console.log('[getUser] User not found for id:', id);
         return undefined;
       }
       
-      console.log('[getUser] Found user:', user.email, 'dbId:', user.id, 'supabaseUserId:', user.supabaseUserId, 'companyId:', user.companyId);
+      // Create a safe copy of the user to avoid any reference issues
+      const user = result[0];
+      const safeUser: User = {
+        id: user.id || '',
+        email: user.email || null,
+        firstName: user.firstName || null,
+        lastName: user.lastName || null,
+        profileImageUrl: user.profileImageUrl || null,
+        companyId: user.companyId || null,
+        role: user.role || null,
+        subscriptionStatus: user.subscriptionStatus || null,
+        trialEndsAt: user.trialEndsAt || null,
+        createdAt: user.createdAt || null,
+        updatedAt: user.updatedAt || null,
+        supabaseUserId: user.supabaseUserId || null,
+        authProvider: user.authProvider || null,
+        defaultProjectId: user.defaultProjectId || null,
+        phone: user.phone || null,
+        stripeCustomerId: user.stripeCustomerId || null,
+        stripeSubscriptionId: user.stripeSubscriptionId || null,
+      };
+      
+      console.log('[getUser] Found user:', safeUser.email, 'dbId:', safeUser.id, 'supabaseUserId:', safeUser.supabaseUserId, 'companyId:', safeUser.companyId);
       
       // Hydrate subscription status from company (company status takes precedence)
-      if (user && user.companyId) {
-        console.log('[getUser] Step 3: Fetching company subscription for companyId:', user.companyId);
+      if (safeUser.companyId) {
+        console.log('[getUser] Step 3: Fetching company subscription for companyId:', safeUser.companyId);
         try {
           const companyResult = await db.select({
             subscriptionStatus: companies.subscriptionStatus,
             subscriptionEndDate: companies.subscriptionEndDate,
-          }).from(companies).where(eq(companies.id, user.companyId));
+          }).from(companies).where(eq(companies.id, safeUser.companyId));
           
           if (companyResult && companyResult[0]) {
             console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
-            // Safely merge user with company data using Object.assign to avoid spread issues
-            const hydratedUser = Object.assign({}, user, {
-              subscriptionStatus: companyResult[0].subscriptionStatus || user.subscriptionStatus,
-              subscriptionEndDate: companyResult[0].subscriptionEndDate,
-            });
+            // Safely update subscription data from company
+            safeUser.subscriptionStatus = companyResult[0].subscriptionStatus || safeUser.subscriptionStatus;
+            // Note: subscriptionEndDate is on company, not user - but we return user schema
             console.log('[getUser] SUCCESS: Returning hydrated user');
-            return hydratedUser;
+            return safeUser;
           } else {
-            console.warn('[getUser] Company not found for companyId:', user.companyId, '- returning user without hydration');
+            console.warn('[getUser] Company not found for companyId:', safeUser.companyId, '- returning user without hydration');
           }
         } catch (companyError: any) {
           console.error('[getUser] Error fetching company:', companyError?.message);
@@ -275,10 +293,10 @@ export class DbStorage implements IStorage {
       }
       
       console.log('[getUser] SUCCESS: Returning user without company hydration');
-      return user;
+      return safeUser;
     } catch (error: any) {
-      console.error('[getUser] DATABASE ERROR:', error.message);
-      console.error('[getUser] Error stack:', error.stack);
+      console.error('[getUser] DATABASE ERROR:', error?.message || 'Unknown error');
+      console.error('[getUser] Error stack:', error?.stack);
       throw error;
     }
   }

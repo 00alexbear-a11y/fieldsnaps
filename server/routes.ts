@@ -382,6 +382,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     throw new Error('Test error - Sentry should catch this!');
   });
   
+  // Build health endpoint - returns deployment info to verify production code version
+  // Used to confirm the deployed code matches the expected version
+  const BUILD_TIMESTAMP = new Date().toISOString();
+  const BUILD_VERSION = 'v2025.12.28.1'; // Increment this when deploying auth fixes
+  
+  app.get('/api/_health/build', (req, res) => {
+    res.json({
+      version: BUILD_VERSION,
+      buildTimestamp: BUILD_TIMESTAMP,
+      nodeEnv: process.env.NODE_ENV || 'unknown',
+      serverTime: new Date().toISOString(),
+      authFixVersion: 'safe-user-object-v2', // Tracks which auth fix is deployed
+    });
+  });
+  
   // Apple App Site Association (AASA) file for Universal Links
   // Required for iOS to recognize this domain as associated with the app
   // NOTE: Update APPLE_TEAM_ID environment variable with your Apple Developer Team ID
