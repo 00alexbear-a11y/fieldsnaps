@@ -135,7 +135,7 @@ export function ProfilePhotoUpload({
       });
 
       // Invalidate user cache
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
 
       if (onUploadComplete && response.profileImageUrl) {
         onUploadComplete(response.profileImageUrl);
@@ -173,7 +173,7 @@ export function ProfilePhotoUpload({
       });
 
       // Invalidate user cache
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
 
       if (onUploadComplete && uploadResponse.profileImageUrl) {
         onUploadComplete(uploadResponse.profileImageUrl);

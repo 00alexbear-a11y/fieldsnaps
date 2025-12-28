@@ -33,7 +33,7 @@ export default function CompanySetup() {
       await apiRequest('POST', '/api/companies', { name: companyName });
       
       // Invalidate user query to refresh company data
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
 
       toast({
         title: "Company created!",
@@ -45,7 +45,7 @@ export default function CompanySetup() {
     } catch (error: any) {
       // If user already has a company (e.g., from production DB sync), just redirect
       if (error.message?.includes('already belongs to a company')) {
-        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
         toast({
           title: "Welcome back!",
           description: "Redirecting to your projects...",

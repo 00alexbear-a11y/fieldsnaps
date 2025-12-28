@@ -33,7 +33,7 @@ export function useDevAutoLogin() {
         if (response.ok) {
           console.log('[DevAutoLogin] ✅ Auto-login successful');
           // Invalidate auth query to trigger re-fetch with new session
-          await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+          await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
           console.log('[DevAutoLogin] 🔄 Auth query invalidated');
         } else {
           console.warn('[DevAutoLogin] ⚠️ Auto-login failed:', response.status);

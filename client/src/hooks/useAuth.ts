@@ -48,7 +48,7 @@ export function useAuth() {
           // Use invalidateQueries instead of resetQueries to trigger a refetch
           // resetQueries clears the cache but doesn't trigger refetch when enabled changes
           console.log('[useAuth] Session found, invalidating user query to trigger fetch');
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          queryClient.invalidateQueries({ queryKey: ["auth", "currentUser"] });
         }
         
         // Register auth state change listener AFTER initialization completes
@@ -66,7 +66,7 @@ export function useAuth() {
           // causing incorrect onboarding/routing decisions
           if (session) {
             console.log('[useAuth] Session available after auth change, invalidating query');
-            queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+            queryClient.invalidateQueries({ queryKey: ["auth", "currentUser"] });
           }
         });
       } catch (error) {
@@ -100,7 +100,7 @@ export function useAuth() {
   const refetchRef = useRef<(() => Promise<any>) | null>(null);
   
   const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser, refetch } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
+    queryKey: ["auth", "currentUser"],
     retry: false,
     enabled: queryEnabled,
     // Don't refetch on window focus - user data doesn't change often

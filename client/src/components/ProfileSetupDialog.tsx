@@ -36,7 +36,7 @@ export function ProfileSetupDialog({ open, onOpenChange, user, isFirstTime = fal
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
       toast({
         title: "Profile Updated",
         description: "Your profile has been saved successfully",

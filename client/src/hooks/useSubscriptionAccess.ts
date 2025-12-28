@@ -3,7 +3,7 @@ import { User } from "@shared/schema";
 
 export function useSubscriptionAccess() {
   const { data: user } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
+    queryKey: ["auth", "currentUser"],
   });
 
   // Check if user can perform write operations (create/upload/edit)

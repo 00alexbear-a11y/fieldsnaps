@@ -126,7 +126,7 @@ function AppContent() {
     setShowProfileSetup(false);
     if (user?.id) {
       // Refetch user data to update UI with new profile data
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
     }
   };
   

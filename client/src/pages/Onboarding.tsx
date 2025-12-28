@@ -35,7 +35,7 @@ export default function Onboarding() {
   const [isValidatingInvite, setIsValidatingInvite] = useState(false);
 
   const { data: user } = useQuery<any>({
-    queryKey: ['/api/auth/user'],
+    queryKey: ['auth', 'currentUser'],
   });
 
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function Onboarding() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
       });
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
       setStep('company');
     } catch (error: any) {
       toast({
@@ -129,7 +129,7 @@ export default function Onboarding() {
     setIsSubmitting(true);
     try {
       await apiRequest('POST', '/api/companies', { name: companyName });
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
 
       toast({
         title: "Welcome to FieldSnaps!",
@@ -140,7 +140,7 @@ export default function Onboarding() {
     } catch (error: any) {
       // If user already has a company (e.g., from production DB sync), just redirect
       if (error.message?.includes('already belongs to a company')) {
-        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
         toast({
           title: "Welcome back!",
           description: "Redirecting to your projects...",
@@ -172,7 +172,7 @@ export default function Onboarding() {
     setIsSubmitting(true);
     try {
       await apiRequest('POST', `/api/companies/invite/${inviteToken}/accept`, {});
-      await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
 
       toast({
         title: "Welcome to the team!",
@@ -183,7 +183,7 @@ export default function Onboarding() {
     } catch (error: any) {
       // If user already has a company, just redirect
       if (error.message?.includes('already belongs to a company')) {
-        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        await queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
         toast({
           title: "Welcome back!",
           description: "Redirecting to your projects...",
