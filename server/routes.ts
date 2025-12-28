@@ -1259,8 +1259,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', isAuthenticatedAndWhitelisted, async (req: any, res) => {
     // User is authenticated (via JWT or session) - return user data
     try {
-      // Detailed logging for debugging iOS auth
-      console.log('[/api/auth/user] Full req.user object:', JSON.stringify(req.user, null, 2));
+      // Detailed logging for debugging iOS auth (safely)
+      try {
+        console.log('[/api/auth/user] Full req.user object:', req.user ? JSON.stringify(req.user, null, 2) : 'undefined');
+      } catch (logError) {
+        console.log('[/api/auth/user] Could not stringify req.user:', logError);
+      }
       
       const userId = req.user?.claims?.sub;
       const supabaseUserId = req.user?.supabaseUserId;

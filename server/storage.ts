@@ -248,24 +248,29 @@ export class DbStorage implements IStorage {
       console.log('[getUser] Found user:', user.email, 'dbId:', user.id, 'supabaseUserId:', user.supabaseUserId, 'companyId:', user.companyId);
       
       // Hydrate subscription status from company (company status takes precedence)
-      if (user.companyId) {
+      if (user && user.companyId) {
         console.log('[getUser] Step 3: Fetching company subscription for companyId:', user.companyId);
-        const companyResult = await db.select({
-          subscriptionStatus: companies.subscriptionStatus,
-          subscriptionEndDate: companies.subscriptionEndDate,
-        }).from(companies).where(eq(companies.id, user.companyId));
-        
-        if (companyResult[0]) {
-          console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
-          const hydratedUser = {
-            ...user,
-            subscriptionStatus: companyResult[0].subscriptionStatus,
-            subscriptionEndDate: companyResult[0].subscriptionEndDate,
-          };
-          console.log('[getUser] SUCCESS: Returning hydrated user');
-          return hydratedUser;
-        } else {
-          console.warn('[getUser] Company not found for companyId:', user.companyId, '- returning user without hydration');
+        try {
+          const companyResult = await db.select({
+            subscriptionStatus: companies.subscriptionStatus,
+            subscriptionEndDate: companies.subscriptionEndDate,
+          }).from(companies).where(eq(companies.id, user.companyId));
+          
+          if (companyResult && companyResult[0]) {
+            console.log('[getUser] Company subscription:', companyResult[0].subscriptionStatus, 'endDate:', companyResult[0].subscriptionEndDate);
+            // Safely merge user with company data using Object.assign to avoid spread issues
+            const hydratedUser = Object.assign({}, user, {
+              subscriptionStatus: companyResult[0].subscriptionStatus || user.subscriptionStatus,
+              subscriptionEndDate: companyResult[0].subscriptionEndDate,
+            });
+            console.log('[getUser] SUCCESS: Returning hydrated user');
+            return hydratedUser;
+          } else {
+            console.warn('[getUser] Company not found for companyId:', user.companyId, '- returning user without hydration');
+          }
+        } catch (companyError: any) {
+          console.error('[getUser] Error fetching company:', companyError?.message);
+          // Return user without hydration if company lookup fails
         }
       }
       

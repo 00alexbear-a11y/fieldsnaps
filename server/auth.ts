@@ -140,29 +140,43 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     
     // Try Supabase JWT token
     try {
+      console.log('[Auth] Attempting Supabase token verification...');
       const supabasePayload = await verifySupabaseToken(token);
       
       if (supabasePayload) {
+        console.log('[Auth] Supabase payload verified, sub:', supabasePayload.sub, 'email:', supabasePayload.email);
+        
         const user = await getOrCreateUserFromSupabase(supabasePayload);
+        console.log('[Auth] getOrCreateUserFromSupabase returned:', user ? `id=${user.id}` : 'null');
         
         if (user) {
-          (req as any).user = {
+          // Safely construct the user object to avoid null/undefined spread issues
+          const reqUser = {
             claims: {
-              sub: user.id,
-              email: user.email,
+              sub: user.id || '',
+              email: user.email || null,
             },
             displayName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : undefined,
-            profilePicture: user.profileImageUrl,
-            supabaseUserId: supabasePayload.sub,
-            isNewUser: user.isNewUser,
+            profilePicture: user.profileImageUrl || null,
+            supabaseUserId: supabasePayload.sub || '',
+            isNewUser: user.isNewUser || false,
           };
+          
+          (req as any).user = reqUser;
+          console.log('[Auth] Set req.user with id:', reqUser.claims.sub);
+          
           setUserContext({ id: user.id, email: user.email || undefined, companyId: user.companyId || undefined });
           res.on('finish', () => clearUserContext());
           return next();
+        } else {
+          console.error('[Auth] getOrCreateUserFromSupabase returned null/undefined');
         }
+      } else {
+        console.log('[Auth] Supabase payload verification returned null');
       }
-    } catch (error) {
-      console.error('[Auth] Supabase token verification error:', error);
+    } catch (error: any) {
+      console.error('[Auth] Supabase token verification error:', error?.message || error);
+      console.error('[Auth] Error stack:', error?.stack);
     }
     
     console.log('[Auth] Bearer token auth failed - returning 401');
