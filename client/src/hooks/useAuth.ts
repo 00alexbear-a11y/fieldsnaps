@@ -96,6 +96,9 @@ export function useAuth() {
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = authState.session;
   
+  // Store refetch function in a ref so we can call it from useEffect
+  const refetchRef = useRef<(() => Promise<any>) | null>(null);
+  
   const { data: user, isLoading: isLoadingUser, isFetching: isFetchingUser, refetch } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
@@ -103,7 +106,6 @@ export function useAuth() {
     // Don't refetch on window focus - user data doesn't change often
     refetchOnWindowFocus: false,
     // Set staleTime to 0 to ensure fresh fetch when enabled changes
-    // The enabled flag already prevents unnecessary fetches
     staleTime: 0,
     // Force refetch when query becomes enabled
     refetchOnMount: 'always',
@@ -191,6 +193,19 @@ export function useAuth() {
       return userData;
     },
   });
+
+  // Store refetch in ref so we can call it from effects
+  refetchRef.current = refetch;
+  
+  // CRITICAL: When queryEnabled becomes true, we need to explicitly call refetch()
+  // invalidateQueries only marks as stale but won't trigger fetch if query was never fetched
+  // This effect ensures the query actually runs when session becomes available
+  useEffect(() => {
+    if (queryEnabled && refetchRef.current) {
+      console.log('[useAuth] Query enabled - calling refetch directly');
+      refetchRef.current();
+    }
+  }, [queryEnabled]);
 
   const signOut = useCallback(async () => {
     try {
