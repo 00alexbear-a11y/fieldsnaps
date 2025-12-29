@@ -38,7 +38,11 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    // Let iOS handle safe areas natively - do NOT use 'always' as it wraps WebView in a scrollview
+    // CRITICAL: contentInset 'never' prevents iOS from wrapping WebView in UIScrollView
+    // This is essential for position:fixed to work correctly
+    contentInset: 'never',
+    // Allow scroll behavior to be controlled by web content
+    allowsLinkPreview: false,
   },
   android: {
     useLegacyBridge: true, // CRITICAL: Prevents 5-minute timeout issue with TransistorSoft Background Geolocation

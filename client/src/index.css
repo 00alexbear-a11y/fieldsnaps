@@ -679,11 +679,11 @@
   }
   
   /* Scrollable content container - contain scroll within bounds */
+  /* NOTE: Removed -webkit-overflow-scrolling: touch as it breaks position:fixed on iOS */
   .scroll-container {
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
   }
   
