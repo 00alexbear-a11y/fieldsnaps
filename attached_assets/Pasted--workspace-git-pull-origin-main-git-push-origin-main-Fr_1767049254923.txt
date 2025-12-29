@@ -1,0 +1,66 @@
+~/workspace$ git pull origin main
+git push origin main
+From https://github.com/00alexbear-a11y/fieldsnaps
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Enumerating objects: 162, done.
+Counting objects: 100% (162/162), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (140/140), done.
+Writing objects: 100% (140/140), 7.38 MiB | 7.08 MiB/s, done.
+Total 140 (delta 121), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (121/121), completed with 22 local objects.
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: 
+remote: - GITHUB PUSH PROTECTION
+remote:   —————————————————————————————————————————
+remote:     Resolve the following violations before pushing again
+remote: 
+remote:     - Push cannot contain secrets
+remote: 
+remote:     
+remote:      (?) Learn how to resolve a blocked push
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push
+remote:     
+remote:      (?) This repository does not have Secret Scanning enabled, but is eligible. Enable Secret Scanning to view and manage detected secrets.
+remote:      Visit the repository settings page, https://github.com/00alexbear-a11y/fieldsnaps/settings/security_analysis
+remote:     
+remote:     
+remote:       —— Google OAuth Access Token —————————————————————————
+remote:        locations:
+remote:          - commit: 83ddb9bbd21f1167102132daaa587d190f7b4061
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766958305409.txt:110
+remote:          - commit: 321816ec28dcd4d30f2f42e541059d8b4959fd9f
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766959587377.txt:107
+remote:          - commit: e22d5d9eefd6689d7634f8cc617eb9c74aca5b9e
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766960553769.txt:107
+remote:          - commit: e22d5d9eefd6689d7634f8cc617eb9c74aca5b9e
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1766960553769.txt:142
+remote:     
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.
+remote:        https://github.com/00alexbear-a11y/fieldsnaps/security/secret-scanning/unblock-secret/37XUZViGoBb7OLpIIid8BrL9aaX
+remote:     
+remote:     
+remote:       —— Google OAuth Access Token —————————————————————————
+remote:        locations:
+remote:          - commit: f8c108e4ca9f4f7d427b1e13bb9c4fddb3c18bb4
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767032093085.txt:113
+remote:     
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.
+remote:        https://github.com/00alexbear-a11y/fieldsnaps/security/secret-scanning/unblock-secret/37XUZOz7zKDGQUB7ri1xEpXjXZh
+remote:     
+remote:     
+remote:       —— Google OAuth Access Token —————————————————————————
+remote:        locations:
+remote:          - commit: f8c108e4ca9f4f7d427b1e13bb9c4fddb3c18bb4
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767032093085.txt:115
+remote:     
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.
+remote:        https://github.com/00alexbear-a11y/fieldsnaps/security/secret-scanning/unblock-secret/37XUZPLYoWxgsy9JLfvWU6df8Oh
+remote:     
+remote: 
+remote: 
+To https://github.com/00alexbear-a11y/fieldsnaps.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/00alexbear-a11y/fieldsnaps.git'
+~/workspace$ 
