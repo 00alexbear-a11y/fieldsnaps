@@ -725,11 +725,11 @@
   }
   
   /* App shell layout - flex row for sidebar, fills viewport */
+  /* NOTE: Do NOT use overflow:hidden here - it breaks position:fixed on iOS WKWebView */
   .app-shell {
-    height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     width: 100%;
-    overflow: hidden;
     display: flex;
     flex-direction: row;
   }

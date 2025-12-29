@@ -2,6 +2,7 @@ import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useEffect, useState, lazy, Suspense } from "react";
+import { createPortal } from "react-dom";
 
 // Lazy-load Toaster to prevent Safari dispatcher error
 const Toaster = lazy(() => import("@/components/ui/toaster").then(m => ({ default: m.Toaster })));
@@ -249,22 +250,43 @@ function AppContent() {
     );
   }
 
+  // At this point, user is authenticated AND whitelisted
+  // (unauthenticated users blocked at line ~198, non-whitelisted at line ~238)
+  
   // Routes where sidebar should be hidden (camera, edit modes, full-screen views)
+  // These render COMPLETELY OUTSIDE SidebarProvider to avoid transform issues on iOS
   // Extract pathname without query params or hash
   const pathname = location.split('?')[0].split('#')[0];
   
-  const hideSidebarRoutes = ['/camera', '/photo/:id/edit', '/photo/:id/view'];
-  const shouldShowSidebar = !hideSidebarRoutes.some(route => {
-    // Route matching with pathname parsing
+  const fullScreenRoutes = ['/camera', '/photo/:id/edit', '/photo/:id/view'];
+  const isFullScreenRoute = fullScreenRoutes.some(route => {
     if (route.includes(':')) {
-      // Convert route pattern to regex (e.g., /photo/:id/edit -> /photo/[^/]+/edit)
       const pattern = route.replace(/:[^/]+/g, '[^/]+');
-      return new RegExp(`^${pattern}/?$`).test(pathname); // Allow optional trailing slash
+      return new RegExp(`^${pattern}/?$`).test(pathname);
     }
-    // Exact match with optional trailing slash
     return pathname === route || pathname === route + '/';
   });
 
+  // Full-screen routes render WITHOUT SidebarProvider to ensure position:fixed works on iOS
+  // SidebarProvider applies transforms that break position:fixed in WKWebView
+  if (isFullScreenRoute) {
+    return (
+      <div className="min-h-screen bg-black text-foreground">
+        <SwipeBackGesture disabled={disableSwipeBack} />
+        <OfflineIndicator />
+        <Suspense fallback={<div className="flex items-center justify-center h-screen bg-black"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+          <Switch>
+            <Route path="/camera" component={Camera} />
+            <Route path="/photo/:id/edit" component={PhotoEdit} />
+            <Route path="/photo/:id/view" component={PhotoView} />
+          </Switch>
+        </Suspense>
+        <UpgradeModal open={upgradeModalOpen} onClose={() => setUpgradeModalOpen(false)} />
+      </div>
+    );
+  }
+
+  // Normal routes with SidebarProvider
   return (
     <SidebarProvider defaultOpen={false}>
       <div className="app-shell bg-white dark:bg-black text-foreground">
@@ -289,46 +311,55 @@ function AppContent() {
         )}
         
         
-        {/* Sidebar - only shown on non-camera pages */}
-        {shouldShowSidebar && <AppSidebar />}
+        {/* Sidebar */}
+        <AppSidebar />
         
-        <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
-          {/* Header with menu button and logo - only shown when sidebar is visible */}
-          {shouldShowSidebar && (
-            <header className="flex-shrink-0 flex items-center justify-between px-3 pb-3 pt-safe-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 touch-none">
-              <SidebarTrigger 
-                data-testid="button-sidebar-trigger"
-                className="hover-elevate active-elevate-2 !h-auto !w-auto flex items-center gap-2 px-1"
-                aria-label="Toggle sidebar"
-              >
-                <img 
-                  src={logoPath} 
-                  alt="FieldSnaps" 
-                  className="h-8 w-auto object-contain"
-                  data-testid="img-fieldsnaps-logo"
-                />
-              </SidebarTrigger>
-              {/* New Project button - only shown on /projects route */}
-              {pathname === '/projects' && (
-                <CreateProjectDialog 
-                  canWrite={canWrite} 
-                  onUpgradeRequired={() => setUpgradeModalOpen(true)} 
-                />
-              )}
-            </header>
-          )}
-          
-          <main className="flex-1 min-h-0 bg-white dark:bg-black scroll-container">
+        {/* Header with menu button and logo - rendered via portal to escape transform ancestors */}
+        {/* NOTE: Use portal to bypass SidebarProvider transforms that break position:fixed on iOS */}
+        {createPortal(
+          <header 
+            className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-3 pb-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 touch-none"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+          >
+            <SidebarTrigger 
+              data-testid="button-sidebar-trigger"
+              className="hover-elevate active-elevate-2 !h-auto !w-auto flex items-center gap-2 px-1"
+              aria-label="Toggle sidebar"
+            >
+              <img 
+                src={logoPath} 
+                alt="FieldSnaps" 
+                className="h-8 w-auto object-contain"
+                data-testid="img-fieldsnaps-logo"
+              />
+            </SidebarTrigger>
+            {/* New Project button - only shown on /projects route */}
+            {pathname === '/projects' && (
+              <CreateProjectDialog 
+                canWrite={canWrite} 
+                onUpgradeRequired={() => setUpgradeModalOpen(true)} 
+              />
+            )}
+          </header>,
+          document.body
+        )}
+        
+        {/* Main content - scrollable area with padding for fixed header/footer */}
+        <div className="flex flex-col flex-1 min-w-0">
+          <main 
+            className="flex-1 bg-white dark:bg-black"
+            style={{ 
+              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 68px)',
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)'
+            }}
+          >
             <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
               <Switch>
                 <Route path="/auth/callback" component={AuthCallback} />
-                <Route path="/camera" component={Camera} />
                 <Route path="/projects" component={Projects} />
                 <Route path="/projects/:id" component={ProjectPhotos} />
                 <Route path="/all-photos" component={AllPhotos} />
                 <Route path="/activity" component={Activity} />
-                <Route path="/photo/:id/edit" component={PhotoEdit} />
-                <Route path="/photo/:id/view" component={PhotoView} />
                 <Route path="/my-tasks" component={MyTasks} />
                 <Route path="/timesheets" component={Timesheets} />
                 <Route path="/settings" component={Settings} />
@@ -350,8 +381,10 @@ function AppContent() {
               </Switch>
             </Suspense>
           </main>
-          <BottomNav />
         </div>
+        
+        {/* BottomNav - rendered via portal to escape transform ancestors */}
+        <BottomNav />
         
         {/* Upgrade Modal */}
         <UpgradeModal open={upgradeModalOpen} onClose={() => setUpgradeModalOpen(false)} />
