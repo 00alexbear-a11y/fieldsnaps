@@ -176,3 +176,6 @@ Key principles:
 2. Header has `flex-shrink-0` and `touch-action: none` to prevent scroll
 3. Main content uses `scroll-container` for contained scrolling
 4. Camera and modals use `fixed-fullscreen` for edge-to-edge display
+5. **Use `env(safe-area-inset-*)` directly in inline styles** - CSS custom properties may not propagate correctly on iOS native
+6. BottomNav hides when keyboard is open using `useKeyboardManager` hook
+7. MobileDialog uses `visualViewport` API for keyboard-aware sizing

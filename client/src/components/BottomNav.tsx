@@ -2,6 +2,7 @@ import { Link, useLocation } from 'wouter';
 import { Camera, Home, CheckSquare, MapPin, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useKeyboardManager } from '@/hooks/useKeyboardManager';
 
 type Notification = {
   id: string;
@@ -16,6 +17,7 @@ type Notification = {
 export default function BottomNav() {
   const [location] = useLocation();
   const { isAuthenticated } = useAuth();
+  const { isKeyboardOpen } = useKeyboardManager();
   
   // Fetch notifications to show unread count on To-Do tab
   // Only fetch when authenticated to prevent 401 errors
@@ -82,13 +84,17 @@ export default function BottomNav() {
     <>
       {/* Background fill to prevent content from showing at bottom */}
       <div 
-        className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none"
-        style={{ height: 'calc(6rem + var(--safe-area-bottom, 0px))' }}
+        className={`fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none pb-safe transition-transform duration-200 ${
+          isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'
+        }`}
+        style={{ height: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
       />
       
       <nav
-        className="fixed left-0 right-0 z-[100] bg-transparent touch-none"
-        style={{ bottom: 'calc(1rem + var(--safe-area-bottom, 0px))' }}
+        className={`fixed left-0 right-0 z-[100] bg-transparent touch-none overscroll-none transition-transform duration-200 ${
+          isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'
+        }`}
+        style={{ bottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
         data-testid="nav-bottom"
       >
         <div className="flex items-center justify-around gap-1 min-h-[44px] max-w-screen-sm mx-auto px-2">
