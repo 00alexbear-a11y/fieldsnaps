@@ -2124,7 +2124,7 @@ export default function Camera() {
       {/* iOS 26-Style Bottom Controls with Liquid Glass Background - Apple Layout */}
       <div 
         className="flex-shrink-0 flex flex-col items-center gap-2 pt-4 px-6 bg-black"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: 'max(1rem, max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px)))' }}
       >
         {/* Central Control Row - Bottom Position */}
         <div className="flex items-center justify-between w-full">

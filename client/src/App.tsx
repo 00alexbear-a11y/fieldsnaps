@@ -65,6 +65,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { isNativePlatform } from './lib/nativeNavigation';
 import { nativeStatusBar } from './lib/nativeStatusBar';
+import { SafeAreaProvider } from './components/SafeAreaProvider';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 
 function AppContent() {
@@ -377,18 +378,20 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TodoSessionProvider>
-            <AppContent />
-            <SyncStatusNotifier />
-            <ServiceWorkerUpdate />
-            <Suspense fallback={null}>
-              <Toaster />
-            </Suspense>
-          </TodoSessionProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <TodoSessionProvider>
+              <AppContent />
+              <SyncStatusNotifier />
+              <ServiceWorkerUpdate />
+              <Suspense fallback={null}>
+                <Toaster />
+              </Suspense>
+            </TodoSessionProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </ErrorBoundary>
   );
 }

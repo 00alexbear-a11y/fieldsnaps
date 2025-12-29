@@ -87,14 +87,14 @@ export default function BottomNav() {
         className={`fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-30 pointer-events-none pb-safe transition-transform duration-200 ${
           isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'
         }`}
-        style={{ height: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
+        style={{ height: 'calc(5rem + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px)))' }}
       />
       
       <nav
         className={`fixed left-0 right-0 z-[100] bg-transparent touch-none overscroll-none transition-transform duration-200 ${
           isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'
         }`}
-        style={{ bottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: 'calc(0.75rem + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px)))' }}
         data-testid="nav-bottom"
       >
         <div className="flex items-center justify-around gap-1 min-h-[44px] max-w-screen-sm mx-auto px-2">
