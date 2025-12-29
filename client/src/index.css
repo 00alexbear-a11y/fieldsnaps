@@ -761,4 +761,27 @@
   .h-viewport-safe {
     height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   }
+  
+  /* ============================================
+   * iOS WKWebView position:fixed Fix
+   * ============================================
+   * 
+   * On iOS WKWebView, CSS transforms create a new stacking context that
+   * breaks position:fixed. All fixed descendants become scrollable.
+   * 
+   * The .ios-wkwebview class is added to document root when running
+   * in iOS native mode (via main.tsx). This enables targeted fixes
+   * that don't affect web browsers or Android.
+   * 
+   * IMPORTANT: We only target the mobile sidebar sheet (.ios-fixed-patch)
+   * when it's OPEN, to avoid breaking the close animation. We also only
+   * target the sidebar, not other popper-based components.
+   */
+  
+  /* Target only the mobile sidebar sheet when OPEN on iOS */
+  /* Closed state keeps transforms for smooth dismiss animation */
+  .ios-wkwebview .ios-fixed-patch[data-state="open"] {
+    transform: none !important;
+    translate: none !important;
+  }
 }

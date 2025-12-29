@@ -20,6 +20,13 @@ const initializeApp = async () => {
   console.log('[App] Platform:', platform);
   console.log('[App] Is Native:', isNative);
   
+  // Add iOS-specific class to document root for WKWebView position:fixed fixes
+  // This enables targeted CSS overrides that don't affect web or Android
+  if (isNative && platform === 'ios') {
+    document.documentElement.classList.add('ios-wkwebview');
+    console.log('[App] Added ios-wkwebview class for position:fixed fixes');
+  }
+  
   // Register Service Worker for offline functionality (web only)
   if (!isNative) {
     registerServiceWorker().catch((error) => {

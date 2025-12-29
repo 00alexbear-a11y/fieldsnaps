@@ -1988,18 +1988,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "PDF file is required" });
       }
 
-      // Upload PDF to Object Storage
+      // Upload PDF to Object Storage using presigned URL
       const filename = req.file.originalname || `pdf_${Date.now()}.pdf`;
-      const objectKey = `pdfs/${project.id}/${Date.now()}_${filename}`;
       
       const objectStorageService = new ObjectStorageService();
       let storageUrl: string;
       try {
-        storageUrl = await objectStorageService.uploadFile(
-          objectKey,
-          req.file.buffer,
-          req.file.mimetype || 'application/pdf'
-        );
+        // Get presigned upload URL
+        const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+        
+        // Upload to object storage
+        const uploadResponse = await fetch(uploadURL, {
+          method: 'PUT',
+          body: req.file.buffer,
+          headers: {
+            'Content-Type': req.file.mimetype || 'application/pdf',
+          },
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error(`Object storage upload failed: ${uploadResponse.status}`);
+        }
+        
+        // Normalize the path for storage
+        storageUrl = objectStorageService.normalizeObjectEntityPath(uploadURL);
       } catch (uploadError: any) {
         console.error('Object storage upload failed:', uploadError);
         return res.status(500).json({ error: 'Failed to upload PDF to storage' });
@@ -4391,6 +4403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save subscription to database
       await storage.createSubscription({
         userId: user.id,
+        companyId: user.companyId || '', // Required field - user must have company
         stripeSubscriptionId: subscription.id,
         stripePriceId: priceId,
         status: subscription.status,
