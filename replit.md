@@ -179,3 +179,12 @@ Key principles:
 5. **Use `env(safe-area-inset-*)` directly in inline styles** - CSS custom properties may not propagate correctly on iOS native
 6. BottomNav hides when keyboard is open using `useKeyboardManager` hook
 7. MobileDialog uses `visualViewport` API for keyboard-aware sizing
+
+### iOS Fixed Positioning Critical Fixes (December 2024)
+Three changes were required to make `position: fixed` work correctly on iOS:
+
+1. **`contentInset: 'never'` in capacitor.config.ts** - Prevents iOS from wrapping WKWebView in UIScrollView
+2. **Removed `-webkit-overflow-scrolling: touch`** from scroll-container class - This iOS property breaks fixed positioning
+3. **Synchronous safe area initialization** in index.html - Sets CSS vars before React loads
+
+**NEVER use `-webkit-overflow-scrolling: touch`** in any CSS class - it causes fixed elements to scroll with content on iOS.
