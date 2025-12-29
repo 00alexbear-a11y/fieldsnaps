@@ -1,0 +1,157 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/1CBF8D0A-6D73-4C2F-A8D3-BDAB348B72EF/App.app'
+KeyboardPlugin: resize mode - native
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11b0ad650 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 185fa819-65b7-4026-adc5-6f0143691ea5
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+WebContent[53085] Unable to hide query parameters from script (missing data)
+⚡️  WebView loaded
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - ℹ️  Sentry temporarily disabled to debug iOS authentication
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 90368341
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"version":"builtin","status":"success","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z","checksum":""}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  SecureStorage internalGetItem 90368342
+⚡️  To Native ->  CapacitorUpdater addListener 90368343
+⚡️  To Native ->  CapacitorUpdater addListener 90368344
+⚡️  To Native ->  CapacitorUpdater addListener 90368345
+⚡️  To Native ->  CapacitorUpdater current 90368346
+⚡️  TO JS {"data":null}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  SecureStorage internalGetItem 90368347
+⚡️  TO JS {"native":"1.0","bundle":{"status":"success","id":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin"}}
+⚡️  To Native ->  App addListener 90368348
+⚡️  To Native ->  App addListener 90368349
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"token_type\\\":\\\"bearer\\\",\\\"expires_at\\\":1766974707,\\\"user\\\":{\\\"is_anonymous\\\":false,\\\"phone\\\":\\\"\\\",\\\"id\\\":\\\"7889aa04-6fdf-473b-bb80-bcc7d4899d8e\\\",\\\"identities\\\":[{\\\"identity_id
+⚡️  [log] - [Capgo] Current bundle: {"status":"success","id":"builtin","checksum":"","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin"}
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  To Native ->  App getLaunchUrl 90368350
+⚡️  To Native ->  App addListener 90368351
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar setOverlaysWebView 90368352
+⚡️  To Native ->  StatusBar setStyle 90368353
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [AuthContext] Session found, invalidating user query to trigger fetch
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [AuthContext] ========== QUERY STARTING ==========
+⚡️  [log] - [AuthContext] Session from ref: true
+⚡️  [log] - [AuthContext] Fetching user data...
+⚡️  [log] - [AuthContext] Token from session: true eyJhbGciOiJIUzI1NiIsImtpZCI6In...
+⚡️  [log] - [AuthContext] Making request to: https://fieldsnaps.replit.app/api/auth/user
+⚡️  [log] - [AuthContext] Query enabled - calling refetch directly
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [AuthContext] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [AuthContext] Session available after auth change, invalidating query
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  To Native ->  SplashScreen hide 90368354
+⚡️  TO JS undefined
+⚡️  [log] - [AuthContext] Response received: 200 
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  To Native ->  Network getStatus 90368355
+⚡️  To Native ->  Network addListener 90368356
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  [log] - [QueryClient] Token attached to request: /api/notifications
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects/with-counts
+⚡️  [log] - [QueryClient] Token attached to request: /api/user/favorite-projects
+⚡️  [log] - [QueryClient] Token attached to request: /api/user/recent-projects
+⚡️  [log] - [Offline] Saved 2 projects to IndexedDB (once per session)
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera] Setting project from URL: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  To Native ->  SpeechRecognition available 90368357
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  To Native ->  StatusBar hide 90368358
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera Tags] Selected project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Cleaning up session photos for session: dbdb8e9f-bdc8-487f-95c2-125ecdc7685f
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  To Native ->  SpeechRecognition removeAllListeners 90368359
+⚡️  To Native ->  SpeechRecognition stop 90368360
+⚡️  To Native ->  StatusBar show 90368361
+⚡️  To Native ->  StatusBar show 90368362
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+WebContent[53085] Unable to find source 1371 for videoFrameAvailable
+WebContent[53085] Service "com.apple.CARenderServer" failed bootstrap look up (1) - (os/kern) invalid address
+WebContent[53085] Null Context server port!
+⚡️  [log] - [IndexedDB] Session cleanup: deleted 0 uploaded photos, cleared 10 pending photos
+⚡️  [log] - [Camera] Session cleanup complete: {"deleted":0,"cleared":10}

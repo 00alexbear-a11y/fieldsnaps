@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { SafeArea } from 'capacitor-plugin-safe-area';
 
 interface SafeAreaInsets {
   top: number;
@@ -8,31 +9,45 @@ interface SafeAreaInsets {
   left: number;
 }
 
-export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(false);
+const IOS_FALLBACK_INSETS: SafeAreaInsets = {
+  top: 59,
+  right: 0,
+  bottom: 34,
+  left: 0,
+};
 
+export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function initSafeArea() {
+      console.log('[SafeArea] Initializing, isNative:', Capacitor.isNativePlatform());
+      
       if (Capacitor.isNativePlatform()) {
         try {
-          const { SafeArea } = await import('capacitor-plugin-safe-area');
+          console.log('[SafeArea] Calling getSafeAreaInsets...');
+          const result = await SafeArea.getSafeAreaInsets();
+          console.log('[SafeArea] Plugin returned:', result);
           
-          const { insets } = await SafeArea.getSafeAreaInsets();
-          applyInsets(insets);
+          if (result && result.insets) {
+            applyInsets(result.insets);
+            console.log('[SafeArea] Insets applied from plugin:', result.insets);
+          } else {
+            console.warn('[SafeArea] No insets in result, using iOS fallback');
+            applyInsets(IOS_FALLBACK_INSETS);
+          }
           
-          await SafeArea.addListener('safeAreaChanged', (data: { insets: SafeAreaInsets }) => {
+          SafeArea.addListener('safeAreaChanged', (data: { insets: SafeAreaInsets }) => {
+            console.log('[SafeArea] Safe area changed:', data.insets);
             applyInsets(data.insets);
           });
-          
-          console.log('[SafeArea] Insets applied:', insets);
         } catch (error) {
-          console.error('[SafeArea] Failed to get safe area insets:', error);
-          applyFallbackInsets();
+          console.error('[SafeArea] Plugin failed:', error);
+          console.log('[SafeArea] Using iOS fallback insets');
+          applyInsets(IOS_FALLBACK_INSETS);
         }
       } else {
-        applyFallbackInsets();
+        console.log('[SafeArea] Web platform, using zero insets');
+        applyInsets({ top: 0, right: 0, bottom: 0, left: 0 });
       }
-      setReady(true);
     }
 
     function applyInsets(insets: SafeAreaInsets) {
@@ -41,27 +56,17 @@ export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
       root.style.setProperty('--safe-area-inset-right', `${insets.right}px`);
       root.style.setProperty('--safe-area-inset-bottom', `${insets.bottom}px`);
       root.style.setProperty('--safe-area-inset-left', `${insets.left}px`);
-    }
-
-    function applyFallbackInsets() {
-      const root = document.documentElement;
-      const computedTop = getComputedStyle(root).getPropertyValue('padding-top');
-      
-      if (!computedTop || computedTop === '0px') {
-        root.style.setProperty('--safe-area-inset-top', '0px');
-        root.style.setProperty('--safe-area-inset-right', '0px');
-        root.style.setProperty('--safe-area-inset-bottom', '0px');
-        root.style.setProperty('--safe-area-inset-left', '0px');
-      }
+      console.log('[SafeArea] CSS variables set:', {
+        top: `${insets.top}px`,
+        bottom: `${insets.bottom}px`,
+      });
     }
 
     initSafeArea();
 
     return () => {
       if (Capacitor.isNativePlatform()) {
-        import('capacitor-plugin-safe-area').then(({ SafeArea }) => {
-          SafeArea.removeAllListeners();
-        }).catch(() => {});
+        SafeArea.removeAllListeners().catch(() => {});
       }
     };
   }, []);

@@ -38,7 +38,7 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    contentInset: 'always',
+    // Let iOS handle safe areas natively - do NOT use 'always' as it wraps WebView in a scrollview
   },
   android: {
     useLegacyBridge: true, // CRITICAL: Prevents 5-minute timeout issue with TransistorSoft Background Geolocation
