@@ -63,6 +63,8 @@ The architecture prioritizes simplicity and an invisible interface. Service Work
 - **@capacitor/core**: Core functionality
 - **@capacitor/camera**: Native camera integration
 - **@capacitor/haptics**: Native haptic feedback
+- **@capacitor/keyboard**: Keyboard visibility events for iOS native
+- **capacitor-plugin-safe-area**: Real device safe area insets for notches/home indicators
 - **@transistorsoft/capacitor-background-geolocation**: Battery-optimized background location tracking and geofencing
 - **@transistorsoft/capacitor-background-fetch**: Background task scheduling for location sync
 - **@capacitor-community/speech-recognition**: Native speech recognition
