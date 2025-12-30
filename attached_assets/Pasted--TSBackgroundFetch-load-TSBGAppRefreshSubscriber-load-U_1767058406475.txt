@@ -1,0 +1,1022 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/BC2EDE3F-B87E-4815-B8F2-A932250E14F1/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 35a81f0a-9a2d-4628-9e61-00977ef03f18
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+Loading network plugin
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x13b52c390 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+Networking process (0x112064190) took 1.454095 seconds to launch
+GPU process (0x1121141e0) took 1.111944 seconds to launch
+WebContent process (0x1120e4100) took 1.123148 seconds to launch
+WebContent[58057] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [SafeArea-Sync] Applied iOS fallback insets
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [log] - ℹ️  Sentry temporarily disabled to debug iOS authentication
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  [log] - [App] Added ios-wkwebview class for position:fixed fixes
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 128245230
+⚡️  WebView loaded
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"status":"success","id":"builtin","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":""}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 128245231
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 128245232
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  To Native ->  CapacitorUpdater addListener 128245233
+⚡️  To Native ->  CapacitorUpdater current 128245234
+⚡️  To Native ->  SecureStorage internalGetItem 128245235
+⚡️  TO JS {"native":"1.0","bundle":{"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","status":"success","id":"builtin","checksum":""}}
+⚡️  To Native ->  App addListener 128245236
+⚡️  To Native ->  App addListener 128245237
+⚡️  TO JS {"data":null}
+⚡️  [log] - [Capgo] Current bundle: {"downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","status":"success","id":"builtin","checksum":""}
+⚡️  To Native ->  SecureStorage internalGetItem 128245238
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":false,"hasSession":false,"enabled":false}
+⚡️  [log] - [Platform Detection - Initial] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [Platform Detection - Poll 1] isNativePlatform(): true getPlatform(): ios
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [SafeArea] Initializing, platform: ios isNative: true
+⚡️  [log] - [SafeArea] Calling plugin getSafeAreaInsets...
+⚡️  To Native ->  App getLaunchUrl 128245239
+⚡️  To Native ->  App ⚡️  TO JS addListener undefined
+128245240
+⚡️  To Native ->  SafeArea getSafeAreaInsets 128245241
+⚡️  To Native ->  StatusBar setOverlaysWebView 128245242
+⚡️  TO JS undefined
+⚡️  TO JS {"insets":{"bottom":34,"right":0,"left":0,"top":62}}
+⚡️  To Native ->  StatusBar setStyle 128245243
+⚡️  TO JS {}
+⚡️  To Native ->  CapacitorHttp request 128245244
+⚡️  To Native ->  SafeArea addListener 128245245
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SafeArea] Plugin returned: {"insets":{"bottom":34,"right":0,"left":0,"top":62}}
+⚡️  [log] - [SafeArea] CSS variables set: {"top":"62px","bottom":"34px"}
+⚡️  To Native ->  SplashScreen hide 128245246
+⚡️  TO JS undefined
+⚡️  TO JS {"status":200,"headers":{"x-envoy-attempt-count":"1","cf-ray":"9b5dc0895a80817f-PDX","x-envoy-upstream-service-time":"302","content-encoding":"gzip","sb-auth-session-id":"88b95db5-8f4d-4cea-89ee-1b66b171daa9","set-cookie":"__cf_bm=v_ZxlCcBFcgrf68pqVpO6Kxlz
+⚡️  To Native ->  SecureStorage internalSetItem 128245247
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [AuthContext] Session found, invalidating user query to trigger fetch
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [AuthContext] ========== QUERY STARTING ==========
+⚡️  [log] - [AuthContext] Session from ref: true
+⚡️  [log] - [AuthContext] Fetching user data...
+⚡️  [log] - [AuthContext] Token from session: true eyJhbGciOiJIUzI1NiIsImtpZCI6In...
+⚡️  [log] - [AuthContext] Making request to: https://fieldsnaps.replit.app/api/auth/user
+⚡️  [log] - [AuthContext] Query enabled - calling refetch directly
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [AuthContext] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [AuthContext] Session available after auth change, invalidating query
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [AuthContext] Response received: 200 
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  Network getStatus 128245248
+⚡️  To Native ->  Network addListener 128245249
+⚡️  To Native ->  Keyboard addListener 128245250
+⚡️  TO JS {"connected":true,"connectionType":"wifi"}
+⚡️  To Native ->  Keyboard addListener 128245251
+⚡️  [log] - [QueryClient] Token attached to request: /api/notifications
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects/with-counts
+⚡️  [log] - [QueryClient] Token attached to request: /api/user/favorite-projects
+⚡️  [log] - [QueryClient] Token attached to request: /api/user/recent-projects
+⚡️  [log] - [Offline] Saved 2 projects to IndexedDB (once per session)
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  Keyboard addListener 128245252
+⚡️  To Native ->  Keyboard addListener 128245253
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects/a3568f97-95ab-4f
+⚡️  [log] - [QueryClient] Token attached to request: /api/companies/me
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects/a3568f97-95ab-4f
+⚡️  [log] - [QueryClient] Token attached to request: /api/tags
+⚡️  To Native ->  CapacitorHttp request 128245254
+⚡️  TO JS {"data":"<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" \/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover\" \/>\n    <meta name=\"theme-color\" content=\"#FFFFF
+⚡️  To Native ->  Keyboard removeListener 128245255
+⚡️  To Native ->  Keyboard removeListener 128245256
+⚡️  To Native ->  Keyboard removeListener 128245257
+⚡️  To Native ->  Keyboard removeListener 128245258
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  To Native ->  SpeechRecognition available 128245259
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+(Fig) signalled err=-12710 at <>:601
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  To Native ->  StatusBar hide 128245260
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 128245261
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification 128245262
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"a03fc607-5768-4d8d-993d-c2e677006030","projectId":"2c81d15c-3019-427d-a55d-548777a48bca","action":"create","online":true}
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create a03fc607-5768-4d8d-993d-c2e677006030
+⚡️  [log] - [Sync] Processing photo create 6837e457-76f1-4a1e-8a74-4f24c59d39fd
+⚡️  [log] - [Sync] Processing photo create a8ac436d-6b55-46f4-9d72-02d294aec162
+⚡️  [log] - [Sync] Processing photo create 46ccb241-3fda-4006-8952-8022e31e3872
+⚡️  [log] - [Sync] Processing photo create 44688999-5926-4926-bc3f-a78f37479ec8
+⚡️  [log] - [Sync] Starting photo upload for: a03fc607-5768-4d8d-993d-c2e677006030 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 223363 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 6837e457-76f1-4a1e-8a74-4f24c59d39fd to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 349067 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a8ac436d-6b55-46f4-9d72-02d294aec162 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 328804 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 46ccb241-3fda-4006-8952-8022e31e3872 to project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 335771 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 44688999-5926-4926-bc3f-a78f37479ec8 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 467595 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 7307 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Thumbnail generated: 9807 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9465 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9780 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/a3568f97-95ab-4fc2-a139-7952ba346ff1/photos
+⚡️  [log] - [Sync] Thumbnail generated: 11528 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Cleaning up session photos for session: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  SpeechRecognition removeAllListeners 128245263
+⚡️  TO JS undefined
+⚡️  To Native ->  SpeechRecognition stop 128245264
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 128245265
+⚡️  To Native ->  StatusBar show ⚡️  TO JS 128245266
+undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 128245267
+⚡️  To Native ->  Keyboard addListener 128245268
+WebContent[58057] Service "com.apple.CARenderServer" failed bootstrap look up (1) - (os/kern) invalid address
+WebContent[58057] Null Context server port!
+⚡️  [error] - [Camera] Session cleanup failed: null
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+🟢 [✨  CapgoUpdater]: Check for pending update
+🟢 [✨  CapgoUpdater]: Background timestamp saved
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_background, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Check for pending update
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp saved
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_background, version builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+⚡️  [info] - 🟢 ✨  CapgoUpdater : All delays canceled from checkCancelDelay
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Background timestamp removed
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Auto update is disabled
+⚡️  [info] - 🟢 ✨  CapgoUpdater : sendReadyToJs
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Wait for 15000 ms, then check for notifyAppReady
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [AuthContext] Auth state changed: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [AuthContext] Session available after auth change, invalidating query
+⚡️  [log] - [AuthContext] ========== QUERY STARTING ==========
+⚡️  [log] - [AuthContext] Session from ref: true
+⚡️  [log] - [AuthContext] Fetching user data...
+⚡️  [log] - [AuthContext] Token from session: true eyJhbGciOiJIUzI1NiIsImtpZCI6In...
+⚡️  [log] - [AuthContext] Making request to: https://fieldsnaps.replit.app/api/auth/user
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Stats sent for app_moved_to_foreground, version builtin
+⚡️  [log] - [AuthContext] Response received: 200 
+⚡️  [log] - [AuthContext] Query enabled check: {"isInitialized":true,"hasSession":true,"enabled":true}
+⚡️  To Native ->  BackgroundGeolocation getProviderState 128245269
+⚡️  TO JS {"accuracyAuthorization":0,"enabled":true,"network":true,"status":4,"gps":true}
+⚡️  [log] - [QueryClient] Token attached to request: /api/clock/status
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  To Native ->  SpeechRecognition available 128245270
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  To Native ->  Keyboard removeListener 128245271
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Keyboard removeListener ⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+128245272
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663618 }
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E1D563AE-9EA3-4AB6-BE86-EC529710FE72
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663618 }
+⚡️  [log] - [Camera] Cleaning up session photos for session: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  SpeechRecognition removeAllListeners 128245273
+⚡️  To Native ->  SpeechRecognition stop 128245274
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 128245275
+⚡️  To Native ->  StatusBar show 128245276
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 128245277
+⚡️  To Native ->  Keyboard addListener 128245278
+⚡️  [log] - [IndexedDB] Session cleanup: deleted 0 uploaded photos, cleared 5 pending photos
+⚡️  [log] - [Camera] Session cleanup complete: {"deleted":0,"cleared":5}
+⚡️  To Native ->  Haptics impact 128245279
+⚡️  TO JS undefined
+⚡️  [error] - [Sync] Error checking network/settings: {"line":643,"column":38074,"sourceURL":"capacitor://localhost/assets/index-BuDEyTA4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create a03fc607-5768-4d8d-993d-c2e677006030
+⚡️  [log] - [Sync] Processing photo create 6837e457-76f1-4a1e-8a74-4f24c59d39fd
+⚡️  [log] - [Sync] Processing photo create a8ac436d-6b55-46f4-9d72-02d294aec162
+⚡️  [log] - [Sync] Processing photo create 46ccb241-3fda-4006-8952-8022e31e3872
+⚡️  [warn] - [Sync] Max retries exceeded for photo 44688999-5926-4926-bc3f-a78f37479ec8 - skipping (manual action required)
+⚡️  [log] - [Sync] Starting photo upload for: a03fc607-5768-4d8d-993d-c2e677006030 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 223363 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 6837e457-76f1-4a1e-8a74-4f24c59d39fd to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 349067 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a8ac436d-6b55-46f4-9d72-02d294aec162 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 328804 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 46ccb241-3fda-4006-8952-8022e31e3872 to project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 335771 bytes
+⚡️  [warn] - [Sync] Thumbnail generation failed, continuing without thumbnail: {}
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [warn] - [Sync] Thumbnail generation failed, continuing without thumbnail: {}
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [warn] - [Sync] Thumbnail generation failed, continuing without thumbnail: {}
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [warn] - [Sync] Thumbnail generation failed, continuing without thumbnail: {}
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/a3568f97-95ab-4fc2-a139-7952ba346ff1/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [error] - [Sync] Error processing photo: {}
+⚡️  [error] - [Sync] Error processing photo: {}
+⚡️  [error] - [Sync] Error processing photo: {}
+⚡️  [error] - [Sync] Error processing photo: {}
+⚡️  To Native ->  Haptics notification 128245280
+⚡️  TO JS undefined
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 15000ms
+⚡️  [error] - 🔴 ✨  CapgoUpdater : Semaphore wait timed out after 15000ms
+🟢 [✨  CapgoUpdater]: Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Built-in bundle is active. We skip the check for notifyAppReady.
+⚡️  To Native ->  Haptics impact 128245281
+⚡️  TO JS undefined
+⚡️  [error] - [Sync] Error checking network/settings: {"line":643,"column":38074,"sourceURL":"capacitor://localhost/assets/index-BuDEyTA4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create a03fc607-5768-4d8d-993d-c2e677006030
+⚡️  [log] - [Sync] Processing photo create 6837e457-76f1-4a1e-8a74-4f24c59d39fd
+⚡️  [log] - [Sync] Processing photo create a8ac436d-6b55-46f4-9d72-02d294aec162
+⚡️  [log] - [Sync] Waiting for retry delay: 8434ms (retry 4/5)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 44688999-5926-4926-bc3f-a78f37479ec8 - skipping (manual action required)
+⚡️  [log] - [Sync] Starting photo upload for: a03fc607-5768-4d8d-993d-c2e677006030 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 223363 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 6837e457-76f1-4a1e-8a74-4f24c59d39fd to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 349067 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a8ac436d-6b55-46f4-9d72-02d294aec162 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 328804 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 7307 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9807 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9465 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  To Native ->  Haptics notification 128245282
+⚡️  TO JS undefined
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663617 }
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  [warn] - Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663619 }
+⚡️  TO JS {"keyboardHeight":345}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E1D563AE-9EA3-4AB6-BE86-EC529710FE72
+⚡️  To Native ->  Keyboard addListener 128245283
+⚡️  To Native ->  Keyboard addListener 128245284
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  [warn] - Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+⚡️  [warn] - As of March 1st, 2025, google.maps.places.Autocomplete is not available to new customers. Please use google.maps.places.PlaceAutocompleteElement instead. At this time, google.maps.places.Autocomplete is not scheduled to be discontinued, but google.maps.places.PlaceAutocompleteElement is recommended over google.maps.places.Autocomplete. While google.maps.places.Autocomplete will continue to receive bug fixes for any major regressions, existing bugs in google.maps.places.Autocomplete will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/legacy for additional details and https://developers.google.com/maps/documentation/javascript/places-migration-overview for the migration guide.
+Attempted to update accumulator from source type: 0, after completion has already been called for token:[9796561B]. This is an error and will be ignored.
+⚡️  TO JS {"keyboardHeight":345}
+⚡️  TO JS {"keyboardHeight":345}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E1D563AE-9EA3-4AB6-BE86-EC529710FE72
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663619 }
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663620 }
+⚡️  TO JS {"keyboardHeight":345}
+⚡️  TO JS {"keyboardHeight":345}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = E1D563AE-9EA3-4AB6-BE86-EC529710FE72
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  CapacitorHttp request 128245285
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663620 }
+⚡️  TO JS {"status":201,"headers":{"referrer-policy":"strict-origin-when-cross-origin","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","strict-transport-security":"max-age=63072000; includeSubDomains, max-age=31536000; includeSubDomains","via":"1.1 go
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects
+⚡️  To Native ->  Keyboard removeListener 128245286
+⚡️  To Native ->  Keyboard removeListener 128245287
+⚡️  [log] - [QueryClient] Token attached to request: /api/projects/with-counts
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  To Native ->  SpeechRecognition available 128245288
+⚡️  [log] - [Camera] Setting project from URL: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  To Native ->  Keyboard removeListener 128245289
+⚡️  To Native ->  Keyboard removeListener 128245290
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  To Native ->  StatusBar hide 128245291
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 128245292
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification 128245293
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"b72bc7bf-1bb6-427d-b434-9168bf4a5838","projectId":"4b8b31f5-c0c0-40e5-be39-fc0102d7e12a","action":"create","online":true}
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create b72bc7bf-1bb6-427d-b434-9168bf4a5838
+⚡️  [log] - [Sync] Processing photo create a03fc607-5768-4d8d-993d-c2e677006030
+⚡️  [log] - [Sync] Processing photo create 6837e457-76f1-4a1e-8a74-4f24c59d39fd
+⚡️  [log] - [Sync] Processing photo create a8ac436d-6b55-46f4-9d72-02d294aec162
+⚡️  [log] - [Sync] Processing photo create 46ccb241-3fda-4006-8952-8022e31e3872
+⚡️  [warn] - [Sync] Max retries exceeded for photo 44688999-5926-4926-bc3f-a78f37479ec8 - skipping (manual action required)
+⚡️  [log] - [Sync] Starting photo upload for: b72bc7bf-1bb6-427d-b434-9168bf4a5838 to project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 275137 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a03fc607-5768-4d8d-993d-c2e677006030 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 223363 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 6837e457-76f1-4a1e-8a74-4f24c59d39fd to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 349067 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a8ac436d-6b55-46f4-9d72-02d294aec162 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 328804 bytes
+⚡️  [log] - [Sync] Starting photo upload for: 46ccb241-3fda-4006-8952-8022e31e3872 to project: a3568f97-95ab-4fc2-a139-7952ba346ff1
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 335771 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 7307 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 8579 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/4b8b31f5-c0c0-40e5-be39-fc0102d7e12a/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9807 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 9465 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Thumbnail generated: 9780 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/a3568f97-95ab-4fc2-a139-7952ba346ff1/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Cleaning up session photos for session: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  SpeechRecognition removeAllListeners 128245294
+⚡️  TO JS undefined
+⚡️  To Native ->  SpeechRecognition stop 128245295
+⚡️  To Native ->  StatusBar show 128245296
+⚡️  To Native ->  StatusBar show 128245297
+⚡️  TO JS ⚡️  To Native ->  Keyboard addListener 128245298
+⚡️  To Native ->  Keyboard addListener 128245299
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+undefined
+WebContent[58057] Service "com.apple.CARenderServer" failed bootstrap look up (1) - (os/kern) invalid address
+WebContent[58057] Null Context server port!
+⚡️  [error] - [Camera] Session cleanup failed: null
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  To Native ->  SpeechRecognition available 128245300
+⚡️  To Native ->  Keyboard removeListener 128245301
+⚡️  To Native ->  Keyboard removeListener 128245302
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Cleaning up session photos for session: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  SpeechRecognition removeAllListeners 128245303
+⚡️  To Native ->  SpeechRecognition stop 128245304
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 128245305
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 128245306
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 128245307
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 128245308
+⚡️  [log] - [IndexedDB] Session cleanup: deleted 0 uploaded photos, cleared 6 pending photos
+⚡️  [log] - [Camera] Session cleanup complete: {"deleted":0,"cleared":6}
+⚡️  To Native ->  BackgroundGeolocation getProviderState 128245309
+⚡️  TO JS {"network":true,"gps":true,"accuracyAuthorization":0,"enabled":true,"status":4}
+⚡️  [warn] - As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'CUR '-_reader->initImage[0] failed err=-50
+⚡️  To Native ->  CapacitorHttp request 128245310
+⚡️  TO JS {"status":200,"data":["Map data ©2025 Google",[["obliques",[[45.859412127907554,-122.56347656249999],[45.890008158661828,-122.4755859375]]],["obliques",[[45.828799251921339,-122.6513671875],[45.859412127907554,-122.431640625]]],["obliques",[[45.79816953017
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+WebContent[58057] makeImagePlus:3798: *** ERROR: 'WEBP'-_reader->initImage[0] failed err=-50
+⚡️  [log] - [QueryClient] Token attached to request: /api/todos
+⚡️  [log] - [QueryClient] Token attached to request: /api/companies/members
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  [warn] - Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663621 }
+⚡️  TO JS {"keyboardHeight":318}
+⚡️  To Native ->  Keyboard addListener 128245311
+⚡️  To Native ->  Keyboard addListener 128245312
+⚡️  [log] - [KeyboardManager] Keyboard will show: 318
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663621 }
+⚡️  To Native ->  CapacitorHttp request 128245313
+⚡️  TO JS {"data":{"completedBy":null,"title":"Take out trash ","completedAt":null,"completed":false,"createdAt":"2025-12-30T01:30:15.994Z","id":"b5c2bbe9-b8c7-4b74-9a8b-b513a4932cb6","flag":false,"projectId":"2c81d15c-3019-427d-a55d-548777a48bca","photoId":null,"du
+⚡️  To Native ->  Haptics notification 128245314
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard removeListener 128245315
+⚡️  To Native ->  Keyboard removeListener 128245316
+⚡️  To Native ->  Haptics impact 128245317
+⚡️  TO JS undefined
+⚡️  To Native ->  Haptics impact 128245318
+⚡️  TO JS undefined
+⚡️  To Native ->  Haptics impact 128245319
+⚡️  TO JS undefined
+⚡️  To Native ->  Haptics impact 128245320
+⚡️  TO JS undefined
+⚡️  [log] - [QueryClient] Token attached to request: /api/todos
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+⚡️  [log] - [QueryClient] Token attached to request: /api/notifications
+⚡️  To Native ->  BackgroundGeolocation getProviderState 128245321
+⚡️  TO JS {"gps":true,"status":4,"accuracyAuthorization":0,"enabled":true,"network":true}
+⚡️  [warn] - Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663622 }
+⚡️  TO JS {"keyboardHeight":345}
+-[RTIInputSystemClient remoteTextInputSessionWithID:textSuggestionsChanged:]  Can only set suggestions for an active session. sessionID = 19440E74-332E-4D54-B1B1-C8427581D939
+⚡️  [log] - [KeyboardManager] Keyboard will show: 345
+⚡️  [log] - [QueryClient] Token attached to request: /api/todos/b5c2bbe9-b8c7-4b74-
+⚡️  TO JS undefined
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663622 }
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  [warn] - Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+Reporter disconnected. { function=sendMessage, reporterID=249305671663623 }
+⚡️  TO JS {"keyboardHeight":318}
+⚡️  To Native ->  Keyboard addListener 128245322
+⚡️  To Native ->  Keyboard addListener 128245323
+⚡️  [log] - [KeyboardManager] Keyboard will show: 318
+⚡️  [error] - `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+⚡️  [warn] - Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+Reporter disconnected or already stopped. { func=stop, reporterID=249305671663623 }
+⚡️  [log] - [KeyboardManager] Keyboard will hide
+⚡️  To Native ->  CapacitorHttp request 128245324
+⚡️  TO JS {"data":{"completedBy":null,"title":"Today","completedAt":null,"completed":false,"createdAt":"2025-12-30T01:31:29.180Z","id":"421abf40-ecbc-4ad9-8be1-12302a1eaa74","flag":false,"projectId":"a3568f97-95ab-4fc2-a139-7952ba346ff1","photoId":null,"dueDate":"20
+⚡️  To Native ->  Haptics notification 128245325
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard removeListener 128245326
+⚡️  To Native ->  Keyboard removeListener 128245327
+⚡️  [log] - [QueryClient] Token attached to request: /api/todos/b5c2bbe9-b8c7-4b74-
+⚡️  [log] - [QueryClient] Token attached to request: /api/todos
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  To Native ->  SpeechRecognition available 128245328
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Fresh session - clearing session photos, using sessionId: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  To Native ->  Keyboard removeListener 128245329
+⚡️  To Native ->  Keyboard removeListener 128245330
+⚡️  TO JS {"available":true}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+nw_read_request_report [C1] Receive failed with error "Operation timed out"
+nw_read_request_report [C1] Receive failed with error "Operation timed out"
+nw_read_request_report [C1] Receive failed with error "Operation timed out"
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Starting camera session 1
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Stream set, videoRef dimensions: 0 x 0
+⚡️  [log] - [Camera] Video play() successful
+⚡️  [log] - [Camera] Metadata already loaded, dimensions: 2160 x 3840
+⚡️  [log] - [Camera] isActive set to true, loading overlay should hide
+⚡️  To Native ->  StatusBar hide 128245331
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 0.5x via applyConstraints
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 1x via applyConstraints
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 2x via applyConstraints
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Applied zoom 1x via applyConstraints
+⚡️  To Native ->  Haptics impact 128245332
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics notification 128245333
+⚡️  [log] - [Sync] Queuing photo for sync: {"photoId":"ea29e33e-7173-4398-b8df-b13cdf4c9a27","projectId":"2c81d15c-3019-427d-a55d-548777a48bca","action":"create","online":true}
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Sync] Photo added to queue successfully
+⚡️  [log] - [Sync] Online - syncing immediately
+⚡️  [log] - [Camera] Photo queued for sync successfully
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [error] - [Sync] Error checking network/settings: {"line":643,"column":38074,"sourceURL":"capacitor://localhost/assets/index-BuDEyTA4.js"}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create ea29e33e-7173-4398-b8df-b13cdf4c9a27
+⚡️  [log] - [Sync] Processing photo create b72bc7bf-1bb6-427d-b434-9168bf4a5838
+⚡️  [log] - [Sync] Processing photo create a03fc607-5768-4d8d-993d-c2e677006030
+⚡️  [warn] - [Sync] Max retries exceeded for photo 6837e457-76f1-4a1e-8a74-4f24c59d39fd - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo a8ac436d-6b55-46f4-9d72-02d294aec162 - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 46ccb241-3fda-4006-8952-8022e31e3872 - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 44688999-5926-4926-bc3f-a78f37479ec8 - skipping (manual action required)
+⚡️  [log] - [Sync] Starting photo upload for: ea29e33e-7173-4398-b8df-b13cdf4c9a27 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 309707 bytes
+⚡️  [log] - [Sync] Starting photo upload for: b72bc7bf-1bb6-427d-b434-9168bf4a5838 to project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 275137 bytes
+⚡️  [log] - [Sync] Starting photo upload for: a03fc607-5768-4d8d-993d-c2e677006030 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 223363 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 8579 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/4b8b31f5-c0c0-40e5-be39-fc0102d7e12a/photos
+⚡️  [log] - [Sync] Thumbnail generated: 7307 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 7479 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 128245334
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 128245335
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  To Native ->  Haptics impact 128245336
+⚡️  TO JS undefined
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Restoring existing sessionId from storage: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera Tags] Selected project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Camera Tags] Tags loaded: []
+⚡️  [log] - [Camera Tags] Should show selector: false
+⚡️  [log] - [Camera] Cleaning up session photos for session: bc81d1cb-186c-4f77-91d5-8ee37bff636d
+⚡️  [log] - [Camera] Stopping camera - session not preserved
+⚡️  [log] - [KeyboardManager] Using Capacitor keyboard events for iOS native
+⚡️  To Native ->  SpeechRecognition removeAllListeners 128245337
+⚡️  To Native ->  SpeechRecognition stop 128245338
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  StatusBar show 128245339
+⚡️  To Native ->  StatusBar show 128245340
+⚡️  To Native ->  Keyboard addListener 128245341
+⚡️  TO JS undefined
+⚡️  TO JS undefined
+⚡️  To Native ->  Keyboard addListener 128245342
+WebContent[58057] Service "com.apple.CARenderServer" failed bootstrap look up (1) - (os/kern) invalid address
+WebContent[58057] Null Context server port!
+⚡️  [log] - [IndexedDB] Session cleanup: deleted 0 uploaded photos, cleared 7 pending photos
+⚡️  [log] - [Camera] Session cleanup complete: {"deleted":0,"cleared":7}
+-[RTIInputSystemClient remoteTextInputSessionWithID:performInputOperation:]  perform input operation requires a valid sessionID. inputModality = Keyboard, inputOperation = <null selector>, customInfoType = UIEmojiSearchOperations
+⚡️  TO JS {"isActive":false}
+⚡️  [log] - [App] State changed. Active: false
+⚡️  TO JS {"isActive":true}
+⚡️  [log] - [App] State changed. Active: true
+⚡️  [log] - [QueryClient] Token attached to request: /api/settings
+⚡️  [log] - [QueryClient] Token attached to request: /api/companies/me
+⚡️  [log] - [QueryClient] Token attached to request: /api/tags
+⚡️  [error] - [Sync] Error checking network/settings: {}
+⚡️  [log] - [Sync] Checking for photos with pending tags...
+⚡️  [log] - [Sync] Processing photo create ea29e33e-7173-4398-b8df-b13cdf4c9a27
+⚡️  [log] - [Sync] Processing photo create b72bc7bf-1bb6-427d-b434-9168bf4a5838
+⚡️  [warn] - [Sync] Max retries exceeded for photo a03fc607-5768-4d8d-993d-c2e677006030 - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 6837e457-76f1-4a1e-8a74-4f24c59d39fd - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo a8ac436d-6b55-46f4-9d72-02d294aec162 - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 46ccb241-3fda-4006-8952-8022e31e3872 - skipping (manual action required)
+⚡️  [warn] - [Sync] Max retries exceeded for photo 44688999-5926-4926-bc3f-a78f37479ec8 - skipping (manual action required)
+⚡️  [log] - [Sync] Starting photo upload for: ea29e33e-7173-4398-b8df-b13cdf4c9a27 to project: 2c81d15c-3019-427d-a55d-548777a48bca
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 309707 bytes
+⚡️  [log] - [Sync] Starting photo upload for: b72bc7bf-1bb6-427d-b434-9168bf4a5838 to project: 4b8b31f5-c0c0-40e5-be39-fc0102d7e12a
+⚡️  [log] - [Sync] Using traditional multipart upload for file: 275137 bytes
+⚡️  [log] - [Sync] Thumbnail generated: 7479 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/2c81d15c-3019-427d-a55d-548777a48bca/photos
+⚡️  [log] - [Sync] Thumbnail generated: 8579 bytes
+⚡️  [log] - [Sync] Upload headers: {}
+⚡️  [log] - [Sync] Upload URL: /api/projects/4b8b31f5-c0c0-40e5-be39-fc0102d7e12a/photos
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
+⚡️  [log] - [Sync] Upload response status: 200
+⚡️  [error] - [Sync] Unexpected response type: text/html
+⚡️  [error] - [Sync] Photo sync error: {}
