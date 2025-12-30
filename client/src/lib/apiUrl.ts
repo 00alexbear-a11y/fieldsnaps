@@ -7,7 +7,7 @@ import { Capacitor } from '@capacitor/core';
  * 
  * IMPORTANT: Update PRODUCTION_URL before deploying to production
  */
-const PRODUCTION_URL = import.meta.env.VITE_API_URL || 'https://fieldsnaps.com';
+const PRODUCTION_URL = import.meta.env.VITE_API_URL || 'https://fieldsnaps.replit.app';
 
 export function getApiBaseUrl(): string {
   if (Capacitor.isNativePlatform()) {

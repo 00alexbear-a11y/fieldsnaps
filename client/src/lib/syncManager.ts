@@ -13,6 +13,7 @@ import { generateThumbnail } from './imageCompression';
 import { nativeNetwork } from './nativeNetwork';
 import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
 import { tokenManager } from './tokenManager';
+import { getApiUrl } from './apiUrl';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -153,7 +154,7 @@ class SyncManager {
       }
 
       // Fetch user settings
-      const response = await fetch('/api/settings', {
+      const response = await fetch(getApiUrl('/api/settings'), {
         credentials: 'include',
       });
 
@@ -527,7 +528,7 @@ class SyncManager {
 
     try {
       if (item.action === 'create') {
-        const response = await fetch('/api/projects', {
+        const response = await fetch(getApiUrl('/api/projects'), {
           method: 'POST',
           headers: await this.getSyncHeaders('application/json'),
           credentials: 'include',
@@ -554,7 +555,7 @@ class SyncManager {
       }
 
       if (item.action === 'update' && project.serverId) {
-        const response = await fetch(`/api/projects/${project.serverId}`, {
+        const response = await fetch(getApiUrl(`/api/projects/${project.serverId}`), {
           method: 'PATCH',
           headers: await this.getSyncHeaders('application/json'),
           credentials: 'include',
@@ -577,7 +578,7 @@ class SyncManager {
       }
 
       if (item.action === 'delete' && project.serverId) {
-        const response = await fetch(`/api/projects/${project.serverId}`, {
+        const response = await fetch(getApiUrl(`/api/projects/${project.serverId}`), {
           method: 'DELETE',
           headers: await this.getSyncHeaders(),
           credentials: 'include',
@@ -675,7 +676,7 @@ class SyncManager {
             console.log('[Sync] All chunks uploaded, completing...');
             
             // Complete the upload with metadata (backend assembles chunks and creates photo)
-            const completeResponse = await fetch(`/api/uploads/chunked/${result.uploadId}/complete`, {
+            const completeResponse = await fetch(getApiUrl(`/api/uploads/chunked/${result.uploadId}/complete`), {
               method: 'POST',
               headers: {
                 ...(await this.getSyncHeaders()),
@@ -708,7 +709,7 @@ class SyncManager {
           try {
             // Step 1: Request presigned upload URL from backend
             const mimeType = photo.blob.type || (photo.mediaType === 'video' ? 'video/webm' : 'image/jpeg');
-            const initResponse = await fetch('/api/photos/presigned-upload', {
+            const initResponse = await fetch(getApiUrl('/api/photos/presigned-upload'), {
               method: 'POST',
               headers: {
                 ...(await this.getSyncHeaders()),
@@ -748,7 +749,7 @@ class SyncManager {
             console.log('[Sync] Direct upload complete, notifying backend...');
             
             // Step 3: Notify backend to create photo record (send fileSize for metrics)
-            const completeResponse = await fetch(`/api/photos/complete-presigned/${uploadSessionId}`, {
+            const completeResponse = await fetch(getApiUrl(`/api/photos/complete-presigned/${uploadSessionId}`), {
               method: 'POST',
               headers: {
                 ...(await this.getSyncHeaders()),
@@ -831,10 +832,11 @@ class SyncManager {
 
           // Get headers (without Content-Type for FormData)
           const headers = await this.getSyncHeaders();
+          const uploadUrl = getApiUrl(`/api/projects/${serverProjectId}/photos`);
           console.log('[Sync] Upload headers:', Object.keys(headers));
-          console.log('[Sync] Upload URL:', `/api/projects/${serverProjectId}/photos`);
+          console.log('[Sync] Upload URL:', uploadUrl);
 
-          const response = await fetch(`/api/projects/${serverProjectId}/photos`, {
+          const response = await fetch(uploadUrl, {
             method: 'POST',
             headers,
             credentials: 'include',
@@ -859,7 +861,7 @@ class SyncManager {
           try {
             for (const tagId of photo.pendingTagIds) {
               try {
-                const tagResponse = await fetch(`/api/photos/${data.id}/tags`, {
+                const tagResponse = await fetch(getApiUrl(`/api/photos/${data.id}/tags`), {
                   method: 'POST',
                   headers: {
                     ...(await this.getSyncHeaders()),
@@ -924,7 +926,7 @@ class SyncManager {
         // Note: Annotations are stored client-side in IndexedDB, not sent to server
         // The backend doesn't have an annotations field in the photos table
 
-        const response = await fetch(`/api/photos/${photo.serverId}`, {
+        const response = await fetch(getApiUrl(`/api/photos/${photo.serverId}`), {
           method: 'PATCH',
           headers: await this.getSyncHeaders(),
           credentials: 'include',
@@ -944,7 +946,7 @@ class SyncManager {
       }
 
       if (item.action === 'delete' && photo.serverId) {
-        const response = await fetch(`/api/photos/${photo.serverId}`, {
+        const response = await fetch(getApiUrl(`/api/photos/${photo.serverId}`), {
           method: 'DELETE',
           headers: await this.getSyncHeaders(),
           credentials: 'include',
@@ -1015,7 +1017,7 @@ class SyncManager {
           try {
             for (const tagId of photo.pendingTagIds) {
               try {
-                const tagResponse = await fetch(`/api/photos/${photo.serverId}/tags`, {
+                const tagResponse = await fetch(getApiUrl(`/api/photos/${photo.serverId}/tags`), {
                   method: 'POST',
                   headers: {
                     ...(await this.getSyncHeaders()),
