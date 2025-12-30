@@ -12,6 +12,7 @@ import { indexedDB as idb, type LocalPhoto, type LocalProject, type SyncQueueIte
 import { generateThumbnail } from './imageCompression';
 import { nativeNetwork } from './nativeNetwork';
 import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
+import { tokenManager } from './tokenManager';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -492,12 +493,27 @@ class SyncManager {
    */
   /**
    * Get headers for sync requests with auth
+   * Includes Bearer token for iOS native apps where cookies don't work cross-origin
    */
-  private getSyncHeaders(contentType?: string): Record<string, string> {
+  private async getSyncHeaders(contentType?: string): Promise<Record<string, string>> {
     const headers: Record<string, string> = {};
     if (contentType) {
       headers['Content-Type'] = contentType;
     }
+    
+    // Add Bearer token for authentication (critical for iOS native)
+    try {
+      const token = await tokenManager.getValidAccessToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('[Sync] Auth token attached to request');
+      } else {
+        console.warn('[Sync] No auth token available for sync request');
+      }
+    } catch (error) {
+      console.error('[Sync] Failed to get auth token:', error);
+    }
+    
     return headers;
   }
 
@@ -513,7 +529,7 @@ class SyncManager {
       if (item.action === 'create') {
         const response = await fetch('/api/projects', {
           method: 'POST',
-          headers: this.getSyncHeaders('application/json'),
+          headers: await this.getSyncHeaders('application/json'),
           credentials: 'include',
           body: JSON.stringify({
             name: project.name,
@@ -540,7 +556,7 @@ class SyncManager {
       if (item.action === 'update' && project.serverId) {
         const response = await fetch(`/api/projects/${project.serverId}`, {
           method: 'PATCH',
-          headers: this.getSyncHeaders('application/json'),
+          headers: await this.getSyncHeaders('application/json'),
           credentials: 'include',
           body: JSON.stringify({
             name: project.name,
@@ -563,7 +579,7 @@ class SyncManager {
       if (item.action === 'delete' && project.serverId) {
         const response = await fetch(`/api/projects/${project.serverId}`, {
           method: 'DELETE',
-          headers: this.getSyncHeaders(),
+          headers: await this.getSyncHeaders(),
           credentials: 'include',
         });
 
@@ -662,7 +678,7 @@ class SyncManager {
             const completeResponse = await fetch(`/api/uploads/chunked/${result.uploadId}/complete`, {
               method: 'POST',
               headers: {
-                ...this.getSyncHeaders(),
+                ...(await this.getSyncHeaders()),
                 'Content-Type': 'application/json',
               },
               credentials: 'include',
@@ -695,7 +711,7 @@ class SyncManager {
             const initResponse = await fetch('/api/photos/presigned-upload', {
               method: 'POST',
               headers: {
-                ...this.getSyncHeaders(),
+                ...(await this.getSyncHeaders()),
                 'Content-Type': 'application/json',
               },
               credentials: 'include',
@@ -735,7 +751,7 @@ class SyncManager {
             const completeResponse = await fetch(`/api/photos/complete-presigned/${uploadSessionId}`, {
               method: 'POST',
               headers: {
-                ...this.getSyncHeaders(),
+                ...(await this.getSyncHeaders()),
                 'Content-Type': 'application/json',
               },
               credentials: 'include',
@@ -814,8 +830,8 @@ class SyncManager {
           }
 
           // Get headers (without Content-Type for FormData)
-          const headers = this.getSyncHeaders();
-          console.log('[Sync] Upload headers:', headers);
+          const headers = await this.getSyncHeaders();
+          console.log('[Sync] Upload headers:', Object.keys(headers));
           console.log('[Sync] Upload URL:', `/api/projects/${serverProjectId}/photos`);
 
           const response = await fetch(`/api/projects/${serverProjectId}/photos`, {
@@ -846,7 +862,7 @@ class SyncManager {
                 const tagResponse = await fetch(`/api/photos/${data.id}/tags`, {
                   method: 'POST',
                   headers: {
-                    ...this.getSyncHeaders(),
+                    ...(await this.getSyncHeaders()),
                     'Content-Type': 'application/json',
                   },
                   credentials: 'include',
@@ -910,7 +926,7 @@ class SyncManager {
 
         const response = await fetch(`/api/photos/${photo.serverId}`, {
           method: 'PATCH',
-          headers: this.getSyncHeaders(),
+          headers: await this.getSyncHeaders(),
           credentials: 'include',
           body: formData,
         });
@@ -930,7 +946,7 @@ class SyncManager {
       if (item.action === 'delete' && photo.serverId) {
         const response = await fetch(`/api/photos/${photo.serverId}`, {
           method: 'DELETE',
-          headers: this.getSyncHeaders(),
+          headers: await this.getSyncHeaders(),
           credentials: 'include',
         });
 
@@ -1002,7 +1018,7 @@ class SyncManager {
                 const tagResponse = await fetch(`/api/photos/${photo.serverId}/tags`, {
                   method: 'POST',
                   headers: {
-                    ...this.getSyncHeaders(),
+                    ...(await this.getSyncHeaders()),
                     'Content-Type': 'application/json',
                   },
                   credentials: 'include',
