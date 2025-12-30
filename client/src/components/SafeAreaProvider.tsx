@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { SafeArea, type SafeAreaInsets as PluginSafeAreaInsets } from 'capacitor-plugin-safe-area';
 
 interface SafeAreaInsets {
   top: number;
@@ -38,26 +39,15 @@ export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Check if SafeArea plugin is available via Capacitor.Plugins
-      const plugins = (Capacitor as any).Plugins;
-      const SafeAreaPlugin = plugins?.SafeArea;
-      
-      if (!SafeAreaPlugin) {
-        console.log('[SafeArea] Plugin not available in Capacitor.Plugins, using iOS fallback');
-        applyInsets(IOS_FALLBACK_INSETS);
-        return;
-      }
-
       try {
-        console.log('[SafeArea] Plugin found, calling getSafeAreaInsets...');
-        const result = await SafeAreaPlugin.getSafeAreaInsets();
+        console.log('[SafeArea] Calling plugin getSafeAreaInsets...');
+        const result: PluginSafeAreaInsets = await SafeArea.getSafeAreaInsets();
         console.log('[SafeArea] Plugin returned:', result);
         
         if (result && result.insets) {
           applyInsets(result.insets);
           
-          // Listen for changes
-          SafeAreaPlugin.addListener('safeAreaChanged', (data: { insets: SafeAreaInsets }) => {
+          SafeArea.addListener('safeAreaChanged', (data: PluginSafeAreaInsets) => {
             console.log('[SafeArea] Safe area changed:', data.insets);
             applyInsets(data.insets);
           });
@@ -75,12 +65,9 @@ export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
     initSafeArea();
 
     return () => {
-      // Cleanup listeners if plugin is available
       try {
-        const plugins = (Capacitor as any).Plugins;
-        const SafeAreaPlugin = plugins?.SafeArea;
-        if (SafeAreaPlugin?.removeAllListeners) {
-          SafeAreaPlugin.removeAllListeners();
+        if (Capacitor.isNativePlatform()) {
+          SafeArea.removeAllListeners();
         }
       } catch (e) {
         // Ignore cleanup errors

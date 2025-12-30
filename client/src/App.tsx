@@ -319,7 +319,7 @@ function AppContent() {
         {createPortal(
           <header 
             className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-3 pb-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 touch-none"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+            style={{ paddingTop: 'calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 12px)' }}
           >
             <SidebarTrigger 
               data-testid="button-sidebar-trigger"
@@ -349,8 +349,8 @@ function AppContent() {
           <main 
             className="flex-1 bg-white dark:bg-black"
             style={{ 
-              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 68px)',
-              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)'
+              paddingTop: 'calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 68px)',
+              paddingBottom: 'calc(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) + 80px)'
             }}
           >
             <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>

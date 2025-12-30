@@ -77,11 +77,51 @@ class SyncManager {
     // Check for non-OK status
     if (!response.ok) {
       const contentType = response.headers.get('content-type');
+      
+      // Handle HTML error pages
       if (contentType && contentType.includes('text/html')) {
         console.error('[Sync] Server returned HTML error page');
         throw new Error('Server error. Please try again or log in.');
       }
+      
+      // Try to parse JSON error response for better logging
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const errorJson = await response.json();
+          console.error('[Sync] Server error response:', {
+            status: response.status,
+            url: response.url,
+            error: errorJson,
+          });
+          
+          // Special handling for validation errors (400/422)
+          if (response.status === 400 || response.status === 422) {
+            const errorMessage = errorJson.message || errorJson.error || 'Validation failed';
+            const details = errorJson.errors || errorJson.details;
+            if (details) {
+              console.error('[Sync] Validation details:', details);
+            }
+            throw new Error(`Validation error: ${errorMessage}`);
+          }
+          
+          throw new Error(`Server error: ${response.status} - ${errorJson.message || errorJson.error || 'Unknown error'}`);
+        } catch (parseError) {
+          if (parseError instanceof Error && parseError.message.startsWith('Validation error:')) {
+            throw parseError;
+          }
+          if (parseError instanceof Error && parseError.message.startsWith('Server error:')) {
+            throw parseError;
+          }
+          // JSON parse failed, fall through to text handling
+        }
+      }
+      
       const errorText = await response.text();
+      console.error('[Sync] Server error (text):', {
+        status: response.status,
+        url: response.url,
+        response: errorText.substring(0, 500), // Limit logged text
+      });
       throw new Error(`Server error: ${response.status} - ${errorText}`);
     }
 

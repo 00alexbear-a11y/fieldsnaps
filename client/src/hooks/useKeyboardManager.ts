@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { nativeKeyboard } from '@/lib/nativeKeyboard';
 
 interface KeyboardState {
@@ -9,8 +10,8 @@ interface KeyboardState {
 
 /**
  * Hook to manage iOS keyboard interactions and viewport changes
- * Uses visualViewport API for accurate keyboard detection on iOS Safari
- * Works on both web and native platforms
+ * Uses Capacitor Keyboard plugin on iOS native (visualViewport doesn't work in WKWebView)
+ * Falls back to visualViewport API on web
  * 
  * @param isActive - Only track keyboard when true (prevents multiple listeners)
  */
@@ -26,17 +27,73 @@ export function useKeyboardManager(isActive: boolean = true) {
       return;
     }
 
-    // Try visualViewport API first (works on modern iOS Safari and most mobile browsers)
+    const isNativeIOS = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
+    // On iOS native, ALWAYS use Capacitor keyboard events
+    // visualViewport events don't fire correctly in WKWebView when body isn't scroll container
+    if (isNativeIOS) {
+      console.log('[KeyboardManager] Using Capacitor keyboard events for iOS native');
+      
+      const removeWillShowListener = nativeKeyboard.addWillShowListener((info) => {
+        const keyboardHeight = info.keyboardHeight;
+        const visualViewportHeight = window.innerHeight - keyboardHeight;
+        
+        console.log('[KeyboardManager] Keyboard will show:', keyboardHeight);
+        
+        setKeyboardState({
+          keyboardHeight,
+          isKeyboardOpen: true,
+          visualViewportHeight,
+        });
+
+        document.documentElement.style.setProperty(
+          '--keyboard-height',
+          `${keyboardHeight}px`
+        );
+        document.documentElement.style.setProperty(
+          '--visual-viewport-height',
+          `${visualViewportHeight}px`
+        );
+        document.documentElement.classList.add('keyboard-open');
+      });
+
+      const removeWillHideListener = nativeKeyboard.addWillHideListener(() => {
+        console.log('[KeyboardManager] Keyboard will hide');
+        
+        setKeyboardState({
+          keyboardHeight: 0,
+          isKeyboardOpen: false,
+          visualViewportHeight: window.innerHeight,
+        });
+
+        document.documentElement.style.setProperty('--keyboard-height', '0px');
+        document.documentElement.style.setProperty(
+          '--visual-viewport-height',
+          `${window.innerHeight}px`
+        );
+        document.documentElement.classList.remove('keyboard-open');
+      });
+
+      return () => {
+        removeWillShowListener();
+        removeWillHideListener();
+        
+        if (isActive) {
+          document.documentElement.style.removeProperty('--keyboard-height');
+          document.documentElement.style.removeProperty('--visual-viewport-height');
+          document.documentElement.classList.remove('keyboard-open');
+        }
+      };
+    }
+
+    // For web and Android, use visualViewport API if available
     if (window.visualViewport) {
       const updateKeyboardState = () => {
         const visualViewport = window.visualViewport!;
         const windowHeight = window.innerHeight;
         const visualHeight = visualViewport.height;
         
-        // Calculate keyboard height (difference between window and visual viewport)
         const keyboardHeight = Math.max(0, windowHeight - visualHeight);
-        
-        // Consider keyboard "open" if it takes up more than 150px
         const isKeyboardOpen = keyboardHeight > 150;
 
         setKeyboardState({
@@ -45,7 +102,6 @@ export function useKeyboardManager(isActive: boolean = true) {
           visualViewportHeight: visualHeight,
         });
 
-        // Update CSS custom properties for use in components
         document.documentElement.style.setProperty(
           '--keyboard-height',
           `${keyboardHeight}px`
@@ -54,12 +110,16 @@ export function useKeyboardManager(isActive: boolean = true) {
           '--visual-viewport-height',
           `${visualHeight}px`
         );
+        
+        if (isKeyboardOpen) {
+          document.documentElement.classList.add('keyboard-open');
+        } else {
+          document.documentElement.classList.remove('keyboard-open');
+        }
       };
 
-      // Initial update
       updateKeyboardState();
 
-      // Listen to viewport changes (keyboard open/close, device rotation)
       window.visualViewport.addEventListener('resize', updateKeyboardState);
       window.visualViewport.addEventListener('scroll', updateKeyboardState);
 
@@ -67,14 +127,14 @@ export function useKeyboardManager(isActive: boolean = true) {
         window.visualViewport?.removeEventListener('resize', updateKeyboardState);
         window.visualViewport?.removeEventListener('scroll', updateKeyboardState);
         
-        // Clean up CSS properties
         if (isActive) {
           document.documentElement.style.removeProperty('--keyboard-height');
           document.documentElement.style.removeProperty('--visual-viewport-height');
+          document.documentElement.classList.remove('keyboard-open');
         }
       };
     } else {
-      // Fallback to Capacitor keyboard events for native platforms without visualViewport
+      // Fallback for older browsers without visualViewport
       const removeDidShowListener = nativeKeyboard.addDidShowListener((info) => {
         const keyboardHeight = info.keyboardHeight;
         const visualViewportHeight = window.innerHeight - keyboardHeight;
@@ -85,7 +145,6 @@ export function useKeyboardManager(isActive: boolean = true) {
           visualViewportHeight,
         });
 
-        // Update CSS custom properties
         document.documentElement.style.setProperty(
           '--keyboard-height',
           `${keyboardHeight}px`
@@ -94,6 +153,7 @@ export function useKeyboardManager(isActive: boolean = true) {
           '--visual-viewport-height',
           `${visualViewportHeight}px`
         );
+        document.documentElement.classList.add('keyboard-open');
       });
 
       const removeDidHideListener = nativeKeyboard.addDidHideListener(() => {
@@ -103,22 +163,22 @@ export function useKeyboardManager(isActive: boolean = true) {
           visualViewportHeight: window.innerHeight,
         });
 
-        // Reset CSS custom properties
         document.documentElement.style.setProperty('--keyboard-height', '0px');
         document.documentElement.style.setProperty(
           '--visual-viewport-height',
           `${window.innerHeight}px`
         );
+        document.documentElement.classList.remove('keyboard-open');
       });
 
       return () => {
         removeDidShowListener();
         removeDidHideListener();
         
-        // Clean up CSS properties
         if (isActive) {
           document.documentElement.style.removeProperty('--keyboard-height');
           document.documentElement.style.removeProperty('--visual-viewport-height');
+          document.documentElement.classList.remove('keyboard-open');
         }
       };
     }
@@ -138,14 +198,12 @@ export function useAutoScrollInput(isActive: boolean = true) {
     const handleFocus = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
       
-      // Only scroll for input elements
       if (
         target.tagName === 'INPUT' ||
         target.tagName === 'TEXTAREA' ||
         target.tagName === 'SELECT' ||
         target.contentEditable === 'true'
       ) {
-        // Delay to allow keyboard animation to complete
         setTimeout(() => {
           target.scrollIntoView({
             behavior: 'smooth',
@@ -156,7 +214,6 @@ export function useAutoScrollInput(isActive: boolean = true) {
       }
     };
 
-    // Use capture phase to catch focus on all elements
     document.addEventListener('focus', handleFocus, true);
 
     return () => {

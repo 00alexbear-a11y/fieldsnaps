@@ -784,4 +784,25 @@
     transform: none !important;
     translate: none !important;
   }
+  
+  /* ============================================
+   * Keyboard Visibility Management
+   * ============================================
+   * 
+   * When keyboard is open on iOS, hide bottom navigation to prevent
+   * it from overlapping the keyboard or jumping around. The keyboard-open
+   * class is added/removed by useKeyboardManager hook via Capacitor events.
+   */
+  
+  /* Hide bottom navigation when keyboard is open on iOS native */
+  .ios-wkwebview.keyboard-open [data-testid="nav-bottom"],
+  .ios-wkwebview.keyboard-open [data-testid="nav-bottom"] + div {
+    display: none !important;
+  }
+  
+  /* Also hide the background fill element when keyboard is open on iOS native */
+  .ios-wkwebview.keyboard-open .fixed.bottom-0.bg-white\/80,
+  .ios-wkwebview.keyboard-open .fixed.bottom-0.bg-black\/80 {
+    display: none !important;
+  }
 }

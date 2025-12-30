@@ -38,6 +38,7 @@ import SwipeableProjectCard from "@/components/SwipeableProjectCard";
 import { ProjectsFilterSheet } from "@/components/ProjectsFilterSheet";
 import type { Project, Photo } from "../../../shared/schema";
 import { syncManager } from "@/lib/syncManager";
+import { indexedDB as idb } from "@/lib/indexeddb";
 import { nativeClipboard } from "@/lib/nativeClipboard";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeDialogs } from "@/lib/nativeDialogs";
@@ -265,6 +266,23 @@ export default function Projects() {
 
   const deleteMutation = useMutation({
     mutationFn: async (projectId: string) => {
+      // First, clean up any pending photos from IndexedDB for this project
+      try {
+        const pendingPhotos = await idb.getProjectPhotos(projectId);
+        if (pendingPhotos.length > 0) {
+          console.log(`[Projects] Cleaning up ${pendingPhotos.length} local photos for project ${projectId}`);
+          for (const photo of pendingPhotos) {
+            await idb.deletePhoto(photo.id);
+          }
+        }
+        // Also delete the local project record if it exists
+        await idb.deleteProject(projectId);
+      } catch (err) {
+        console.warn('[Projects] Failed to clean up local storage during delete:', err);
+        // Continue with server deletion even if local cleanup fails
+      }
+      
+      // Then delete from server
       await apiRequest("DELETE", `/api/projects/${projectId}`);
     },
     onSuccess: () => {
