@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, Home, Trash2, CheckSquare, Square } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Wifi, WifiOff, Image, Home, Trash2, CheckSquare, Square, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -40,6 +40,10 @@ export default function SyncStatus() {
   const touchCurrentX = useRef<number>(0);
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [photoToMove, setPhotoToMove] = useState<{ syncItemId: string; photoId: string } | null>(null);
+  const [resettingFailed, setResettingFailed] = useState(false);
+
+  const MAX_RETRY_COUNT = 5;
+  const failedItems = syncItems.filter(item => item.retryCount >= MAX_RETRY_COUNT);
 
   useEffect(() => {
     loadSyncItems();
@@ -258,6 +262,31 @@ export default function SyncStatus() {
     }
   };
 
+  const handleResetFailedAndRetry = async () => {
+    if (syncing) return; // Prevent concurrent syncs
+    
+    setResettingFailed(true);
+    try {
+      const resetCount = await indexedDBService.resetFailedSyncItems(MAX_RETRY_COUNT);
+      console.log(`[SyncStatus] Reset ${resetCount} failed items`);
+      
+      if (resetCount > 0) {
+        await loadSyncItems();
+        setSyncing(true);
+        try {
+          await syncManager.syncNow();
+        } finally {
+          setSyncing(false);
+        }
+        await loadSyncItems();
+      }
+    } catch (error) {
+      console.error('Failed to reset failed items:', error);
+    } finally {
+      setResettingFailed(false);
+    }
+  };
+
   const photoItems = syncItems.filter(item => item.type === 'photo');
   const projectItems = syncItems.filter(item => item.type === 'project');
 
@@ -368,6 +397,26 @@ export default function SyncStatus() {
               <div className="text-sm text-muted-foreground">Projects</div>
             </div>
           </div>
+          
+          {failedItems.length > 0 && (
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-destructive">
+                  {failedItems.length} item{failedItems.length !== 1 ? 's' : ''} failed (max retries exceeded)
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleResetFailedAndRetry}
+                  disabled={!isOnline || resettingFailed || syncing}
+                  data-testid="button-reset-failed"
+                >
+                  <RotateCcw className={`w-4 h-4 mr-2 ${resettingFailed ? 'animate-spin' : ''}`} />
+                  {resettingFailed ? 'Retrying...' : 'Reset & Retry'}
+                </Button>
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* Loading State */}

@@ -1,0 +1,10 @@
+1. Th slide out menu - the top of the user name needs to be rught underneath the logo of fieldsnaps, the logo needs to sit at the same i fnot a little lower height than tha new button, the new button crops the circle edges at the bottom when the slider menu comes up. 
+2. photos still do not sync to the project, i get an error when trying to take aphoto and enter photo mode. the network error one, 
+3. there is a ui probelm with the to do list, the top of the pop menu goes behind the top menu where the logo is and is blurred, it should not be that high, it should sit under the top menu. the bottom of the pop menu is not rounded like the top is. it still takes too long for the todo to pop up, it should be immediate, i get an error that hides behind the top menu i cant even tell what it is whenever i do try to make a todo. when i mark something complete i get an error as well. when i try to attach a photo to a to do it closes the to do entirely and does not att ch a photo. when i press on the to do, the keyboard sohuld not pop up right away. it should be a read ready format and then only if i press the notes page or a space does it pop up. deleting a to do list causes an error to pop up.
+4. locations view - it is too low below the main logo, the logo again is floating above some error. 
+5. time view- same story with the top meny flaoting over an error, i annot view the timesheet so i cannot verify that it is indeed counting hte time. 
+6. cannot sync photo to project, just get an error and they stay pending. 
+7. when logging out and trying to login it automatically logs me back in instead of askign for what google account i would like to use. it should not auto loggin. 
+8. uploading photos from my camera roll does not seem to work. 
+9. within a project, the view is too low from the top logo as well. 
+10. within settings you need to go through every option and make sure it is not sitting to high up where it is behind the top menu. for example in team members view. i think we need to add a rule or something that alligns all menus with the proper height and make it easily adjustable. it needs to be applied app wide.

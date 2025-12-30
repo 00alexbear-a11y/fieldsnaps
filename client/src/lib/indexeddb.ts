@@ -723,6 +723,46 @@ class IndexedDBManager {
   }
 
   /**
+   * Reset retry count for all failed sync items (those with retryCount >= maxRetries)
+   * This allows them to be retried during the next sync
+   */
+  async resetFailedSyncItems(maxRetries: number = 5): Promise<number> {
+    const db = await this.init();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORES.SYNC_QUEUE], 'readwrite');
+      const store = transaction.objectStore(STORES.SYNC_QUEUE);
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const items = request.result as SyncQueueItem[];
+        const failedItems = items.filter(item => item.retryCount >= maxRetries);
+        
+        let resetCount = 0;
+        
+        if (failedItems.length === 0) {
+          resolve(0);
+          return;
+        }
+        
+        failedItems.forEach(item => {
+          const updated = { ...item, retryCount: 0, lastAttempt: undefined, error: undefined };
+          const putRequest = store.put(updated);
+          putRequest.onsuccess = () => {
+            resetCount++;
+            if (resetCount === failedItems.length) {
+              resolve(resetCount);
+            }
+          };
+          putRequest.onerror = () => reject(putRequest.error);
+        });
+      };
+      
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
    * Get storage usage stats
    */
   async getStorageStats(): Promise<{ used: number; quota: number; available: number }> {
