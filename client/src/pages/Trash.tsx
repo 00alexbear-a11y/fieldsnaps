@@ -228,7 +228,7 @@ export default function Trash() {
   const hasItems = deletedProjects.length > 0 || deletedPhotos.length > 0;
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-black">
+    <div className="flex flex-col h-full bg-white dark:bg-black">
       {/* Header */}
       <div className="flex items-center justify-between py-3 px-4 border-b">
         <div className="flex items-center gap-3">

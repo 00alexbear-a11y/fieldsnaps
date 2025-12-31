@@ -229,7 +229,7 @@ export default function Activity() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full">
+      <div className="flex h-full w-full">
         <ActivitySidebar
           currentFilter={filter}
           onFilterChange={setFilter}

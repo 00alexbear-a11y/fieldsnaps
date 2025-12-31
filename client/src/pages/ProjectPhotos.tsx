@@ -1380,7 +1380,7 @@ export default function ProjectPhotos() {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="flex h-screen w-full">
+      <div className="flex h-full w-full">
         <PhotosSidebar
           dateFilter={dateFilter}
           onDateFilterChange={setDateFilter}
@@ -1398,7 +1398,7 @@ export default function ProjectPhotos() {
           onSessionChange={setSelectedSessionId}
         />
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="h-screen flex flex-col overflow-hidden pb-20">
+          <div className="h-full flex flex-col overflow-hidden">
         <header className="border-b py-3 px-4 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between gap-2">
           {/* Tag Filter Dropdown on left */}

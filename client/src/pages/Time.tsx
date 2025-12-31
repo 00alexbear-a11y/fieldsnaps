@@ -51,28 +51,46 @@ export default function Time() {
     queryKey: ['/api/projects'],
   });
 
-  // Calculate active projects with hours from recent entries
+  // Calculate active projects with hours from recent entries by pairing clock_in/clock_out
   const activeProjects = useMemo(() => {
     if (!recentEntries.length || !projects.length) return [];
     
     const projectHours = new Map<string, { hours: number; lastWorked: Date }>();
     
+    // Group entries by project and calculate hours from clock_in/clock_out pairs
+    const entriesByProject = new Map<string, ClockEntry[]>();
     for (const entry of recentEntries) {
       if (entry.projectId && (entry.type === 'clock_in' || entry.type === 'clock_out')) {
-        const projectId = entry.projectId;
-        const existing = projectHours.get(projectId);
+        const existing = entriesByProject.get(entry.projectId) || [];
+        existing.push(entry);
+        entriesByProject.set(entry.projectId, existing);
+      }
+    }
+    
+    // Calculate hours for each project
+    for (const [projectId, entries] of entriesByProject) {
+      // Sort entries by timestamp
+      const sorted = entries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      
+      let totalHours = 0;
+      let lastWorked = new Date(0);
+      let clockInTime: Date | null = null;
+      
+      for (const entry of sorted) {
         const entryDate = new Date(entry.timestamp);
+        if (entryDate > lastWorked) lastWorked = entryDate;
         
-        if (entry.type === 'clock_out' && entry.totalHours) {
-          const current = existing || { hours: 0, lastWorked: entryDate };
-          projectHours.set(projectId, {
-            hours: current.hours + entry.totalHours,
-            lastWorked: entryDate > current.lastWorked ? entryDate : current.lastWorked,
-          });
-        } else if (!existing) {
-          projectHours.set(projectId, { hours: 0, lastWorked: entryDate });
+        if (entry.type === 'clock_in') {
+          clockInTime = entryDate;
+        } else if (entry.type === 'clock_out' && clockInTime) {
+          // Calculate hours between clock_in and clock_out
+          const diffMs = entryDate.getTime() - clockInTime.getTime();
+          totalHours += diffMs / (1000 * 60 * 60);
+          clockInTime = null;
         }
       }
+      
+      projectHours.set(projectId, { hours: totalHours, lastWorked });
     }
     
     return Array.from(projectHours.entries())

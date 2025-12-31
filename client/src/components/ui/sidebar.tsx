@@ -181,8 +181,8 @@ function Sidebar({
   }
 
   if (isMobile) {
-    // Calculate header height: safe area top + 56px (12px top padding + 32px content + 12px bottom padding)
-    const headerHeight = "calc(env(safe-area-inset-top, 0px) + 56px)";
+    // Calculate header height: safe area top + 57px (12px top padding + 32px logo + 12px bottom padding + 1px border)
+    const headerHeight = "calc(env(safe-area-inset-top, 0px) + 57px)";
     
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>

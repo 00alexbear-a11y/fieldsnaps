@@ -97,7 +97,7 @@ export default function AllPhotos() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <header className="flex items-center justify-between px-4 h-14 border-b">
         <div className="flex items-center gap-3">

@@ -345,9 +345,9 @@ function AppContent() {
         )}
         
         {/* Main content - scrollable area with padding for fixed header/footer */}
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1 min-w-0 h-screen">
           <main 
-            className="flex-1 bg-white dark:bg-black"
+            className="flex-1 bg-white dark:bg-black overflow-y-auto overflow-x-hidden"
             style={{ 
               paddingTop: 'calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 68px)',
               paddingBottom: 'calc(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) + 80px)'

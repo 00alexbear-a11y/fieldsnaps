@@ -291,7 +291,7 @@ export default function SyncStatus() {
   const projectItems = syncItems.filter(item => item.type === 'project');
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between py-3 px-4 border-b">
         <div className="flex items-center gap-3">
