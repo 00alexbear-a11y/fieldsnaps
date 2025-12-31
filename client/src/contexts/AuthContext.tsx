@@ -49,11 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    let cancelled = false;
     let unsubscribe: (() => void) | undefined;
 
     const init = async () => {
       try {
         const { session, user } = await initializeAuth();
+        
+        if (cancelled) return;
         
         setAuthState({
           session,
@@ -67,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         
         unsubscribe = onAuthStateChange((session, user) => {
+          if (cancelled) return;
           console.log('[AuthContext] Auth state changed:', user?.id ?? 'signed out');
           setAuthState(prev => ({
             ...prev,
@@ -80,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         });
       } catch (error) {
+        if (cancelled) return;
         console.error('[AuthContext] Initialization error:', error);
         setAuthState(prev => ({ ...prev, isInitialized: true }));
       }
@@ -88,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     init();
 
     return () => {
+      cancelled = true;
       unsubscribe?.();
     };
   }, [queryClient]);

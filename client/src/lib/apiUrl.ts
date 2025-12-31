@@ -19,9 +19,22 @@ export function getApiBaseUrl(): string {
 }
 
 /**
- * Convert a relative API path to an absolute URL if needed
+ * Convert a relative API path to an absolute URL if needed.
+ * Leaves already-absolute URLs unchanged (blob:, https://, http://, capacitor://, data:, file://).
+ * This is critical for native apps where camera/IndexedDB return absolute blob: or file: URLs.
  */
 export function getApiUrl(path: string): string {
+  // Early return for already-absolute URLs (blob:, https:, http:, capacitor:, data:, file:)
+  if (!path || 
+      path.startsWith('blob:') || 
+      path.startsWith('data:') || 
+      path.startsWith('http://') || 
+      path.startsWith('https://') ||
+      path.startsWith('capacitor://') ||
+      path.startsWith('file://')) {
+    return path;
+  }
+  
   const baseUrl = getApiBaseUrl();
   
   // Ensure path starts with /

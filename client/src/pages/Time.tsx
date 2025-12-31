@@ -10,6 +10,7 @@ import { getAuthorizationStatus } from "@/lib/geofencing";
 import BackgroundGeolocation from "@transistorsoft/capacitor-background-geolocation";
 import { Capacitor } from "@capacitor/core";
 import type { ClockEntry, Project } from "@shared/schema";
+import { getApiUrl } from "@/lib/apiUrl";
 
 export default function Time() {
   const { showEducation, setShowEducation, handleClose } = useLocationPermissionEducation();
@@ -38,7 +39,7 @@ export default function Time() {
         startDate: recentDateRange.startISO,
         endDate: recentDateRange.endISO,
       });
-      const res = await fetch(`/api/timesheets?${params}`, {
+      const res = await fetch(getApiUrl(`/api/timesheets?${params}`), {
         credentials: 'include',
       });
       if (!res.ok) return [];

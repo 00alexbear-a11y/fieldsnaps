@@ -12,6 +12,7 @@ import { useState, useMemo } from "react";
 import type { ClockEntry, User, Project } from "@shared/schema";
 import { processTimesheetData, generateCsvData, formatHours } from "@/lib/timesheetUtils";
 import { generateBasicTimecardPdf, generateDetailedTimecardPdf } from "@/lib/timesheetPdfUtils";
+import { getApiUrl } from "@/lib/apiUrl";
 
 export default function Timesheets() {
   const [weekOffset, setWeekOffset] = useState(0);
@@ -41,7 +42,7 @@ export default function Timesheets() {
         startDate: startOfWeek.toISOString(),
         endDate: endOfWeek.toISOString(),
       });
-      const res = await fetch(`/api/timesheets?${params}`, {
+      const res = await fetch(getApiUrl(`/api/timesheets?${params}`), {
         credentials: 'include',
       });
       if (!res.ok) {
@@ -73,7 +74,7 @@ export default function Timesheets() {
         startDate: startOfWeek.toISOString(),
         endDate: endOfWeek.toISOString(),
       });
-      const res = await fetch(`/api/locations/user?${params}`, {
+      const res = await fetch(getApiUrl(`/api/locations/user?${params}`), {
         credentials: 'include',
       });
       if (!res.ok) {

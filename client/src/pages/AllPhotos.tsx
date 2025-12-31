@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Image as ImageIcon, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
+import { getApiUrl } from "@/lib/apiUrl";
 
 interface Photo {
   id: string;
@@ -39,7 +40,7 @@ export default function AllPhotos() {
       const url = pageParam 
         ? `/api/photos?cursor=${encodeURIComponent(pageParam)}&limit=50`
         : '/api/photos?limit=50';
-      const res = await fetch(url);
+      const res = await fetch(getApiUrl(url));
       if (!res.ok) throw new Error('Failed to fetch photos');
       return res.json() as Promise<PhotosResponse>;
     },
@@ -165,7 +166,7 @@ export default function AllPhotos() {
                         className="relative aspect-square bg-muted overflow-hidden cursor-pointer hover-elevate"
                       >
                         <img
-                          src={`/api/photos/${photo.id}/thumbnail`}
+                          src={getApiUrl(`/api/photos/${photo.id}/thumbnail`)}
                           alt={photo.caption || 'Photo'}
                           className="w-full h-full object-cover"
                           loading="lazy"

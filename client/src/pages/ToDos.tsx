@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, isToday, isPast, isThisWeek, startOfDay, isSameDay } from "date-fns";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { getApiUrl } from "@/lib/apiUrl";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -120,14 +121,14 @@ export default function ToDos() {
     if (photoId) {
       const savedFormData = localStorage.getItem('todo-form-draft');
       
-      fetch(`/api/photos/${photoId}`)
+      fetch(getApiUrl(`/api/photos/${photoId}`))
         .then(res => {
           if (!res.ok) throw new Error('Photo not found');
           return res.json();
         })
         .then(photo => {
           setSelectedPhotoId(photoId);
-          setSelectedPhotoUrl(photo.url);
+          setSelectedPhotoUrl(getApiUrl(photo.url));
           
           if (savedFormData) {
             const formData = JSON.parse(savedFormData);
@@ -760,7 +761,7 @@ export default function ToDos() {
     });
     if (todo.photo) {
       setSelectedPhotoId(todo.photoId || null);
-      setSelectedPhotoUrl(todo.photo.url);
+      setSelectedPhotoUrl(getApiUrl(todo.photo.url));
     }
     setShowEditDialog(true);
   };
@@ -1007,7 +1008,7 @@ export default function ToDos() {
               data-testid={`img-todo-photo-${todo.id}`}
             >
               <img
-                src={todo.photo.url}
+                src={getApiUrl(todo.photo.url)}
                 alt="Task photo"
                 className="w-full h-full object-cover"
               />
@@ -1504,7 +1505,7 @@ export default function ToDos() {
                   }}
                 >
                   <img 
-                    src={selectedTodoForDetails.photo.url} 
+                    src={getApiUrl(selectedTodoForDetails.photo.url)} 
                     alt="Task photo"
                     className="w-full h-full object-cover" 
                     data-testid="img-task-detail-photo"

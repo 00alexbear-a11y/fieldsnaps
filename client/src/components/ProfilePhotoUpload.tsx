@@ -134,8 +134,10 @@ export function ProfilePhotoUpload({
         description: "Profile photo uploaded successfully",
       });
 
-      // Invalidate user cache
+      // Invalidate all user-related caches to ensure avatar updates everywhere
       queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
 
       if (onUploadComplete && response.profileImageUrl) {
         onUploadComplete(response.profileImageUrl);
@@ -172,8 +174,10 @@ export function ProfilePhotoUpload({
         description: "Profile photo uploaded successfully",
       });
 
-      // Invalidate user cache
+      // Invalidate all user-related caches to ensure avatar updates everywhere
       queryClient.invalidateQueries({ queryKey: ['auth', 'currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
 
       if (onUploadComplete && uploadResponse.profileImageUrl) {
         onUploadComplete(uploadResponse.profileImageUrl);

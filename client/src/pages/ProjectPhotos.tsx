@@ -46,6 +46,7 @@ import { PhotoGestureViewer } from "@/components/PhotoGestureViewer";
 import TagPicker from "@/components/TagPicker";
 import LazyImage from "@/components/LazyImage";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { getApiUrl } from "@/lib/apiUrl";
 import { PhotosSidebar, type DateFilter, type SortOption } from "@/components/PhotosSidebar";
 import type { Photo as BasePhoto, Project, Tag, ToDo } from "../../../shared/schema";
 
@@ -1121,7 +1122,7 @@ export default function ProjectPhotos() {
           const col = i % layout.cols;
           
           try {
-            const response = await fetch(photo.url);
+            const response = await fetch(getApiUrl(photo.url));
             const blob = await response.blob();
             
             // Skip non-image files
@@ -1667,7 +1668,7 @@ export default function ProjectPhotos() {
                             data-testid={`img-todo-photo-${todo.id}`}
                           >
                             <img
-                              src={todo.photo.url}
+                              src={getApiUrl(todo.photo.url)}
                               alt="Task photo"
                               className="w-full h-full object-cover"
                             />
@@ -1975,13 +1976,13 @@ export default function ProjectPhotos() {
                                 {/* Display static thumbnail if available, fallback to video element */}
                                 {photo.thumbnailUrl ? (
                                   <LazyImage
-                                    src={photo.thumbnailUrl}
+                                    src={getApiUrl(photo.thumbnailUrl)}
                                     alt={photo.caption || "Video"}
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
                                   <video
-                                    src={photo.url}
+                                    src={getApiUrl(photo.url)}
                                     className="w-full h-full object-cover"
                                     preload="metadata"
                                     crossOrigin="use-credentials"
@@ -1996,7 +1997,7 @@ export default function ProjectPhotos() {
                               </>
                             ) : (
                               <LazyImage
-                                src={photo.url}
+                                src={getApiUrl(photo.url)}
                                 alt={photo.caption || "Photo"}
                                 className="w-full h-full object-cover"
                               />

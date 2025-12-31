@@ -9,6 +9,7 @@ import { indexedDB as idb } from '@/lib/indexeddb';
 import { syncManager } from '@/lib/syncManager';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { getApiUrl } from '@/lib/apiUrl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -151,12 +152,12 @@ export default function PhotoEdit() {
           return;
         }
 
-        const response = await fetch(`/api/photos/${photoId}`);
+        const response = await fetch(getApiUrl(`/api/photos/${photoId}`));
         if (!response.ok) {
           throw new Error('Photo not found');
         }
         const serverPhoto = await response.json();
-        setPhotoUrl(serverPhoto.url);
+        setPhotoUrl(getApiUrl(serverPhoto.url));
         setProjectId(serverPhoto.projectId);
       } catch (error) {
         console.error('[PhotoEdit] Error loading photo:', error);
@@ -197,14 +198,14 @@ export default function PhotoEdit() {
       // If photo not in IndexedDB (e.g., it's a server-synced photo), create it first
       if (!existingPhoto) {
         // Fetch the original photo from server
-        const response = await fetch(`/api/photos/${photoId}`);
+        const response = await fetch(getApiUrl(`/api/photos/${photoId}`));
         if (!response.ok) {
           throw new Error('Failed to fetch photo from server');
         }
         const serverPhoto = await response.json();
         
         // Fetch the photo blob
-        const blobResponse = await fetch(serverPhoto.url);
+        const blobResponse = await fetch(getApiUrl(serverPhoto.url));
         if (!blobResponse.ok) {
           throw new Error('Failed to fetch photo blob from server');
         }

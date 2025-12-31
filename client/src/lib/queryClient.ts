@@ -151,6 +151,7 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // Cache data for 5 minutes to prevent infinite refetch loops
+      gcTime: 10 * 60 * 1000, // Garbage collect unused queries after 10 minutes to prevent memory bloat
       retry: false,
     },
     mutations: {

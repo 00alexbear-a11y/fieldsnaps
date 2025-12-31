@@ -4,6 +4,7 @@ import { ArrowLeft, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { indexedDB as idb } from '@/lib/indexeddb';
+import { getApiUrl } from '@/lib/apiUrl';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function PhotoView() {
@@ -41,7 +42,7 @@ export default function PhotoView() {
           
           // Fetch latest metadata from server to refresh cache (non-blocking)
           try {
-            const response = await fetch(`/api/photos/${photoId}`, { credentials: 'include' });
+            const response = await fetch(getApiUrl(`/api/photos/${photoId}`), { credentials: 'include' });
             if (response.ok) {
               const serverPhoto = await response.json();
               
@@ -72,11 +73,11 @@ export default function PhotoView() {
         }
 
         // Fallback to server if not in IndexedDB
-        const response = await fetch(`/api/photos/${photoId}`, { credentials: 'include' });
+        const response = await fetch(getApiUrl(`/api/photos/${photoId}`), { credentials: 'include' });
         if (!response.ok) throw new Error('Photo not found');
         
         const serverPhoto = await response.json();
-        setMediaUrl(serverPhoto.url);
+        setMediaUrl(getApiUrl(serverPhoto.url));
         // Use mediaType from server if available, otherwise default to 'photo'
         setMediaType(serverPhoto.mediaType || 'photo');
         setProjectId(serverPhoto.projectId);

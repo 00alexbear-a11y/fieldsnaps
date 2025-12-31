@@ -73,3 +73,237 @@ The architecture prioritizes simplicity and an invisible interface. Service Work
 - **Google Geocoding API**: Address to coordinates conversion
 - **Google Maps API**: Map views and location display
 - **Stripe**: Web subscription management and payment processing
+
+---
+
+## iOS/Android Native App Fix Gameplan (January 2025)
+
+### Executive Summary
+Fix critical bugs preventing FieldSnaps from working on native iOS/Android devices. Primary focus: photos not displaying, UI layout problems, and functional issues.
+
+### Verified Status (From Three-Way Audit)
+**Already Implemented (DO NOT REBUILD):**
+- ✅ Network status caching and deduplication (`nativeNetwork.ts`)
+- ✅ Sync queue size limits (`MAX_QUEUE_SIZE = 500`)
+- ✅ Sync queue cleanup called in `syncNow()`
+- ✅ IndexedDB offline storage with background sync
+- ✅ Virtual scrolling with react-window
+- ✅ `getApiUrl()` helper exists in `apiUrl.ts`
+
+---
+
+### Phase 1 Fixes (Critical - Day 1)
+
+#### 🔴 ISSUE #1: Photos Not Displaying (CRITICAL)
+**Problem:** Photos show "Connect to internet to view" even when synced. Native apps cannot resolve relative URLs like `/objects/123`.
+
+**Root Cause:** Server returns relative paths. Web browser resolves correctly (same origin), but native Capacitor app has NO origin - relative URLs fail.
+
+**Solution:** Wrap ALL photo URLs with `getApiUrl()`:
+```typescript
+<LazyImage src={getApiUrl(photo.url)} />
+```
+
+**Files to modify:**
+- `client/src/components/LazyImage.tsx` - Core image component
+- `client/src/pages/ProjectPhotos.tsx` - Photo grid
+- `client/src/pages/AllPhotos.tsx` - All photos view  
+- `client/src/pages/ToDos.tsx` - Todo attachments
+
+---
+
+#### 🟡 ISSUE #2: CSS Safe Area Variables
+**Problem:** Sidebar header height hardcoded to `57px`. Doesn't adapt to device notches.
+
+**Solution:** Add CSS variables to `index.css`:
+```css
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --header-height: 57px;
+  --bottom-nav-height: 72px;
+}
+```
+
+---
+
+#### 🟡 ISSUE #3: Sidebar Header Gap
+**Problem:** Gap between sidebar header and content doesn't match device safe areas.
+
+**Solution:** Use CSS variable instead of hardcoded 57px:
+```typescript
+height: calc(var(--safe-area-top) + var(--header-height));
+```
+
+---
+
+#### 🟡 ISSUE #4: Red Error Behind Logo
+**Problem:** Error states render at full-page height, show behind fixed header.
+
+**Solution:** Add proper padding to error states in ToDos.tsx, Timesheets.tsx
+
+---
+
+#### 🟡 ISSUE #5: Timesheets Not Loading
+**Problem:** API calls using relative URLs on native.
+
+**Solution:** Ensure all API calls use `getApiUrl()` and auth headers.
+
+---
+
+#### 🟢 ISSUE #6: Google Re-login Auto-selects
+**Status:** ✅ ALREADY FIXED (added `SocialLogin.logout()` to sign out)
+
+---
+
+#### 🟡 ISSUE #7: Profile Photo Not Setting
+**Problem:** Upload works but avatar stays as initials (cache not invalidated).
+
+**Solution:** Invalidate queries after upload:
+```typescript
+queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+```
+
+---
+
+### Phase 1 Fixes (Day 1-2 Continued)
+
+#### 🟡 ISSUE #8: Create useKeyboard Hook
+**Problem:** Keyboard events not handled properly, platform differences.
+
+**Solution:** Create simplified keyboard hook with platform-specific events:
+```typescript
+// hooks/useKeyboard.ts
+export function useKeyboard() {
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+  useEffect(() => {
+    const platform = Capacitor.getPlatform();
+    const showEvent = platform === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = platform === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    
+    const showListener = Keyboard.addListener(showEvent, (info) => {
+      setKeyboardHeight(info.keyboardHeight);
+    });
+    
+    const hideListener = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+    
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
+  
+  return keyboardHeight;
+}
+```
+
+---
+
+#### 🟡 ISSUE #9: Apply Keyboard Hook to Camera Edit Mode
+**Problem:** Bottom toolbar overlaps with text input.
+
+**Solution:** Use `useKeyboard()` hook to adjust padding when keyboard visible.
+
+---
+
+#### 🟡 ISSUE #10: Map View Header Too Large
+**Problem:** "Locations" title + toggle take up too much space.
+
+**Solution:** Remove title, compact controls, floating overlay for count.
+
+---
+
+#### 🟡 ISSUE #11: Auth Cancellation Flag
+**Problem:** React 18 Strict Mode causes duplicate initialization (minor).
+
+**Solution:** Add cancellation flag:
+```typescript
+useEffect(() => {
+  let cancelled = false;
+  const init = async () => {
+    if (cancelled) return;
+    const { session, user } = await initializeAuth();
+    if (cancelled) return;
+    setAuthState({ session, supabaseUser: user, isInitialized: true });
+  };
+  init();
+  return () => { cancelled = true; };
+}, []);
+```
+
+---
+
+#### 🟢 ISSUE #12: Add Global gcTime
+**Problem:** Query cache may grow over long sessions.
+
+**Solution:** Add to `queryClient.ts` defaults:
+```typescript
+gcTime: 10 * 60 * 1000, // 10 minutes
+```
+
+---
+
+#### 🟡 ISSUE #13: Verify Memory Leaks
+**Problem:** Potential listener leaks in Camera.tsx, PhotoEdit.tsx.
+
+**Solution:** Check for missing cleanup in useEffect hooks.
+
+---
+
+### Phase 2 (Do Last - After Testing)
+
+#### 🔴 ISSUE #14: Re-enable Sentry Safely
+**IMPORTANT:** Previous Sentry implementation broke Google login for weeks.
+
+**Solution:** Re-enable with careful configuration:
+```typescript
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  enabled: import.meta.env.PROD && !import.meta.env.VITE_DISABLE_SENTRY,
+  environment: Capacitor.isNativePlatform() ? 'mobile' : 'web',
+  
+  integrations: [
+    Sentry.browserTracingIntegration({
+      tracePropagationTargets: [/^(?!.*\/api\/auth).*$/], // Exclude auth
+    }),
+  ],
+  
+  beforeSend(event) {
+    const blocklist = ['did not match expected pattern', 'OAuth callback'];
+    if (blocklist.some(msg => event.message?.includes(msg))) return null;
+    return event;
+  },
+});
+```
+
+**Testing Protocol:**
+1. Build WITHOUT Sentry → Verify login works
+2. Enable Sentry → Test login IMMEDIATELY
+3. If login breaks → Disable via `VITE_DISABLE_SENTRY=true`
+
+---
+
+### iOS vs Android Platform Differences
+
+| Feature | iOS | Android | Solution |
+|---------|-----|---------|----------|
+| Safe Area Top | 20-59px (Dynamic Island/notch) | ~24px | `env(safe-area-inset-top)` |
+| Safe Area Bottom | ~34px (home indicator) | 0-56px | `env(safe-area-inset-bottom)` |
+| Keyboard Events | `keyboardWillShow` | `keyboardDidShow` | Check `Capacitor.getPlatform()` |
+| Back Navigation | Swipe gesture | Hardware button | `App.addListener('backButton')` |
+
+---
+
+### Success Criteria
+Phase 1 complete when:
+- [ ] Photos display in all views on iOS/Android device
+- [ ] Camera works without errors
+- [ ] Keyboard doesn't cover inputs
+- [ ] All API calls succeed
+- [ ] No red error toasts
+- [ ] UI looks correct on iPhone notch devices
+- [ ] Login works 10/10 times

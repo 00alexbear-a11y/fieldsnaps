@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { getApiUrl } from "@/lib/apiUrl";
 import { haptics } from "@/lib/nativeHaptics";
 import { nativeShare, type ShareResult } from "@/lib/nativeShare";
 import { nativeClipboard } from "@/lib/nativeClipboard";
@@ -423,7 +424,7 @@ export function PhotoGestureViewer({
                 <>
                   <video
                     ref={index === currentIndex ? videoRef : null}
-                    src={photo.url}
+                    src={getApiUrl(photo.url)}
                     playsInline
                     crossOrigin="use-credentials"
                     className="max-w-full max-h-full object-contain pointer-events-auto"
@@ -458,7 +459,7 @@ export function PhotoGestureViewer({
               ) : (
                 <img
                   ref={index === currentIndex ? imageRef : null}
-                  src={photo.url}
+                  src={getApiUrl(photo.url)}
                   alt={photo.caption || "Photo"}
                   crossOrigin="use-credentials"
                   className="max-w-full max-h-full object-contain pointer-events-auto"
