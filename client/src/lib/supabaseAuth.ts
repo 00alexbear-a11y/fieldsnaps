@@ -313,6 +313,18 @@ export async function signOut(): Promise<void> {
   cachedAuthResult = null;
   authInitializationPromise = null;
   
+  // On native platforms, also sign out from SocialLogin to clear cached Google account
+  // This ensures Google prompts for account selection on next login
+  if (isNativePlatform() && socialLoginInitialized) {
+    try {
+      await SocialLogin.logout({ provider: 'google' });
+      console.log('[SupabaseAuth] SocialLogin Google logout successful');
+    } catch (socialError) {
+      // Don't block signout if SocialLogin logout fails
+      console.warn('[SupabaseAuth] SocialLogin logout error (non-blocking):', socialError);
+    }
+  }
+  
   const { error } = await supabase.auth.signOut();
   
   if (error) {
