@@ -1,0 +1,17 @@
+1. the gap in the slide out menu is still wrong, too big. 
+2. within a project i cannot view a photo, it says it uplaoded but it does not look like it. no preview, no photo,cant click on it to view. 
+3. the first photo does not become the default photo of the project, probaly the same issue as to why i cant see the photos to begin with. 
+4. when typing in address ina new project had a ui glitch. 
+5. sitll get network error when initiating camera 
+6. get network error when initiating edit mode. 
+7. the ui at the bottom when editing text is not right, its under the bottom menu of tools to select and the done button does not look good. the tools need to dissapear while adjusting the text
+8. the text in the measure tool makes the ui trip in the background when entering a emasurement. the 
+9. when i select a drawn tool in edit mode there needs to be a delete option. 
+10. photos are not syncing, i jsut see icons of connect to internet to view. 
+11. when making a to do it still takes way too long to see it pop up. it should be immediate. 
+12. ther is still some error code or soemthign behind the to do list view that is red behind our logo. this should never happen thoruought the app. nothing should ever appear blurred behind the logo at the top. 
+13. nothing loads in time sheets. same error behind our logo appears. 
+14. the errors taht pop up dont appear int he debug console. so they pop up on screen but there is no error taht shows up in the settinsg debug console 
+15. setting profile photo does not set the photo, stays the blank default first letter of the name. 
+16. when signing out and hit loggin with google it auto logs me in. does not even ask for what google account i want to login with. 
+17. for the maps menu portion, lets make the top menu under our logo a little tighter, it feels too large, especially the show completed toggle. we can even remove the text “locations” at the top and the amount of projects can be displayed right under my locations as an overlayon the map. id like to have more map visible.

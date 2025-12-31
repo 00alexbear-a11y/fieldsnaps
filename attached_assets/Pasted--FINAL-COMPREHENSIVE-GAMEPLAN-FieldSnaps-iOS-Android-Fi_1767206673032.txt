@@ -1,0 +1,347 @@
+📋 FINAL COMPREHENSIVE GAMEPLAN - FieldSnaps iOS/Android Fix
+🎯 EXECUTIVE SUMMARY
+Goal: Fix critical bugs preventing FieldSnaps from working on native iOS/Android devices
+
+Timeline: Phase 1 (1-2 weeks), with clear path to Phase 2
+
+Key Decision: Re-enable Sentry with proper filtering (you're right to be cautious - we'll do it carefully)
+
+🚨 CRITICAL CONTEXT: THE SENTRY PROBLEM
+What Happened Before:
+Added Sentry → Login broke completely
+Took weeks to fix → Had to disable Sentry to ship
+Why It Happened:
+Sentry's auto-instrumentation interfered with Capacitor OAuth flow
+fetch requests were being wrapped/intercepted incorrectly
+Token manager timing was disrupted
+How We'll Prevent It This Time:
+CopySentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  enabled: import.meta.env.PROD && !import.meta.env.VITE_DISABLE_SENTRY, // Emergency kill switch
+  environment: Capacitor.isNativePlatform() ? 'mobile' : 'web',
+  
+  // ⚠️ CRITICAL: Don't instrument auth/OAuth flows
+  integrations: [
+    Sentry.browserTracingIntegration({
+      // Exclude auth URLs from tracing
+      tracePropagationTargets: [
+        /^(?!.*\/api\/auth).*$/, // Don't trace /api/auth/*
+      ],
+    }),
+  ],
+  
+  beforeSend(event) {
+    // Filter known problematic errors
+    const blocklist = [
+      'did not match expected pattern',
+      'OAuth callback', // Don't log OAuth internals
+    ];
+    
+    if (blocklist.some(msg => event.message?.includes(msg))) {
+      return null;
+    }
+    
+    return event;
+  },
+  
+  // Don't sample auth requests
+  tracesSampler: (samplingContext) => {
+    if (samplingContext.location?.pathname.includes('/api/auth')) {
+      return 0; // Never sample auth
+    }
+    return 0.1; // 10% sampling for everything else
+  },
+});
+Testing Protocol (To Catch Login Breaks Early):
+Copy# 1. Test without Sentry first
+VITE_DISABLE_SENTRY=true npm run build
+# → Verify login works
+
+# 2. Enable Sentry in dev
+VITE_DISABLE_SENTRY=false npm run build
+# → Test login again immediately
+
+# 3. If login breaks:
+# - Check Sentry dashboard for any auth-related events
+# - Add those to beforeSend blocklist
+# - Adjust tracePropagationTargets
+📋 PHASE 1: CRITICAL FIXES (1-2 weeks)
+🔴 ISSUE #1: Photos Not Displaying
+Problem: Relative URLs fail on native (/objects/123 has no origin)
+
+Root Cause: Server returns relative paths, native apps can't resolve them
+
+Solution:
+
+Copy// Wrap ALL photo URLs with getApiUrl()
+// Files to modify:
+- client/src/pages/ProjectPhotos.tsx
+- client/src/pages/AllPhotos.tsx  
+- client/src/pages/ToDos.tsx
+- client/src/components/LazyImage.tsx
+
+// Example:
+<LazyImage src={getApiUrl(photo.url)} />
+Why it works: Converts /objects/123 → https://fieldsnaps.replit.app/objects/123
+
+Testing:
+
+✅ Open project on iOS device
+✅ Photos should display (no "Connect to internet" message)
+✅ Thumbnails should load fast (already cached in IndexedDB)
+🔴 ISSUE #2: Camera Network Error
+Problem: Red toast "string did not match expected pattern" when opening camera
+
+Root Cause: Sentry trying to parse invalid URL/DSN on native platform
+
+Solution: Re-enable Sentry with proper filtering (see code above)
+
+Why it's important: Need JS error tracking in production, but done safely
+
+Testing:
+
+✅ Open camera on iOS device
+✅ No red toast appears
+✅ Take photo successfully
+✅ Check Sentry dashboard - should see events (but not the "pattern" error)
+⚠️ CRITICAL: Test Google login immediately after enabling Sentry
+If login breaks: disable Sentry, adjust config, retry
+🟡 ISSUE #3: Slide-out Menu Gap
+Problem: Sidebar header height hardcoded, doesn't adapt to device notches
+
+Solution: Use CSS variables for safe areas
+
+Copy:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --header-height: 57px;
+}
+
+.sidebar-header {
+  height: calc(var(--safe-area-top) + var(--header-height));
+}
+Why it works: env() automatically adjusts per device (iPhone notch vs Dynamic Island vs Android)
+
+🟡 ISSUE #4: Red Error Behind Logo
+Problem: Error states render at full-page height, show behind fixed header
+
+Solution: Add padding to content wrappers
+
+Copy<div style={{ paddingTop: 'calc(var(--safe-area-top) + var(--header-height))' }}>
+  {error && <ErrorComponent />}
+</div>
+🟡 ISSUE #5: Timesheets Not Loading
+Problem: API calls using relative URLs, auth token not passed
+
+Solution: Ensure all API calls use getApiUrl() and auth headers
+
+Copyconst response = await fetch(getApiUrl(`/api/clock/entries?${params}`), {
+  credentials: 'include',
+  headers: await getAuthHeaders(),
+});
+Files to modify: client/src/pages/Timesheets.tsx
+
+🟢 ISSUE #6: Google Re-login Auto-selects Account
+Status: ✅ Already fixed (added SocialLogin.logout() to sign out)
+
+🟢 ISSUE #7: Profile Photo Not Setting
+Problem: Upload works but avatar stays as initials (cache not invalidated)
+
+Solution: Invalidate queries after upload
+
+CopyqueryClient.invalidateQueries({ queryKey: ['/api/user'] });
+queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+🟡 ISSUE #8: Keyboard Overlapping Input
+Problem: Bottom toolbar covers text input in camera edit mode
+
+Solution: Create simplified keyboard hook
+
+Copy// hooks/useKeyboard.ts
+export function useKeyboard() {
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+  useEffect(() => {
+    // Handle both iOS and Android events
+    const showListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (info) => {
+        setKeyboardHeight(info.keyboardHeight);
+      }
+    );
+    
+    const hideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardHeight(0)
+    );
+    
+    // CRITICAL: Cleanup on unmount
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
+  
+  return keyboardHeight;
+}
+
+// Usage in camera edit mode:
+const keyboardHeight = useKeyboard();
+
+<div style={{ 
+  paddingBottom: keyboardHeight,
+  transition: 'padding-bottom 0.3s'
+}}>
+  {/* Annotation tools */}
+</div>
+Why simplified approach:
+
+✅ Only handles dynamic value (keyboard)
+✅ CSS handles static values (safe areas)
+✅ Fewer re-renders
+✅ Easier to debug
+🟡 ISSUE #9: Map View Header Too Large
+Problem: "Locations" title + toggle take up too much space
+
+Solution:
+
+Remove "Locations" text
+Make toggle smaller
+Move project count to floating overlay on map
+📊 VERIFICATION CHECKLIST
+After implementing Phase 1, test EVERY item:
+
+Photos
+ Project photos display on iOS device
+ All photos page loads images
+ Todo task photos visible
+ No "Connect to internet" messages
+ Thumbnails load quickly
+Camera
+ No red error toast when opening camera
+ Can take photos successfully
+ Photos sync to project
+ Edit mode works without errors
+Authentication
+ ⚠️ CRITICAL: Google login still works after Sentry enabled
+ Profile photo updates immediately
+ Session persists across app restarts
+UI/Layout
+ Sidebar header aligns properly on all devices
+ No red background behind logo
+ Keyboard doesn't cover text inputs
+ Map view is usable
+API Calls
+ Timesheets load successfully
+ All API endpoints return data
+ No CORS errors in console
+⚠️ ERRORS TO WATCH OUT FOR
+When Re-enabling Sentry:
+"Network request failed" during OAuth
+
+Cause: Sentry intercepting OAuth redirect
+Fix: Add to tracePropagationTargets exclusion list
+"Token undefined" errors
+
+Cause: Sentry wrapping tokenManager methods
+Fix: Don't instrument tokenManager.ts file
+Login succeeds but app stays loading
+
+Cause: Sentry event blocking React Query
+Fix: Disable Sentry during auth flow: Sentry.getCurrentScope().setTag('skip', true)
+"SecurityError: Blocked a frame" in console
+
+Cause: Sentry trying to access OAuth window
+Fix: Add to beforeSend blocklist
+General Mobile Errors:
+"Failed to fetch" intermittently
+
+Cause: Relative URLs on some code paths
+Fix: Search codebase for fetch('/api and wrap with getApiUrl()
+White screen on cold start
+
+Cause: Initialization race condition
+Fix: Ensure Capacitor.Plugins loaded before app code
+"Maximum update depth exceeded"
+
+Cause: Layout hook causing re-render loop
+Fix: Use CSS variables, minimize state updates
+🚀 PHASE 2: OPTIMIZATION (Future)
+Not urgent, but good to plan:
+CDN Migration (Cloudinary)
+
+Automatic image optimization
+Global delivery
+Bandwidth savings
+Virtual Scrolling Audit
+
+Verify react-window used in ALL photo grids
+Measure performance improvement
+Memory Management
+
+Set cache size limits
+Cleanup old photos
+Monitor background memory
+Background Sync Improvements
+
+Retry logic optimization
+Better offline indicators
+Conflict resolution
+📱 iOS vs ANDROID REFERENCE
+Feature	iOS	Android	Implementation
+Safe Area Top	20-59px (notch dependent)	~24px	env(safe-area-inset-top)
+Safe Area Bottom	~34px (home indicator)	0-56px (nav bar)	env(safe-area-inset-bottom)
+Keyboard Events	keyboardWillShow/Hide	keyboardDidShow/Hide	Check Platform.OS
+Back Navigation	Swipe gesture	Hardware button	App.addListener('backButton')
+Permissions	Just-in-time	Upfront request	Platform-specific UX
+✅ SUCCESS CRITERIA
+Phase 1 is complete when:
+
+✅ Can log in with Google (with Sentry enabled)
+✅ Photos display in all views on iOS device
+✅ Camera works without errors
+✅ Keyboard doesn't cover inputs
+✅ All API calls succeed
+✅ No red error toasts
+✅ UI looks correct on iPhone notch devices
+✅ Sentry dashboard shows JS errors (but not login issues)
+🎯 EXECUTION PLAN
+Week 1:
+Day 1-2: Photo URL fixes (#1)
+Day 3: Re-enable Sentry carefully (#2)
+Day 4-5: Test login extensively, adjust Sentry config if needed
+Week 2:
+Day 1-2: Layout fixes (#3, #4)
+Day 3: Keyboard handling (#8)
+Day 4: API fixes (#5)
+Day 5: Final testing + bug fixes
+Rollout:
+TestFlight beta with 5-10 users
+Monitor Sentry for 48 hours
+If stable → Production release
+💬 TELL REPLIT
+Proceed with Phase 1 fixes with these adjustments:
+
+✅ All photo URL fixes with getApiUrl()
+⚠️ Re-enable Sentry CAREFULLY:
+Use the safe config I provided
+Test login IMMEDIATELY after enabling
+Emergency kill switch: VITE_DISABLE_SENTRY=true
+If login breaks: disable Sentry, debug separately
+✅ Simplified keyboard-only hook (not full layout metrics)
+✅ CSS variables for safe areas (no React state)
+✅ All other fixes as planned
+Testing protocol:
+
+Build without Sentry first → Verify login works
+Enable Sentry → Test login immediately
+Monitor for ANY auth-related errors
+Adjust beforeSend filter as needed
+My concern: Last time Sentry broke login for weeks. Let's be methodical this time.
+
+This plan balances:
+
+✅ Re-enabling Sentry (you need production visibility)
+⚠️ Your valid concern (it broke before)
+🛡️ Safety measures (kill switch, careful testing)
+🎯 Fixing critical bugs (photos, camera, keyboard)
+Proceed? Reply with any concerns about the Sentry approach.
