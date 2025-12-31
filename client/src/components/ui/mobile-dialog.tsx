@@ -66,21 +66,22 @@ export function MobileDialog({
     }
   };
 
-  // Calculate max height with safe area consideration:
+  // Calculate max height with safe area and header consideration:
   // - Use visual viewport height (accounts for keyboard)
   // - Account for safe area insets (iOS notch, etc)
+  // - Account for fixed header height (57px)
   // - Ensure dialog fits with padding
   const maxHeight = visualViewportHeight > 0 
-    ? `min(${visualViewportHeight - 40}px, calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px))` 
-    : 'calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px)';
+    ? `min(${visualViewportHeight - 100}px, calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 100px))` 
+    : 'calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 100px)';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          // Top-aligned with safe area consideration
-          "top-[max(20px,env(safe-area-inset-top))] translate-y-0",
-          "sm:top-[max(20px,env(safe-area-inset-top))] sm:translate-y-0",
+          // Top-aligned below the fixed header (safe-area + 57px header height + 12px margin)
+          "top-[calc(env(safe-area-inset-top,0px)+69px)] translate-y-0",
+          "sm:top-[calc(env(safe-area-inset-top,0px)+69px)] sm:translate-y-0",
           // Mobile-first: full width with padding, desktop: max-w-lg
           "w-[calc(100vw-32px)] sm:max-w-lg",
           // Enable vertical layout with flex
