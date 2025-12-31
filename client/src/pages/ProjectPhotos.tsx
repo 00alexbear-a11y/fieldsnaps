@@ -1399,7 +1399,7 @@ export default function ProjectPhotos() {
         />
         <div className="flex-1 flex flex-col min-w-0">
           <div className="h-screen flex flex-col overflow-hidden pb-20">
-        <header className="border-b pt-safe-3 pb-3 px-4 bg-background sticky top-0 z-10">
+        <header className="border-b py-3 px-4 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between gap-2">
           {/* Tag Filter Dropdown on left */}
           {availableTags.length > 0 && (

@@ -244,7 +244,7 @@ export default function Activity() {
           onProjectFilterChange={setSelectedProjectId}
         />
         <SidebarInset className="flex flex-col">
-          <div className="sticky top-0 z-10 bg-background border-b border-border pt-safe-3 pb-3">
+          <div className="sticky top-0 z-10 bg-background border-b border-border py-3">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger data-testid="button-sidebar-toggle" />
               <h1 className="text-xl font-semibold text-foreground" data-testid="heading-activity">

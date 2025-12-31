@@ -99,7 +99,7 @@ export default function AllPhotos() {
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 h-14 border-b safe-area-inset-top">
+      <header className="flex items-center justify-between px-4 h-14 border-b">
         <div className="flex items-center gap-3">
           <Link href="/projects">
             <Button

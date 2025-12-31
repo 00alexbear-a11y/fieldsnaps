@@ -4,7 +4,7 @@ export default function Inbox() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b pt-safe-3 pb-3">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b py-3">
         <div className="flex items-center justify-between px-4 max-w-screen-sm mx-auto">
           <h1 className="text-2xl font-bold">Notifications</h1>
         </div>
