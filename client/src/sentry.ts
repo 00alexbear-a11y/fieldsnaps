@@ -1,17 +1,15 @@
 import * as Sentry from "@sentry/react";
+import { Capacitor } from "@capacitor/core";
 
 export function initSentry() {
-  // TEMPORARILY DISABLED: Sentry's browserTracingIntegration() intercepts network requests
-  // and corrupts the Authorization header on iOS, causing "string did not match expected pattern" errors.
-  // This is blocking iOS authentication. Once auth is confirmed working, we'll re-enable
-  // Sentry with network breadcrumbs excluded for auth endpoints.
-  console.log("ℹ️  Sentry temporarily disabled to debug iOS authentication");
-  return;
-
-  // Original implementation preserved below for re-enabling later:
-  /*
   const dsn = import.meta.env.VITE_SENTRY_DSN;
   const isProduction = import.meta.env.PROD;
+  const isDisabled = import.meta.env.VITE_DISABLE_SENTRY === 'true';
+  
+  if (isDisabled) {
+    console.log("ℹ️  Sentry disabled via VITE_DISABLE_SENTRY environment variable");
+    return;
+  }
   
   if (!dsn) {
     console.warn("⚠️  Sentry frontend DSN not configured");
@@ -23,9 +21,18 @@ export function initSentry() {
     return;
   }
 
+  const isNative = Capacitor.isNativePlatform();
+
   Sentry.init({
     dsn,
-    environment: import.meta.env.MODE,
+    environment: isNative ? 'mobile' : import.meta.env.MODE,
+    
+    tracePropagationTargets: [
+      /^(?!.*\/api\/auth).*$/,
+      /^(?!.*supabase\.co).*$/,
+      /^(?!.*accounts\.google\.com).*$/,
+      /^(?!.*appleid\.apple\.com).*$/,
+    ],
     
     integrations: [
       Sentry.browserTracingIntegration(),
@@ -43,22 +50,38 @@ export function initSentry() {
     release: import.meta.env.VITE_APP_VERSION || "1.0.0",
     
     beforeSend(event, hint) {
+      const blocklist = [
+        'did not match expected pattern',
+        'OAuth callback',
+        'Network request failed',
+        'Failed to fetch',
+        'Load failed',
+        'authorization',
+        'auth/callback',
+        'supabase',
+      ];
+      
       if (event.exception) {
         const error = hint.originalException;
         if (error instanceof Error) {
-          if (error.message.includes("Network request failed") ||
-              error.message.includes("Failed to fetch") ||
-              error.message.includes("Load failed")) {
+          const errorLower = error.message.toLowerCase();
+          if (blocklist.some(msg => errorLower.includes(msg.toLowerCase()))) {
+            console.log('[Sentry] Filtered auth-related error:', error.message.substring(0, 100));
             return null;
           }
         }
       }
+      
+      if (event.message && blocklist.some(msg => event.message?.toLowerCase().includes(msg.toLowerCase()))) {
+        console.log('[Sentry] Filtered auth-related message');
+        return null;
+      }
+      
       return event;
     },
   });
 
-  console.log("✅ Sentry initialized for frontend");
-  */
+  console.log("✅ Sentry initialized for frontend", isNative ? "(mobile)" : "(web)");
 }
 
 export function setSentryUser(user: { id: string; email?: string; subscriptionStatus?: string }) {
