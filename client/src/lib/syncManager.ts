@@ -14,6 +14,7 @@ import { nativeNetwork } from './nativeNetwork';
 import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
 import { tokenManager } from './tokenManager';
 import { getApiUrl } from './apiUrl';
+import { haptics } from './nativeHaptics';
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -314,14 +315,16 @@ class SyncManager {
       // Then process photos in batches
       await this.processBatch(photos, result, totalItems, totalBatches, batchCounter);
 
-      // Emit sync completion event with result
+      // Emit sync completion event with result and haptic feedback
       if (result.failed > 0) {
+        haptics.error();
         this.emitEvent({
           type: 'sync-error',
           result,
           error: `${result.failed} item${result.failed > 1 ? 's' : ''} failed to sync`,
         });
       } else if (result.synced > 0) {
+        haptics.success();
         this.emitEvent({
           type: 'sync-complete',
           result,
