@@ -97,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const queryEnabled = authState.isInitialized && !!authState.session;
+  console.log('[Auth] queryEnabled:', queryEnabled, 'isInitialized:', authState.isInitialized, 'hasSession:', !!authState.session);
 
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = authState.session;
@@ -115,11 +116,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentSession = sessionRef.current;
       const token = currentSession?.access_token;
       
+      console.log('[Auth] Query starting, hasToken:', !!token);
+      
       if (!token) {
+        console.error('[Auth] No token available');
         throw new Error('No session token available');
       }
       
       const apiUrl = getApiUrl('/api/auth/user');
+      console.log('[Auth] Fetching:', apiUrl);
       
       const response = await fetch(apiUrl, {
         headers: {
@@ -128,11 +133,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signal: AbortSignal.timeout(10000),
       });
       
+      console.log('[Auth] Response:', response.status, response.ok);
+      
       if (!response.ok) {
         let errorBody = '';
         try {
           errorBody = await response.text();
         } catch (e) {}
+        
+        console.error('[Auth] Error body:', errorBody.substring(0, 200));
         
         if (response.status === 401 || response.status === 403) {
           console.error('[Auth] Session rejected:', response.status);
@@ -151,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       const userData = await response.json();
+      console.log('[Auth] User loaded:', userData?.id);
       
       if (userData && userData.id) {
         setSentryUser({
