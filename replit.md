@@ -5,12 +5,14 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes (January 2026)
 
-### Phase 2 Native App Hotfix
-- **Critical Fix**: Rewrote `getApiUrl()` in `client/src/lib/apiUrl.ts` to return relative URLs on both web and native Capacitor platforms. Previous approach using absolute URLs caused cross-origin authentication failures where photos wouldn't load on native apps due to session cookie issues.
-- **Offline Indicator**: Made notification more compact (pill style) with auto-dismiss after 3 seconds. Re-shows when going offline again.
-- **Header Fix**: Removed `backdrop-blur` from app header in `App.tsx` due to iOS WKWebView compatibility issues. Now uses solid `bg-background`.
-- **Haptic Feedback**: Added haptics to sync events in `syncManager.ts` - success vibration on sync-complete, error vibration on sync-error (including catch block errors).
-- **Keep-Awake**: Skipped - `@capacitor-community/keep-awake` is incompatible with Capacitor 7.4.4.
+### Phase 2 Native App Hotfix (Critical)
+- **Root Cause Fixed**: The `VITE_API_URL=https://fieldsnaps.replit.app` environment variable was being used on native platforms, causing ALL API calls to use absolute URLs. This triggered cross-origin issues where session cookies weren't sent, resulting in HTML login redirects instead of JSON.
+- **Solution**: Modified `getApiUrl()` in `client/src/lib/apiUrl.ts` to check `Capacitor.isNativePlatform()` first - if native, ALWAYS return empty string (relative URLs) regardless of VITE_API_URL setting. Web can still use VITE_API_URL if needed.
+- **Technical Note**: `VITE_API_URL` is now **web-only**. Native platforms always use relative URLs which Capacitor resolves correctly.
+- **Offline Indicator**: Made notification more compact (pill style) with auto-dismiss after 3 seconds.
+- **Header Fix**: Removed `backdrop-blur` from app header due to iOS WKWebView issues. Now uses solid `bg-background`.
+- **Haptic Feedback**: Added haptics to sync events - success/error vibrations on sync completion.
+- **Keep-Awake**: Skipped - incompatible with Capacitor 7.4.4.
 
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
