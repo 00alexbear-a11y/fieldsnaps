@@ -3,6 +3,15 @@
 ## Overview
 FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construction professionals. Its core purpose is to provide robust offline photo and video documentation, enhancing project efficiency, minimizing disputes, and streamlining organization through instant media capture, smart compression, and auto-timestamping. The project aims to become a commercial SaaS product, offering full offline functionality, touch optimization, automatic time tracking with geofencing, and comprehensive timecard export capabilities.
 
+## Recent Changes (January 2026)
+
+### Phase 2 Native App Hotfix
+- **Critical Fix**: Rewrote `getApiUrl()` in `client/src/lib/apiUrl.ts` to return relative URLs on both web and native Capacitor platforms. Previous approach using absolute URLs caused cross-origin authentication failures where photos wouldn't load on native apps due to session cookie issues.
+- **Offline Indicator**: Made notification more compact (pill style) with auto-dismiss after 3 seconds. Re-shows when going offline again.
+- **Header Fix**: Removed `backdrop-blur` from app header in `App.tsx` due to iOS WKWebView compatibility issues. Now uses solid `bg-background`.
+- **Haptic Feedback**: Added haptics to sync events in `syncManager.ts` - success vibration on sync-complete, error vibration on sync-error (including catch block errors).
+- **Keep-Awake**: Skipped - `@capacitor-community/keep-awake` is incompatible with Capacitor 7.4.4.
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.
