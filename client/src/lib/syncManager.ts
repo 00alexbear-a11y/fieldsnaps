@@ -336,7 +336,8 @@ class SyncManager {
       result.success = false;
       result.errors.push(error instanceof Error ? error.message : 'Unknown error');
       
-      // Emit sync error event
+      // Haptic feedback and emit sync error event
+      haptics.error();
       this.emitEvent({
         type: 'sync-error',
         result,
