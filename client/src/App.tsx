@@ -77,7 +77,7 @@ function AppContent() {
   // Disabled auto dev login - user must manually login
   // useDevAutoLogin();
   
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, isFetching, isSupabaseAuthenticated, user } = useAuth();
   const isNativeApp = useIsNativeApp();
   const { canWrite } = useSubscriptionAccess();
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
@@ -167,11 +167,13 @@ function AppContent() {
   }, [isLoading, needsOnboarding, isOnboardingRoute, isPublicRoute, location, setLocation]);
 
   // Redirect unauthenticated users from private routes to landing
+  // CRITICAL: Don't redirect if we have a Supabase session but are still fetching user data
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !isPublicRoute && !isOnboardingRoute && location !== '/') {
+    const shouldRedirect = !isLoading && !isAuthenticated && !isSupabaseAuthenticated && !isFetching && !isPublicRoute && !isOnboardingRoute && location !== '/';
+    if (shouldRedirect) {
       setLocation('/');
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, isOnboardingRoute, location, setLocation]);
+  }, [isAuthenticated, isSupabaseAuthenticated, isFetching, isLoading, isPublicRoute, isOnboardingRoute, location, setLocation]);
 
   // Redirect non-whitelisted authenticated users to waitlist
   useEffect(() => {
@@ -195,7 +197,8 @@ function AppContent() {
   // CRITICAL: Block rendering of private routes for unauthenticated users (redirect happens in useEffect)
   // This prevents data queries from firing without auth credentials
   // Allow onboarding routes for authenticated users without companies
-  if (!isAuthenticated && !isPublicRoute && !isOnboardingRoute) {
+  // ALSO allow if we have a Supabase session (even if user data is still loading)
+  if (!isAuthenticated && !isSupabaseAuthenticated && !isPublicRoute && !isOnboardingRoute) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

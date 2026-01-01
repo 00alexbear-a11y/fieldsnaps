@@ -15,6 +15,15 @@ import { shouldUseChunkedUpload, uploadFileChunked } from './chunkedUpload';
 import { tokenManager } from './tokenManager';
 import { getApiUrl } from './apiUrl';
 import { haptics } from './nativeHaptics';
+import { Capacitor } from '@capacitor/core';
+
+// PERFORMANCE: Skip verbose logs on native platforms (console.log goes through Capacitor bridge)
+const isNative = Capacitor.isNativePlatform();
+const debugLog = (...args: unknown[]) => {
+  if (!isNative && process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
 
 const MAX_RETRY_COUNT = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -260,7 +269,7 @@ class SyncManager {
     // Check if we should upload now (network + settings check)
     const { canUpload, reason } = await this.shouldUploadNow();
     if (!canUpload) {
-      console.log('[Sync] Upload skipped:', reason);
+      debugLog('[Sync] Upload skipped:', reason);
       return {
         success: false,
         synced: 0,
@@ -511,7 +520,7 @@ class SyncManager {
       const token = await tokenManager.getValidAccessToken();
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-        console.log('[Sync] Auth token attached to request');
+        debugLog('[Sync] Auth token attached to request');
       } else {
         console.warn('[Sync] No auth token available for sync request');
       }
@@ -644,7 +653,7 @@ class SyncManager {
 
     try {
       if (item.action === 'create') {
-        console.log('[Sync] Starting photo upload for:', item.localId, 'to project:', serverProjectId);
+        debugLog('[Sync] Starting photo upload for:', item.localId, 'to project:', serverProjectId);
         
         // Determine upload strategy based on file size:
         // - Files > 20MB: Chunked upload (handles very large files with retry)
@@ -658,7 +667,7 @@ class SyncManager {
         
         if (useChunkedUpload) {
           // Use chunked upload for large files
-          console.log('[Sync] Using chunked upload for large file:', photo.blob.size, 'bytes');
+          debugLog('[Sync] Using chunked upload for large file:', photo.blob.size, 'bytes');
           
           try {
             // Generate file name (same logic as multipart upload)
@@ -677,7 +686,7 @@ class SyncManager {
               },
             });
             
-            console.log('[Sync] All chunks uploaded, completing...');
+            debugLog('[Sync] All chunks uploaded, completing...');
             
             // Complete the upload with metadata (backend assembles chunks and creates photo)
             const completeResponse = await fetch(getApiUrl(`/api/uploads/chunked/${result.uploadId}/complete`), {
@@ -701,14 +710,14 @@ class SyncManager {
             });
             
             data = await this.safeJsonParse(completeResponse);
-            console.log('[Sync] Chunked upload complete:', data);
+            debugLog('[Sync] Chunked upload complete:', data);
           } catch (chunkError) {
             console.error('[Sync] Chunked upload failed:', chunkError);
             throw chunkError;
           }
         } else if (usePresignedUpload) {
           // Use presigned URL for medium files (5-20MB) - bypasses backend for faster uploads
-          console.log('[Sync] Using presigned upload for file:', photo.blob.size, 'bytes');
+          debugLog('[Sync] Using presigned upload for file:', photo.blob.size, 'bytes');
           
           try {
             // Step 1: Request presigned upload URL from backend
@@ -735,7 +744,7 @@ class SyncManager {
             });
             
             const { uploadURL, sessionId: uploadSessionId } = await this.safeJsonParse(initResponse);
-            console.log('[Sync] Got presigned URL, uploading directly to cloud...');
+            debugLog('[Sync] Got presigned URL, uploading directly to cloud...');
             
             // Step 2: Upload directly to object storage (bypasses backend!)
             const uploadResponse = await fetch(uploadURL, {
@@ -750,7 +759,7 @@ class SyncManager {
               throw new Error(`Direct upload failed: ${uploadResponse.status}`);
             }
             
-            console.log('[Sync] Direct upload complete, notifying backend...');
+            debugLog('[Sync] Direct upload complete, notifying backend...');
             
             // Step 3: Notify backend to create photo record (send fileSize for metrics)
             const completeResponse = await fetch(getApiUrl(`/api/photos/complete-presigned/${uploadSessionId}`), {
@@ -766,7 +775,7 @@ class SyncManager {
             });
             
             data = await this.safeJsonParse(completeResponse);
-            console.log('[Sync] Presigned upload complete:', data);
+            debugLog('[Sync] Presigned upload complete:', data);
           } catch (presignedError) {
             console.error('[Sync] Presigned upload failed, falling back to multipart:', presignedError);
             // Fall through to multipart upload as fallback
@@ -776,7 +785,7 @@ class SyncManager {
         
         if (!data) {
           // Use traditional multipart upload for small files or as fallback
-          console.log('[Sync] Using traditional multipart upload for file:', photo.blob.size, 'bytes');
+          debugLog('[Sync] Using traditional multipart upload for file:', photo.blob.size, 'bytes');
           
           // Create FormData for multipart upload
           const formData = new FormData();
@@ -792,14 +801,14 @@ class SyncManager {
           if (photo.thumbnailBlob) {
             // Use pre-extracted thumbnail (for videos)
             formData.append('thumbnail', photo.thumbnailBlob, `thumb-${photo.id}.jpg`);
-            console.log('[Sync] Using pre-extracted thumbnail:', photo.thumbnailBlob.size, 'bytes');
+            debugLog('[Sync] Using pre-extracted thumbnail:', photo.thumbnailBlob.size, 'bytes');
           } else if (photo.mediaType === 'photo') {
             // Generate thumbnail for photos on-the-fly
             try {
               const file = new File([photo.blob], `photo-${photo.id}.jpg`, { type: photo.blob.type });
               const thumbnailBlob = await generateThumbnail(file, 200);
               formData.append('thumbnail', thumbnailBlob, `thumb-${photo.id}.jpg`);
-              console.log('[Sync] Thumbnail generated:', thumbnailBlob.size, 'bytes');
+              debugLog('[Sync] Thumbnail generated:', thumbnailBlob.size, 'bytes');
             } catch (thumbError) {
               console.warn('[Sync] Thumbnail generation failed, continuing without thumbnail:', thumbError);
             }
@@ -837,8 +846,8 @@ class SyncManager {
           // Get headers (without Content-Type for FormData)
           const headers = await this.getSyncHeaders();
           const uploadUrl = getApiUrl(`/api/projects/${serverProjectId}/photos`);
-          console.log('[Sync] Upload headers:', Object.keys(headers));
-          console.log('[Sync] Upload URL:', uploadUrl);
+          debugLog('[Sync] Upload headers:', Object.keys(headers));
+          debugLog('[Sync] Upload URL:', uploadUrl);
 
           const response = await fetch(uploadUrl, {
             method: 'POST',
@@ -847,10 +856,10 @@ class SyncManager {
             body: formData,
           });
 
-          console.log('[Sync] Upload response status:', response.status);
+          debugLog('[Sync] Upload response status:', response.status);
 
           data = await this.safeJsonParse(response);
-          console.log('[Sync] Upload successful, server response:', data);
+          debugLog('[Sync] Upload successful, server response:', data);
         }
         
         // Update local photo with server ID and sync status
@@ -858,7 +867,7 @@ class SyncManager {
 
         // Apply pending tags if any
         if (photo.pendingTagIds && photo.pendingTagIds.length > 0 && data.id) {
-          console.log('[Sync] Applying pending tags:', photo.pendingTagIds);
+          debugLog('[Sync] Applying pending tags:', photo.pendingTagIds);
           
           const failedTagIds: string[] = [];
           
@@ -890,7 +899,7 @@ class SyncManager {
             if (failedTagIds.length === 0) {
               // All tags applied successfully
               await idb.updatePhoto(item.localId, { pendingTagIds: [] });
-              console.log('[Sync] All pending tags applied successfully');
+              debugLog('[Sync] All pending tags applied successfully');
             } else {
               // Keep failed tags for retry
               await idb.updatePhoto(item.localId, { pendingTagIds: failedTagIds });
@@ -907,7 +916,7 @@ class SyncManager {
       }
 
       if (item.action === 'update' && photo.serverId) {
-        console.log('[Sync] Updating photo:', photo.serverId);
+        debugLog('[Sync] Updating photo:', photo.serverId);
         
         // Create FormData for multipart upload
         const formData = new FormData();
@@ -988,7 +997,7 @@ class SyncManager {
    * This is called after main sync completes to ensure tags are eventually applied
    */
   private async retryPendingTags(): Promise<void> {
-    console.log('[Sync] Checking for photos with pending tags...');
+    debugLog('[Sync] Checking for photos with pending tags...');
     
     try {
       // Get all photos - we need to scan all projects
@@ -1086,13 +1095,13 @@ class SyncManager {
     // If online and not currently syncing, trigger sync. Otherwise use background sync
     if (navigator.onLine) {
       if (this.syncInProgress) {
-        console.log('[Sync] Sync already in progress, item queued for next sync');
+        debugLog('[Sync] Sync already in progress, item queued for next sync');
       } else {
-        console.log('[Sync] Online - syncing immediately');
+        debugLog('[Sync] Online - syncing immediately');
         this.syncNow();
       }
     } else {
-      console.log('[Sync] Offline - registering background sync');
+      debugLog('[Sync] Offline - registering background sync');
       await this.registerBackgroundSync();
     }
   }
@@ -1101,7 +1110,7 @@ class SyncManager {
    * Queue a photo for sync
    */
   async queuePhotoSync(photoId: string, projectId: string, action: 'create' | 'delete'): Promise<void> {
-    console.log('[Sync] Queuing photo for sync:', { photoId, projectId, action, online: navigator.onLine });
+    debugLog('[Sync] Queuing photo for sync:', { photoId, projectId, action, online: navigator.onLine });
     
     // Check queue size before adding
     const queueSize = await idb.getQueueSize();
@@ -1121,18 +1130,18 @@ class SyncManager {
       retryCount: 0,
     });
 
-    console.log('[Sync] Photo added to queue successfully');
+    debugLog('[Sync] Photo added to queue successfully');
 
     // If online and not currently syncing, trigger sync. Otherwise use background sync
     if (navigator.onLine) {
       if (this.syncInProgress) {
-        console.log('[Sync] Sync already in progress, item queued for next sync');
+        debugLog('[Sync] Sync already in progress, item queued for next sync');
       } else {
-        console.log('[Sync] Online - syncing immediately');
+        debugLog('[Sync] Online - syncing immediately');
         this.syncNow();
       }
     } else {
-      console.log('[Sync] Offline - registering background sync');
+      debugLog('[Sync] Offline - registering background sync');
       await this.registerBackgroundSync();
     }
   }
@@ -1142,11 +1151,11 @@ class SyncManager {
    * Used for attach-to-todo flow where we need the server ID before proceeding
    */
   async uploadPhotoAndWait(photoId: string, projectId: string): Promise<string | null> {
-    console.log('[Sync] Uploading photo and waiting:', { photoId, projectId });
+    debugLog('[Sync] Uploading photo and waiting:', { photoId, projectId });
     
     // If offline, we can't wait for upload
     if (!navigator.onLine) {
-      console.log('[Sync] Offline - cannot upload immediately');
+      debugLog('[Sync] Offline - cannot upload immediately');
       return null;
     }
 
@@ -1182,7 +1191,7 @@ class SyncManager {
     const photo = await idb.getPhoto(photoId);
     
     if (photo && photo.serverId) {
-      console.log('[Sync] Photo uploaded successfully, server ID:', photo.serverId);
+      debugLog('[Sync] Photo uploaded successfully, server ID:', photo.serverId);
       return photo.serverId;
     }
 
@@ -1254,12 +1263,12 @@ class SyncManager {
    */
   private setupNetworkListeners(): void {
     window.addEventListener('online', () => {
-      console.log('[Sync] Network online, attempting sync');
+      debugLog('[Sync] Network online, attempting sync');
       this.syncNow();
     });
 
     window.addEventListener('offline', () => {
-      console.log('[Sync] Network offline');
+      debugLog('[Sync] Network offline');
     });
   }
 

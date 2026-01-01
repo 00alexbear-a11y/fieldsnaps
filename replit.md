@@ -14,6 +14,12 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 - **Haptic Feedback**: Added haptics to sync events - success/error vibrations on sync completion.
 - **Keep-Awake**: Skipped - incompatible with Capacitor 7.4.4.
 
+### Phase 3 Native Performance Optimization
+- **Platform Detection Polling Removed**: The `usePlatform.ts` hook was polling 100x every 100ms, each console.log call going through Capacitor bridge causing 10-14s startup delays. Fixed by using immediate detection (Capacitor.isNativePlatform() is reliable).
+- **Auth Race Condition Fixed**: Added `isSupabaseAuthenticated` check to App.tsx to prevent redirect loops during OAuth callback when session exists but user data is still fetching.
+- **Console Logging Optimized**: Added conditional `debugLog()` wrapper in syncManager.ts that skips logging on native platforms. Reduced verbose AuthContext logs. Native console.log calls are expensive as they cross the Capacitor JS-native bridge.
+- **Performance Rule**: On native platforms, minimize console.log calls - each one crosses the Capacitor bridge and blocks the main thread.
+
 ## User Preferences
 - **Communication style**: I prefer simple language and direct answers.
 - **Coding style**: I prefer clean, modern, and well-documented code. Focus on readability and maintainability.

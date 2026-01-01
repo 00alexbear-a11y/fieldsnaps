@@ -27,6 +27,7 @@ interface AuthContextValue {
   supabaseUser: SupabaseUser | null;
   session: Session | null;
   isLoading: boolean;
+  isFetching: boolean;
   isAuthenticated: boolean;
   isSupabaseAuthenticated: boolean;
   signOut: () => Promise<void>;
@@ -65,13 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         
         if (session) {
-          console.log('[AuthContext] Session found, invalidating user query to trigger fetch');
           queryClient.invalidateQueries({ queryKey: ["auth", "currentUser"] });
         }
         
         unsubscribe = onAuthStateChange((session, user) => {
           if (cancelled) return;
-          console.log('[AuthContext] Auth state changed:', user?.id ?? 'signed out');
           setAuthState(prev => ({
             ...prev,
             session,
@@ -79,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }));
           
           if (session) {
-            console.log('[AuthContext] Session available after auth change, invalidating query');
             queryClient.invalidateQueries({ queryKey: ["auth", "currentUser"] });
           }
         });
@@ -99,11 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const queryEnabled = authState.isInitialized && !!authState.session;
-  console.log('[AuthContext] Query enabled check:', { 
-    isInitialized: authState.isInitialized, 
-    hasSession: !!authState.session,
-    enabled: queryEnabled 
-  });
 
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = authState.session;
@@ -119,22 +112,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refetchOnMount: 'always',
     gcTime: 0,
     queryFn: async () => {
-      console.log('[AuthContext] ========== QUERY STARTING ==========');
-      
       const currentSession = sessionRef.current;
-      console.log('[AuthContext] Session from ref:', !!currentSession);
-      console.log('[AuthContext] Fetching user data...');
-      
       const token = currentSession?.access_token;
-      console.log('[AuthContext] Token from session:', !!token, token ? token.substring(0, 30) + '...' : 'null');
       
       if (!token) {
-        console.error('[AuthContext] No token in session - this should not happen');
         throw new Error('No session token available');
       }
       
       const apiUrl = getApiUrl('/api/auth/user');
-      console.log('[AuthContext] Making request to:', apiUrl);
       
       const response = await fetch(apiUrl, {
         headers: {
@@ -143,26 +128,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signal: AbortSignal.timeout(10000),
       });
       
-      console.log('[AuthContext] Response received:', response.status, response.statusText);
-      
       if (!response.ok) {
         let errorBody = '';
         try {
           errorBody = await response.text();
-          console.error('[AuthContext] Error response body:', errorBody);
-        } catch (e) {
-          console.error('[AuthContext] Could not read error body');
-        }
+        } catch (e) {}
         
         if (response.status === 401 || response.status === 403) {
-          console.error('[AuthContext] Backend rejected token (401/403), clearing session');
-          console.error('[AuthContext] Error details:', errorBody);
+          console.error('[Auth] Session rejected:', response.status);
           clearSentryUser();
           try {
             await supabaseSignOut();
-          } catch (e) {
-            console.error('[AuthContext] Error signing out:', e);
-          }
+          } catch (e) {}
           setAuthState({
             session: null,
             supabaseUser: null,
@@ -195,7 +172,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   useEffect(() => {
     if (queryEnabled && refetchRef.current) {
-      console.log('[AuthContext] Query enabled - calling refetch directly');
       refetchRef.current();
     }
   }, [queryEnabled]);
@@ -234,6 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabaseUser: authState.supabaseUser,
     session: authState.session,
     isLoading: !!isLoading,
+    isFetching: isFetchingUser,
     isAuthenticated: !!authState.session && !!user,
     isSupabaseAuthenticated: !!authState.session,
     signOut,
