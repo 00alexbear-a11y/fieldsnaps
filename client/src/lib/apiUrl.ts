@@ -1,29 +1,36 @@
+import { Capacitor } from '@capacitor/core';
+
 /**
  * API URL utilities for cross-platform support
  * 
  * CRITICAL INSIGHT (Jan 2025):
  * On native Capacitor (iOS/Android), the app runs on capacitor://localhost.
- * The Capacitor HTTP plugin automatically resolves relative URLs against 
- * the configured server. If we prefix with https://fieldsnaps.replit.app,
- * it becomes a cross-origin request WITHOUT session cookies, causing 401/404.
+ * Absolute URLs like https://fieldsnaps.replit.app cause cross-origin requests
+ * WITHOUT session cookies, resulting in 401/404 errors and HTML redirects.
  * 
- * SOLUTION: Always use relative URLs. Both web and native resolve them correctly.
- * - Web: relative to current origin
- * - Native: Capacitor HTTP plugin handles the resolution
+ * SOLUTION: 
+ * - Native: ALWAYS use relative URLs (Capacitor resolves against configured server)
+ * - Web: Can use VITE_API_URL if set, otherwise relative URLs work fine
  */
 
 /**
  * Get the base API URL.
- * Returns empty string to use relative URLs (works on both web and native).
- * Only returns absolute URL if VITE_API_URL is explicitly set for special cases.
+ * - Native platforms: ALWAYS returns empty string (relative URLs required)
+ * - Web: Returns VITE_API_URL if set, otherwise empty string
  */
 export function getApiBaseUrl(): string {
-  // Only use absolute URL if explicitly configured (e.g., for testing against different server)
+  // CRITICAL: Native platforms MUST use relative URLs to avoid cross-origin issues
+  // Even if VITE_API_URL is set, ignore it on native!
+  if (Capacitor.isNativePlatform()) {
+    return '';
+  }
+  
+  // Web: Can use absolute URL if explicitly configured
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Default: use relative URLs (works correctly on both web and native Capacitor)
+  // Default: relative URLs work on web too
   return '';
 }
 
