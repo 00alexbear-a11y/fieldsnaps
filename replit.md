@@ -5,10 +5,13 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes (January 2026)
 
-### Phase 2 Native App Hotfix (Critical)
-- **Root Cause Fixed**: The `VITE_API_URL=https://fieldsnaps.replit.app` environment variable was being used on native platforms, causing ALL API calls to use absolute URLs. This triggered cross-origin issues where session cookies weren't sent, resulting in HTML login redirects instead of JSON.
-- **Solution**: Modified `getApiUrl()` in `client/src/lib/apiUrl.ts` to check `Capacitor.isNativePlatform()` first - if native, ALWAYS return empty string (relative URLs) regardless of VITE_API_URL setting. Web can still use VITE_API_URL if needed.
-- **Technical Note**: `VITE_API_URL` is now **web-only**. Native platforms always use relative URLs which Capacitor resolves correctly.
+### Phase 4 Native App API URL Fix (Critical - Jan 2026)
+- **Root Cause**: On native Capacitor platforms, relative URLs like `/api/auth/user` resolve to `capacitor://localhost/api/auth/user` which serves the bundled `index.html` (200 OK) - NOT the actual backend. This caused auth to fail silently.
+- **Solution**: Modified `getApiUrl()` in `client/src/lib/apiUrl.ts` to use `VITE_API_URL` on native platforms. Since we use Bearer token auth (not cookies), cross-origin requests work fine.
+- **Technical Note**: `VITE_API_URL=https://fieldsnaps.replit.app` is **required for native builds**. Web uses relative URLs (same origin).
+- **Content-Type Validation**: Added content-type check in AuthContext to catch HTML responses with clear error messages.
+
+### Phase 2 Native App Hotfix (Historical - Superseded by Phase 4)
 - **Offline Indicator**: Made notification more compact (pill style) with auto-dismiss after 3 seconds.
 - **Header Fix**: Removed `backdrop-blur` from app header due to iOS WKWebView issues. Now uses solid `bg-background`.
 - **Haptic Feedback**: Added haptics to sync events - success/error vibrations on sync completion.
