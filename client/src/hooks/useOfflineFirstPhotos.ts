@@ -79,6 +79,7 @@ export function useOfflineFirstPhotos(projectId: string) {
             height: p.height || null,
             photographerId: p.photographerId || null,
             photographerName: p.photographerName || null,
+            sessionId: p.sessionId || null, // Camera session grouping
             unitLabel: p.unitLabel || null,
             createdAt: p.createdAt ? new Date(p.createdAt) : (p.timestamp ? new Date(p.timestamp) : new Date()),
             deletedAt: null,

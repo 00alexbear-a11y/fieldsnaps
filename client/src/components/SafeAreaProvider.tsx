@@ -18,6 +18,13 @@ const IOS_FALLBACK_INSETS: SafeAreaInsets = {
 
 function applyInsets(insets: SafeAreaInsets) {
   const root = document.documentElement;
+  // Set both naming conventions for compatibility
+  // --safe-area-* is used by sidebar.tsx and other components
+  // --safe-area-inset-* matches native CSS env() naming
+  root.style.setProperty('--safe-area-top', `${insets.top}px`);
+  root.style.setProperty('--safe-area-bottom', `${insets.bottom}px`);
+  root.style.setProperty('--safe-area-left', `${insets.left}px`);
+  root.style.setProperty('--safe-area-right', `${insets.right}px`);
   root.style.setProperty('--safe-area-inset-top', `${insets.top}px`);
   root.style.setProperty('--safe-area-inset-right', `${insets.right}px`);
   root.style.setProperty('--safe-area-inset-bottom', `${insets.bottom}px`);

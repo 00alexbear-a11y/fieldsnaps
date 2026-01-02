@@ -2208,14 +2208,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve photo image with CORS headers for iOS WebView
   app.get("/api/photos/:id/image", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    const startTime = Date.now();
+    const photoId = req.params.id;
+    
     try {
       // Verify access and get photo in one query (optimization)
-      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, photoId);
       if (!authorized) return;
 
       if (!photo || !photo.url) {
         return res.status(404).json({ error: "Photo has no image" });
       }
+
+      const authTime = Date.now() - startTime;
 
       // Set CORS headers for iOS WebView
       res.set({
@@ -2225,9 +2230,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const objectStorageService = new ObjectStorageService();
       const objectFile = await objectStorageService.getObjectEntityFile(photo.url);
+      const storageTime = Date.now() - startTime;
+      
       await objectStorageService.downloadObject(objectFile, res);
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`[PhotoProxy] Image ${photoId.substring(0, 8)}... auth:${authTime}ms storage:${storageTime}ms total:${totalTime}ms`);
     } catch (error: any) {
-      console.error("Error serving photo image:", error);
+      const errorTime = Date.now() - startTime;
+      console.error(`[PhotoProxy] Image ${photoId.substring(0, 8)}... ERROR after ${errorTime}ms:`, error.message);
       if (error instanceof ObjectNotFoundError) {
         return res.status(404).json({ error: "Image not found" });
       }
@@ -2237,9 +2248,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve photo thumbnail with CORS headers for iOS WebView
   app.get("/api/photos/:id/thumbnail", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    const startTime = Date.now();
+    const photoId = req.params.id;
+    
     try {
       // Verify access and get photo in one query (optimization)
-      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, photoId);
       if (!authorized) return;
 
       // If no thumbnail, serve the full image
@@ -2247,6 +2261,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!imageUrl) {
         return res.status(404).json({ error: "Photo has no image" });
       }
+
+      const authTime = Date.now() - startTime;
 
       // Set CORS headers for iOS WebView
       res.set({
@@ -2256,9 +2272,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const objectStorageService = new ObjectStorageService();
       const objectFile = await objectStorageService.getObjectEntityFile(imageUrl);
+      const storageTime = Date.now() - startTime;
+      
       await objectStorageService.downloadObject(objectFile, res);
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`[PhotoProxy] Thumb ${photoId.substring(0, 8)}... auth:${authTime}ms storage:${storageTime}ms total:${totalTime}ms`);
     } catch (error: any) {
-      console.error("Error serving photo thumbnail:", error);
+      const errorTime = Date.now() - startTime;
+      console.error(`[PhotoProxy] Thumb ${photoId.substring(0, 8)}... ERROR after ${errorTime}ms:`, error.message);
       if (error instanceof ObjectNotFoundError) {
         return res.status(404).json({ error: "Thumbnail not found" });
       }

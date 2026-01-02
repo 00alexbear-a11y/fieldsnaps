@@ -12,7 +12,31 @@ import { Capacitor } from '@capacitor/core';
  * - Native: MUST use absolute URLs (VITE_API_URL) to reach real backend
  *   Since we use Bearer tokens (not cookies), cross-origin is OK
  * - Web: Use relative URLs (same origin, cookies work fine)
+ * 
+ * BUILD REQUIREMENT:
+ * VITE_API_URL must be set BEFORE `npm run build` (not after).
+ * Environment variables are baked into the bundle at build time.
  */
+
+// Startup diagnostic - log once on app load
+let _diagnosticLogged = false;
+function logApiDiagnostic(): void {
+  if (_diagnosticLogged) return;
+  _diagnosticLogged = true;
+  
+  const isNative = Capacitor.isNativePlatform();
+  const platform = Capacitor.getPlatform();
+  const apiUrl = import.meta.env.VITE_API_URL || '(not set)';
+  
+  if (isNative) {
+    console.log(`[API] Native platform: ${platform}`);
+    console.log(`[API] VITE_API_URL: ${apiUrl}`);
+    if (apiUrl === '(not set)') {
+      console.error('[API] CRITICAL: VITE_API_URL not baked into build! API calls will fail.');
+      console.error('[API] Fix: Set VITE_API_URL=https://fieldsnaps.replit.app BEFORE npm run build');
+    }
+  }
+}
 
 /**
  * Get the base API URL.
@@ -20,6 +44,9 @@ import { Capacitor } from '@capacitor/core';
  * - Web: Returns empty string (relative URLs work via same origin)
  */
 export function getApiBaseUrl(): string {
+  // Log diagnostic once on first call
+  logApiDiagnostic();
+  
   // CRITICAL: Native platforms MUST use absolute URLs to reach real backend
   // Relative URLs resolve to capacitor://localhost which serves HTML, not API
   if (Capacitor.isNativePlatform()) {
