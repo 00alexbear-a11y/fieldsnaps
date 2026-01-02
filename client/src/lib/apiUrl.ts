@@ -3,34 +3,36 @@ import { Capacitor } from '@capacitor/core';
 /**
  * API URL utilities for cross-platform support
  * 
- * CRITICAL INSIGHT (Jan 2025):
+ * CRITICAL INSIGHT (Jan 2025 - Updated):
  * On native Capacitor (iOS/Android), the app runs on capacitor://localhost.
- * Absolute URLs like https://fieldsnaps.replit.app cause cross-origin requests
- * WITHOUT session cookies, resulting in 401/404 errors and HTML redirects.
+ * Relative URLs like /api/auth/user resolve to capacitor://localhost/api/auth/user
+ * which serves the bundled index.html (status 200!) - NOT the actual backend.
  * 
  * SOLUTION: 
- * - Native: ALWAYS use relative URLs (Capacitor resolves against configured server)
- * - Web: Can use VITE_API_URL if set, otherwise relative URLs work fine
+ * - Native: MUST use absolute URLs (VITE_API_URL) to reach real backend
+ *   Since we use Bearer tokens (not cookies), cross-origin is OK
+ * - Web: Use relative URLs (same origin, cookies work fine)
  */
 
 /**
  * Get the base API URL.
- * - Native platforms: ALWAYS returns empty string (relative URLs required)
- * - Web: Returns VITE_API_URL if set, otherwise empty string
+ * - Native platforms: Returns VITE_API_URL to reach the real backend
+ * - Web: Returns empty string (relative URLs work via same origin)
  */
 export function getApiBaseUrl(): string {
-  // CRITICAL: Native platforms MUST use relative URLs to avoid cross-origin issues
-  // Even if VITE_API_URL is set, ignore it on native!
+  // CRITICAL: Native platforms MUST use absolute URLs to reach real backend
+  // Relative URLs resolve to capacitor://localhost which serves HTML, not API
   if (Capacitor.isNativePlatform()) {
-    return '';
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (apiUrl) {
+      return apiUrl;
+    }
+    // Fallback - should never happen if env is configured correctly
+    console.error('[API] VITE_API_URL not set for native platform!');
+    return 'https://fieldsnaps.replit.app';
   }
   
-  // Web: Can use absolute URL if explicitly configured
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-  
-  // Default: relative URLs work on web too
+  // Web: relative URLs work fine (same origin)
   return '';
 }
 

@@ -135,6 +135,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       console.log('[Auth] Response:', response.status, response.ok);
       
+      // CRITICAL: Check content-type before parsing JSON
+      // On native, if API URL is misconfigured, we might get HTML instead of JSON
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const body = await response.text();
+        console.error('[Auth] Expected JSON but got:', contentType, body.substring(0, 200));
+        throw new Error(`API returned non-JSON response (${contentType}). Check VITE_API_URL config.`);
+      }
+      
       if (!response.ok) {
         let errorBody = '';
         try {
