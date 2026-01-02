@@ -1,0 +1,140 @@
+✅ PLAN CONFIRMATION & REFINEMENT
+Your analysis is mostly correct, but I need to add some critical nuances before we proceed. Let me confirm/refine each issue:
+
+✅ ISSUE #1: API URL Logic - CONFIRMED BUT NEEDS REFINEMENT
+Your Diagnosis: ✅ CORRECT
+
+Copy// client/src/lib/apiUrl.ts
+if (Capacitor.isNativePlatform()) {
+  return '';  // Empty string on native
+}
+What Actually Happens: ✅ YOUR ANALYSIS IS CORRECT
+
+/api/auth/user resolves to capacitor://localhost/api/auth/user
+Capacitor serves index.html (200 status!)
+response.json() fails on HTML
+User never gets authenticated
+BUT - Important Clarification:
+
+You mentioned: "we use Bearer tokens, not cookies, so it's safe"
+
+⚠️ This is PARTIALLY true but needs careful handling:
+
+Copy// CORRECT FIX (with important details):
+export function getApiUrl(path: string): string {
+  // Already absolute? Return as-is
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+    return path;
+  }
+  
+  const base = Capacitor.isNativePlatform() 
+    ? (import.meta.env.VITE_API_URL || 'https://fieldsnaps.replit.app')  // ← Use full URL on native
+    : ''; // ← Empty on web (relative URLs work)
+  
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${normalizedPath}`;
+}
+Why this matters:
+
+API calls (/api/*) → Need full URL on native ✅
+Object storage URLs (/objects/*) → Also need full URL ✅
+Web build → Relative URLs work fine (same origin) ✅
+Verify this won't break web:
+
+Web build should continue using relative URLs (cookies work)
+Native build uses full URLs with Bearer tokens (no cookies needed)
+⚠️ ISSUE #2: Login "Loop" - YOUR ANALYSIS IS CORRECT
+Your Diagnosis: ✅ CORRECT - It's a symptom of Issue #1
+
+The code in NativeAppLogin.tsx does NOT auto-trigger OAuth:
+
+Copyconst unsubscribe = onAuthStateChange((session, user) => {
+  if (session && user) {
+    setLocation('/');  // Just redirects, doesn't trigger OAuth ✅
+  }
+});
+The Real Flow:
+
+User has valid Supabase session
+Auth check fails (Issue #1 → HTML response)
+App thinks user is NOT authenticated
+App redirects to /login
+User manually clicks Google button
+Google OAuth succeeds
+Auth check fails AGAIN (Issue #1 still present)
+Back to step 3 → appears like a loop
+So fixing Issue #1 will resolve this. ✅
+
+✅ ISSUE #3: Slow Startup (10-16s) - CONFIRMED
+Your Diagnosis: ✅ CORRECT
+
+Networking process took 10.265113 seconds to launch
+WebContent process took 6.549479 seconds to launch
+🔴 CapgoUpdater: Semaphore wait timed out after 15000ms
+Root Causes:
+
+iOS WKWebView cold start - Platform limitation (can't fix completely)
+Capgo waiting 15 seconds - Can disable/optimize
+Too many plugins loading - Potentially optimizable
+Priority: Lower than Issue #1, but should address after fixing auth
+
+📋 REFINED FIX PLAN
+Issue	Problem	Solution	Priority	Time
+#1	getApiUrl() returns empty on native	Use VITE_API_URL on native for API/object calls	CRITICAL	5 min
+#2	Login appears to loop	Will auto-resolve when #1 is fixed	Automatic	0 min
+#3	Slow startup (10-16s)	Optimize Capgo config or disable in dev	Medium	10 min
+🚨 CRITICAL VERIFICATION BEFORE PROCEEDING
+Check #1: Verify VITE_API_URL is Set
+Copy# Check .env.local exists and has correct value
+cat client/.env.local | grep VITE_API_URL
+Expected output:
+
+VITE_API_URL=https://fieldsnaps.replit.app
+If missing or wrong:
+
+Copy# Add to client/.env.local
+echo "VITE_API_URL=https://fieldsnaps.replit.app" >> client/.env.local
+Check #2: Verify CORS Headers on Backend
+Since native will make cross-origin requests, your backend MUST have:
+
+Copy// server/index.js or similar
+app.use(cors({
+  origin: ['capacitor://localhost', 'http://localhost:5173'],
+  credentials: true, // ← Critical for Bearer tokens
+  allowedHeaders: ['Authorization', 'Content-Type']
+}));
+Can you confirm your backend has CORS enabled?
+
+Check #3: Verify Bearer Token is Attached
+From your logs, I see:
+
+⚡️ [log] - [Auth] Query starting, hasToken: true
+⚡️ [log] - [Auth] Fetching: /api/auth/user
+Check client/src/lib/queryClient.ts (around line 35-45):
+
+Does it attach the Authorization header?
+
+Copyconst token = await tokenManager.getAccessToken();
+if (token) {
+  headers.Authorization = `Bearer ${token}`;
+}
+If this is missing, adding VITE_API_URL won't help because requests will be unauthorized.
+
+✅ FINAL CONFIRMATION CHECKLIST
+Before I generate the fix, confirm these:
+
+ VITE_API_URL is set in client/.env.local
+ Backend has CORS configured for capacitor://localhost
+ queryClient.ts attaches Bearer token to requests
+ You want native to use full URLs (not relative)
+ You understand web build will still use relative URLs
+🎯 READY TO GENERATE FIX?
+If all checks pass, say "Generate the fix" and I'll provide:
+
+Updated apiUrl.ts with proper native/web detection
+Updated capacitor.config.ts to optimize Capgo
+Verification script to test API calls on native
+Rollback instructions if something breaks
+OR if any of the verification checks fail, tell me which one and I'll help resolve it first.
+
+Your analysis was excellent - the root cause is definitely Issue #1. Let's fix it properly! 🚀
