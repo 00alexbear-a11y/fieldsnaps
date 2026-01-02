@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Capacitor } from "@capacitor/core";
-import { Camera as CapacitorCamera } from "@capacitor/camera";
+import { Camera as CapacitorCamera, CameraResultType, CameraSource } from "@capacitor/camera";
 
 interface ProfilePhotoUploadProps {
   currentPhotoUrl?: string | null;
@@ -30,8 +30,8 @@ export function ProfilePhotoUpload({
         const image = await CapacitorCamera.getPhoto({
           quality: 90,
           allowEditing: true,
-          resultType: 'DataUrl',
-          source: 'camera',
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Camera,
         });
 
         if (image.dataUrl) {
@@ -61,8 +61,8 @@ export function ProfilePhotoUpload({
         const image = await CapacitorCamera.getPhoto({
           quality: 90,
           allowEditing: true,
-          resultType: 'DataUrl',
-          source: 'photos',
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Photos,
         });
 
         if (image.dataUrl) {

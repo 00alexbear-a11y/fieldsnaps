@@ -25,7 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { haptics } from "@/lib/nativeHaptics";
 import type { ToDo, Project, Subtask } from "@shared/schema";
 import { ToDosFilterSheet } from "@/components/ToDosFilterSheet";
-import { Trash2, ListChecks } from "lucide-react";
+import { Trash2, ListChecks, Pencil } from "lucide-react";
 import { InlineMonthCalendar } from "@/components/InlineMonthCalendar";
 import { InlineWeekCalendar } from "@/components/InlineWeekCalendar";
 import { InlineDayHeader } from "@/components/InlineDayHeader";
@@ -105,6 +105,8 @@ export default function ToDos() {
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedTodoForDetails, setSelectedTodoForDetails] = useState<TodoWithDetails | null>(null);
   const [showDetailsDrawer, setShowDetailsDrawer] = useState(false);
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [showSubtaskInput, setShowSubtaskInput] = useState(false);
   const [showFullScreenCalendar, setShowFullScreenCalendar] = useState(false);
   const [showTodoDueDatePicker, setShowTodoDueDatePicker] = useState(false);
   const [animatingTasks, setAnimatingTasks] = useState<Set<string>>(new Set());
@@ -1487,7 +1489,13 @@ export default function ToDos() {
         </MobileDialog>
 
         {/* Details Drawer */}
-        <Sheet open={showDetailsDrawer} onOpenChange={setShowDetailsDrawer}>
+        <Sheet open={showDetailsDrawer} onOpenChange={(open) => {
+          setShowDetailsDrawer(open);
+          if (!open) {
+            setIsEditingNotes(false);
+            setShowSubtaskInput(false);
+          }
+        }}>
           <SheetContent side="bottom" className="h-[85vh] flex flex-col">
             <SheetHeader>
               <SheetTitle>Task Details</SheetTitle>
@@ -1636,42 +1644,66 @@ export default function ToDos() {
                       </span>
                     )}
                   </h3>
+                  {!showSubtaskInput && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSubtaskInput(true)}
+                      data-testid="button-show-subtask-input"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" />
+                      Add
+                    </Button>
+                  )}
                 </div>
                 
-                {/* Add subtask input */}
-                <div className="flex gap-2 mb-3">
-                  <Input
-                    value={newSubtaskTitle}
-                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                    placeholder="Add a subtask..."
-                    className="flex-1"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newSubtaskTitle.trim() && selectedTodoForDetails) {
-                        e.preventDefault();
-                        createSubtaskMutation.mutate({ 
-                          todoId: selectedTodoForDetails.id, 
-                          title: newSubtaskTitle.trim() 
-                        });
-                      }
-                    }}
-                    data-testid="input-new-subtask"
-                  />
-                  <Button
-                    size="icon"
-                    onClick={() => {
-                      if (newSubtaskTitle.trim() && selectedTodoForDetails) {
-                        createSubtaskMutation.mutate({ 
-                          todoId: selectedTodoForDetails.id, 
-                          title: newSubtaskTitle.trim() 
-                        });
-                      }
-                    }}
-                    disabled={!newSubtaskTitle.trim() || createSubtaskMutation.isPending}
-                    data-testid="button-add-subtask"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
+                {/* Add subtask input - only shown when user wants to add */}
+                {showSubtaskInput && (
+                  <div className="flex gap-2 mb-3">
+                    <Input
+                      value={newSubtaskTitle}
+                      onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                      placeholder="Add a subtask..."
+                      className="flex-1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newSubtaskTitle.trim() && selectedTodoForDetails) {
+                          e.preventDefault();
+                          createSubtaskMutation.mutate({ 
+                            todoId: selectedTodoForDetails.id, 
+                            title: newSubtaskTitle.trim() 
+                          });
+                        }
+                      }}
+                      data-testid="input-new-subtask"
+                    />
+                    <Button
+                      size="icon"
+                      onClick={() => {
+                        if (newSubtaskTitle.trim() && selectedTodoForDetails) {
+                          createSubtaskMutation.mutate({ 
+                            todoId: selectedTodoForDetails.id, 
+                            title: newSubtaskTitle.trim() 
+                          });
+                        }
+                      }}
+                      disabled={!newSubtaskTitle.trim() || createSubtaskMutation.isPending}
+                      data-testid="button-add-subtask"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setShowSubtaskInput(false);
+                        setNewSubtaskTitle('');
+                      }}
+                      data-testid="button-cancel-subtask"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
                 
                 {/* Subtasks list */}
                 {subtasksLoading ? (
@@ -1712,31 +1744,75 @@ export default function ToDos() {
               </div>
 
               <div className="pt-4 border-t">
-                <h3 className="text-sm font-semibold mb-2">Notes</h3>
-                <Textarea
-                  value={selectedTodoForDetails?.description || ''}
-                  onChange={(e) => {
-                    if (selectedTodoForDetails) {
-                      setSelectedTodoForDetails({
-                        ...selectedTodoForDetails,
-                        description: e.target.value
-                      });
-                    }
-                  }}
-                  onBlur={() => {
-                    if (selectedTodoForDetails) {
-                      updateMutation.mutate({
-                        id: selectedTodoForDetails.id,
-                        data: { description: selectedTodoForDetails.description || '' },
-                        silent: true
-                      });
-                    }
-                  }}
-                  placeholder="Add notes..."
-                  rows={6}
-                  className="resize-none"
-                  data-testid="textarea-task-notes"
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold">Notes</h3>
+                  {!isEditingNotes && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditingNotes(true)}
+                      data-testid="button-edit-notes"
+                    >
+                      <Pencil className="w-3.5 h-3.5 mr-1" />
+                      Edit
+                    </Button>
+                  )}
+                </div>
+                {isEditingNotes ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={selectedTodoForDetails?.description || ''}
+                      onChange={(e) => {
+                        if (selectedTodoForDetails) {
+                          setSelectedTodoForDetails({
+                            ...selectedTodoForDetails,
+                            description: e.target.value
+                          });
+                        }
+                      }}
+                      placeholder="Add notes..."
+                      rows={6}
+                      className="resize-none"
+                      data-testid="textarea-task-notes"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditingNotes(false)}
+                        data-testid="button-cancel-notes"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (selectedTodoForDetails) {
+                            updateMutation.mutate({
+                              id: selectedTodoForDetails.id,
+                              data: { description: selectedTodoForDetails.description || '' },
+                              silent: true
+                            });
+                            setIsEditingNotes(false);
+                          }
+                        }}
+                        data-testid="button-save-notes"
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className="p-3 bg-muted/50 rounded-lg min-h-[100px] text-sm"
+                    onClick={() => setIsEditingNotes(true)}
+                    data-testid="text-notes-readonly"
+                  >
+                    {selectedTodoForDetails?.description || (
+                      <span className="text-muted-foreground">Tap to add notes...</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             

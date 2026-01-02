@@ -241,6 +241,34 @@ export class ObjectStorageService {
     });
   }
 
+  // Gets a signed download URL for an object entity.
+  // Returns a URL that can be used directly in <img> tags without auth headers.
+  async getSignedDownloadUrl(objectPath: string, ttlSec: number = 3600): Promise<string> {
+    if (!objectPath.startsWith("/objects/")) {
+      throw new ObjectNotFoundError();
+    }
+
+    const parts = objectPath.slice(1).split("/");
+    if (parts.length < 2) {
+      throw new ObjectNotFoundError();
+    }
+
+    const entityId = parts.slice(1).join("/");
+    let entityDir = this.getPrivateObjectDir();
+    if (!entityDir.endsWith("/")) {
+      entityDir = `${entityDir}/`;
+    }
+    const objectEntityPath = `${entityDir}${entityId}`;
+    const { bucketName, objectName } = parseObjectPath(objectEntityPath);
+    
+    return signObjectURL({
+      bucketName,
+      objectName,
+      method: "GET",
+      ttlSec,
+    });
+  }
+
   // Deletes an object entity from object storage.
   async deleteObjectEntity(objectPath: string): Promise<boolean> {
     try {

@@ -182,3 +182,22 @@ Photos are served through proxy routes instead of direct Object Storage URLs to 
 - `/api/photos/:id/thumbnail` - 200x200 thumbnail
 
 These routes have timing logs to help diagnose slow loads.
+
+### Signed URLs for Native Platforms (Jan 2026)
+
+**Problem**: iOS WKWebView `<img>` tags cannot include Authorization headers with requests.
+This caused photo authentication to fail on native platforms.
+
+**Solution**: Implemented signed URL system:
+- `/api/photos/:id/signed-urls` - Get signed URLs for a single photo
+- `/api/photos/batch-signed-urls` - Get signed URLs for multiple photos (batch endpoint)
+
+The `useOfflineFirstPhotos` hook automatically:
+1. Detects native platforms
+2. Fetches batch signed URLs for all photos
+3. Caches URLs client-side (1-hour TTL with refresh buffer)
+4. Falls back to proxy URLs if signing fails
+
+Key files:
+- `server/objectStorage.ts` - `getSignedDownloadUrl()` method
+- `client/src/hooks/useOfflineFirstPhotos.ts` - Signed URL fetching/caching logic

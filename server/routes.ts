@@ -2288,6 +2288,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get signed URLs for a photo (for native iOS/Android where <img> tags can't include auth headers)
+  app.get("/api/photos/:id/signed-urls", isAuthenticatedAndWhitelisted, validateUuidParam('id'), async (req, res) => {
+    try {
+      const { authorized, photo } = await verifyPhotoCompanyAccess(req, res, req.params.id);
+      if (!authorized) return;
+
+      if (!photo) {
+        return res.status(404).json({ error: "Photo not found" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      const TTL_SECONDS = 3600; // 1 hour
+
+      // Generate signed URLs
+      let signedUrl: string | null = null;
+      let signedThumbnailUrl: string | null = null;
+
+      if (photo.url) {
+        try {
+          signedUrl = await objectStorageService.getSignedDownloadUrl(photo.url, TTL_SECONDS);
+        } catch (e) {
+          console.error(`[SignedURL] Failed to sign image URL for ${req.params.id}:`, e);
+        }
+      }
+
+      if (photo.thumbnailUrl) {
+        try {
+          signedThumbnailUrl = await objectStorageService.getSignedDownloadUrl(photo.thumbnailUrl, TTL_SECONDS);
+        } catch (e) {
+          console.error(`[SignedURL] Failed to sign thumbnail URL for ${req.params.id}:`, e);
+        }
+      }
+
+      res.json({
+        id: photo.id,
+        signedUrl,
+        signedThumbnailUrl,
+        expiresAt: new Date(Date.now() + TTL_SECONDS * 1000).toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Error generating signed URLs:", error);
+      handleError(res, error);
+    }
+  });
+
+  // Batch get signed URLs for multiple photos (more efficient for photo grids)
+  app.post("/api/photos/batch-signed-urls", isAuthenticatedAndWhitelisted, async (req: any, res) => {
+    try {
+      const { photoIds } = req.body;
+      if (!Array.isArray(photoIds) || photoIds.length === 0) {
+        return res.status(400).json({ error: "photoIds array is required" });
+      }
+
+      // Limit batch size to prevent abuse
+      if (photoIds.length > 100) {
+        return res.status(400).json({ error: "Maximum 100 photos per batch" });
+      }
+
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user?.companyId) {
+        return res.status(403).json({ error: "User must belong to a company" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      const TTL_SECONDS = 3600; // 1 hour
+      const results: Record<string, { signedUrl: string | null; signedThumbnailUrl: string | null }> = {};
+
+      // Process photos in parallel
+      await Promise.all(photoIds.map(async (photoId: string) => {
+        try {
+          const photo = await storage.getPhoto(photoId);
+          if (!photo) return;
+
+          // Verify company access via project
+          const project = await storage.getProject(photo.projectId);
+          if (!project || project.companyId !== user.companyId) return;
+
+          let signedUrl: string | null = null;
+          let signedThumbnailUrl: string | null = null;
+
+          if (photo.url) {
+            try {
+              signedUrl = await objectStorageService.getSignedDownloadUrl(photo.url, TTL_SECONDS);
+            } catch (e) {
+              // Skip failed URLs
+            }
+          }
+
+          if (photo.thumbnailUrl) {
+            try {
+              signedThumbnailUrl = await objectStorageService.getSignedDownloadUrl(photo.thumbnailUrl, TTL_SECONDS);
+            } catch (e) {
+              // Skip failed URLs
+            }
+          }
+
+          results[photoId] = { signedUrl, signedThumbnailUrl };
+        } catch (e) {
+          // Skip failed photos
+        }
+      }));
+
+      res.json({
+        signedUrls: results,
+        expiresAt: new Date(Date.now() + TTL_SECONDS * 1000).toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Error generating batch signed URLs:", error);
+      handleError(res, error);
+    }
+  });
+
   // Unauthenticated photo proxy for public share links
   app.get("/api/shared/:shareToken/photos/:id/image", validateUuidParam('id'), async (req, res) => {
     try {

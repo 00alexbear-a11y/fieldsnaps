@@ -5,6 +5,14 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes (January 2026)
 
+### Phase 6 Native App - Photo Display & UI Fixes (Jan 2026)
+- **Signed URLs for Native Photos**: iOS WKWebView `<img>` tags cannot include Authorization headers. Implemented signed URL system:
+  - `server/objectStorage.ts` - Added `getSignedDownloadUrl()` method
+  - `server/routes.ts` - Added `/api/photos/:id/signed-urls` and `/api/photos/batch-signed-urls` endpoints
+  - `client/src/hooks/useOfflineFirstPhotos.ts` - Auto-fetches batch signed URLs on native with 1-hour caching
+- **ToDo Detail Sheet Keyboard Fix**: Changed Notes section and Subtask input to read-only by default with explicit Edit buttons. Prevents iOS keyboard from auto-opening when viewing task details.
+- **ProfilePhotoUpload Type Fix**: Fixed Camera enum types (CameraResultType, CameraSource) for proper TypeScript compatibility.
+
 ### Phase 5 Native App - Systematic API URL Fix (Critical - Jan 2026)
 - **Root Cause Identified**: CORS config in production wasn't allowing `capacitor://localhost` origin correctly, causing requests to fall through to the static HTML handler instead of API routes.
 - **Solution - CORS Fix**: Added `https://fieldsnaps.replit.app` to allowed origins list in `server/index.ts`.

@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Capacitor } from '@capacitor/core';
 import { indexedDB as idb, createPhotoUrl, type LocalPhoto } from '@/lib/indexeddb';
 import type { Photo, Tag } from '../../../shared/schema';
 import { getPhotoImageUrl, getPhotoThumbnailUrl } from '@/lib/photoUrls';
+import { apiRequest } from '@/lib/queryClient';
 
 export type PhotoWithStatus = Photo & {
   syncStatus?: 'pending' | 'syncing' | 'synced' | 'error';
@@ -20,9 +22,25 @@ export type PhotoWithStatus = Photo & {
  * 5. Creates blob URLs for local photos (properly revokes on cleanup)
  * 6. Preserves photos with syncStatus 'pending', 'syncing', or 'error'
  */
+// Cache for signed URLs with expiry times - scoped by projectId
+// Structure: Map<projectId, Map<photoId, { url, thumbnailUrl, expiresAt }>>
+const signedUrlCacheByProject = new Map<string, Map<string, { url: string; thumbnailUrl: string | null; expiresAt: number }>>();
+const SIGNED_URL_REFRESH_BUFFER = 5 * 60 * 1000; // Refresh 5 minutes before expiry
+
+// Helper to get project-scoped cache
+function getProjectCache(projectId: string) {
+  if (!signedUrlCacheByProject.has(projectId)) {
+    signedUrlCacheByProject.set(projectId, new Map());
+  }
+  return signedUrlCacheByProject.get(projectId)!;
+}
+
 export function useOfflineFirstPhotos(projectId: string) {
   const [localPhotos, setLocalPhotos] = useState<PhotoWithStatus[]>([]);
   const [isLoadingLocal, setIsLoadingLocal] = useState(true);
+  const [signedUrls, setSignedUrls] = useState<Record<string, { signedUrl: string | null; signedThumbnailUrl: string | null }>>({});
+  const isNative = Capacitor.isNativePlatform();
+  const prevProjectIdRef = useRef<string>(projectId);
   
   // Use ref to track blob URLs created during async load
   const blobUrlsRef = useRef<Map<string, string>>(new Map());
@@ -120,27 +138,118 @@ export function useOfflineFirstPhotos(projectId: string) {
     };
   }, [projectId]); // Only reload when projectId changes
 
-  // Note: Server photos have URLs (not blobs), so true offline caching
-  // would require downloading and storing the actual image data.
-  // Current strategy: 
-  // - When offline: show photos from IndexedDB (local captures)
-  // - When online: show server photos (via URLs) + unsynced local photos
-  // Enhancement: Pre-download server photo blobs for true offline viewing
+  // Clear signed URLs when project changes
+  useEffect(() => {
+    if (prevProjectIdRef.current !== projectId) {
+      setSignedUrls({});
+      prevProjectIdRef.current = projectId;
+    }
+  }, [projectId]);
+
+  // Fetch signed URLs for native platforms (iOS/Android)
+  // Native <img> tags can't include Authorization headers, so we need pre-signed URLs
+  useEffect(() => {
+    if (!isNative || serverPhotos.length === 0) return;
+
+    const fetchSignedUrls = async () => {
+      const projectCache = getProjectCache(projectId);
+      
+      // Filter photos that need signed URLs (not videos, have URL)
+      const photoIds = serverPhotos
+        .filter(p => p.mediaType !== 'video' && (p.url || p.thumbnailUrl))
+        .map(p => p.id);
+
+      if (photoIds.length === 0) return;
+
+      // Check cache for valid URLs
+      const now = Date.now();
+      const needsRefresh = photoIds.filter(id => {
+        const cached = projectCache.get(id);
+        return !cached || cached.expiresAt - SIGNED_URL_REFRESH_BUFFER < now;
+      });
+
+      if (needsRefresh.length === 0) {
+        // All URLs are cached and valid
+        const cachedUrls: Record<string, { signedUrl: string | null; signedThumbnailUrl: string | null }> = {};
+        photoIds.forEach(id => {
+          const cached = projectCache.get(id);
+          if (cached) {
+            cachedUrls[id] = { signedUrl: cached.url, signedThumbnailUrl: cached.thumbnailUrl };
+          }
+        });
+        setSignedUrls(cachedUrls);
+        return;
+      }
+
+      try {
+        const response = await apiRequest(
+          'POST',
+          '/api/photos/batch-signed-urls',
+          { photoIds: needsRefresh }
+        );
+        
+        const data = await response.json() as { 
+          signedUrls: Record<string, { signedUrl: string | null; signedThumbnailUrl: string | null }>;
+          expiresAt: string;
+        };
+        
+        const expiresAt = new Date(data.expiresAt).getTime();
+        
+        // Update project-scoped cache
+        Object.entries(data.signedUrls).forEach(([id, urls]) => {
+          projectCache.set(id, {
+            url: urls.signedUrl || '',
+            thumbnailUrl: urls.signedThumbnailUrl,
+            expiresAt,
+          });
+        });
+
+        // Merge with existing cached URLs for this project
+        const allUrls: Record<string, { signedUrl: string | null; signedThumbnailUrl: string | null }> = {};
+        photoIds.forEach(id => {
+          const cached = projectCache.get(id);
+          if (cached) {
+            allUrls[id] = { signedUrl: cached.url, signedThumbnailUrl: cached.thumbnailUrl };
+          }
+        });
+        
+        setSignedUrls(allUrls);
+      } catch (error) {
+        console.error('[Native] Failed to fetch signed URLs:', error);
+        // Clear signed URLs on error to prevent using stale/unauthorized URLs
+        setSignedUrls({});
+      }
+    };
+
+    fetchSignedUrls();
+  }, [isNative, serverPhotos, projectId]);
 
   // Merge local and server photos (dedupe by ID)
   const mergedPhotos = useMemo(() => {
     if (serverPhotos.length > 0) {
       // Server data available - use it
-      // Transform URLs to use backend proxy routes for proper CORS support
-      const serverPhotosWithStatus: PhotoWithStatus[] = serverPhotos.map(p => ({
-        ...p,
+      const serverPhotosWithStatus: PhotoWithStatus[] = serverPhotos.map(p => {
         // Videos always use raw URL (for <video> element playback)
-        // Photos use proxy URL (for CORS support)
-        url: p.mediaType === 'video' ? p.url : getPhotoImageUrl(p.id, p.url),
-        thumbnailUrl: p.thumbnailUrl ? getPhotoThumbnailUrl(p.id, p.thumbnailUrl) : null,
-        syncStatus: 'synced' as const,
-        isLocal: false,
-      }));
+        if (p.mediaType === 'video') {
+          return {
+            ...p,
+            syncStatus: 'synced' as const,
+            isLocal: false,
+          };
+        }
+
+        // For native platforms, use signed URLs if available
+        // For web, use proxy URLs (cookies work fine)
+        const signedUrlData = isNative ? signedUrls[p.id] : null;
+        
+        return {
+          ...p,
+          url: signedUrlData?.signedUrl || getPhotoImageUrl(p.id, p.url),
+          thumbnailUrl: signedUrlData?.signedThumbnailUrl || (p.thumbnailUrl ? getPhotoThumbnailUrl(p.id, p.thumbnailUrl) : null),
+          syncStatus: 'synced' as const,
+          isLocal: false,
+        };
+      });
 
       // Keep local photos that aren't on the server yet
       // This includes photos with syncStatus: 'pending', 'syncing', or 'error'
@@ -156,7 +265,7 @@ export function useOfflineFirstPhotos(projectId: string) {
 
     // No server data - use local photos
     return localPhotos;
-  }, [localPhotos, serverPhotos]);
+  }, [localPhotos, serverPhotos, signedUrls, isNative]);
 
   // Overall loading state
   const isLoading = isLoadingLocal && isLoadingServer;
