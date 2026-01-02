@@ -145,7 +145,7 @@ export default function ProjectPhotos() {
       const params = new URLSearchParams({ view: taskView });
       if (projectId) params.append('projectId', projectId);
       if (taskFilterCompleted !== 'all') params.append('completed', taskFilterCompleted === 'completed' ? 'true' : 'false');
-      const response = await fetch(`/api/todos?${params.toString()}`, {
+      const response = await fetch(getApiUrl(`/api/todos?${params.toString()}`), {
         credentials: "include",
       });
       if (!response.ok) {
@@ -397,7 +397,7 @@ export default function ProjectPhotos() {
       formData.append('width', width.toString());
       formData.append('height', height.toString());
       
-      const res = await fetch(`/api/projects/${projectId}/photos`, {
+      const res = await fetch(getApiUrl(`/api/projects/${projectId}/photos`), {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -496,7 +496,7 @@ export default function ProjectPhotos() {
             }
             
             // Send PATCH request with FormData
-            const response = await fetch(`/api/photos/${photoId}`, {
+            const response = await fetch(getApiUrl(`/api/photos/${photoId}`), {
               method: 'PATCH',
               credentials: 'include',
               body: formData,
@@ -813,7 +813,7 @@ export default function ProjectPhotos() {
   const confirmCreateShare = async () => {
     try {
       // Create share via API with selected photos and expiration
-      const response = await fetch(`/api/projects/${projectId}/share`, {
+      const response = await fetch(getApiUrl(`/api/projects/${projectId}/share`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1245,7 +1245,7 @@ export default function ProjectPhotos() {
             includeComments: exportOptions.includeComments,
           }));
           
-          const uploadRes = await fetch(`/api/projects/${projectId}/pdfs`, {
+          const uploadRes = await fetch(getApiUrl(`/api/projects/${projectId}/pdfs`), {
             method: 'POST',
             credentials: 'include',
             body: formData,

@@ -13,6 +13,7 @@ import { Preferences } from '@capacitor/preferences';
 import { nativeNetwork } from './nativeNetwork';
 import { App } from '@capacitor/app';
 import { debugLog } from './geofenceDebugLog';
+import { getApiUrl } from './apiUrl';
 
 /**
  * FieldSnaps Geofencing Service
@@ -831,7 +832,7 @@ async function performClockInWithData(
   longitude: number,
   accuracy: number
 ): Promise<void> {
-  const response = await fetch('/api/clock', {
+  const response = await fetch(getApiUrl('/api/clock'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -920,7 +921,7 @@ async function performClockOutWithData(
   longitude: number,
   accuracy: number
 ): Promise<void> {
-  const response = await fetch('/api/clock', {
+  const response = await fetch(getApiUrl('/api/clock'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -950,7 +951,7 @@ async function fetchClockStatus(): Promise<{ isClockedIn: boolean } | null> {
       return { isClockedIn: cachedClockStatus.isClockedIn };
     }
 
-    const response = await fetch('/api/clock/status', {
+    const response = await fetch(getApiUrl('/api/clock/status'), {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -993,7 +994,7 @@ async function fetchClockStatus(): Promise<{ isClockedIn: boolean } | null> {
  */
 async function fetchGeofenceDetails(geofenceId: string): Promise<{ projectId: string; projectName: string } | null> {
   try {
-    const response = await fetch(`/api/geofences/${geofenceId}`, {
+    const response = await fetch(getApiUrl(`/api/geofences/${geofenceId}`), {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1028,7 +1029,7 @@ async function logLocationToServer(location: Location): Promise<void> {
     }
 
     // Send location to server
-    const response = await fetch('/api/locations', {
+    const response = await fetch(getApiUrl('/api/locations'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

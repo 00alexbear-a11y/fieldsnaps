@@ -5,6 +5,21 @@ FieldSnaps is an Apple-inspired Progressive Web App (PWA) designed for construct
 
 ## Recent Changes (January 2026)
 
+### Phase 5 Native App - Systematic API URL Fix (Critical - Jan 2026)
+- **Root Cause Identified**: CORS config in production wasn't allowing `capacitor://localhost` origin correctly, causing requests to fall through to the static HTML handler instead of API routes.
+- **Solution - CORS Fix**: Added `https://fieldsnaps.replit.app` to allowed origins list in `server/index.ts`.
+- **Solution - Complete API URL Audit**: Found and fixed 15+ files with hardcoded relative URLs (`/api/...`) that bypassed `getApiUrl()` wrapper:
+  - `geofencing.ts` - 4 fetch calls (clock-in/out, status, location logs)
+  - `tokenManager.ts` - 2 fetch calls (token refresh, logout)
+  - `chunkedUpload.ts` - 1 fetch call (upload session init)
+  - `Camera.tsx` - 2 fetch calls (photo upload during todo capture)
+  - `Landing.tsx` - 1 fetch call (waitlist signup)
+  - `ToDos.tsx`, `MyTasks.tsx` - useQuery fetch calls
+  - `useWebAuthn.ts` - 4 fetch calls (biometric auth)
+  - `useDevAutoLogin.ts` - 1 fetch call (dev login)
+- **Pattern**: All fetch() calls must use `getApiUrl('/api/...')` wrapper for native platform compatibility.
+- **Deployment**: Requires rebuild in Replit → git push → pull on Mac → `npx cap sync ios` → Xcode rebuild.
+
 ### Phase 4 Native App API URL Fix (Critical - Jan 2026)
 - **Root Cause**: On native Capacitor platforms, relative URLs like `/api/auth/user` resolve to `capacitor://localhost/api/auth/user` which serves the bundled `index.html` (200 OK) - NOT the actual backend. This caused auth to fail silently.
 - **Solution**: Modified `getApiUrl()` in `client/src/lib/apiUrl.ts` to use `VITE_API_URL` on native platforms. Since we use Bearer token auth (not cookies), cross-origin requests work fine.

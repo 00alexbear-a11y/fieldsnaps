@@ -171,7 +171,7 @@ export default function ToDos() {
   const { data: allTodos = [], isLoading } = useQuery<TodoWithDetails[]>({
     queryKey: ['/api/todos'],
     queryFn: async () => {
-      const response = await fetch('/api/todos');
+      const response = await fetch(getApiUrl('/api/todos'));
       if (!response.ok) {
         throw new Error(`Failed to fetch todos: ${response.statusText}`);
       }

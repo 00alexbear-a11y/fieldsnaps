@@ -2,6 +2,7 @@ import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 import { jwtDecode } from 'jwt-decode';
 import { supabase } from './supabase';
 import { Capacitor } from '@capacitor/core';
+import { getApiUrl } from './apiUrl';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -170,7 +171,7 @@ class TokenManager {
       }
 
       // Call backend refresh endpoint
-      const response = await fetch('/api/auth/refresh', {
+      const response = await fetch(getApiUrl('/api/auth/refresh'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -356,7 +357,7 @@ class TokenManager {
       // Try to revoke legacy refresh token on server (best effort - don't fail if it fails)
       if (refreshToken) {
         try {
-          await fetch('/api/auth/logout', {
+          await fetch(getApiUrl('/api/auth/logout'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -5,6 +5,14 @@ import { getApiUrl } from "./apiUrl";
 import { toast } from "@/hooks/use-toast";
 
 async function throwIfResNotOk(res: Response) {
+  // Check content-type to catch HTML responses (common on native when API URL misconfigured)
+  const contentType = res.headers.get('content-type') || '';
+  if (res.ok && !contentType.includes('application/json')) {
+    // Got 200 OK but not JSON - likely got HTML page instead of API response
+    console.error('[QueryClient] Expected JSON but got:', contentType, res.url);
+    throw new Error(`API returned non-JSON response. Server may be unavailable.`);
+  }
+  
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);

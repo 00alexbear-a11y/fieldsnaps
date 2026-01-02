@@ -45,6 +45,7 @@ export const corsConfig = cors({
       // Also check specific allowed origins from environment
       const allowedOrigins = [
         'https://fieldsnaps.com',
+        'https://fieldsnaps.replit.app', // Native app backend
         process.env.APP_URL,
       ].filter(Boolean);
       

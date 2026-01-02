@@ -5,6 +5,9 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
+# Attached assets (contains pasted logs with OAuth tokens)
+attached_assets/
+
 # Local environment files (never commit these!)
 .env.local
 .env.*.local

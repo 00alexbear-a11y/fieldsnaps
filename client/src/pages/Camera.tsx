@@ -13,6 +13,7 @@ import { indexedDB as idb, type LocalPhoto, createPhotoUrl } from '@/lib/indexed
 import { syncManager } from '@/lib/syncManager';
 import { haptics } from '@/lib/nativeHaptics';
 import { nativeStatusBar } from '@/lib/nativeStatusBar';
+import { getApiUrl } from '@/lib/apiUrl';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import {
   Select,
@@ -273,7 +274,7 @@ export default function Camera() {
     queryKey: ['/api/todos', 'my-tasks'],
     queryFn: async () => {
       const params = new URLSearchParams({ view: 'my-tasks' });
-      const response = await fetch(`/api/todos?${params.toString()}`);
+      const response = await fetch(getApiUrl(`/api/todos?${params.toString()}`));
       if (!response.ok) return [];
       return await response.json();
     },
@@ -357,7 +358,7 @@ export default function Camera() {
 
   const { data: tags = [] } = useQuery<Tag[]>({
     queryKey: ['/api/tags', selectedProject],
-    queryFn: () => fetch(`/api/tags?projectId=${selectedProject}`, {
+    queryFn: () => fetch(getApiUrl(`/api/tags?projectId=${selectedProject}`), {
       credentials: 'include'
     }).then(r => r.json()),
     enabled: !!selectedProject,
@@ -2724,7 +2725,7 @@ export default function Camera() {
               formData.append('photo', photoBlob, `todo-${localId}.jpg`);
               formData.append('projectId', selectedProject);
               
-              const photoRes = await fetch('/api/photos/upload', {
+              const photoRes = await fetch(getApiUrl('/api/photos/upload'), {
                 method: 'POST',
                 body: formData,
               });
@@ -2851,7 +2852,7 @@ export default function Camera() {
                 formData.append('photo', item.photoBlob, `todo-${item.localId}.jpg`);
                 formData.append('projectId', selectedProject);
                 
-                const photoRes = await fetch('/api/photos/upload', {
+                const photoRes = await fetch(getApiUrl('/api/photos/upload'), {
                   method: 'POST',
                   body: formData,
                 });

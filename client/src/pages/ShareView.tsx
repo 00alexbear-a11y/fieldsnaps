@@ -4,6 +4,7 @@ import { useParams } from "wouter";
 import { Download, ArrowLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LazyImage from "@/components/LazyImage";
+import { getApiUrl } from "@/lib/apiUrl";
 import type { Photo, Project, Share } from "../../../shared/schema";
 import { format } from "date-fns";
 
@@ -35,7 +36,7 @@ export default function ShareView() {
   useEffect(() => {
     if (data && token && !viewLoggedRef.current) {
       viewLoggedRef.current = true;
-      fetch(`/api/shared/${token}/view-log`, {
+      fetch(getApiUrl(`/api/shared/${token}/view-log`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       }).catch(err => console.error('Failed to log view:', err));

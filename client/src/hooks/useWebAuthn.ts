@@ -4,6 +4,7 @@ import {
   startAuthentication,
 } from "@simplewebauthn/browser";
 import { useToast } from "@/hooks/use-toast";
+import { getApiUrl } from "@/lib/apiUrl";
 
 export function useWebAuthn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +14,7 @@ export function useWebAuthn() {
     try {
       setIsLoading(true);
 
-      const optionsResponse = await fetch("/api/webauthn/register/options", {
+      const optionsResponse = await fetch(getApiUrl("/api/webauthn/register/options"), {
         method: "POST",
         credentials: "include",
       });
@@ -27,7 +28,7 @@ export function useWebAuthn() {
 
       const registrationResponse = await startRegistration({ optionsJSON: options });
 
-      const verificationResponse = await fetch("/api/webauthn/register/verify", {
+      const verificationResponse = await fetch(getApiUrl("/api/webauthn/register/verify"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -67,7 +68,7 @@ export function useWebAuthn() {
     try {
       setIsLoading(true);
 
-      const optionsResponse = await fetch("/api/webauthn/authenticate/options", {
+      const optionsResponse = await fetch(getApiUrl("/api/webauthn/authenticate/options"), {
         method: "POST",
         credentials: "include",
       });
@@ -81,7 +82,7 @@ export function useWebAuthn() {
 
       const authenticationResponse = await startAuthentication({ optionsJSON: options });
 
-      const verificationResponse = await fetch("/api/webauthn/authenticate/verify", {
+      const verificationResponse = await fetch(getApiUrl("/api/webauthn/authenticate/verify"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

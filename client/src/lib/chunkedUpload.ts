@@ -3,6 +3,8 @@
  * Handles large file uploads by splitting into chunks with retry logic
  */
 
+import { getApiUrl } from './apiUrl';
+
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks (matches backend)
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY = 1000; // 1 second
@@ -54,7 +56,7 @@ async function initUploadSession(
   totalChunks: number,
   signal?: AbortSignal
 ): Promise<UploadSession> {
-  const response = await fetch('/api/uploads/chunked/init', {
+  const response = await fetch(getApiUrl('/api/uploads/chunked/init'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +102,7 @@ async function uploadChunkWithRetry(
 
       // uploadId goes in query params (not body) for pre-multer validation
       const response = await fetch(
-        `/api/uploads/chunked/chunk?uploadId=${encodeURIComponent(uploadId)}`,
+        getApiUrl(`/api/uploads/chunked/chunk?uploadId=${encodeURIComponent(uploadId)}`),
         {
           method: 'POST',
           credentials: 'include',

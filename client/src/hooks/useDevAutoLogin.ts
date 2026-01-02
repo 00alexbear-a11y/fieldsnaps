@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { queryClient } from '@/lib/queryClient';
+import { getApiUrl } from '@/lib/apiUrl';
 
 /**
  * Automatically logs in as dev user during development for faster testing.
@@ -25,7 +26,7 @@ export function useDevAutoLogin() {
     const autoLogin = async () => {
       try {
         console.log('[DevAutoLogin] Automatically logging in as dev user...');
-        const response = await fetch('/api/dev-login', {
+        const response = await fetch(getApiUrl('/api/dev-login'), {
           method: 'GET',
           credentials: 'include',
         });

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Building2, User, ArrowRight, ArrowLeft, Check, Users, Link2, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { getApiUrl } from '@/lib/apiUrl';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { signOut } from '@/lib/supabaseAuth';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
@@ -68,7 +69,7 @@ export default function Onboarding() {
     
     setIsValidatingInvite(true);
     try {
-      const response = await fetch(`/api/companies/invite/${token}`);
+      const response = await fetch(getApiUrl(`/api/companies/invite/${token}`));
       if (response.ok) {
         const data = await response.json();
         setInviteValidation({ companyName: data.companyName, valid: true });

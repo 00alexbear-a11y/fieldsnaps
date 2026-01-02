@@ -22,6 +22,7 @@ import {
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { getApiUrl } from '@/lib/apiUrl';
 import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/Fieldsnap logo v1.2_1760310501545.png';
 import mixedPhotosPath from '@assets/camera-roll-mixed-photos.png';
@@ -39,7 +40,7 @@ export default function Landing() {
   const waitlistMutation = useMutation({
     mutationFn: async (data: { email: string; name?: string }) => {
       // Use fetch directly since this is a public endpoint (no auth needed)
-      const response = await fetch('/api/waitlist', {
+      const response = await fetch(getApiUrl('/api/waitlist'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

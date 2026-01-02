@@ -37,6 +37,7 @@ def capacitor_pods
   pod 'TransistorsoftCapacitorBackgroundFetch', :path => '../../node_modules/@transistorsoft/capacitor-background-fetch'
   pod 'TransistorsoftCapacitorBackgroundGeolocation', :path => '../../node_modules/@transistorsoft/capacitor-background-geolocation'
   pod 'CapacitorNativeSettings', :path => '../../node_modules/capacitor-native-settings'
+  pod 'CapacitorPluginSafeArea', :path => '../../node_modules/capacitor-plugin-safe-area'
 end
 
 target 'App' do

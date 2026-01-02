@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { getApiUrl } from "@/lib/apiUrl";
 import { format } from "date-fns";
 
 type TaskWithProject = {
@@ -31,7 +32,7 @@ export default function MyTasks() {
   const { data: tasks = [], isLoading } = useQuery<TaskWithProject[]>({
     queryKey: ["/api/tasks/my-tasks"],
     queryFn: async () => {
-      const response = await fetch("/api/tasks/my-tasks", {
+      const response = await fetch(getApiUrl("/api/tasks/my-tasks"), {
         credentials: "include",
       });
       if (!response.ok) {
