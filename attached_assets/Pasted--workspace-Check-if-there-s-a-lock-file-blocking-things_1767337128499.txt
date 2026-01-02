@@ -1,0 +1,59 @@
+~/workspace$ # Check if there's a lock file blocking things
+rm -f .git/index.lock
+
+# See what branch you're on and what's ahead/behind
+git status
+git log --oneline origin/main..HEAD
+
+# Force push if you're sure your local changes are correct
+git push -f origin main
+On branch main
+Your branch is ahead of 'origin/main' by 4 commits.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+    attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767336953419.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+e6724d6 (HEAD -> main) Saved progress at the end of the loop
+8ae4c1b Update API URL handling and add content-type validation for native platforms
+8a6b949 Improve API request handling and URL configuration for native platforms
+84898c5 Transitioned from Plan to Build mode
+Enumerating objects: 28, done.
+Counting objects: 100% (28/28), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (19/19), done.
+Writing objects: 100% (19/19), 17.98 KiB | 8.99 MiB/s, done.
+Total 19 (delta 13), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (13/13), completed with 8 local objects.
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: 
+remote: - GITHUB PUSH PROTECTION
+remote:   —————————————————————————————————————————
+remote:     Resolve the following violations before pushing again
+remote: 
+remote:     - Push cannot contain secrets
+remote: 
+remote:     
+remote:      (?) Learn how to resolve a blocked push
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push
+remote:     
+remote:      (?) This repository does not have Secret Scanning enabled, but is eligible. Enable Secret Scanning to view and manage detected secrets.
+remote:      Visit the repository settings page, https://github.com/00alexbear-a11y/fieldsnaps/settings/security_analysis
+remote:     
+remote:     
+remote:       —— Google OAuth Access Token —————————————————————————
+remote:        locations:
+remote:          - commit: 84898c5d73464e5da015b26449da4ee03702791b
+remote:            path: attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt:116
+remote:     
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.
+remote:        https://github.com/00alexbear-a11y/fieldsnaps/security/secret-scanning/unblock-secret/37guOJxzhjpa2x3BH0qm0osVBNX
+remote:     
+remote: 
+remote: 
+To https://github.com/00alexbear-a11y/fieldsnaps.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/00alexbear-a11y/fieldsnaps.git'
+~/workspace$ 

@@ -1,0 +1,36 @@
+~/workspace$ git filter-branch --force --index-filter "git rm --cached --ignore-unmatch attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt" --prune-empty -- --all
+git push -f origin main
+WARNING: git-filter-branch has a glut of gotchas generating mangled history
+     rewrites.  Hit Ctrl-C before proceeding to abort, then use an
+     alternative filtering tool such as 'git filter-repo'
+     (https://github.com/newren/git-filter-repo/) instead.  See the
+     filter-branch manual page for more details; to squelch this warning,
+     set FILTER_BRANCH_SQUELCH_WARNING=1.
+Proceeding with filter-branch...
+
+Rewrite 84898c5d73464e5da015b26449da4ee03702791b (4025/4053) (170 seconds passed, remaining 1 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite 68c304a8da9b851e2744854e47b1f698503b17d1 (4025/4053) (170 seconds passed, remaining 1 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite 8a6b94925a06cbc9576ab7ae1582d250102a3d50 (4025/4053) (170 seconds passed, remaining 1 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite 794e4beeb9b5d7129fc5784b5a88d13d388b5064 (4049/4053) (171 seconds passed, remaining 0 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite 8ae4c1b3e9530410aea6f1faf8fbf1c4ab2ecc83 (4049/4053) (171 seconds passed, remaining 0 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite f649bb62e6635f1bc7c8e7bcc715a51a60d0c6e5 (4049/4053) (171 seconds passed, remaining 0 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite e6724d614be8ce2842ecafcfd3ad15e8577dc49d (4049/4053) (171 seconds passed, remaining 0 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+Rewrite 0ae9bc96d1a20ead9cd8d7d7d42e1b341877d4d7 (4049/4053) (171 seconds passed, remaining 0 predicted)    rm 'attached_assets/Pasted--TSBackgroundFetch-load-TSBGAppRefreshSubscriber-load-U_1767335845132.txt'
+
+Ref 'refs/heads/main' was rewritten
+Ref 'refs/heads/replit-agent' was rewritten
+WARNING: Ref 'refs/notes/commits' is unchanged
+Ref 'refs/remotes/gitsafe-backup/main' was rewritten
+Ref 'refs/remotes/origin/main' was rewritten
+WARNING: Ref 'refs/remotes/origin/main' is unchanged
+Ref 'refs/replit/agent-ledger' was rewritten
+Enumerating objects: 9858, done.
+Counting objects: 100% (9858/9858), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (5182/5182), done.
+Writing objects: 100% (9858/9858), 563.07 MiB | 5.68 MiB/s, done.
+Total 9858 (delta 7883), reused 5459 (delta 4563), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (7883/7883), done.
+To https://github.com/00alexbear-a11y/fieldsnaps.git
+ + 1c1f22e...3f1bcda main -> main (forced update)
+~/workspace$  

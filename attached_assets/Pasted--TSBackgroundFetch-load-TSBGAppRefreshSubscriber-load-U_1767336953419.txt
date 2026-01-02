@@ -1,0 +1,123 @@
+[TSBackgroundFetch load]: (
+)
+[TSBGAppRefreshSubscriber load]: {
+}
+`UIScene` lifecycle will soon be required. Failure to adopt will result in an assert in the future.
+Could not create a sandbox extension for '/var/containers/Bundle/Application/8734DE6B-D699-44F6-9FDB-8E46ED39AE8B/App.app'
+🟢 [✨  CapgoUpdater]: WebView set successfully for logging
+🔴 [✨  CapgoUpdater]: Semaphore wait timed out after 0ms
+🟢 [✨  CapgoUpdater]: init for device 35a81f0a-9a2d-4628-9e61-00977ef03f18
+🟢 [✨  CapgoUpdater]: version native 1.0
+🟢 [✨  CapgoUpdater]: appId com.fieldsnaps.app
+🟢 [✨  CapgoUpdater]: Initial load builtin
+🟢 [✨  CapgoUpdater]: All delays canceled from checkCancelDelay
+🟢 [✨  CapgoUpdater]: Background timestamp removed
+🟢 [✨  CapgoUpdater]: Auto update is disabled
+🟢 [✨  CapgoUpdater]: sendReadyToJs
+🟢 [✨  CapgoUpdater]: Wait for 15000 ms, then check for notifyAppReady
+KeyboardPlugin: resize mode - native
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11a4edd10 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}
+Loading network plugin
+⚡️  Loading app at capacitor://localhost...
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+Reachable via WiFi
+🟢 [✨  CapgoUpdater]: Stats sent for app_moved_to_foreground, version builtin
+WebContent[71022] Unable to hide query parameters from script (missing data)
+⚡️  [log] - [SafeArea-Sync] Applied iOS fallback insets
+⚡️  [log] - [Supabase] Platform check: ios, isNative: true
+⚡️  [log] - [DevMode] Native platform detected: ios
+⚡️  [log] - [DevMode] Dev login enabled: false
+⚡️  [warn] - ⚠️  Sentry frontend DSN not configured
+⚡️  [log] - [App] Platform: ios
+⚡️  [log] - [App] Is Native: true
+⚡️  [log] - [App] Added ios-wkwebview class for position:fixed fixes
+⚡️  To Native ->  CapacitorUpdater notifyAppReady 10537245
+⚡️  WebView loaded
+🟢 [✨  CapgoUpdater]: Setting status for bundle [builtin] to SUCCESS
+🟢 [✨  CapgoUpdater]: Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+🟢 [✨  CapgoUpdater]: Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  TO JS {"bundle":{"id":"builtin","status":"success","downloaded":"1970-01-01T00:00:00.000Z","version":"builtin","checksum":""}}
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Setting status for bundle [builtin] to SUCCESS
+⚡️  To Native ->  ⚡️  [info] - 🟢 ✨  CapgoUpdater : Not saving info for bundle [builtin] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+CapacitorUpdater addListener 10537246
+⚡️  To Native ->  CapacitorUpdater addListener 10537247
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Fallback bundle is: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater addListener 10537248
+⚡️  [info] - 🟢 ✨  CapgoUpdater : Version successfully loaded: { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+⚡️  To Native ->  CapacitorUpdater ⚡️  [info] - 🟢 ✨  CapgoUpdater : Current bundle loaded successfully. [notifyAppReady was called] { "id": "builtin", "version": "builtin", "downloaded": "1970-01-01T00:00:00.000Z", "checksum": "", "status": "success"}
+current 10537249
+⚡️  [log] - [Capgo] App ready notification sent
+⚡️  TO JS {"bundle":{"id":"builtin","checksum":"","status":"success","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z"},"native":"1.0"}
+⚡️  To Native ->  ⚡️  [log] - [Capgo] Current bundle: {"id":"builtin","checksum":"","status":"success","version":"builtin","downloaded":"1970-01-01T00:00:00.000Z"}
+App addListener 10537250
+⚡️  To Native ->  App addListener 10537251
+⚡️  [log] - [Auth] queryEnabled: false isInitialized: false hasSession: false
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] Initializing auth
+⚡️  [log] - [SupabaseAuth] Platform check for deep link listener, isNative: true
+⚡️  [log] - [SupabaseAuth] Setting up deep link listener for OAuth callbacks
+⚡️  [log] - [SupabaseAuth] Deep link listener registered successfully
+⚡️  [log] - [SafeArea] Initializing, platform: ios isNative: true
+⚡️  [log] - [SafeArea] Calling plugin getSafeAreaInsets...
+⚡️  To Native ->  App getLaunchUrl 10537252
+⚡️  To Native ->  App addListener 10537253
+⚡️  To Native ->  SafeArea getSafeAreaInsets 10537254
+⚡️  TO JS ⚡️  To Native ->  StatusBar setOverlaysWebView 10537255
+undefined
+⚡️  To Native ->  StatusBar setStyle 10537256
+⚡️  To Native ->  SecureStorage internalGetItem 10537257
+⚡️  TO JS undefined
+⚡️  TO JS {}
+⚡️  TO JS {"insets":{"bottom":34,"left":0,"top":62,"right":0}}
+⚡️  TO JS {"data":null}
+⚡️  [log] - [SupabaseAuth] getLaunchUrl result: undefined
+⚡️  [log] - [SafeArea] Plugin returned: {"insets":{"bottom":34,"left":0,"top":62,"right":0}}
+⚡️  To Native ->  SafeArea addListener 10537258
+⚡️  [log] - [SafeArea] CSS variables set: {"top":"62px","bottom":"34px"}
+⚡️  To Native ->  SecureStorage internalGetItem 10537259
+⚡️  TO JS {"data":"\"{\\\"expires_in\\\":3600,\\\"access_token\\\":\\\"eyJhbGciOiJIUzI1NiIsImtpZCI6InNkeWJidGFDdno5M3R2emEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BiZnV3ZnpjY2RtcGttaG5jeWpnLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI3ODg5YWEwNC02ZmRmLTQ3M2ItYmI4MC1iY2M3
+⚡️  [log] - [SupabaseAuth] Auth initialized, user: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [Auth] queryEnabled: true isInitialized: true hasSession: true
+⚡️  [log] - [Auth] Query starting, hasToken: true
+⚡️  [log] - [Auth] Fetching: /api/auth/user
+⚡️  [log] - [Auth] Response: 200 true
+⚡️  [log] - [Auth] queryEnabled: true isInitialized: true hasSession: true
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  SplashScreen hide 10537260
+⚡️  TO JS undefined
+⚡️  [log] - [Login] Starting Google OAuth authentication via Supabase
+⚡️  [log] - [SupabaseAuth] Starting Google OAuth sign-in
+⚡️  [log] - [SupabaseAuth] Platform check for OAuth, isNative: true
+⚡️  [log] - [SupabaseAuth] Using native Google Sign-In SDK
+⚡️  [log] - [SupabaseAuth] Initializing SocialLogin for platform: ios
+⚡️  To Native ->  SocialLogin initialize 10537261
+No saved state found
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] SocialLogin initialized successfully
+⚡️  To Native ->  SocialLogin login 10537262
+⚡️  TO JS {"provider":"google","result":{"accessToken":{"token":"ya29.a0Aa7pCA9ygChLH0ZRqOSwqKoTxzmp8or3UOlYoKtlVcT079z842JJ0ErT5wieRPAjWTcu_qrC-UH0jApN1jMcUQnozzDtPRoZnsSn_Il2JzJlpGFGmiSoz5sFTN0Tafd69os_achm4ep2ZqDCZ9FpUs1UKwa12TDgtVdMLbAFwGNwnKrYm2Xo_DJR9Rd9oH0QQT
+⚡️  To Native ->  CapacitorHttp request 10537263
+⚡️  [log] - [SupabaseAuth] Native Google Sign-In result: {"provider":"google","result":{"accessToken":{"token":"ya29.a0Aa7pCA9ygChLH0ZRqOSwqKoTxzmp8or3UOlYoKtlVcT079z842JJ0ErT5wieRPAjWTcu_qrC-UH0jApN1jMcUQnozzDtPRoZnsSn_Il2JzJlpGFGmiSoz5sFTN0Tafd69os_achm4ep2ZqDCZ9FpUs1UKwa12TDgtVdMLbAFwGNwnKrYm2Xo_DJR9Rd9oH0QQTxcKmeCnwaCgYKASISARASFQHGX2MiGgB2ws1DJ1rNehO04Pbwxg0209","refreshToken":"1//065PIhLKWBpKpCgYIARAAGAYSNwF-L9IrGNmOjwh-nGi33aswHiacCVUfNstrIuR-nDgs70wG64cybyHCtH6HF8Wm0bsGTmFyvt4","userId":"101096107950550804914"},"responseType":"online","idToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ5NmQwMDhlOGM3YmUxY2FlNDIwOWUwZDVjMjFiMDUwYTYxZTk2MGYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3NTc4MzUwMzUwMTgtcGRmdHZzb29uajRic2QwYThzMW03bGgzN2FhZG5tYWMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDEwOTYxMDc5NTA1NTA4MDQ5MTQiLCJoZCI6ImZpZWxkc25hcHMuY29tIiwiZW1haWwiOiJoZWxsb0BmaWVsZHNuYXBzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiN0g0MnBVQnU1bmdhWEdBQnpXUkVOZyIsImlhdCI6MTc2NzMzNTgzNSwiZXhwIjoxNzY3MzM5NDM1fQ.HsXnZ7vSePms1OciGFSMTkFjLsOM2mAa8TsUlFmhWg0VbuIO8fns0skqmA4pCLoOA2XyVeKQGBgfYHaOpw-cB-O973Kv3Ul67fawQBMi7-85lOKUENWian8f3X68FyAceZ8ZSOBuGU18kak-_9I8cmKguZbyRjoX1vV4mxLF_1P4movWa8PnawbBBC12E_cI8eOZuMrlXAbvKsW91FY6YBD1MkvYNVAdK__qGz25W3eq5UJF4Kw4g5Ch-VSr2aDfsVlLfD0uFuHr26UD226Jo5FUo1XpzW4rHJI2SCaxLyupQxUfbEgfNiTaWZZy9Jnk2PJNFlIPR0GUK7hAm8sHiA","profile":{"givenName":"Aleksandr","familyName":"Medvedev","name":"Aleksandr Medvedev","id":"101096107950550804914","email":"hello@fieldsnaps.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocK4yW23H0Pli5HPUoyFnZXc7LGqa5UYDZYkEe8bEAmYT8PBUg=s100"}}}
+⚡️  [log] - [SupabaseAuth] Got ID token, authenticating with Supabase...
+⚡️  TO JS {"url":"https:\/\/pbfuwfzccdmpkmhncyjg.supabase.co\/auth\/v1\/token?grant_type=id_token","data":{"expires_at":1767340543,"user":{"email":"hello@fieldsnaps.com","phone":"","user_metadata":{"name":"Aleksandr Medvedev","sub":"101096107950550804914","iss":"htt
+⚡️  To Native ->  SecureStorage internalSetItem 10537264
+⚡️  TO JS undefined
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [Auth] Query starting, hasToken: true
+⚡️  [log] - [Auth] Fetching: /api/auth/user
+⚡️  [log] - [SupabaseAuth] Auth state changed: SIGNED_IN
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
+⚡️  To Native ->  Preferences set 10537265
+⚡️  TO JS undefined
+⚡️  [log] - [Auth] queryEnabled: true isInitialized: true hasSession: true
+⚡️  [log] - [App] Loading... isAuthenticated: false user: false
+⚡️  [log] - [SupabaseAuth] First launch marked as completed
+⚡️  [log] - [SupabaseAuth] Successfully authenticated with Supabase: 7889aa04-6fdf-473b-bb80-bcc7d4899d8e
+⚡️  [log] - [Auth] Response: 200 true
+⚡️  [log] - [Auth] queryEnabled: true isInitialized: true hasSession: true
+⚡️  [log] - [SupabaseAuth] Auth state changed: INITIAL_SESSION
+⚡️  [log] - [NativeAppLogin] Auth state changed - user signed in: hello@fieldsnaps.com
